@@ -1,0 +1,14 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+// Config contains overall simulation configuration options.
+type Config struct {
+	// GPU determines whether to use the GPU.
+	GPU bool `default:"true"`
+
+	// GUI determines whether to show the GUI.
+	GUI bool
+}
