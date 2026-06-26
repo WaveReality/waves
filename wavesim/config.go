@@ -19,8 +19,12 @@ type Config struct {
 
 	// Size of Universe to run
 	Size math32.Vector3i
+
+	// MaxSteps is the maximum number of steps to run.
+	MaxSteps int
 }
 
 func (cfg *Config) Defaults() {
 	cfg.Size.Set(10, 1, 10)
+	cfg.MaxSteps = 1000
 }

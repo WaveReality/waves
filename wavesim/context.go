@@ -50,8 +50,15 @@ func (ctx *Context) StateCoords(idx uint32, x, y, z *int32) bool {
 	return true
 }
 
+// PrevState returns the index for the previous state, relative to CurState.
 func (ctx *Context) PrevState() int32 {
 	return 1 - ctx.CurState
+}
+
+// StepInc increments for next step of processing.
+func (ctx *Context) StepInc() {
+	ctx.Step++
+	ctx.CurState = ctx.PrevState()
 }
 
 //gosl:end

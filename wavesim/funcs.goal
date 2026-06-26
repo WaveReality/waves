@@ -9,7 +9,6 @@ import (
 	"cogentcore.org/lab/tensor"
 )
 
-
 //gosl:start
 
 func (ss *Sim) ConfigVars() {

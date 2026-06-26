@@ -113,13 +113,35 @@ func (ss *Sim) InitRandSeed(run int) {
 	ss.RandSeeds.Set(run)
 }
 
+// Init initializes the state and prepares everything for running.
 func (ss *Sim) Init() {
+	ss.InitRandSeed(0) // todo: run param
+	State.SetZeros()
+	// todo: various initial state functions
+	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
 }
 
+// Run runs until stopped or Step > MaxSteps
 func (ss *Sim) Run() {
-
+	ctx := GetCtx(0)
+	for {
+		if ss.GUI.StopNow() || int(ctx.Step) > ss.Config.MaxSteps {
+			return
+		}
+		ss.StepRun()
+	}
 }
 
+func (ss *Sim) StepN(n int) {
+	for range n {
+		if ss.GUI.StopNow() {
+			return
+		}
+		ss.StepRun()
+	}
+}
+
+// StepRun does one step of running.
 func (ss *Sim) StepRun() {
 	ctx := GetCtx(0)
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
@@ -127,6 +149,7 @@ func (ss *Sim) StepRun() {
 	case Wave3D:
 		RunWave3DKernel(ns)
 	}
+	ctx.StepInc()
 }
 
 func (ss *Sim) ConfigGUI(b tree.Node) {
