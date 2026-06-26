@@ -62,3 +62,7 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 }
 
 //gosl:end
+
+func (ss *Sim) WaveConfig() {
+	ss.StateVars = WaveStatesN
+}

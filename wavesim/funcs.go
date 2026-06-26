@@ -6,9 +6,47 @@
 
 package wavesim
 
-import "cogentcore.org/core/math32"
+import (
+	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/tensor"
+)
 
 //gosl:start
+
+func (ss *Sim) ConfigVars() {
+	if Params != nil {
+		return
+	}
+	Params = make([]Parameters, 1)
+	Params[0].Defaults()
+	ss.Params = &Params[0]
+	Ctx = make([]Context, 1)
+	Ctx[0].Init()
+	NeighOffs = tensor.NewInt32(26, 3)
+	LaplacianWts = tensor.NewFloat32(26)
+	idx := 0
+	for z := -1; z <= 1; z++ {
+		for y := -1; y <= 1; y++ {
+			for x := -1; x <= 1; x++ {
+				if x == 0 && y == 0 && z == 0 {
+					continue
+				}
+				NeighOffs.Set(int32(x), int(idx), int(math32.X))
+				NeighOffs.Set(int32(y), int(idx), int(math32.Y))
+				NeighOffs.Set(int32(z), int(idx), int(math32.Z))
+
+				v := math32.Vec3(float32(x), float32(y), float32(z))
+				d2 := v.LengthSquared()
+				// d := v.Length()
+				invD2 := 1.0 / d2
+				// invD := 1.0 / d
+				LaplacianWts.Set(invD2, idx)
+
+				idx++
+			}
+		}
+	}
+}
 
 // Laplacian26 computes the 3D Laplacian across 26 neighbors,
 // for given x,y,z center coordinates, variable index vidx,

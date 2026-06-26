@@ -24,6 +24,11 @@ type Context struct {
 	pad, pad1 int32
 }
 
+func (ctx *Context) Init() {
+	ctx.Step = 0
+	ctx.CurState = 0
+}
+
 // StateCoords returns the x,y,z coordinates for given index into
 // the state, where index is in Size units of active states,
 // excluding edges. Resulting coords have 1 added to each,

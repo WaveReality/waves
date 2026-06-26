@@ -6,6 +6,51 @@ import (
 	"cogentcore.org/core/enums"
 )
 
+var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4}
+
+// GPUVarsN is the highest valid value for type GPUVars, plus one.
+//
+//gosl:start
+const GPUVarsN GPUVars = 5
+
+//gosl:end
+
+var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `LaplacianWtsVar`: 2, `CtxVar`: 3, `StateVar`: 4}
+
+var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``}
+
+var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `LaplacianWtsVar`, 3: `CtxVar`, 4: `StateVar`}
+
+// String returns the string representation of this GPUVars value.
+func (i GPUVars) String() string { return enums.String(i, _GPUVarsMap) }
+
+// SetString sets the GPUVars value from its string representation,
+// and returns an error if the string is invalid.
+func (i *GPUVars) SetString(s string) error {
+	return enums.SetString(i, s, _GPUVarsValueMap, "GPUVars")
+}
+
+// Int64 returns the GPUVars value as an int64.
+func (i GPUVars) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the GPUVars value from an int64.
+func (i *GPUVars) SetInt64(in int64) { *i = GPUVars(in) }
+
+// Desc returns the description of the GPUVars value.
+func (i GPUVars) Desc() string { return enums.Desc(i, _GPUVarsDescMap) }
+
+// GPUVarsValues returns all possible values for the type GPUVars.
+func GPUVarsValues() []GPUVars { return _GPUVarsValues }
+
+// Values returns all possible values for the type GPUVars.
+func (i GPUVars) Values() []enums.Enum { return enums.Values(_GPUVarsValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
+
 var _EquationsValues = []Equations{0, 1}
 
 // EquationsN is the highest valid value for type Equations, plus one.

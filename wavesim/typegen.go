@@ -6,9 +6,13 @@ import (
 	"cogentcore.org/core/types"
 )
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run"}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}, {Name: "pad1"}}})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GPUVars", IDName: "gpu-vars", Doc: "GPUVars is an enum for GPU variables, for specifying what to sync."})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GUI", IDName: "gui", Doc: "GUI manages all standard elements of a simulation Graphical User Interface", Embeds: []types.Field{{Name: "Browser"}}, Fields: []types.Field{{Name: "Active", Doc: "Active is true if the GUI is configured and running"}, {Name: "SimForm", Doc: "SimForm displays the Sim object fields in the left panel."}, {Name: "Body", Doc: "Body is the entire content of the sim window."}, {Name: "isRunning", Doc: "isRunning is true if sim is running."}, {Name: "stopNow", Doc: "stopNow can be set via SetStopNow method under mutex protection\nto signal the current sim to stop running.\nIt is not used directly in the looper-based control logic, which has\nits own direct Stop function, but it is set there in case there are\nother processes that are looking at this flag."}, {Name: "sim", Doc: "the sim"}, {Name: "runMu"}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Equations", IDName: "equations", Doc: "Equations are the different implemented equations to simulate."})
 
@@ -20,12 +24,46 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Di
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Units", IDName: "units", Doc: "Units contains all the relevant units", Fields: []types.Field{{Name: "C", Doc: "C is the speed of light factor"}, {Name: "CSq", Doc: "CSq = C^2"}, {Name: "Inv2CSq", Doc: "Inv2CSq = 1 / 2C^2"}, {Name: "pad"}}})
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Sim", IDName: "sim", Doc: "Sim contains everything for the simulation.", Directives: []types.Directive{{Tool: "go", Directive: "generate", Args: []string{"core", "generate", "-add-types", "-add-funcs", "-gosl"}}}, Fields: []types.Field{{Name: "Params", Doc: "Params contains the current simulation parameters."}, {Name: "Config", Doc: "Config contains the broader running configuration."}, {Name: "Root", Doc: "Root is the root tensorfs directory, where all stats and other misc sim data goes."}, {Name: "Stats", Doc: "Stats has the stats directory within Root."}, {Name: "Current", Doc: "Current has the current stats values within Stats."}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Sim", IDName: "sim", Doc: "Sim contains everything for the simulation.", Directives: []types.Directive{{Tool: "go", Directive: "generate", Args: []string{"core", "generate", "-add-types", "-add-funcs", "-gosl"}}}, Fields: []types.Field{{Name: "Params", Doc: "Params contains the current simulation parameters."}, {Name: "Config", Doc: "Config contains the broader running configuration."}, {Name: "Root", Doc: "Root is the root tensorfs directory, where all stats and other misc sim data goes."}, {Name: "Stats", Doc: "Stats has the stats directory within Root."}, {Name: "Current", Doc: "Current has the current stats values within Stats."}, {Name: "GUI", Doc: "GUI manages all the GUI elements"}, {Name: "StateVars", Doc: "StateVars points the current state variables in effect."}, {Name: "Rand", Doc: "Rand is the random number generator for the network.\nall random calls must use this.\nSet seed here for weight initialization values."}, {Name: "RandSeed", Doc: "Random seed to be set at the start of configuring\nthe network and initializing the weights.\nSet this to get a different set of weights."}, {Name: "RandSeeds", Doc: "RandSeeds is a list of random seeds to use for each run."}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.WaveStates", IDName: "wave-states", Doc: "WaveStates are the state variables for Wave equations."})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.PotentialEnergy26", Doc: "PotentialEnergy26 computes the 3D potential energy across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.GPUInit", Doc: "GPUInit initializes the GPU compute system,\nconfiguring system(s), variables and kernels.\nIt is safe to call multiple times: detects if already run."})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.GPURelease", Doc: "GPURelease releases the GPU compute system resources.\nCall this at program exit."})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWave3DKernel", Doc: "RunWave3DKernel runs the Wave3DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneWave3DKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWave3DKernelGPU", Doc: "RunWave3DKernelGPU runs the Wave3DKernel kernel on the GPU. See [RunWave3DKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWave3DKernelCPU", Doc: "RunWave3DKernelCPU runs the Wave3DKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneWave3DKernel", Doc: "RunOneWave3DKernel runs the Wave3DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunDone", Doc: "RunDone must be called after Run* calls to start compute kernels.\nThis actually submits the kernel jobs to the GPU, and adds commands\nto synchronize the given variables back from the GPU to the CPU.\nAfter this function completes, the GPU results will be available in\nthe specified variables.", Args: []string{"syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ToGPU", Doc: "ToGPU copies given variables to the GPU for the system.", Args: []string{"vars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunGPUSync", Doc: "RunGPUSync can be called to synchronize data between CPU and GPU.\nAny prior ToGPU* calls will execute to send data to the GPU,\nand any subsequent RunDone* calls will copy data back from the GPU."})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ToGPUTensorStrides", Doc: "ToGPUTensorStrides gets tensor strides and starts copying to the GPU."})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ReadFromGPU", Doc: "ReadFromGPU starts the process of copying vars to the GPU.", Args: []string{"vars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.SyncFromGPU", Doc: "SyncFromGPU synchronizes vars from the GPU to the actual variable.", Args: []string{"vars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.GetParams", Doc: "GetParams returns a pointer to the given global variable:\n[Params] []Parameters at given index. This directly processed in the GPU code,\nso this function call is an equivalent for the CPU.", Args: []string{"idx"}, Returns: []string{"Parameters"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.GetCtx", Doc: "GetCtx returns a pointer to the given global variable:\n[Ctx] []Context at given index. This directly processed in the GPU code,\nso this function call is an equivalent for the CPU.", Args: []string{"idx"}, Returns: []string{"Context"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewGUIBody", Doc: "NewGUIBody returns a new GUI, with an initialized Body by calling [gui.MakeBody].", Args: []string{"b", "sim", "fsroot", "appname", "title", "about"}, Returns: []string{"GUI"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run"})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSim", Args: []string{"cfg"}, Returns: []string{"error"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Wave3DKernel", Doc: "Wave3DKernel is the kernel for computing the Wave3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})

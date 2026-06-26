@@ -49,6 +49,14 @@ type Parameters struct {
 	Units Units
 }
 
+func (pr *Parameters) Defaults() {
+	pr.Units.Defaults()
+}
+
+func (pr *Parameters) Update() {
+	pr.Units.Update()
+}
+
 // Display contains display parameters.
 type Display struct {
 	// On determines if display is updated.
@@ -64,12 +72,22 @@ type Units struct {
 	C float32
 
 	// CSq = C^2
-	CSq float32
+	CSq float32 `edit:"-"`
 
 	// Inv2CSq = 1 / 2C^2
-	Inv2CSq float32
+	Inv2CSq float32 `edit:"-"`
 
 	pad float32
+}
+
+func (un *Units) Defaults() {
+	un.C = 0.5
+	un.Update()
+}
+
+func (un *Units) Update() {
+	un.CSq = un.C * un.C
+	un.Inv2CSq = 1.0 / (2 * un.CSq)
 }
 
 //gosl:end

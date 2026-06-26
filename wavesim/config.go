@@ -4,11 +4,23 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 // Config contains overall simulation configuration options.
 type Config struct {
 	// GPU determines whether to use the GPU.
 	GPU bool `default:"true"`
 
 	// GUI determines whether to show the GUI.
-	GUI bool
+	GUI bool `default:"true"`
+
+	// Equation to run
+	Equation Equations
+
+	// Size of Universe to run
+	Size math32.Vector3i
+}
+
+func (cfg *Config) Defaults() {
+	cfg.Size.Set(10, 1, 10)
 }

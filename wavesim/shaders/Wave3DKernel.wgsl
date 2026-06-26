@@ -41,17 +41,33 @@ fn Index5D(s0: u32, s1: u32, s2: u32, s3: u32, s4: u32, i0: u32, i1: u32, i2: u3
 
 //////// import: "context.go"
 struct Context {
-	Size: vec4<f32>i,
+	Size: vec4<i32>,
 	Step: i32,
 	CurState: i32,
 	pad: i32,
 	pad1: i32,
+}
+fn Context_StateCoords(ctx: Context, idx: u32, x: ptr<function,i32>,y: ptr<function,i32>,z: ptr<function,i32>) -> bool {
+	var szxy = ctx.Size.x * ctx.Size.y;
+	*z = i32(idx) / szxy;
+	var rz = i32(idx) % szxy;
+	var szx = ctx.Size.x;
+	*y = rz / szx;
+	*x = rz % szx;
+	if (*z >= ctx.Size.z || *y >= ctx.Size.y || *x >= ctx.Size.x) {
+		return false;
+	}
+	*z += i32(1);
+	*y += i32(1);
+	*x += i32(1);
+return true;
 }
 fn Context_PrevState(ctx: Context) -> i32 {
 	return 1 - ctx.CurState;
 }
 
 //////// import: "enumgen.go"
+const GPUVarsN: GPUVars = 5;
 const EquationsN: Equations = 2;
 const EdgesN: Edges = 2;
 const WaveStatesN: WaveStates = 6;
@@ -115,7 +131,7 @@ const  WaveEnergy: WaveStates = 5;
 fn Wave3DKernel(i: u32) { //gosl:kernel
 var ctx = Ctx[0];; var x: i32;
 var y: i32;
-var z: i32;; var ok = Context_StateCooords(ctx, i);
+var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; if (!ok) {
 	return;
 }; var cur = ctx.CurState;
