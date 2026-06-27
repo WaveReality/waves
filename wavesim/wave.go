@@ -9,7 +9,7 @@ package wavesim
 //gosl:start
 
 // WaveStates are the state variables for Wave equations.
-type WaveStates int32 //enums:enum
+type WaveStates int32 //enums:enum -trim-prefix=Wave
 
 const (
 	// WavePos is the position (height) wave state variable.

@@ -8,6 +8,7 @@ import (
 	_ "embed"
 
 	"cogentcore.org/core/core"
+	"cogentcore.org/core/math32"
 	_ "cogentcore.org/lab/yaegilab"
 	"github.com/WaveReality/waves/wavesim"
 )
@@ -19,5 +20,7 @@ var icon string
 
 func main() {
 	core.AppIcon = icon
-	wavesim.Run()
+	wavesim.Run(nil, func(sim *wavesim.Sim) {
+		sim.Sine(wavesim.WavePos, math32.X, 27, 0, 1, 0)
+	})
 }

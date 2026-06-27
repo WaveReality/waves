@@ -8,6 +8,7 @@ import (
 	"image/color"
 	"log"
 	"reflect"
+	"strconv"
 	"sync"
 	"time"
 
@@ -130,6 +131,7 @@ func (vw *View) Init() {
 		})
 		w.OnShow(func(e events.Event) {
 			vw.UpdateView()
+			vw.SceneXYZ().Rebuild()
 		})
 	})
 	tree.AddChildAt(vw, "counters", func(w *core.Text) {
@@ -293,6 +295,7 @@ func (vw *View) makeVars(frame *core.Frame) {
 	tree.AddChildAt(frame, "vars", func(w *core.Frame) {
 		vw.varsFrame = w
 		w.Styler(func(s *styles.Style) {
+			s.Direction = styles.Column
 			s.Grow.Set(0, 1)
 			s.Overflow.Y = styles.OverflowAuto
 		})
@@ -319,10 +322,9 @@ func (vw *View) makeVars(frame *core.Frame) {
 
 // ViewDefaults are the default 3D view params
 func (vw *View) ViewDefaults(se *xyz.Scene) {
-	se.Camera.Pose.Pos.Set(0, 1.5, 2.5) // more "top down" view shows more of layers
-	// 	vs.Camera.Pose.Pos.Set(0, 1, 2.75) // more "head on" for larger / deeper networks
+	se.Camera.Pose.Pos.Set(0, 2.7, 1.2) // more "top down" view shows more of layers
 	se.Camera.Near = 0.1
-	se.Camera.LookAt(math32.Vec3(0, 0, 0), math32.Vec3(0, 1, 0))
+	se.Camera.LookAt(math32.Vec3(0, 0.2, -.8), math32.Vec3(0, 1, 0))
 	vw.Styler(func(s *styles.Style) {
 		se.Background = colors.Scheme.Surface
 	})
@@ -357,6 +359,10 @@ func (vw *View) ValColor(raw float32) (scaled float32, clr color.RGBA) {
 	return
 }
 
+func (vw *View) planeName(no int) string {
+	return "plane_" + strconv.Itoa(no)
+}
+
 func (vw *View) Planes() *xyz.Group {
 	se := vw.SceneXYZ()
 	lgpi := se.ChildByName("Planes", 0)
@@ -366,24 +372,13 @@ func (vw *View) Planes() *xyz.Group {
 	return lgpi.(*xyz.Group)
 }
 
-// LabelByName returns given Text2D label (see ConfigLabels).
+// PlaneAtNumber returns the xyz.Group that represents given plane number.
 // nil if not found.
-// func (vw *View) LabelByName(lab string) *xyz.Text2D {
-// 	lgp := vw.Labels()
-// 	txt := lgp.ChildByName(lab, 0)
-// 	if txt == nil {
-// 		return nil
-// 	}
-// 	return txt.(*xyz.Text2D)
-// }
-
-// LayerByName returns the xyz.Group that represents layer of given name.
-// nil if not found.
-func (vw *View) LayerByName(lay string) *xyz.Group {
-	lgp := vw.Planes()
-	ly := lgp.ChildByName(lay, 0)
-	if ly == nil {
+func (vw *View) PlaneAtNumber(no int) *xyz.Group {
+	plgp := vw.Planes()
+	pl := plgp.ChildByName(vw.planeName(no), 0)
+	if pl == nil {
 		return nil
 	}
-	return ly.(*xyz.Group)
+	return pl.(*xyz.Group)
 }

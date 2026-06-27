@@ -127,7 +127,7 @@ const  Plane: ViewModes = 0;
 const  Bars: ViewModes = 1;
 
 //////// import: "wave.go"
-alias WaveStates = i32; //enums:enum
+alias WaveStates = i32; //enums:enum -trim-prefix=Wave
 const  WavePos: WaveStates = 0;
 const  WaveVel: WaveStates = 1;
 const  WaveForce: WaveStates = 2;
@@ -142,14 +142,13 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 	return;
 }; var cur = ctx.CurState;
 ; var prv = Context_PrevState(ctx);
+; var ppos = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePos), u32(prv))];
 ; var pvel = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv))];
-; var ppos = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv))];
 ; var force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
 ; var vel = pvel + Params[0].Units.CSq*force;
 ; var pos = ppos + vel;
-; if (i == 55) {
-	fmt.Println(ctx.Step, cur, ppos, pos, pvel, vel);
-}; if (Params[0].DoEnergy == 1) {
+;
+if (Params[0].DoEnergy == 1) {
 	var midVel = 0.5 * (pvel + vel);
 	var kinetic = Params[0].Units.Inv2CSq * midVel * midVel;
 	var potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);

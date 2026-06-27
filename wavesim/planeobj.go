@@ -5,9 +5,6 @@
 package wavesim
 
 import (
-	"strconv"
-
-	"cogentcore.org/core/base/errors"
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/text/text"
@@ -40,55 +37,52 @@ func (vw *View) UpdatePlanes() {
 	}
 	plGp := se.ChildByName("Planes", 0).(*xyz.Group)
 
-	plname := func(i int) string {
-		return "plane_" + strconv.Itoa(i)
-	}
-
 	plConfig := tree.TypePlan{}
 	for li := range vw.NPanels {
-		plConfig.Add(types.For[xyz.Group](), plname(li))
+		plConfig.Add(types.For[xyz.Group](), vw.planeName(li))
 	}
 
-	if !tree.Update(plGp, plConfig) {
-		for li := range plGp.Children {
-			lmesh := errors.Log1(se.MeshByName(plname(li)))
-			se.SetMesh(lmesh) // does update
-		}
-		return
-	}
+	tree.Update(plGp, plConfig)
+	// for li := range plGp.Children {
+	// 	lmesh := errors.Log1(se.MeshByName(vw.planeName(li)))
+	// 	se.SetMesh(lmesh) // does update
+	// }
+	// return
 
 	gpConfig := tree.TypePlan{}
 	gpConfig.Add(types.For[PlaneObj](), "plane")
 	gpConfig.Add(types.For[xyz.Text2D](), "name")
 
 	sz := vw.Size
-	if vw.NPanels > 1 {
-		sz.X *= 2
-	}
-	if vw.NPanels > 2 {
-		sz.Z *= 2
-	}
+	// if vw.NPanels > 1 {
+	// 	sz.X *= 2
+	// }
+	// if vw.NPanels > 2 {
+	// 	sz.Z *= 2
+	// }
 
-	nsc := math32.Vec3(1.0/float32(sz.X), 1.0/float32(sz.Y), 1.0/float32(sz.Z))
-	szc := math32.Max(nsc.X, nsc.Y)
+	nsc := math32.Vec3(2/float32(sz.X), 2/float32(sz.Y), 2/float32(sz.Z))
+	ht := vw.Settings.Height
+	// szc := max(nsc.X, nsc.Y)
 	poff := math32.Vector3Scalar(0.5)
 	poff.Y = -0.5
+	poff.X = 1
 	for li, plgi := range plGp.Children {
-		plnm := plname(li)
+		plnm := vw.planeName(li)
 		plmesh, _ := se.MeshByName(plnm)
 		if plmesh == nil {
-			NewPlaneMesh(se, vw, li)
+			plmesh = NewPlaneMesh(se, vw, li)
 		} else {
 			plmesh.(*PlaneMesh).panelNo = li
 		}
+		se.SetMesh(plmesh)
 		plg := plgi.(*xyz.Group)
-		gpConfig[1].Name = plname(li) // text2d textures use obj name, so must be unique
+		gpConfig[1].Name = plnm // text2d textures use obj name, so must be unique
 		tree.Update(plg, gpConfig)
 		lp := math32.Vec3(0, 0, 0).Sub(poff)
-		// lp.Y = -lp.Y // reverse direction
+		lp.Y = -lp.Y // reverse direction
 		// lp = lp.Sub(nmin).Mul(nsc).Sub(poff)
 		plg.Pose.Pos.Set(lp.X, lp.Z, lp.Y)
-		plg.Pose.Scale.Set(nsc.X, szc, nsc.Y)
 
 		plo := plg.Child(0).(*PlaneObj)
 		plo.Defaults()
@@ -99,13 +93,16 @@ func (vw *View) UpdatePlanes() {
 		plo.Material.Reflective = 8
 		plo.Material.Bright = 8
 		plo.Material.Shiny = 30
+		plo.Pose.Scale.Set(nsc.X, ht, nsc.Y)
 		// note: would actually be better to NOT cull back so you can view underneath
 		// but then the front and back fight against each other, causing flickering
 
 		txt := plg.Child(1).(*xyz.Text2D)
 		txt.Defaults()
-		txt.SetText(vw.Vars[li].String())
-		txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize).Div(plg.Pose.Scale)
+		txt.SetText("Var: " + vw.Vars[li].String())
+		// this doesn't help updating, neither does Rebuild!
+		// txt.RenderText()
+		txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize)
 		txt.Styles.Background = colors.Uniform(colors.Transparent)
 		txt.Styles.Text.Align = text.Start
 		txt.Styles.Text.AlignV = text.Start

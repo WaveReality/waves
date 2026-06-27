@@ -13,6 +13,9 @@ import (
 // Settings for how the View is rendered.
 type Settings struct {
 
+	// Height is how high the values are, in normalized units.
+	Height float32
+
 	// size of a single bar element, where 1 = full width and no space.. .9 default
 	BarSize float32 `min:"0.1" max:"1" step:"0.1" default:"0.9"`
 
@@ -28,10 +31,11 @@ type Settings struct {
 }
 
 func (nv *Settings) Defaults() {
+	nv.Height = 0.2
 	nv.BarSize = 0.9
-	if nv.ColorMap == "" {
-		nv.ColorMap = core.ColorMapName("ColdHot")
-	}
+	nv.LabelSize = 0.05
+	nv.ZeroAlpha = 0.5
+	nv.ColorMap = core.ColorMapName("ColdHot")
 }
 
 // VarSettings holds parameters for display of each variable

@@ -189,6 +189,15 @@ func (gui *GUI) FinalizeGUI(closePrompt bool) {
 }
 
 func (gui *GUI) MakeToolbar(p *tree.Plan) {
+	tree.AddAt(p, "Init", func(w *core.Button) {
+		w.SetText("Init").SetIcon(icons.Update).
+			SetTooltip("Run simulation until Stop").OnClick(func(e events.Event) {
+			if !gui.IsRunning() {
+				gui.sim.Init()
+			}
+		})
+		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
+	})
 	tree.AddAt(p, "Run", func(w *core.Button) {
 		w.SetText("Run").SetIcon(icons.PlayArrow).
 			SetTooltip("Run simulation until Stop").OnClick(func(e events.Event) {
@@ -197,9 +206,6 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 				gui.StartRun()
 				tb.Restyle()
 				go gui.sim.Run()
-				// go func() {
-				// 	gui.Stopped()
-				// }()
 			}
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
@@ -216,7 +222,10 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 	tree.AddAt(p, "Step 1", func(w *core.Button) {
 		w.SetText("Step 1").SetIcon(icons.SkipNext).
 			SetTooltip("Step forward 1 time step").OnClick(func(e events.Event) {
+			tb := gui.Toolbar
 			if !gui.IsRunning() {
+				gui.StartRun()
+				tb.Restyle()
 				go gui.sim.StepN(1)
 			}
 		})
@@ -225,8 +234,23 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 	tree.AddAt(p, "Step 10", func(w *core.Button) {
 		w.SetText("Step 10").SetIcon(icons.SkipNext).
 			SetTooltip("Step forward 10 time steps").OnClick(func(e events.Event) {
+			tb := gui.Toolbar
 			if !gui.IsRunning() {
+				gui.StartRun()
+				tb.Restyle()
 				go gui.sim.StepN(10)
+			}
+		})
+		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
+	})
+	tree.AddAt(p, "Step 100", func(w *core.Button) {
+		w.SetText("Step 100").SetIcon(icons.SkipNext).
+			SetTooltip("Step forward 10 time steps").OnClick(func(e events.Event) {
+			tb := gui.Toolbar
+			if !gui.IsRunning() {
+				gui.StartRun()
+				tb.Restyle()
+				go gui.sim.StepN(100)
 			}
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })

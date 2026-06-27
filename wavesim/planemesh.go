@@ -5,8 +5,6 @@
 package wavesim
 
 import (
-	"strconv"
-
 	"cogentcore.org/core/gpu/shape"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/xyz"
@@ -34,7 +32,7 @@ type PlaneMesh struct {
 // NewPlaneMesh adds PlaneMesh mesh to given scene for given layer
 func NewPlaneMesh(sc *xyz.Scene, view *View, panel int) *PlaneMesh {
 	pm := &PlaneMesh{view: view, panelNo: panel, mode: view.Mode}
-	pm.Name = "plane_" + strconv.Itoa(panel)
+	pm.Name = view.planeName(panel)
 	sc.SetMesh(pm)
 	return pm
 }

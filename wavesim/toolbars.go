@@ -176,6 +176,7 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 		w.SetIcon(icons.Update).SetTooltip("reset to default initial display").
 			OnClick(func(e events.Event) {
 				vw.SceneXYZ().SetCamera("default")
+				vw.SceneXYZ().Rebuild()
 				vw.UpdateView()
 			})
 	})

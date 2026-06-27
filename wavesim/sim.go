@@ -7,7 +7,6 @@ package wavesim
 import (
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
-	"cogentcore.org/core/math32"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/lab/base/randx"
 	"cogentcore.org/lab/tensor"
@@ -24,6 +23,14 @@ type Sim struct {
 	// Config contains the broader running configuration.
 	Config *Config `new-window:"+" display:"no-inline"`
 
+	// ConfigFunc is run at initial configuration, after all default configuration,
+	// and can then change any parameters etc.
+	ConfigFunc func(sim *Sim) `display:"-"`
+
+	// InitFunc is run at initialization, and should be used to set
+	// the initial State, using functions in init.
+	InitFunc func(sim *Sim) `display:"-"`
+
 	// Root is the root tensorfs directory, where all stats and other misc sim data goes.
 	Root *tensorfs.Node `display:"-"`
 
@@ -34,7 +41,7 @@ type Sim struct {
 	Current *tensorfs.Node `display:"-"`
 
 	// GUI manages all the GUI elements
-	GUI GUI `display:"-"`
+	GUI GUI // `display:"-"`
 
 	// StateVars points the current state variables in effect.
 	StateVars enums.Enum `display:"-"`
@@ -53,7 +60,7 @@ type Sim struct {
 	RandSeeds randx.Seeds `display:"-"`
 }
 
-func Run() *Sim {
+func Run(configFunc, initFunc func(sim *Sim)) *Sim {
 	cfg := &Config{}
 	cfg.Defaults()
 	opts := cli.DefaultOptions("Waves", "Waves")
@@ -63,15 +70,17 @@ func Run() *Sim {
 
 	var sim *Sim
 	cli.Run(opts, cfg, func(cfg *Config) error {
-		sim = RunSim(cfg)
+		sim = RunSim(cfg, configFunc, initFunc)
 		return nil
 	})
 	return sim
 }
 
-func RunSim(cfg *Config) *Sim {
+func RunSim(cfg *Config, configFunc, initFunc func(sim *Sim)) *Sim {
 	sim := &Sim{}
 	sim.Config = cfg
+	sim.ConfigFunc = configFunc
+	sim.InitFunc = initFunc
 	sim.ConfigSim()
 	if cfg.GUI {
 		sim.Init()
@@ -103,6 +112,9 @@ func (ss *Sim) ConfigSim() {
 	// if ss.Config.GPU {
 	// 	fmt.Println(axon.GPUSystem.Vars().StringDoc())
 	// }
+	if ss.ConfigFunc != nil {
+		ss.ConfigFunc(ss)
+	}
 	ss.Init()
 }
 
@@ -124,9 +136,9 @@ func (ss *Sim) InitRandSeed(run int) {
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
 	State.SetZeros()
-	ss.Sine(WaveVel, math32.X, 13, 0, 1, 0)
-	ss.CopyCurToPrev()
-	// todo: various initial state functions
+	if ss.InitFunc != nil {
+		ss.InitFunc(ss)
+	}
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
 }
 
@@ -135,39 +147,56 @@ func (ss *Sim) Run() {
 	ctx := GetCtx(0)
 	for {
 		if ss.GUI.StopNow() || int(ctx.Step) > ss.Config.MaxSteps {
-			return
+			break
 		}
 		ss.StepRun()
 	}
+	ss.Stopped()
 }
 
 // StepN runs given number of steps. Must be called by goroutine.
 func (ss *Sim) StepN(n int) {
 	for range n {
 		if ss.GUI.StopNow() {
-			return
+			break
 		}
 		ss.StepRun()
 	}
+	ss.Stopped()
 }
 
 // StepRun does one step of running. Must be called from goroutine.
 func (ss *Sim) StepRun() {
 	ctx := GetCtx(0)
+	ctx.StepInc()
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
 	switch ss.Config.Equation {
 	case Wave3D:
 		RunWave3DKernel(ns)
 	}
-	ctx.StepInc()
+	// ctx.StepInc()
 	ss.UpdateView()
+}
+
+// Stopped should be called whenever running stops.
+func (ss *Sim) Stopped() {
+	if !ss.GUI.Active {
+		return
+	}
+	ss.GUI.Stopped()
 }
 
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
 	vw := ss.GUI.AddView("View")
-	vw.Size = ss.Config.SizeFull()
+	vw.Size = ss.Config.Size
+	vw.Size.Z = 3
+	vw.Start.X = 1
+	vw.Start.Y = 1
 	vw.Start.Z = vw.Size.Z / 2
+	if vw.Start.Z == 0 {
+		vw.Start.Z = 1
+	}
 	vw.SetVar(WavePos, 0)
 	ss.GUI.FinalizeGUI(false)
 }

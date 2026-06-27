@@ -12,19 +12,20 @@ import (
 )
 
 // CopyCurToPrev copies the current values to previous values
-// for all variables. Do this at initialization.
+// for all variables.
 func (ss *Sim) CopyCurToPrev() {
 	vals := ss.StateVars.Values()
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	sz := ss.Config.SizeFull()
+	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
+				f := c.AddScalar(1)
 				for vi := range vals {
-					State.Set(State.Value(int(c.Z), int(c.Y), int(c.X), int(vi), int(cur)), int(c.Z), int(c.Y), int(c.X), int(vi), int(prv))
+					State.Set(State.Value(int(f.Z), int(f.Y), int(f.X), int(vi), int(cur)), int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
 				}
 			}
 		}
@@ -36,15 +37,16 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off floa
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
-	sz := ss.Config.SizeFull()
+	sz := ss.Config.Size
 	tp := float32(2.0 * math32.Pi)
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
+				f := c.AddScalar(1)
 				dv := float32(c.Dim(dim))
 				v := off + amp*math32.Sin(tp*((dv+phase)/period))
-				State.SetAdd(v, int(c.Z), int(c.Y), int(c.X), int(vri), int(cur))
+				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 			}
 		}
 	}

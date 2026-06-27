@@ -197,11 +197,11 @@ const WaveStatesN WaveStates = 6
 
 //gosl:end
 
-var _WaveStatesValueMap = map[string]WaveStates{`WavePos`: 0, `WaveVel`: 1, `WaveForce`: 2, `WaveKinetic`: 3, `WavePotential`: 4, `WaveEnergy`: 5}
+var _WaveStatesValueMap = map[string]WaveStates{`Pos`: 0, `Vel`: 1, `Force`: 2, `Kinetic`: 3, `Potential`: 4, `Energy`: 5}
 
 var _WaveStatesDescMap = map[WaveStates]string{0: `WavePos is the position (height) wave state variable.`, 1: `WaveVel is the velocity of wave state variable.`, 2: `WaveForce is the net force computed from neighbors.`, 3: `WaveKinetic is the kinetic energy.`, 4: `WavePotential is the potential energy.`, 5: `WaveEnergy is the total kinetic + potential energy.`}
 
-var _WaveStatesMap = map[WaveStates]string{0: `WavePos`, 1: `WaveVel`, 2: `WaveForce`, 3: `WaveKinetic`, 4: `WavePotential`, 5: `WaveEnergy`}
+var _WaveStatesMap = map[WaveStates]string{0: `Pos`, 1: `Vel`, 2: `Force`, 3: `Kinetic`, 4: `Potential`, 5: `Energy`}
 
 // String returns the string representation of this WaveStates value.
 func (i WaveStates) String() string { return enums.String(i, _WaveStatesMap) }
