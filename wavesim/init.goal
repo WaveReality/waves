@@ -1,0 +1,29 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import (
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+// Sine adds sine wave values along given dimension, to given variable.
+func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cs := ctx.CurState
+	sz := ss.Config.SizeFull()
+	tp := float32(2.0 * math32.Pi)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				dv := float32(c.Dim(dim))
+				v := off + amp*math32.Sin(tp*((dv+phase)/period))
+				State[c.Z, c.Y, c.X, vri, cs] += v
+			}
+		}
+	}
+}

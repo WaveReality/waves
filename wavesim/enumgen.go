@@ -141,6 +141,53 @@ func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
+var _ViewModesValues = []ViewModes{0, 1}
+
+// ViewModesN is the highest valid value for type ViewModes, plus one.
+//
+//gosl:start
+const ViewModesN ViewModes = 2
+
+//gosl:end
+
+var _ViewModesValueMap = map[string]ViewModes{`Plane`: 0, `Bars`: 1}
+
+var _ViewModesDescMap = map[ViewModes]string{0: `Plane displays a contiguous plane of values -- best for smooth states.`, 1: `Bars displays discrete bars at each point -- best for more discontinuous states.`}
+
+var _ViewModesMap = map[ViewModes]string{0: `Plane`, 1: `Bars`}
+
+// String returns the string representation of this ViewModes value.
+func (i ViewModes) String() string { return enums.String(i, _ViewModesMap) }
+
+// SetString sets the ViewModes value from its string representation,
+// and returns an error if the string is invalid.
+func (i *ViewModes) SetString(s string) error {
+	return enums.SetString(i, s, _ViewModesValueMap, "ViewModes")
+}
+
+// Int64 returns the ViewModes value as an int64.
+func (i ViewModes) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the ViewModes value from an int64.
+func (i *ViewModes) SetInt64(in int64) { *i = ViewModes(in) }
+
+// Desc returns the description of the ViewModes value.
+func (i ViewModes) Desc() string { return enums.Desc(i, _ViewModesDescMap) }
+
+// ViewModesValues returns all possible values for the type ViewModes.
+func ViewModesValues() []ViewModes { return _ViewModesValues }
+
+// Values returns all possible values for the type ViewModes.
+func (i ViewModes) Values() []enums.Enum { return enums.Values(_ViewModesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i ViewModes) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *ViewModes) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "ViewModes")
+}
+
 var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5}
 
 // WaveStatesN is the highest valid value for type WaveStates, plus one.

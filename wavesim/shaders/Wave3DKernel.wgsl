@@ -70,6 +70,7 @@ fn Context_PrevState(ctx: Context) -> i32 {
 const GPUVarsN: GPUVars = 5;
 const EquationsN: Equations = 2;
 const EdgesN: Edges = 2;
+const ViewModesN: ViewModes = 2;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
@@ -119,6 +120,11 @@ struct Units {
 	Inv2CSq: f32,
 	pad: f32,
 }
+
+//////// import: "view.go"
+alias ViewModes = i32; //enums:enum
+const  Plane: ViewModes = 0;
+const  Bars: ViewModes = 1;
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum

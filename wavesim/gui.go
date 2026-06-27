@@ -169,20 +169,15 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	split.SetSplits(.2, .5, .8)
 }
 
-// AddNetView adds NetView in tab with given name
-// func (gui *GUI) AddNetView(tabName string) *netview.NetView {
-// 	nv := lab.NewTab(gui.Tabs, tabName, func(tab *core.Frame) *netview.NetView {
-// 		// nv := netview.NewNetView(tab)
-// 		// nv.Var = "Act"
-// 		// tb.OnFinal(events.Click, func(e events.Event) {
-// 		// 	nv.Current()
-// 		// 	nv.Update()
-// 		// })
-// 		// gui.NetViews = append(gui.NetViews, nv)
-// 		// return nv
-// 	})
-// 	return nv
-// }
+// AddView adds View in tab with given name
+func (gui *GUI) AddView(tabName string) *View {
+	nv := lab.NewTab(gui.Tabs, tabName, func(tab *core.Frame) *View {
+		nv := NewView(tab)
+		// gui.NetViews = append(gui.NetViews, nv)
+		return nv
+	})
+	return nv
+}
 
 // FinalizeGUI wraps the end functionality of the GUI
 func (gui *GUI) FinalizeGUI(closePrompt bool) {

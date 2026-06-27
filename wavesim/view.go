@@ -25,15 +25,44 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
+// note: must be added to gosl due to -gosl flag
+//gosl:start
+
+// ViewModes are different ways of displaying wave states.
+type ViewModes int32 //enums:enum
+
+const (
+	// Plane displays a contiguous plane of values -- best for smooth states.
+	Plane ViewModes = iota
+
+	// Bars displays discrete bars at each point -- best for more discontinuous states.
+	Bars
+)
+
+//gosl:end
+
 // View is a Cogent Core Widget that provides a 3D view into state.
 type View struct {
 	core.Frame
 
-	// Var is the current variable that we're viewing
-	Var enums.Enum
+	// Mode is how the state values are displayed.
+	Mode ViewModes
 
-	// color map for mapping values to colors -- set by name in Settings
-	ColorMap *colormap.Map
+	// Number of different panels, each displaying a different variable
+	// 1, 2 or 4.
+	NPanels int `min:"1" max:"4"`
+
+	// Var is the default variable to view.
+	Var enums.Enum `set:"-"`
+
+	// Vars are the current variables that we're viewing, per panel.
+	Vars []enums.Enum
+
+	// Starting front-left corner location within state.
+	Start math32.Vector3i
+
+	// Size of planes
+	Size math32.Vector3i
 
 	// parameters for the list of variables to view
 	VarSettings map[enums.Enum]*VarSettings
@@ -42,10 +71,15 @@ type View struct {
 	Settings Settings
 
 	// Counters are displayed at the bottom: time, etc.
-	Counters string
+	Counters string `set:"-" display:"-"`
 
 	// current var params -- only valid during Update of display
 	curVarSettings *VarSettings
+
+	// color map for mapping values to colors -- set by name in Settings
+	colorMap *colormap.Map
+
+	curPanel int
 
 	midFrame  *core.Frame
 	scene     *Scene
@@ -60,7 +94,13 @@ type View struct {
 func (vw *View) Init() {
 	vw.Frame.Init()
 	vw.Settings.Defaults()
-	vw.ColorMap = colormap.AvailableMaps[string(vw.Settings.ColorMap)]
+	vw.NPanels = 1
+	vw.Mode = Bars
+	vw.colorMap = colormap.AvailableMaps[string(vw.Settings.ColorMap)]
+	vw.Vars = make([]enums.Enum, vw.NPanels)
+	for i := range vw.NPanels {
+		vw.Vars[i] = vw.Var
+	}
 	vw.Styler(func(s *styles.Style) {
 		s.Direction = styles.Column
 		s.Grow.Set(1, 1)
@@ -89,7 +129,7 @@ func (vw *View) Init() {
 			planesGp.Name = "Planes"
 		})
 		w.OnShow(func(e events.Event) {
-			vw.Current()
+			// vw.Current()
 		})
 	})
 	tree.AddChildAt(vw, "counters", func(w *core.Text) {
@@ -114,28 +154,25 @@ func (vw *View) Init() {
 }
 
 // SetVar sets the variable to view and updates the display
-func (vw *View) SetVar(vr string) {
+func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 	vw.Lock()
 	vw.Var = vr
+	vw.Vars[panelNo] = vr
+	if vw.varsFrame == nil {
+		vw.Unlock()
+		return
+	}
 	vw.varsFrame.Update()
 	vw.Unlock()
 	vw.toolbar.Update()
 	vw.UpdateView()
 }
 
-// HasPlanes returns true if network has any layers -- else no display
-func (vw *View) HasPlanes() bool {
-	if vw.Net == nil || vw.Net.NumPlanes() == 0 {
-		return false
-	}
-	return true
-}
-
 // GoUpdateView is the update call to make from another go routine
 // it does the proper blocking to coordinate with GUI updates
 // generated on the main GUI thread.
 func (vw *View) GoUpdateView() {
-	if !vw.IsVisible() || !vw.HasPlanes() {
+	if !vw.IsVisible() {
 		return
 	}
 	sw := vw.scene
@@ -150,7 +187,7 @@ func (vw *View) GoUpdateView() {
 
 // UpdateView updates the display based on last recorded state of network.
 func (vw *View) UpdateView() {
-	if !vw.IsVisible() || !vw.HasPlanes() {
+	if !vw.IsVisible() {
 		return
 	}
 	sw := vw.scene
@@ -172,7 +209,8 @@ func (vw *View) UpdateImpl() {
 	if !vp.Range.FixMin || !vp.Range.FixMax {
 		needUpdate := false
 		// need to autoscale
-		min, max, ok := vw.Data.VarRange(vw.Var)
+		// min, max, ok := vw.Data.VarRange(vw.Var)
+		min, max, ok := float32(-1), float32(1), true
 		if ok {
 			vp.MinMax.Set(min, max)
 			if !vp.Range.FixMin {
@@ -200,14 +238,14 @@ func (vw *View) UpdateImpl() {
 				vp.Range.Min = -bmax
 			}
 			if needUpdate {
-				tb := vw.Toolbar()
+				tb := vw.toolbar
 				tb.UpdateTree()
 				tb.NeedsRender()
 			}
 		}
 	}
 
-	vw.SetCounters(vw.Data.CounterRec(vw.RecNo))
+	vw.SetCounters(vw.Counters)
 	vw.Unlock()
 	vw.UpdatePlanes()
 }
@@ -231,13 +269,13 @@ func (vw *View) VarsListUpdate() {
 	if reflectx.IsNil(reflect.ValueOf(vw.Var)) {
 		return
 	}
-	vals := vr.Values()
+	vals := vw.Var.Values()
 	if len(vals) == len(vw.VarSettings) {
 		return
 	}
-	vw.VarSettings = make(map[enums.Enum]*VarSettings, len(vw.Vars))
+	vw.VarSettings = make(map[enums.Enum]*VarSettings, len(vals))
 	for _, v := range vals {
-		vp := &VarSettings{Var: v.String()}
+		vp := &VarSettings{Var: v}
 		vp.Defaults()
 		if vsr, ok := v.(VarSettinger); ok {
 			vsr.SetVarSettings(vp)
@@ -269,7 +307,7 @@ func (vw *View) makeVars(frame *core.Frame) {
 				}
 				w.SetType(core.ButtonAction)
 				w.OnClick(func(e events.Event) {
-					vw.SetVar(v)
+					vw.SetVar(v, vw.curPanel)
 				})
 				w.Updater(func() {
 					w.SetSelected(v == vw.Var)
@@ -291,14 +329,6 @@ func (vw *View) ViewDefaults(se *xyz.Scene) {
 	xyz.NewAmbient(se, "ambient", 0.1, xyz.DirectSun)
 	xyz.NewDirectional(se, "directional", 0.5, xyz.DirectSun).Pos.Set(0, 2, 5)
 	xyz.NewPoint(se, "point", .2, xyz.DirectSun).Pos.Set(0, 2, -5)
-}
-
-// StateValue returns the raw value, scaled value, and color representation
-// for given state index. scaled is in range -1..1
-func (vw *View) StateValue(idx ...int) (raw, scaled float32, clr color.RGBA) {
-	raw := State.Value(idx...)
-	scaled, clr = vw.ValColor(lay, idx1d, raw)
-	return
 }
 
 var NilColor = color.RGBA{0x20, 0x20, 0x20, 0x40}
@@ -323,7 +353,7 @@ func (vw *View) ValColor(raw float32) (scaled float32, clr color.RGBA) {
 		scaled = float32(norm)
 		op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*0.8) // no meaningful alpha -- just set at 80\%
 	}
-	clr = colors.WithAF32(vw.ColorMap.Map(norm), op)
+	clr = colors.WithAF32(vw.colorMap.Map(norm), op)
 	return
 }
 

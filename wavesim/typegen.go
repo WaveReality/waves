@@ -3,12 +3,24 @@
 package wavesim
 
 import (
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+	"cogentcore.org/core/tree"
 	"cogentcore.org/core/types"
 )
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run"}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run"}, {Name: "MaxSteps", Doc: "MaxSteps is the maximum number of steps to run."}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}, {Name: "pad1"}}})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Scene", IDName: "scene", Doc: "Scene is a Widget for managing the 3D Scene of the NetView", Embeds: []types.Field{{Name: "Scene"}}, Fields: []types.Field{{Name: "View"}}})
+
+// NewScene returns a new [Scene] with the given optional parent:
+// Scene is a Widget for managing the 3D Scene of the NetView
+func NewScene(parent ...tree.Node) *Scene { return tree.New[Scene](parent...) }
+
+// SetView sets the [Scene.View]
+func (t *Scene) SetView(v *View) *Scene { t.View = v; return t }
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GPUVars", IDName: "gpu-vars", Doc: "GPUVars is an enum for GPU variables, for specifying what to sync."})
 
@@ -24,9 +36,62 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Di
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Units", IDName: "units", Doc: "Units contains all the relevant units", Fields: []types.Field{{Name: "C", Doc: "C is the speed of light factor"}, {Name: "CSq", Doc: "CSq = C^2"}, {Name: "Inv2CSq", Doc: "Inv2CSq = 1 / 2C^2"}, {Name: "pad"}}})
 
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.PlaneMesh", IDName: "plane-mesh", Doc: "PlaneMesh is a xyz.Mesh that represents an X-Y plane through the state.\nIt is dynamically updated using theUpdate method which only resets the\nessential Vertex elements. The geometry is literal in the size:\n0,0,0 lower-left corner and increasing X,Z in display for the X,Y plane.\nDisplay applies an overall scaling to make it fit within the larger view.", Embeds: []types.Field{{Name: "MeshBase"}}, Fields: []types.Field{{Name: "view"}, {Name: "panelNo", Doc: "our panel number"}, {Name: "mode", Doc: "mode for this panel"}, {Name: "offset"}}})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.PlaneObj", IDName: "plane-obj", Doc: "PlaneObj is the Plane 3D object within the View", Embeds: []types.Field{{Name: "Solid"}}, Fields: []types.Field{{Name: "panelNo"}, {Name: "view"}}})
+
+// NewPlaneObj returns a new [PlaneObj] with the given optional parent:
+// PlaneObj is the Plane 3D object within the View
+func NewPlaneObj(parent ...tree.Node) *PlaneObj { return tree.New[PlaneObj](parent...) }
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Settings", IDName: "settings", Doc: "Settings for how the View is rendered.", Fields: []types.Field{{Name: "BarSize", Doc: "size of a single bar element, where 1 = full width and no space.. .9 default"}, {Name: "ColorMap", Doc: "name of color map to use"}, {Name: "LabelSize", Doc: "size of the labels"}, {Name: "ZeroAlpha", Doc: "opacity (0-1) of zero values. greater magnitude values become increasingly\nopaque on either side of this minimum."}}})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.VarSettings", IDName: "var-settings", Doc: "VarSettings holds parameters for display of each variable", Fields: []types.Field{{Name: "Var", Doc: "the variable"}, {Name: "ZeroCtr", Doc: "keep Min - Max centered around 0, and use negative heights for units\nelse use full min-max range for height (no negative heights)"}, {Name: "Range", Doc: "range to display"}, {Name: "MinMax", Doc: "if not using fixed range, this is the actual range of data"}}})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.VarSettinger", IDName: "var-settinger", Doc: "VarSettinger sets variable parameters", Methods: []types.Method{{Name: "SetVarSettings", Args: []string{"vs"}}}})
+
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Sim", IDName: "sim", Doc: "Sim contains everything for the simulation.", Directives: []types.Directive{{Tool: "go", Directive: "generate", Args: []string{"core", "generate", "-add-types", "-add-funcs", "-gosl"}}}, Fields: []types.Field{{Name: "Params", Doc: "Params contains the current simulation parameters."}, {Name: "Config", Doc: "Config contains the broader running configuration."}, {Name: "Root", Doc: "Root is the root tensorfs directory, where all stats and other misc sim data goes."}, {Name: "Stats", Doc: "Stats has the stats directory within Root."}, {Name: "Current", Doc: "Current has the current stats values within Stats."}, {Name: "GUI", Doc: "GUI manages all the GUI elements"}, {Name: "StateVars", Doc: "StateVars points the current state variables in effect."}, {Name: "Rand", Doc: "Rand is the random number generator for the network.\nall random calls must use this.\nSet seed here for weight initialization values."}, {Name: "RandSeed", Doc: "Random seed to be set at the start of configuring\nthe network and initializing the weights.\nSet this to get a different set of weights."}, {Name: "RandSeeds", Doc: "RandSeeds is a list of random seeds to use for each run."}}})
 
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.ViewModes", IDName: "view-modes", Doc: "ViewModes are different ways of displaying wave states."})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.View", IDName: "view", Doc: "View is a Cogent Core Widget that provides a 3D view into state.", Directives: []types.Directive{{Tool: "gosl", Directive: "end"}}, Embeds: []types.Field{{Name: "Frame"}, {Name: "Mutex"}}, Fields: []types.Field{{Name: "Mode", Doc: "Mode is how the state values are displayed."}, {Name: "NPanels", Doc: "Number of different panels, each displaying a different variable\n1, 2 or 4."}, {Name: "Var", Doc: "Var is the default variable to view."}, {Name: "Vars", Doc: "Vars are the current variables that we're viewing, per panel."}, {Name: "Start", Doc: "Starting front-left corner location within state."}, {Name: "Size", Doc: "Size of planes"}, {Name: "VarSettings", Doc: "parameters for the list of variables to view"}, {Name: "Settings", Doc: "Settings are parameters controlling how the view is rendered"}, {Name: "Counters", Doc: "Counters are displayed at the bottom: time, etc."}, {Name: "curVarSettings", Doc: "current var params -- only valid during Update of display"}, {Name: "colorMap", Doc: "color map for mapping values to colors -- set by name in Settings"}, {Name: "curPanel"}, {Name: "midFrame"}, {Name: "scene"}, {Name: "counters"}, {Name: "varsFrame"}, {Name: "toolbar"}, {Name: "viewbar"}}})
+
+// NewView returns a new [View] with the given optional parent:
+// View is a Cogent Core Widget that provides a 3D view into state.
+func NewView(parent ...tree.Node) *View { return tree.New[View](parent...) }
+
+// SetMode sets the [View.Mode]:
+// Mode is how the state values are displayed.
+func (t *View) SetMode(v ViewModes) *View { t.Mode = v; return t }
+
+// SetNPanels sets the [View.NPanels]:
+// Number of different panels, each displaying a different variable
+// 1, 2 or 4.
+func (t *View) SetNPanels(v int) *View { t.NPanels = v; return t }
+
+// SetVars sets the [View.Vars]:
+// Vars are the current variables that we're viewing, per panel.
+func (t *View) SetVars(v ...enums.Enum) *View { t.Vars = v; return t }
+
+// SetStart sets the [View.Start]:
+// Starting front-left corner location within state.
+func (t *View) SetStart(v math32.Vector3i) *View { t.Start = v; return t }
+
+// SetSize sets the [View.Size]:
+// Size of planes
+func (t *View) SetSize(v math32.Vector3i) *View { t.Size = v; return t }
+
+// SetVarSettings sets the [View.VarSettings]:
+// parameters for the list of variables to view
+func (t *View) SetVarSettings(v map[enums.Enum]*VarSettings) *View { t.VarSettings = v; return t }
+
+// SetSettings sets the [View.Settings]:
+// Settings are parameters controlling how the view is rendered
+func (t *View) SetSettings(v Settings) *View { t.Settings = v; return t }
+
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.WaveStates", IDName: "wave-states", Doc: "WaveStates are the state variables for Wave equations."})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
@@ -61,6 +126,8 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ge
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.GetCtx", Doc: "GetCtx returns a pointer to the given global variable:\n[Ctx] []Context at given index. This directly processed in the GPU code,\nso this function call is an equivalent for the CPU.", Args: []string{"idx"}, Returns: []string{"Context"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewGUIBody", Doc: "NewGUIBody returns a new GUI, with an initialized Body by calling [gui.MakeBody].", Args: []string{"b", "sim", "fsroot", "appname", "title", "about"}, Returns: []string{"GUI"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run"})
 

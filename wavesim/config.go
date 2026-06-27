@@ -12,12 +12,13 @@ type Config struct {
 	GPU bool `default:"true"`
 
 	// GUI determines whether to show the GUI.
-	GUI bool `default:"true"`
+	GUI bool `default:"false"`
 
 	// Equation to run
 	Equation Equations
 
-	// Size of Universe to run
+	// Size of Universe to run. This is only the active portion, excluding
+	// edges at all sizes (add 2 to each dim).
 	Size math32.Vector3i
 
 	// MaxSteps is the maximum number of steps to run.
@@ -27,4 +28,8 @@ type Config struct {
 func (cfg *Config) Defaults() {
 	cfg.Size.Set(10, 1, 10)
 	cfg.MaxSteps = 1000
+}
+
+func (cfg *Config) SizeFull() math32.Vector3i {
+	return cfg.Size.AddScalar(2)
 }

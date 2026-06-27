@@ -12,8 +12,15 @@ import (
 
 // Settings for how the View is rendered.
 type Settings struct {
+
+	// size of a single bar element, where 1 = full width and no space.. .9 default
+	BarSize float32 `min:"0.1" max:"1" step:"0.1" default:"0.9"`
+
 	// name of color map to use
-	ColorMap core.ColorMapName
+	ColorMap core.ColorMapName `display:"-"`
+
+	// size of the labels
+	LabelSize float32 `min:"0.01" max:".1" step:"0.01" default:"0.05"`
 
 	// opacity (0-1) of zero values. greater magnitude values become increasingly
 	// opaque on either side of this minimum.
@@ -21,6 +28,7 @@ type Settings struct {
 }
 
 func (nv *Settings) Defaults() {
+	nv.BarSize = 0.9
 	if nv.ColorMap == "" {
 		nv.ColorMap = core.ColorMapName("ColdHot")
 	}

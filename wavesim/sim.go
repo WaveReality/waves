@@ -7,6 +7,7 @@ package wavesim
 import (
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/lab/base/randx"
 	"cogentcore.org/lab/tensor"
@@ -52,7 +53,7 @@ type Sim struct {
 	RandSeeds randx.Seeds `display:"-"`
 }
 
-func Run() {
+func Run() *Sim {
 	cfg := &Config{}
 	cfg.Defaults()
 	opts := cli.DefaultOptions("Waves", "Waves")
@@ -60,10 +61,15 @@ func Run() {
 	// opts.SearchUp = true // so that the sim can be run from the command subdirectory
 	opts.IncludePaths = append(opts.IncludePaths, "./configs")
 
-	cli.Run(opts, cfg, RunSim)
+	var sim *Sim
+	cli.Run(opts, cfg, func(cfg *Config) error {
+		sim = RunSim(cfg)
+		return nil
+	})
+	return sim
 }
 
-func RunSim(cfg *Config) error {
+func RunSim(cfg *Config) *Sim {
 	sim := &Sim{}
 	sim.Config = cfg
 	sim.ConfigSim()
@@ -74,7 +80,7 @@ func RunSim(cfg *Config) error {
 	} else {
 		sim.RunNoGUI()
 	}
-	return nil
+	return sim
 }
 
 func (ss *Sim) ConfigSim() {
@@ -97,6 +103,7 @@ func (ss *Sim) ConfigSim() {
 	// if ss.Config.GPU {
 	// 	fmt.Println(axon.GPUSystem.Vars().StringDoc())
 	// }
+	ss.Init()
 }
 
 func (ss *Sim) ConfigState() {
@@ -117,6 +124,7 @@ func (ss *Sim) InitRandSeed(run int) {
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
 	State.SetZeros()
+	ss.Sine(WavePos, math32.X, 5, 0, 1, 0)
 	// todo: various initial state functions
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
 }
@@ -154,6 +162,9 @@ func (ss *Sim) StepRun() {
 
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
+	vw := ss.GUI.AddView("View")
+	vw.Size = ss.Config.SizeFull()
+	vw.SetVar(WavePos, 0)
 	ss.GUI.FinalizeGUI(false)
 }
 
