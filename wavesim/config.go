@@ -26,7 +26,7 @@ type Config struct {
 }
 
 func (cfg *Config) Defaults() {
-	cfg.Size.Set(10, 1, 10)
+	cfg.Size.Set(100, 100, 1)
 	cfg.MaxSteps = 1000
 }
 

@@ -58,7 +58,7 @@ func Run() *Sim {
 	cfg.Defaults()
 	opts := cli.DefaultOptions("Waves", "Waves")
 	opts.DefaultFiles = append(opts.DefaultFiles, "config.toml")
-	// opts.SearchUp = true // so that the sim can be run from the command subdirectory
+	opts.SearchUp = true // so that the sim can be run from the command subdirectory
 	opts.IncludePaths = append(opts.IncludePaths, "./configs")
 
 	var sim *Sim
@@ -124,12 +124,13 @@ func (ss *Sim) InitRandSeed(run int) {
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
 	State.SetZeros()
-	ss.Sine(WavePos, math32.X, 5, 0, 1, 0)
+	ss.Sine(WaveVel, math32.X, 13, 0, 1, 0)
+	ss.CopyCurToPrev()
 	// todo: various initial state functions
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
 }
 
-// Run runs until stopped or Step > MaxSteps
+// Run runs until stopped or Step > MaxSteps. Must be called by goroutine.
 func (ss *Sim) Run() {
 	ctx := GetCtx(0)
 	for {
@@ -140,6 +141,7 @@ func (ss *Sim) Run() {
 	}
 }
 
+// StepN runs given number of steps. Must be called by goroutine.
 func (ss *Sim) StepN(n int) {
 	for range n {
 		if ss.GUI.StopNow() {
@@ -149,7 +151,7 @@ func (ss *Sim) StepN(n int) {
 	}
 }
 
-// StepRun does one step of running.
+// StepRun does one step of running. Must be called from goroutine.
 func (ss *Sim) StepRun() {
 	ctx := GetCtx(0)
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
@@ -158,14 +160,23 @@ func (ss *Sim) StepRun() {
 		RunWave3DKernel(ns)
 	}
 	ctx.StepInc()
+	ss.UpdateView()
 }
 
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
 	vw := ss.GUI.AddView("View")
 	vw.Size = ss.Config.SizeFull()
+	vw.Start.Z = vw.Size.Z / 2
 	vw.SetVar(WavePos, 0)
 	ss.GUI.FinalizeGUI(false)
+}
+
+func (ss *Sim) UpdateView() {
+	if !ss.GUI.Active || ss.GUI.View == nil {
+		return
+	}
+	ss.GUI.View.GoUpdateView()
 }
 
 func (ss *Sim) RunNoGUI() {

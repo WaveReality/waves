@@ -9,7 +9,7 @@ import (
 	"cogentcore.org/core/types"
 )
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run"}, {Name: "MaxSteps", Doc: "MaxSteps is the maximum number of steps to run."}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run. This is only the active portion, excluding\nedges at all sizes (add 2 to each dim)."}, {Name: "MaxSteps", Doc: "MaxSteps is the maximum number of steps to run."}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}, {Name: "pad1"}}})
 
@@ -24,13 +24,13 @@ func (t *Scene) SetView(v *View) *Scene { t.View = v; return t }
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GPUVars", IDName: "gpu-vars", Doc: "GPUVars is an enum for GPU variables, for specifying what to sync."})
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GUI", IDName: "gui", Doc: "GUI manages all standard elements of a simulation Graphical User Interface", Embeds: []types.Field{{Name: "Browser"}}, Fields: []types.Field{{Name: "Active", Doc: "Active is true if the GUI is configured and running"}, {Name: "SimForm", Doc: "SimForm displays the Sim object fields in the left panel."}, {Name: "Body", Doc: "Body is the entire content of the sim window."}, {Name: "isRunning", Doc: "isRunning is true if sim is running."}, {Name: "stopNow", Doc: "stopNow can be set via SetStopNow method under mutex protection\nto signal the current sim to stop running.\nIt is not used directly in the looper-based control logic, which has\nits own direct Stop function, but it is set there in case there are\nother processes that are looking at this flag."}, {Name: "sim", Doc: "the sim"}, {Name: "runMu"}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GUI", IDName: "gui", Doc: "GUI manages all standard elements of a simulation Graphical User Interface", Embeds: []types.Field{{Name: "Browser"}}, Fields: []types.Field{{Name: "Active", Doc: "Active is true if the GUI is configured and running"}, {Name: "SimForm", Doc: "SimForm displays the Sim object fields in the left panel."}, {Name: "Body", Doc: "Body is the entire content of the sim window."}, {Name: "isRunning", Doc: "isRunning is true if sim is running."}, {Name: "stopNow", Doc: "stopNow can be set via SetStopNow method under mutex protection\nto signal the current sim to stop running.\nIt is not used directly in the looper-based control logic, which has\nits own direct Stop function, but it is set there in case there are\nother processes that are looking at this flag."}, {Name: "View", Doc: "view if created."}, {Name: "sim", Doc: "the sim"}, {Name: "runMu"}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Equations", IDName: "equations", Doc: "Equations are the different implemented equations to simulate."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Edges", IDName: "edges", Doc: "Edges determines how to handle the edges."})
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Parameters", IDName: "parameters", Doc: "Parameters contains the full set of simulation parameters.\nthis is uploaded to the GPU.", Fields: []types.Field{{Name: "Equation", Doc: "Equation determines what equations are computed."}, {Name: "Edges", Doc: "Edges determines how to handle the edges."}, {Name: "DoEnergy", Doc: "DoEnergy determines if energy is computed (when not necessary)."}, {Name: "pad"}, {Name: "Units", Doc: "Units are the relevant unit factors."}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Parameters", IDName: "parameters", Doc: "Parameters contains the full set of simulation parameters.\nthis is uploaded to the GPU.", Fields: []types.Field{{Name: "Edges", Doc: "Edges determines how to handle the edges."}, {Name: "DoEnergy", Doc: "DoEnergy determines if energy is computed (when not necessary)."}, {Name: "pad"}, {Name: "pad1"}, {Name: "Units", Doc: "Units are the relevant unit factors."}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Display", IDName: "display", Doc: "Display contains display parameters.", Fields: []types.Field{{Name: "On", Doc: "On determines if display is updated."}, {Name: "Interval", Doc: "Interval is the number of time steps between display updates."}}})
 
@@ -129,8 +129,8 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ne
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run"})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run", Returns: []string{"Sim"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSim", Args: []string{"cfg"}, Returns: []string{"error"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSim", Args: []string{"cfg"}, Returns: []string{"Sim"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Wave3DKernel", Doc: "Wave3DKernel is the kernel for computing the Wave3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})

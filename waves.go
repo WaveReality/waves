@@ -19,6 +19,5 @@ var icon string
 
 func main() {
 	core.AppIcon = icon
-	sim := wavesim.Run()
-	sim.GUI.Body.RunMainWindow()
+	wavesim.Run()
 }

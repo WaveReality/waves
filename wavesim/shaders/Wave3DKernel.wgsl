@@ -104,10 +104,10 @@ alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
 struct Parameters {
-	Equation: Equations,
 	Edges: Edges,
 	DoEnergy: i32,
 	pad: i32,
+	pad1: i32,
 	Units: Units,
 }
 struct Display {
@@ -147,7 +147,9 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
 ; var vel = pvel + Params[0].Units.CSq*force;
 ; var pos = ppos + vel;
-; if (Params[0].DoEnergy == 1) {
+; if (i == 55) {
+	fmt.Println(ctx.Step, cur, ppos, pos, pvel, vel);
+}; if (Params[0].DoEnergy == 1) {
 	var midVel = 0.5 * (pvel + vel);
 	var kinetic = Params[0].Units.Inv2CSq * midVel * midVel;
 	var potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);

@@ -129,7 +129,7 @@ func (vw *View) Init() {
 			planesGp.Name = "Planes"
 		})
 		w.OnShow(func(e events.Event) {
-			// vw.Current()
+			vw.UpdateView()
 		})
 	})
 	tree.AddChildAt(vw, "counters", func(w *core.Text) {

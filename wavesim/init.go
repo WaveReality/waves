@@ -11,11 +11,31 @@ import (
 	"cogentcore.org/core/math32"
 )
 
+// CopyCurToPrev copies the current values to previous values
+// for all variables. Do this at initialization.
+func (ss *Sim) CopyCurToPrev() {
+	vals := ss.StateVars.Values()
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.SizeFull()
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				for vi := range vals {
+					State.Set(State.Value(int(c.Z), int(c.Y), int(c.X), int(vi), int(cur)), int(c.Z), int(c.Y), int(c.X), int(vi), int(prv))
+				}
+			}
+		}
+	}
+}
+
 // Sine adds sine wave values along given dimension, to given variable.
 func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
-	cs := ctx.CurState
+	cur := ctx.CurState
 	sz := ss.Config.SizeFull()
 	tp := float32(2.0 * math32.Pi)
 	var c math32.Vector3i
@@ -24,7 +44,7 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off floa
 			for c.X = range sz.X {
 				dv := float32(c.Dim(dim))
 				v := off + amp*math32.Sin(tp*((dv+phase)/period))
-				State.SetAdd(v, int(c.Z), int(c.Y), int(c.X), int(vri), int(cs))
+				State.SetAdd(v, int(c.Z), int(c.Y), int(c.X), int(vri), int(cur))
 			}
 		}
 	}

@@ -40,6 +40,9 @@ type GUI struct {
 	// other processes that are looking at this flag.
 	stopNow bool
 
+	// view if created.
+	View *View
+
 	// the sim
 	sim *Sim
 
@@ -173,6 +176,7 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 func (gui *GUI) AddView(tabName string) *View {
 	nv := lab.NewTab(gui.Tabs, tabName, func(tab *core.Frame) *View {
 		nv := NewView(tab)
+		gui.View = nv
 		// gui.NetViews = append(gui.NetViews, nv)
 		return nv
 	})
@@ -208,5 +212,23 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 			}
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(gui.IsRunning()) })
+	})
+	tree.AddAt(p, "Step 1", func(w *core.Button) {
+		w.SetText("Step 1").SetIcon(icons.SkipNext).
+			SetTooltip("Step forward 1 time step").OnClick(func(e events.Event) {
+			if !gui.IsRunning() {
+				go gui.sim.StepN(1)
+			}
+		})
+		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
+	})
+	tree.AddAt(p, "Step 10", func(w *core.Button) {
+		w.SetText("Step 10").SetIcon(icons.SkipNext).
+			SetTooltip("Step forward 10 time steps").OnClick(func(e events.Event) {
+			if !gui.IsRunning() {
+				go gui.sim.StepN(10)
+			}
+		})
+		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
 	})
 }

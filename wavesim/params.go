@@ -34,16 +34,13 @@ const (
 // Parameters contains the full set of simulation parameters.
 // this is uploaded to the GPU.
 type Parameters struct {
-	// Equation determines what equations are computed.
-	Equation Equations
-
 	// Edges determines how to handle the edges.
 	Edges Edges
 
 	// DoEnergy determines if energy is computed (when not necessary).
 	DoEnergy slbool.Bool
 
-	pad int32
+	pad, pad1 int32
 
 	// Units are the relevant unit factors.
 	Units Units
@@ -51,6 +48,7 @@ type Parameters struct {
 
 func (pr *Parameters) Defaults() {
 	pr.Units.Defaults()
+	pr.DoEnergy.SetBool(true)
 }
 
 func (pr *Parameters) Update() {

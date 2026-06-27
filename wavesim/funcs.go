@@ -7,6 +7,8 @@
 package wavesim
 
 import (
+	// "fmt"
+
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/tensor"
 )
@@ -24,6 +26,7 @@ func (ss *Sim) ConfigVars() {
 	Ctx[0].Init()
 	NeighOffs = tensor.NewInt32(26, 3)
 	LaplacianWts = tensor.NewFloat32(26)
+	lnorm := float32(3.0 / 13.0)
 	idx := 0
 	for z := -1; z <= 1; z++ {
 		for y := -1; y <= 1; y++ {
@@ -40,8 +43,7 @@ func (ss *Sim) ConfigVars() {
 				// d := v.Length()
 				invD2 := 1.0 / d2
 				// invD := 1.0 / d
-				LaplacianWts.Set(invD2, idx)
-
+				LaplacianWts.Set(lnorm*invD2, idx)
 				idx++
 			}
 		}
