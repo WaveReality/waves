@@ -21,6 +21,7 @@ var icon string
 func main() {
 	core.AppIcon = icon
 	wavesim.Run(nil, func(sim *wavesim.Sim) {
-		sim.Sine(wavesim.WavePos, math32.X, 27, 0, 1, 0)
+		// sim.Sine(wavesim.WavePos, math32.X, 27, 0, 1, 0)
+		sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
 	})
 }

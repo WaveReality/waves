@@ -51,3 +51,43 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off floa
 		}
 	}
 }
+
+// MovingWavePacket adds moving wave packet along given dimension, to given variable.
+func (ss *Sim) MovingWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, period, width, phase, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
+	var diroff math32.Vector3
+	diroff.SetDim(dim, dir*ss.Params.Units.C)
+	sz := ss.Config.Size
+	tp := float32(2.0 * math32.Pi)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				ff := math32.Vec3(float32(f.X), float32(f.Y), float32(f.Z))
+				d := ff.Sub(ctrf)
+				dv := float32(d.Dim(dim))
+				cos := amp * math32.Cos(tp*((dv/period)+phase))
+				d.SetDivScalar(width)
+				dist := d.Length()
+				gauss := math32.FastExp(-dist * dist)
+				cv := cos * gauss
+				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+
+				ff.SetAdd(diroff)
+				d = ff.Sub(ctrf)
+				dv = float32(d.Dim(dim))
+				cos = amp * math32.Cos(tp*((dv/period)+phase))
+				d.SetDivScalar(width)
+				dist = d.Length()
+				gauss = math32.FastExp(-dist * dist)
+				pv := cos * gauss
+				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+			}
+		}
+	}
+}

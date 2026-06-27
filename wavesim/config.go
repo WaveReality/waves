@@ -21,6 +21,9 @@ type Config struct {
 	// edges at all sizes (add 2 to each dim).
 	Size math32.Vector3i
 
+	// ViewInterval is how often to update the view
+	ViewInterval int `min:"1"`
+
 	// MaxSteps is the maximum number of steps to run.
 	MaxSteps int
 }
@@ -28,6 +31,7 @@ type Config struct {
 func (cfg *Config) Defaults() {
 	cfg.Size.Set(100, 100, 1)
 	cfg.MaxSteps = 1000
+	cfg.ViewInterval = 1
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {

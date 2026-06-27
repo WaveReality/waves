@@ -135,10 +135,13 @@ func (ss *Sim) InitRandSeed(run int) {
 // Init initializes the state and prepares everything for running.
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
+	ctx := GetCtx(0)
+	ctx.Init()
 	State.SetZeros()
 	if ss.InitFunc != nil {
 		ss.InitFunc(ss)
 	}
+	ToGPUTensorStrides()
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
 }
 
@@ -169,12 +172,17 @@ func (ss *Sim) StepN(n int) {
 func (ss *Sim) StepRun() {
 	ctx := GetCtx(0)
 	ctx.StepInc()
+	ToGPU(CtxVar)
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
 	switch ss.Config.Equation {
 	case Wave3D:
 		RunWave3DKernel(ns)
 	}
-	// ctx.StepInc()
+	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
+		RunDone()
+	} else {
+		RunDone(StateVar)
+	}
 	ss.UpdateView()
 }
 
@@ -203,6 +211,10 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 
 func (ss *Sim) UpdateView() {
 	if !ss.GUI.Active || ss.GUI.View == nil {
+		return
+	}
+	ctx := GetCtx(0)
+	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		return
 	}
 	ss.GUI.View.GoUpdateView()
