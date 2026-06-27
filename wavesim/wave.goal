@@ -29,6 +29,10 @@ const (
 	WaveEnergy
 )
 
+func (ws WaveStates) SetVarSettings(vs *VarSettings) {
+	// todo: can set per variable here
+}
+
 // Wave3DKernel is the kernel for computing the Wave3D equations.
 func Wave3DKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)

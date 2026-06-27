@@ -34,7 +34,8 @@ var (
 	Ctx []Context
 
 	// State is the overall wave state, with inner-most index being the current
-	// and previous states.  [Z][Y][X][VarsN][2]
+	// and previous states. [Z][Y][X][VarsN][2]
+	// The display shows X-Y planes stacked in the Z dimension.
 	//gosl:dims 5
 	State *tensor.Float32
 )
