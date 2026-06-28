@@ -9,7 +9,7 @@ import (
 	"cogentcore.org/core/types"
 )
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run. This is only the active portion, excluding\nedges at all sizes (add 2 to each dim)."}, {Name: "MaxSteps", Doc: "MaxSteps is the maximum number of steps to run."}}})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Config", IDName: "config", Doc: "Config contains overall simulation configuration options.", Fields: []types.Field{{Name: "GPU", Doc: "GPU determines whether to use the GPU."}, {Name: "GUI", Doc: "GUI determines whether to show the GUI."}, {Name: "Equation", Doc: "Equation to run"}, {Name: "Size", Doc: "Size of Universe to run. This is only the active portion, excluding\nedges at all sizes (add 2 to each dim)."}, {Name: "ViewInterval", Doc: "ViewInterval is how often to update the view"}, {Name: "MaxSteps", Doc: "MaxSteps is the maximum number of steps to run."}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}, {Name: "pad1"}}})
 
@@ -93,7 +93,7 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Wa
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"xx", "yy", "zz", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.PotentialEnergy26", Doc: "PotentialEnergy26 computes the 3D potential energy across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 

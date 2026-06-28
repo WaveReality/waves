@@ -125,7 +125,8 @@ func (ss *Sim) ConfigState() {
 	if State == nil {
 		State = tensor.NewFloat32()
 	}
-	State.SetShapeSizes(int(ctx.Size.Z)+2, int(ctx.Size.Y)+2, int(ctx.Size.X)+2, nvar, 2)
+	fs := ctx.SizeFull()
+	State.SetShapeSizes(int(fs.Z), int(fs.Y), int(fs.X), nvar, 2)
 }
 
 func (ss *Sim) InitRandSeed(run int) {

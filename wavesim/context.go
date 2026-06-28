@@ -4,7 +4,10 @@
 
 package wavesim
 
-import "cogentcore.org/lab/gosl/slvec"
+import (
+	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/gosl/slvec"
+)
 
 //gosl:start
 
@@ -27,6 +30,10 @@ type Context struct {
 func (ctx *Context) Init() {
 	ctx.Step = 0
 	ctx.CurState = 0
+}
+
+func (ctx *Context) SizeFull() math32.Vector3i {
+	return ctx.Size.V().AddScalar(2)
 }
 
 // StateCoords returns the x,y,z coordinates for given index into

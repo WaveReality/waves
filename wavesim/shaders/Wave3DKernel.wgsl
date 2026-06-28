@@ -74,22 +74,22 @@ const ViewModesN: ViewModes = 2;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
-fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn Laplacian26(xx: i32,yy: i32,zz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<26; j++) {
-		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(x))];
-		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(y))];
-		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(z))];
-		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
+		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
+		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
+		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
+		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(zz + zo), u32(yy + yo), u32(xx + xo), u32(vidx), u32(tidx))];
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
 	}return avg;
 }
 fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<26; j++) {
-		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(x))];
-		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(y))];
-		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(z))];
+		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
+		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
+		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
 		var dv = (nv - ctr);
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * dv * dv;
@@ -147,8 +147,7 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
 ; var vel = pvel + Params[0].Units.CSq*force;
 ; var pos = ppos + vel;
-;
-if (Params[0].DoEnergy == 1) {
+; if (Params[0].DoEnergy == 1) {
 	var midVel = 0.5 * (pvel + vel);
 	var kinetic = Params[0].Units.Inv2CSq * midVel * midVel;
 	var potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);

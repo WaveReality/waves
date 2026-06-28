@@ -48,9 +48,6 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
 	vel := pvel + Params[0].Units.CSq*force
 	pos := ppos + vel
-	// if i == 55 {
-	// 	fmt.Println(ctx.Step, cur, ppos, pos, pvel, vel)
-	// }
 
 	if Params[0].DoEnergy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)

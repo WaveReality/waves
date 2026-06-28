@@ -194,7 +194,7 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 			SetTooltip("Run simulation until Stop").OnClick(func(e events.Event) {
 			if !gui.IsRunning() {
 				gui.sim.Init()
-				gui.sim.UpdateView()
+				go gui.sim.UpdateView()
 			}
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
