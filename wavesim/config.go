@@ -12,7 +12,7 @@ type Config struct {
 	GPU bool `default:"true"`
 
 	// GUI determines whether to show the GUI.
-	GUI bool `default:"false"`
+	GUI bool `default:"true"`
 
 	// Equation to run
 	Equation Equations

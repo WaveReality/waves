@@ -92,7 +92,7 @@ type Settings struct {
 
 func (nv *Settings) Defaults() {
 	nv.NPanels = PanelsOne
-	nv.Mode = Bars
+	// nv.Mode = Bars
 	nv.Height = 0.2
 	nv.BarSize = 0.9
 	nv.LabelSize = 0.05
