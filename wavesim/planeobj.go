@@ -37,8 +37,10 @@ func (vw *View) UpdatePlanes() {
 	}
 	plGp := se.ChildByName("Planes", 0).(*xyz.Group)
 
+	npanels := vw.Settings.NPanels.N()
+
 	plConfig := tree.TypePlan{}
-	for li := range vw.NPanels {
+	for li := range npanels {
 		plConfig.Add(types.For[xyz.Group](), vw.planeName(li))
 	}
 
@@ -54,12 +56,12 @@ func (vw *View) UpdatePlanes() {
 	gpConfig.Add(types.For[xyz.Text2D](), "name")
 
 	sz := vw.Size
-	// if vw.NPanels > 1 {
-	// 	sz.X *= 2
-	// }
-	// if vw.NPanels > 2 {
-	// 	sz.Z *= 2
-	// }
+	if npanels > 1 {
+		sz.X *= 2
+	}
+	if npanels > 2 {
+		sz.Z *= 2
+	}
 
 	nsc := math32.Vec3(2/float32(sz.X), 2/float32(sz.Y), 2/float32(sz.Z))
 	ht := vw.Settings.Height
@@ -67,7 +69,18 @@ func (vw *View) UpdatePlanes() {
 	poff := math32.Vector3Scalar(0.5)
 	poff.Y = -0.5
 	poff.X = 1
+	sp := float32(0.02)
 	for li, plgi := range plGp.Children {
+		ploff := poff
+		switch li {
+		case 1:
+			ploff.X = -sp
+		case 2:
+			ploff.Z = -0.5
+		case 3:
+			ploff.X = -sp
+			ploff.Z = -0.5
+		}
 		plnm := vw.planeName(li)
 		plmesh, _ := se.MeshByName(plnm)
 		if plmesh == nil {
@@ -79,9 +92,8 @@ func (vw *View) UpdatePlanes() {
 		plg := plgi.(*xyz.Group)
 		gpConfig[1].Name = plnm // text2d textures use obj name, so must be unique
 		tree.Update(plg, gpConfig)
-		lp := math32.Vec3(0, 0, 0).Sub(poff)
+		lp := math32.Vec3(0, 0, 0).Sub(ploff)
 		lp.Y = -lp.Y // reverse direction
-		// lp = lp.Sub(nmin).Mul(nsc).Sub(poff)
 		plg.Pose.Pos.Set(lp.X, lp.Z, lp.Y)
 
 		plo := plg.Child(0).(*PlaneObj)
@@ -99,13 +111,18 @@ func (vw *View) UpdatePlanes() {
 
 		txt := plg.Child(1).(*xyz.Text2D)
 		txt.Defaults()
-		txt.SetText("Var: " + vw.Vars[li].String())
+		txt.SetText(vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String())
 		// this doesn't help updating, neither does Rebuild!
-		// txt.RenderText()
+		// fmt.Println("txt:", txt.Text)
+		// txt.Config()
 		txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize)
 		txt.Styles.Background = colors.Uniform(colors.Transparent)
 		txt.Styles.Text.Align = text.Start
 		txt.Styles.Text.AlignV = text.Start
 	}
+	if npanels != vw.curNPanels {
+		se.Rebuild()
+	}
 	sw.NeedsRender()
+	vw.curNPanels = npanels
 }

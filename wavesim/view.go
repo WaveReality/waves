@@ -26,38 +26,32 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
-// note: must be added to gosl due to -gosl flag
-//gosl:start
+// PanelView for what each panel in the View renders.
+type PanelView struct {
+	// Variable to display.
+	Var enums.Enum
 
-// ViewModes are different ways of displaying wave states.
-type ViewModes int32 //enums:enum
+	// Select which state to view
+	CurPrev CurPrev
 
-const (
-	// Plane displays a contiguous plane of values -- best for smooth states.
-	Plane ViewModes = iota
+	// Mode is how the state values are displayed for this panel.
+	Mode ViewModes
 
-	// Bars displays discrete bars at each point -- best for more discontinuous states.
-	Bars
-)
-
-//gosl:end
+	// Offset is an additional offset from the global Start,
+	// enforced to be within the displayable size.
+	Offset math32.Vector3i
+}
 
 // View is a Cogent Core Widget that provides a 3D view into state.
 type View struct {
 	core.Frame
 
-	// Mode is how the state values are displayed.
-	Mode ViewModes
-
-	// Number of different panels, each displaying a different variable
-	// 1, 2 or 4.
-	NPanels int `min:"1" max:"4"`
-
-	// Var is the default variable to view.
+	// Var determines the set of variables being used.
+	// actual variable to view is in the PanelView.
 	Var enums.Enum `set:"-"`
 
-	// Vars are the current variables that we're viewing, per panel.
-	Vars []enums.Enum
+	// Pannels are the view settings per panel (4 max).
+	Panels [4]PanelView
 
 	// Starting front-left corner location within state.
 	Start math32.Vector3i
@@ -80,7 +74,11 @@ type View struct {
 	// color map for mapping values to colors -- set by name in Settings
 	colorMap *colormap.Map
 
+	// which panel are we currently updating
 	curPanel int
+
+	// current number of panels rendered -- if changes, do full rebuild.
+	curNPanels int
 
 	midFrame  *core.Frame
 	scene     *Scene
@@ -95,12 +93,10 @@ type View struct {
 func (vw *View) Init() {
 	vw.Frame.Init()
 	vw.Settings.Defaults()
-	vw.NPanels = 1
-	vw.Mode = Bars
 	vw.colorMap = colormap.AvailableMaps[string(vw.Settings.ColorMap)]
-	vw.Vars = make([]enums.Enum, vw.NPanels)
-	for i := range vw.NPanels {
-		vw.Vars[i] = vw.Var
+	for i := range 4 {
+		vw.Panels[i].Mode = vw.Settings.Mode
+		vw.Panels[i].Var = vw.Var
 	}
 	vw.Styler(func(s *styles.Style) {
 		s.Direction = styles.Column
@@ -159,7 +155,21 @@ func (vw *View) Init() {
 func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 	vw.Lock()
 	vw.Var = vr
-	vw.Vars[panelNo] = vr
+	vw.Panels[panelNo].Var = vr
+	if vw.varsFrame == nil {
+		vw.Unlock()
+		return
+	}
+	vw.varsFrame.Update()
+	vw.Unlock()
+	vw.toolbar.Update()
+	vw.UpdateView()
+}
+
+// SetCurPrev sets the current vs. previous state viewing
+func (vw *View) SetCurPrev(curprv CurPrev, panelNo int) {
+	vw.Lock()
+	vw.Panels[panelNo].CurPrev = curprv
 	if vw.varsFrame == nil {
 		vw.Unlock()
 		return
@@ -200,6 +210,11 @@ func (vw *View) UpdateView() {
 // UpdateImpl does the guts of updating -- backend for Update or GoUpdate
 func (vw *View) UpdateImpl() {
 	vw.Lock()
+	for i := range 4 {
+		if vw.Panels[i].Var == nil {
+			vw.Panels[i].Var = vw.Var
+		}
+	}
 	vp, ok := vw.VarSettings[vw.Var]
 	if !ok {
 		vw.Unlock()
@@ -297,9 +312,28 @@ func (vw *View) makeVars(frame *core.Frame) {
 		w.Styler(func(s *styles.Style) {
 			s.Direction = styles.Column
 			s.Grow.Set(0, 1)
+			s.Min.X.Em(10)
 			s.Overflow.Y = styles.OverflowAuto
 		})
 		vals := vw.Var.Values()
+		tree.AddChildAt(w, "curprv", func(w *core.Switch) {
+			w.SetText("Current").SetChecked(true).
+				SetTooltip("Selects whether to show the current or previous state values")
+			w.OnChange(func(e events.Event) {
+				cp := Current
+				if !w.IsChecked() {
+					cp = Previous
+				}
+				vw.SetCurPrev(cp, vw.curPanel)
+			})
+			w.Updater(func() {
+				if vw.Panels[vw.curPanel].CurPrev == Current {
+					w.SetText("Current").SetChecked(true)
+				} else {
+					w.SetText("Previous").SetChecked(false)
+				}
+			})
+		})
 		for _, v := range vals {
 			vn := v.String()
 			doc := v.Desc()
@@ -313,7 +347,7 @@ func (vw *View) makeVars(frame *core.Frame) {
 					vw.SetVar(v, vw.curPanel)
 				})
 				w.Updater(func() {
-					w.SetSelected(v == vw.Var)
+					w.SetSelected(v == vw.Panels[vw.curPanel].Var)
 				})
 			})
 		}
@@ -322,9 +356,17 @@ func (vw *View) makeVars(frame *core.Frame) {
 
 // ViewDefaults are the default 3D view params
 func (vw *View) ViewDefaults(se *xyz.Scene) {
-	se.Camera.Pose.Pos.Set(0, 2.7, 1.2) // more "top down" view shows more of layers
 	se.Camera.Near = 0.1
+
+	se.Camera.Pose.Pos.Set(0, 1.9, 2.7)
 	se.Camera.LookAt(math32.Vec3(0, 0.2, -.8), math32.Vec3(0, 1, 0))
+	se.SaveCamera("2")
+
+	se.Camera.Pose.Pos.Set(0, 2.7, 1.2)
+	se.Camera.LookAt(math32.Vec3(0, 0.2, -.8), math32.Vec3(0, 1, 0))
+	se.SaveCamera("1")
+	se.SaveCamera("default")
+
 	vw.Styler(func(s *styles.Style) {
 		se.Background = colors.Scheme.Surface
 	})

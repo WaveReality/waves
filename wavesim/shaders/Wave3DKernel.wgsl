@@ -71,16 +71,18 @@ const GPUVarsN: GPUVars = 5;
 const EquationsN: Equations = 2;
 const EdgesN: Edges = 2;
 const ViewModesN: ViewModes = 2;
+const CurPrevN: CurPrev = 2;
+const NPanelsN: NPanels = 3;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
-fn Laplacian26(xx: i32,yy: i32,zz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<26; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(zz + zo), u32(yy + yo), u32(xx + xo), u32(vidx), u32(tidx))];
+		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
 	}return avg;
 }
@@ -121,10 +123,17 @@ struct Units {
 	pad: f32,
 }
 
-//////// import: "view.go"
+//////// import: "settings.go"
 alias ViewModes = i32; //enums:enum
 const  Plane: ViewModes = 0;
 const  Bars: ViewModes = 1;
+alias CurPrev = i32; //enums:enum
+const  Current: CurPrev = 0;
+const  Previous: CurPrev = 1;
+alias NPanels = i32; //enums:enum -trim-prefix=Panels
+const  PanelsOne: NPanels = 0;
+const  PanelsTwo: NPanels = 1;
+const  PanelsFour: NPanels = 2;
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum -trim-prefix=Wave

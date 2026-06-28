@@ -27,6 +27,6 @@ func main() {
 		},
 		func(sim *wavesim.Sim) {
 			// sim.Sine(wavesim.WavePos, math32.X, 27, 0, 1, 0)
-			sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 50, 0), -1, 16, 16, 0, 1.5)
+			sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
 		})
 }

@@ -22,16 +22,11 @@ type PlaneMesh struct {
 
 	// our panel number
 	panelNo int
-
-	// mode for this panel
-	mode ViewModes
-
-	offset math32.Vector3i
 }
 
 // NewPlaneMesh adds PlaneMesh mesh to given scene for given layer
 func NewPlaneMesh(sc *xyz.Scene, view *View, panel int) *PlaneMesh {
-	pm := &PlaneMesh{view: view, panelNo: panel, mode: view.Mode}
+	pm := &PlaneMesh{view: view, panelNo: panel}
 	pm.Name = view.planeName(panel)
 	sc.SetMesh(pm)
 	return pm
@@ -45,8 +40,10 @@ func (pm *PlaneMesh) MeshSize() (nVtx, nIndex int, hasColor bool) {
 	nx := int(pm.view.Size.X)
 	segs := 1
 
+	mode := pm.view.Panels[pm.panelNo].Mode
+
 	nper := 1
-	if pm.mode == Bars {
+	if mode == Bars {
 		nper = 5
 	}
 	vtxSz, idxSz := shape.PlaneN(segs, segs)
@@ -62,6 +59,7 @@ func (pm *PlaneMesh) MeshSize() (nVtx, nIndex int, hasColor bool) {
 var MinUnitHeight = float32(1.0e-6)
 
 func (pm *PlaneMesh) Set(vtxAry, normAry, texAry, clrAry math32.ArrayF32, idxAry math32.ArrayU32) {
+	// mode := pm.view.Panels[pm.panelNo].Mode
 	// if pm.mode == Plane {
 	// 	pm.SetPlane(vtxAry, texAry, clrAry, idxAry)
 	// } else {
@@ -126,11 +124,18 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 	fnz := float32(nz)
 	fnx := float32(nx)
 
-	st := pm.view.Start.Add(pm.offset)
-	vr := pm.view.Vars[pm.panelNo]
-	vri := int(vr.Int64())
 	ctx := GetCtx(0)
-	cur := int(ctx.CurState)
+
+	offset := pm.view.Panels[pm.panelNo].Offset
+	vr := pm.view.Panels[pm.panelNo].Var
+	curprv := pm.view.Panels[pm.panelNo].CurPrev
+	tidx := int(ctx.CurState)
+	if curprv == Previous {
+		tidx = int(ctx.PrevState())
+	}
+
+	st := pm.view.Start.Add(offset)
+	vri := int(vr.Int64())
 
 	uw := pm.view.Settings.BarSize
 	uo := (1.0 - uw)
@@ -150,7 +155,7 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 			ioff := pidx * idxSz * 5
 			x0 := uo + float32(xi)
 
-			val := State.Value(int(st.Z), ys, xs, vri, cur)
+			val := State.Value(int(st.Z), ys, xs, vri, tidx)
 			scaled, clr := pm.view.ValColor(val)
 			v4c := math32.NewVector4Color(clr)
 			shape.SetColor(clrAry, poff, 5*vtxSz, v4c)

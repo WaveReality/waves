@@ -53,13 +53,13 @@ func (ss *Sim) ConfigVars() {
 // Laplacian26 computes the 3D Laplacian across 26 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
-func Laplacian26(xx, yy, zz, vidx, tidx int32, ctr float32) float32 {
+func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range 26 {
 		xo := NeighOffs.Value(int(j), int(math32.X))
 		yo := NeighOffs.Value(int(j), int(math32.Y))
 		zo := NeighOffs.Value(int(j), int(math32.Z))
-		nv := State.Value(int(zz+zo), int(yy+yo), int(xx+xo), int(vidx), int(tidx))
+		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 		avg += LaplacianWts.Value(j) * (nv - ctr)
 	}
 	return avg

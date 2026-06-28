@@ -188,6 +188,96 @@ func (i *ViewModes) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "ViewModes")
 }
 
+var _CurPrevValues = []CurPrev{0, 1}
+
+// CurPrevN is the highest valid value for type CurPrev, plus one.
+//
+//gosl:start
+const CurPrevN CurPrev = 2
+
+//gosl:end
+
+var _CurPrevValueMap = map[string]CurPrev{`Current`: 0, `Previous`: 1}
+
+var _CurPrevDescMap = map[CurPrev]string{0: `Current selects the current state value (most recently updated).`, 1: `Previous selects the previous state value.`}
+
+var _CurPrevMap = map[CurPrev]string{0: `Current`, 1: `Previous`}
+
+// String returns the string representation of this CurPrev value.
+func (i CurPrev) String() string { return enums.String(i, _CurPrevMap) }
+
+// SetString sets the CurPrev value from its string representation,
+// and returns an error if the string is invalid.
+func (i *CurPrev) SetString(s string) error {
+	return enums.SetString(i, s, _CurPrevValueMap, "CurPrev")
+}
+
+// Int64 returns the CurPrev value as an int64.
+func (i CurPrev) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the CurPrev value from an int64.
+func (i *CurPrev) SetInt64(in int64) { *i = CurPrev(in) }
+
+// Desc returns the description of the CurPrev value.
+func (i CurPrev) Desc() string { return enums.Desc(i, _CurPrevDescMap) }
+
+// CurPrevValues returns all possible values for the type CurPrev.
+func CurPrevValues() []CurPrev { return _CurPrevValues }
+
+// Values returns all possible values for the type CurPrev.
+func (i CurPrev) Values() []enums.Enum { return enums.Values(_CurPrevValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i CurPrev) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *CurPrev) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "CurPrev") }
+
+var _NPanelsValues = []NPanels{0, 1, 2}
+
+// NPanelsN is the highest valid value for type NPanels, plus one.
+//
+//gosl:start
+const NPanelsN NPanels = 3
+
+//gosl:end
+
+var _NPanelsValueMap = map[string]NPanels{`One`: 0, `Two`: 1, `Four`: 2}
+
+var _NPanelsDescMap = map[NPanels]string{0: `One panel`, 1: `Two side-by-side panels`, 2: `Four bottom-top and side-by-side panels`}
+
+var _NPanelsMap = map[NPanels]string{0: `One`, 1: `Two`, 2: `Four`}
+
+// String returns the string representation of this NPanels value.
+func (i NPanels) String() string { return enums.String(i, _NPanelsMap) }
+
+// SetString sets the NPanels value from its string representation,
+// and returns an error if the string is invalid.
+func (i *NPanels) SetString(s string) error {
+	return enums.SetString(i, s, _NPanelsValueMap, "NPanels")
+}
+
+// Int64 returns the NPanels value as an int64.
+func (i NPanels) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the NPanels value from an int64.
+func (i *NPanels) SetInt64(in int64) { *i = NPanels(in) }
+
+// Desc returns the description of the NPanels value.
+func (i NPanels) Desc() string { return enums.Desc(i, _NPanelsDescMap) }
+
+// NPanelsValues returns all possible values for the type NPanels.
+func NPanelsValues() []NPanels { return _NPanelsValues }
+
+// Values returns all possible values for the type NPanels.
+func (i NPanels) Values() []enums.Enum { return enums.Values(_NPanelsValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i NPanels) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *NPanels) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "NPanels") }
+
 var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5}
 
 // WaveStatesN is the highest valid value for type WaveStates, plus one.

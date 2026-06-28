@@ -19,11 +19,8 @@ import (
 
 func (vw *View) MakeToolbar(p *tree.Plan) {
 	tree.Add(p, func(w *core.FuncButton) {
-		w.SetFunc(vw.Update).SetText("Init").SetIcon(icons.Update)
+		w.SetFunc(vw.Update).SetIcon(icons.Update).SetTooltip("Update the view to show current state")
 	})
-	// tree.Add(p, func(w *core.FuncButton) {
-	// 	w.SetFunc(vw.Current).SetIcon(icons.Update)
-	// })
 	tree.Add(p, func(w *core.Button) {
 		w.SetText("Settings").SetIcon(icons.Settings).
 			SetTooltip("set parameters that control display (font size etc)").
@@ -36,6 +33,30 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 				d.RunWindowDialog(vw)
 			})
 	})
+	tree.Add(p, func(w *core.Separator) {})
+
+	pltp := "which panel is active for selecting the variable and other view changes"
+	tree.Add(p, func(w *core.Text) {
+		w.SetText("Panel:").SetTooltip(pltp)
+	})
+	tree.Add(p, func(w *core.Spinner) {
+		w.SetMin(0).SetMax(4).SetStep(1).SetValue(float32(vw.curPanel)).SetTooltip(pltp)
+		w.Styler(func(s *styles.Style) {
+			s.Max.X.Ch(9)
+			s.Min.X.Ch(9)
+		})
+		w.OnChange(func(e events.Event) {
+			mx := vw.Settings.NPanels.N()
+			pl := int(w.Value)
+			if pl < mx && pl >= 0 {
+				vw.curPanel = pl
+			}
+			w.SetValue(float32(vw.curPanel))
+			vw.varsFrame.Update()
+			vw.UpdateView()
+		})
+	})
+
 	tree.Add(p, func(w *core.Separator) {})
 
 	vp, ok := vw.VarSettings[vw.Var]
