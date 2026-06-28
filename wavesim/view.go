@@ -80,8 +80,9 @@ type View struct {
 	// current number of panels rendered -- if changes, do full rebuild.
 	curNPanels int
 
-	midFrame  *core.Frame
-	scene     *Scene
+	midFrame *core.Frame
+	scene    *Scene
+	// SceneDBG  *Scene
 	counters  *core.Text
 	varsFrame *core.Frame
 	toolbar   *core.Toolbar
@@ -119,6 +120,7 @@ func (vw *View) Init() {
 		vw.makeVars(w)
 		tree.AddChildAt(w, "scene", func(w *Scene) {
 			vw.scene = w
+			// vw.SceneDBG = w
 			w.View = vw
 			se := w.SceneXYZ()
 			vw.ViewDefaults(se)

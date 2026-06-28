@@ -110,15 +110,16 @@ func (vw *View) UpdatePlanes() {
 		// but then the front and back fight against each other, causing flickering
 
 		txt := plg.Child(1).(*xyz.Text2D)
-		txt.Defaults()
-		txt.SetText(vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String())
-		// this doesn't help updating, neither does Rebuild!
-		// fmt.Println("txt:", txt.Text)
-		// txt.Config()
-		txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize)
-		txt.Styles.Background = colors.Uniform(colors.Transparent)
-		txt.Styles.Text.Align = text.Start
-		txt.Styles.Text.AlignV = text.Start
+		ntxt := vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String()
+		if txt.Text != ntxt {
+			txt.Defaults()
+			txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize)
+			txt.Styles.Background = colors.Uniform(colors.Transparent)
+			txt.Styles.Text.Align = text.Start
+			txt.Styles.Text.AlignV = text.Start
+			txt.SetText(ntxt)
+			txt.Config()
+		}
 	}
 	if npanels != vw.curNPanels {
 		se.Rebuild()
