@@ -90,6 +90,11 @@ func GPUInit() {
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Wave1DKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Wave3DKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -116,6 +121,48 @@ func GPURelease() {
 	ComputeGPU = nil
 }
 
+// RunWave1DKernel runs the Wave1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneWave1DKernel call does Run and Done for a
+// single run-and-sync case.
+func RunWave1DKernel(n int) {
+	if UseGPU {
+		RunWave1DKernelGPU(n)
+	} else {
+		RunWave1DKernelCPU(n)
+	}
+}
+
+// RunWave1DKernelGPU runs the Wave1DKernel kernel on the GPU. See [RunWave1DKernel] for more info.
+func RunWave1DKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["Wave1DKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunWave1DKernelCPU runs the Wave1DKernel kernel on the CPU.
+func RunWave1DKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, Wave1DKernel)
+}
+
+// RunOneWave1DKernel runs the Wave1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneWave1DKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunWave1DKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunWave1DKernelCPU(n)
+	}
+}
 // RunWave3DKernel runs the Wave3DKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched

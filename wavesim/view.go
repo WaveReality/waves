@@ -153,11 +153,43 @@ func (vw *View) Init() {
 	})
 }
 
-// SetVar sets the variable to view and updates the display
+// SetVar sets the variable to view and updates the display,
+// for given panel number. If panelNo is -1, then this sets
+// the global default for all panels, and doesn't update display.
 func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 	vw.Lock()
-	vw.Var = vr
+	if panelNo < 0 {
+		vw.Var = vr
+		for i := range 4 {
+			vw.Panels[i].Var = vr
+		}
+		vw.Unlock()
+		return
+	}
 	vw.Panels[panelNo].Var = vr
+	if vw.varsFrame == nil {
+		vw.Unlock()
+		return
+	}
+	vw.varsFrame.Update()
+	vw.Unlock()
+	vw.toolbar.Update()
+	vw.UpdateView()
+}
+
+// SetMode sets the display mode for given panel number.
+// if panelNo < 0 then sets default for all panels.
+func (vw *View) SetMode(mode ViewModes, panelNo int) {
+	vw.Lock()
+	if panelNo < 0 {
+		vw.Settings.Mode = mode
+		for i := range 4 {
+			vw.Panels[i].Mode = mode
+		}
+		vw.Unlock()
+		return
+	}
+	vw.Panels[panelNo].Mode = mode
 	if vw.varsFrame == nil {
 		vw.Unlock()
 		return

@@ -73,6 +73,10 @@ func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, i
 	nz := int(pm.view.Size.Y)
 	nx := int(pm.view.Size.X)
 
+	if nz < 2 {
+		return
+	}
+
 	fnz := float32(nz)
 	fnx := float32(nx)
 

@@ -31,6 +31,10 @@ type Sim struct {
 	// the initial State, using functions in init.
 	InitFunc func(sim *Sim) `display:"-"`
 
+	// viewInitFuncs are run at initialization of the GUI wave View.
+	// use ViewInit method to add.
+	viewInitFuncs []func(view *View) `display:"-"`
+
 	// Root is the root tensorfs directory, where all stats and other misc sim data goes.
 	Root *tensorfs.Node `display:"-"`
 
@@ -92,11 +96,28 @@ func RunSim(cfg *Config, configFunc, initFunc func(sim *Sim)) *Sim {
 	return sim
 }
 
+func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi:add
+	cfg := &Config{}
+	cfg.Defaults()
+	cfg.GUI = true
+	sim := &Sim{}
+	sim.Config = cfg
+	sim.ConfigFunc = configFunc
+	sim.InitFunc = initFunc
+	sim.ConfigSim()
+	sim.Init()
+	sim.ConfigGUI(parent)
+	return sim
+}
+
 func (ss *Sim) ConfigSim() {
 	ss.Root, _ = tensorfs.NewDir("Root")
 	tensorfs.CurRoot = ss.Root
 	ss.RandSeeds.Init(100) // max 100 runs
 	ss.InitRandSeed(0)
+	if ss.ConfigFunc != nil {
+		ss.ConfigFunc(ss)
+	}
 	if ss.Config.GPU {
 		// gpu.DebugAdapter = true
 		// gpu.SelectAdapter = ss.Config.Run.GPUDevice
@@ -112,9 +133,6 @@ func (ss *Sim) ConfigSim() {
 	// if ss.Config.GPU {
 	// 	fmt.Println(axon.GPUSystem.Vars().StringDoc())
 	// }
-	if ss.ConfigFunc != nil {
-		ss.ConfigFunc(ss)
-	}
 	ss.Init()
 }
 
@@ -178,6 +196,8 @@ func (ss *Sim) StepRun() {
 	switch ss.Config.Equation {
 	case Wave3D:
 		RunWave3DKernel(ns)
+	case Wave1D:
+		RunWave1DKernel(ns)
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()
@@ -195,6 +215,19 @@ func (ss *Sim) Stopped() {
 	ss.GUI.Stopped()
 }
 
+// ViewInit adds given function to view initialization functions.
+// Called in order added -- equations typically set default init
+// for specific equations (e.g., variable).
+func (ss *Sim) ViewInit(fun func(view *View)) {
+	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
+}
+
+func (ss *Sim) callViewInit(view *View) {
+	for _, fun := range ss.viewInitFuncs {
+		fun(view)
+	}
+}
+
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
 	vw := ss.GUI.AddView("View")
@@ -206,7 +239,7 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	if vw.Start.Z == 0 {
 		vw.Start.Z = 1
 	}
-	vw.SetVar(WavePos, 0)
+	ss.callViewInit(vw)
 	ss.GUI.FinalizeGUI(false)
 }
 

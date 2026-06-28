@@ -65,8 +65,48 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
+// Wave1DKernel is the kernel for computing the Wave1D equations.
+func Wave1DKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
+	posm1 := State.Value(int(z), int(y), int(x-1), int(WavePos), int(prv))
+	posp1 := State.Value(int(z), int(y), int(x+1), int(WavePos), int(prv))
+	force := (posm1 + posp1) - 2*ppos
+	vel := pvel + Params[0].Units.CSq*force
+	pos := ppos + vel
+
+	if Params[0].DoEnergy.IsTrue() {
+		midVel := 0.5 * (pvel + vel)
+		kinetic := Params[0].Units.Inv2CSq * midVel * midVel
+		pm1d := posm1 - ppos
+		pp1d := posp1 - ppos
+		potential := 0.5 * (pm1d*pm1d + pp1d*pp1d)
+
+		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
+		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
+		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
+	}
+	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+}
+
 //gosl:end
 
 func (ss *Sim) WaveConfig() {
 	ss.StateVars = WaveStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(WavePos, -1)
+		if ss.Config.Equation == Wave1D {
+			view.SetMode(Bars, -1)
+		}
+	})
 }
