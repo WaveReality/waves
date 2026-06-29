@@ -31,7 +31,7 @@ func main() {
 				sim.Config.Size.Set(100, 100, 1)
 			case 1:
 				sim.Config.Equation = wavesim.Wave1D
-				sim.Config.Size.Set(100, 1, 1)
+				sim.Config.Size.Set(80, 1, 1)
 				sim.ViewInit(wavesim.Wave1DViewAll)
 			}
 		},

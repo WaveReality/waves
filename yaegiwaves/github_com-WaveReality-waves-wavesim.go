@@ -80,6 +80,7 @@ func init() {
 		"ViewModesValues":    reflect.ValueOf(wavesim.ViewModesValues),
 		"Wave1D":             reflect.ValueOf(wavesim.Wave1D),
 		"Wave1DKernel":       reflect.ValueOf(wavesim.Wave1DKernel),
+		"Wave1DViewAll":      reflect.ValueOf(wavesim.Wave1DViewAll),
 		"Wave3D":             reflect.ValueOf(wavesim.Wave3D),
 		"Wave3DKernel":       reflect.ValueOf(wavesim.Wave3DKernel),
 		"WaveEnergy":         reflect.ValueOf(wavesim.WaveEnergy),
