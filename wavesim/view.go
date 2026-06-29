@@ -5,13 +5,14 @@
 package wavesim
 
 import (
+	"fmt"
 	"image/color"
-	"log"
 	"reflect"
 	"strconv"
 	"sync"
 	"time"
 
+	"cogentcore.org/core/base/errors"
 	"cogentcore.org/core/base/reflectx"
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/colors/colormap"
@@ -68,9 +69,6 @@ type View struct {
 	// Counters are displayed at the bottom: time, etc.
 	Counters string `set:"-" display:"-"`
 
-	// current var params -- only valid during Update of display
-	curVarSettings *VarSettings
-
 	// color map for mapping values to colors -- set by name in Settings
 	colorMap *colormap.Map
 
@@ -126,6 +124,7 @@ func (vw *View) Init() {
 			vw.ViewDefaults(se)
 			planesGp := xyz.NewGroup(se)
 			planesGp.Name = "Planes"
+			se.SetCamera(strconv.Itoa(vw.Settings.Camera))
 		})
 		w.OnShow(func(e events.Event) {
 			vw.UpdateView()
@@ -195,23 +194,35 @@ func (vw *View) SetMode(mode ViewModes, panelNo int) {
 		return
 	}
 	vw.varsFrame.Update()
-	vw.Unlock()
 	vw.toolbar.Update()
 	vw.UpdateView()
 }
 
 // SetCurPrev sets the current vs. previous state viewing
 func (vw *View) SetCurPrev(curprv CurPrev, panelNo int) {
-	vw.Lock()
 	vw.Panels[panelNo].CurPrev = curprv
-	if vw.varsFrame == nil {
-		vw.Unlock()
+	vw.UpdateView()
+}
+
+// SetVarMinMax sets the min and max range for given variable.
+func (vw *View) SetVarMinMax(vr enums.Enum, mn, mx float32) {
+	vp, err := vw.GetVarSettings(vr)
+	if errors.Log(err) != nil {
 		return
 	}
-	vw.varsFrame.Update()
-	vw.Unlock()
-	vw.toolbar.Update()
+	vp.Range.SetMin(mn)
+	vp.Range.SetMax(mx)
 	vw.UpdateView()
+}
+
+// SelectCamera selects the given pre-configured camera view,
+// which have different angles. 1= top-down, 2 = head-on
+func (vw *View) SelectCamera(camNo int) {
+	se := vw.SceneXYZ()
+	if se == nil {
+		return
+	}
+	se.SetCamera(strconv.Itoa(camNo))
 }
 
 // GoUpdateView is the update call to make from another go routine
@@ -249,15 +260,13 @@ func (vw *View) UpdateImpl() {
 			vw.Panels[i].Var = vw.Var
 		}
 	}
-	vp, ok := vw.VarSettings[vw.Var]
-	if !ok {
+	vp, err := vw.GetVarSettings(vw.Panels[vw.curPanel].Var)
+	if errors.Log(err) != nil {
 		vw.Unlock()
-		log.Printf("View: %v variable: %v not found\n", vw.Name, vw.Var)
 		return
 	}
-	vw.curVarSettings = vp
 
-	if !vp.Range.FixMin || !vp.Range.FixMax {
+	if false && (!vp.Range.FixMin || !vp.Range.FixMax) { // todo: not yet
 		needUpdate := false
 		// need to autoscale
 		// min, max, ok := vw.Data.VarRange(vw.Var)
@@ -302,6 +311,9 @@ func (vw *View) UpdateImpl() {
 }
 
 func (vw *View) SceneXYZ() *xyz.Scene {
+	if vw.scene == nil {
+		return nil
+	}
 	return vw.scene.SceneXYZ()
 }
 
@@ -313,6 +325,22 @@ func (vw *View) SetCounters(ctrs string) {
 	vw.Counters = ctrs
 	ct := vw.counters
 	ct.UpdateWidget().NeedsRender()
+}
+
+func (vw *View) GetVarSettings(vr enums.Enum) (*VarSettings, error) {
+	vp, ok := vw.VarSettings[vr]
+	if !ok {
+		return nil, fmt.Errorf("Variable: %v settings not found", vw.Name, vw.Var)
+	}
+	return vp, nil
+}
+
+func (vw *View) GetVarSettingsPanel(panelNo int) (*VarSettings, error) {
+	vp, ok := vw.VarSettings[vw.Panels[panelNo].Var]
+	if !ok {
+		return nil, fmt.Errorf("Variable: %v settings not found", vw.Name, vw.Var)
+	}
+	return vp, nil
 }
 
 // VarsListUpdate updates the list of network variables
@@ -413,23 +441,24 @@ var NilColor = color.RGBA{0x20, 0x20, 0x20, 0x40}
 
 // ValColor returns the raw value, scaled value, and color representation
 // for given raw value
-func (vw *View) ValColor(raw float32) (scaled float32, clr color.RGBA) {
-	if vw.curVarSettings == nil || vw.curVarSettings.Var != vw.Var {
-		ok := false
-		vw.curVarSettings, ok = vw.VarSettings[vw.Var]
-		if !ok {
-			return
-		}
-	}
-	clp := vw.curVarSettings.Range.ClampValue(raw)
-	norm := vw.curVarSettings.Range.NormValue(clp)
-	var op float32
-	if vw.curVarSettings.ZeroCtr {
+func (vw *View) ValColor(raw float32, panelNo int) (scaled float32, clr color.RGBA) {
+	vp, err := vw.GetVarSettings(vw.Panels[panelNo].Var)
+	var clp, norm, op float32
+	if err != nil {
+		clp = math32.Clamp(raw, -1, 1)
+		norm = 0.5 * (clp + 1)
 		scaled = float32(2*norm - 1)
 		op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*math32.Abs(scaled))
 	} else {
-		scaled = float32(norm)
-		op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*0.8) // no meaningful alpha -- just set at 80\%
+		clp = vp.Range.ClampValue(raw)
+		norm = vp.Range.NormValue(clp)
+		if vp.ZeroCtr {
+			scaled = float32(2*norm - 1)
+			op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*math32.Abs(scaled))
+		} else {
+			scaled = float32(norm)
+			op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*0.8) // no meaningful alpha -- just set at 80\%
+		}
 	}
 	clr = colors.WithAF32(vw.colorMap.Map(norm), op)
 	return

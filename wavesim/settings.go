@@ -76,6 +76,10 @@ type Settings struct {
 	// Height is how high the values are, in normalized units.
 	Height float32
 
+	// Camera specifies the initial camera view to show the scene
+	// 1 = default = top-down, 2 = side-long
+	Camera int
+
 	// size of a single bar element, where 1 = full width and no space.. .9 default
 	BarSize float32 `min:"0.1" max:"1" step:"0.1" default:"0.9"`
 

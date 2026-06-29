@@ -71,15 +71,15 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 	tree.AddAt(p, "minSwitch", func(w *core.Switch) {
 		minSwitch = w
 		w.SetText("Min").SetType(core.SwitchCheckbox).SetChecked(vp.Range.FixMin).
-			SetTooltip("Fix the minimum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
+			SetTooltip("NOTE: not functional yet!  Fix the minimum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
 			OnChange(func(e events.Event) {
-				vp := vw.VarSettings[vw.Var]
-				vp.Range.FixMin = w.IsChecked()
+				// vp := vw.GetVarSettingsPanel(vw.curPanel)
+				// vp.Range.FixMin = w.IsChecked()
 				minSpin.UpdateWidget().NeedsRender()
 				vw.UpdateView()
 			})
 		w.Updater(func() {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 			if vp != nil {
 				w.SetChecked(vp.Range.FixMin)
 			}
@@ -93,7 +93,10 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 		})
 		w.SetValue(vp.Range.Min).
 			OnChange(func(e events.Event) {
-				vp := vw.VarSettings[vw.Var]
+				vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
+				if vp == nil {
+					return
+				}
 				vp.Range.SetMin(w.Value)
 				vp.Range.FixMin = true
 				minSwitch.UpdateWidget().NeedsRender()
@@ -106,7 +109,7 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 				vw.UpdateView()
 			})
 		w.Updater(func() {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 			if vp != nil {
 				w.SetValue(vp.Range.Min)
 			}
@@ -133,15 +136,15 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 	tree.AddAt(p, "maxSwitch", func(w *core.Switch) {
 		maxSwitch = w
 		w.SetText("Max").SetType(core.SwitchCheckbox).SetChecked(vp.Range.FixMax).
-			SetTooltip("Fix the maximum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
+			SetTooltip("Note: not functional yet! Fix the maximum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
 			OnChange(func(e events.Event) {
-				vp := vw.VarSettings[vw.Var]
-				vp.Range.FixMax = w.IsChecked()
+				// vp := vw.GetVarSettingsPanel(vw.curPanel)
+				// vp.Range.FixMax = w.IsChecked()
 				maxSpin.UpdateWidget().NeedsRender()
 				vw.UpdateView()
 			})
 		w.Updater(func() {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 			if vp != nil {
 				w.SetChecked(vp.Range.FixMax)
 			}
@@ -155,7 +158,10 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			s.Max.X.Ch(15)
 		})
 		w.SetValue(vp.Range.Max).OnChange(func(e events.Event) {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
+			if vp == nil {
+				return
+			}
 			vp.Range.SetMax(w.Value)
 			vp.Range.FixMax = true
 			maxSwitch.UpdateWidget().NeedsRender()
@@ -168,7 +174,7 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			vw.UpdateView()
 		})
 		w.Updater(func() {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 			if vp != nil {
 				w.SetValue(vp.Range.Max)
 			}
@@ -179,12 +185,14 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 		w.SetText("ZeroCtr").SetChecked(vp.ZeroCtr).
 			SetTooltip("keep Min - Max centered around 0, and use negative heights for units -- else use full min-max range for height (no negative heights)").
 			OnChange(func(e events.Event) {
-				vp := vw.VarSettings[vw.Var]
-				vp.ZeroCtr = w.IsChecked()
-				vw.UpdateView()
+				vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
+				if vp != nil {
+					vp.ZeroCtr = w.IsChecked()
+					vw.UpdateView()
+				}
 			})
 		w.Updater(func() {
-			vp := vw.VarSettings[vw.Var]
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 			if vp != nil {
 				w.SetChecked(vp.ZeroCtr)
 			}

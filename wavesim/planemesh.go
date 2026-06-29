@@ -106,7 +106,7 @@ func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, i
 		for xi := 0; xi < nx; xi++ {
 			xs := int(st.X) + xi
 			val := State.Value(int(st.Z), ys, xs, vri, tidx)
-			scaled, clr := pm.view.ValColor(val)
+			scaled, clr := pm.view.ValColor(val, pm.panelNo)
 			v4c := math32.NewVector4Color(clr)
 			shape.SetColor(clrAry, vidx, 1, v4c)
 			ht := 0.5 * scaled
@@ -206,7 +206,7 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 			x0 := uo + float32(xi)
 
 			val := State.Value(int(st.Z), ys, xs, vri, tidx)
-			scaled, clr := pm.view.ValColor(val)
+			scaled, clr := pm.view.ValColor(val, pm.panelNo)
 			v4c := math32.NewVector4Color(clr)
 			shape.SetColor(clrAry, poff, 5*vtxSz, v4c)
 			ht := 0.5 * math32.Abs(scaled)
