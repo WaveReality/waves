@@ -64,8 +64,10 @@ func (vw *View) UpdatePlanes() {
 	}
 
 	nsc := math32.Vec3(2/float32(sz.X), 2/float32(sz.Y), 2/float32(sz.Z))
+	if sz.Y == 1 { // for 1D, just make it a silhouette
+		nsc.Y = 0.05
+	}
 	ht := vw.Settings.Height
-	// szc := max(nsc.X, nsc.Y)
 	poff := math32.Vector3Scalar(0.5)
 	poff.Y = -0.5
 	poff.X = 1

@@ -162,6 +162,7 @@ func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 		for i := range 4 {
 			vw.Panels[i].Var = vr
 		}
+		vw.VarsListUpdate()
 		vw.Unlock()
 		return
 	}
@@ -257,6 +258,7 @@ func (vw *View) UpdateImpl() {
 	vw.Lock()
 	for i := range 4 {
 		if vw.Panels[i].Var == nil {
+			fmt.Println("nil var", i)
 			vw.Panels[i].Var = vw.Var
 		}
 	}
@@ -330,7 +332,7 @@ func (vw *View) SetCounters(ctrs string) {
 func (vw *View) GetVarSettings(vr enums.Enum) (*VarSettings, error) {
 	vp, ok := vw.VarSettings[vr]
 	if !ok {
-		return nil, fmt.Errorf("Variable: %v settings not found", vw.Name, vw.Var)
+		return nil, fmt.Errorf("Variable: %v settings not found", vw.Var)
 	}
 	return vp, nil
 }
@@ -338,7 +340,7 @@ func (vw *View) GetVarSettings(vr enums.Enum) (*VarSettings, error) {
 func (vw *View) GetVarSettingsPanel(panelNo int) (*VarSettings, error) {
 	vp, ok := vw.VarSettings[vw.Panels[panelNo].Var]
 	if !ok {
-		return nil, fmt.Errorf("Variable: %v settings not found", vw.Name, vw.Var)
+		return nil, fmt.Errorf("Variable: %v settings not found", vw.Var)
 	}
 	return vp, nil
 }

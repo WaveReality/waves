@@ -110,3 +110,15 @@ func (ss *Sim) WaveConfig() {
 		}
 	})
 }
+
+// Wave1DViewAll configures the
+func Wave1DViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.SetVarMinMax(WavePos, -0.8, 0.8)
+	view.Settings.Height = 0.8
+	view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = WaveVel
+	view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = WaveVel
+}

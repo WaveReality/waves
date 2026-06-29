@@ -216,14 +216,16 @@ func (ss *Sim) Stopped() {
 }
 
 // ViewInit adds given function to view initialization functions.
-// Called in order added -- equations typically set default init
-// for specific equations (e.g., variable).
+// Called in reverse of order added. Equations typically set default init
+// for specific equations (e.g., variable), added at the end.
 func (ss *Sim) ViewInit(fun func(view *View)) {
 	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
 }
 
 func (ss *Sim) callViewInit(view *View) {
-	for _, fun := range ss.viewInitFuncs {
+	n := len(ss.viewInitFuncs)
+	for i := n - 1; i >= 0; i-- {
+		fun := ss.viewInitFuncs[i]
 		fun(view)
 	}
 }

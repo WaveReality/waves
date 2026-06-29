@@ -32,16 +32,7 @@ func main() {
 			case 1:
 				sim.Config.Equation = wavesim.Wave1D
 				sim.Config.Size.Set(100, 1, 1)
-				sim.ViewInit(func(view *wavesim.View) {
-					view.Settings.NPanels = wavesim.PanelsFour
-					view.Settings.Camera = 2
-					view.SetVarMinMax(wavesim.WavePos, -0.8, 0.8)
-					view.Settings.Height = 0.5
-					view.SetCurPrev(wavesim.Previous, 1)
-					view.SetVar(wavesim.WaveVel, 2)
-					view.SetCurPrev(wavesim.Previous, 3)
-					view.SetVar(wavesim.WaveVel, 3)
-				})
+				sim.ViewInit(wavesim.Wave1DViewAll)
 			}
 		},
 		func(sim *wavesim.Sim) {
