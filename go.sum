@@ -1,9 +1,9 @@
 codeberg.org/go-pdf/fpdf v0.11.1 h1:U8+coOTDVLxHIXZgGvkfQEi/q0hYHYvEHFuGNX2GzGs=
 codeberg.org/go-pdf/fpdf v0.11.1/go.mod h1:Y0DGRAdZ0OmnZPvjbMp/1bYxmIPxm0ws4tfoPOc4LjU=
-cogentcore.org/core v0.3.36 h1:feXPv04fc572MFUTQUyRY/5y3LKbeYTS359iPVBZJcg=
-cogentcore.org/core v0.3.36/go.mod h1:11/KD463R4oHAcGyCEi/BLrABrX14nOYO5O4qLI+Zzg=
-cogentcore.org/lab v0.1.15 h1:VEHDHm4MJQoLxfXDKim8qxPqZeGogkuG2wXAx49YMRY=
-cogentcore.org/lab v0.1.15/go.mod h1:Rp+JitRQBQ0eR0yKrvkRhSOzWGd4OTe5zO/3dS0eSA8=
+cogentcore.org/core v0.3.37 h1:YZyUbeRTr/jpVjKyV6pHFfzsyHt/fPcsH787N3LDlVQ=
+cogentcore.org/core v0.3.37/go.mod h1:11/KD463R4oHAcGyCEi/BLrABrX14nOYO5O4qLI+Zzg=
+cogentcore.org/lab v0.1.16 h1:TL/6rxEyeb9t2D9juMB9herUqLkU69NCZXKOn+DTSXE=
+cogentcore.org/lab v0.1.16/go.mod h1:Jm1CU2TnOZPAtxl/33RBe8keqMpM1BELMT+yAzU+J90=
 git.sr.ht/~sbinet/overlayfs v0.1.1 h1:HvCHXT1cs8RMSjNLQXxPPosB2hgR3tRC8RniH0f3ESg=
 git.sr.ht/~sbinet/overlayfs v0.1.1/go.mod h1:TmrIWKlxyPJJ7vchTqk85DUcW6IDsIa7ONLvSGIw438=
 github.com/Bios-Marcel/wastebasket/v2 v2.0.3 h1:TkoDPcSqluhLGE+EssHu7UGmLgUEkWg7kNyHyyJ3Q9g=
@@ -79,6 +79,8 @@ github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69
 github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
+github.com/mattn/go-shellwords v1.0.12 h1:M2zGm7EW6UQJvDeQxo4T51eKPurbeFbe8WtebGE2xrk=
+github.com/mattn/go-shellwords v1.0.12/go.mod h1:EZzvwXDESEeg03EKmM+RmDnNOPKG4lLtQsUlTZDWQ8Y=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/muesli/termenv v0.16.0 h1:S5AlUN9dENB57rsbnkPyfdGuWIlkmzJjbFf0Tf5FWUc=

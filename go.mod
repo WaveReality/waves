@@ -3,8 +3,9 @@ module github.com/WaveReality/waves
 go 1.25.6
 
 require (
-	cogentcore.org/core v0.3.36
-	cogentcore.org/lab v0.1.15
+	cogentcore.org/core v0.3.37
+	cogentcore.org/lab v0.1.16
+	github.com/cogentcore/yaegi v0.0.0-20260116172027-700fbf8949f3
 )
 
 require (
@@ -18,7 +19,6 @@ require (
 	github.com/bramvdbogaerde/go-scp v1.6.0 // indirect
 	github.com/chewxy/math32 v1.11.2 // indirect
 	github.com/cogentcore/readline v0.1.3 // indirect
-	github.com/cogentcore/yaegi v0.0.0-20260116172027-700fbf8949f3 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/ericchiang/css v1.4.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
@@ -35,6 +35,7 @@ require (
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-shellwords v1.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/oliverbestmann/webgpu v1.33.5-0.20260523154840-fa113c1fb662 // indirect

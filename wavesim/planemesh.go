@@ -10,9 +10,10 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
-// PlaneMesh is a xyz.Mesh that represents an X-Y plane through the state.
-// It is dynamically updated using theUpdate method which only resets the
-// essential Vertex elements. The geometry is literal in the size:
+// PlaneMesh is a xyz.Mesh that represents an X-Y plane through the state,
+// as either a Heightfield or bars.
+// It is dynamically updated using the Set method.
+// The geometry is literal in the size:
 // 0,0,0 lower-left corner and increasing X,Z in display for the X,Y plane.
 // Display applies an overall scaling to make it fit within the larger view.
 type PlaneMesh struct {
@@ -119,7 +120,7 @@ func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, i
 	// a d
 	// abd, bcd
 	// because z is inverted, a is higher z, b is lower
-	nz1 := nx - 1
+	nz1 := nz - 1
 	vIdx := func(z, x int) int {
 		return ((nz1-z)*nx + x)
 	}
@@ -212,18 +213,21 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 			if ht < MinUnitHeight {
 				ht = MinUnitHeight
 			}
+			base := float32(0)
 			if scaled >= 0 {
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff, ioff, math32.X, math32.Y, -1, -1, uw, ht, x0, 0, z0, segs, segs, pos)                    // nz
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+1*vtxSz, ioff+1*idxSz, math32.Z, math32.Y, -1, -1, uw, ht, z0, 0, x0+uw, segs, segs, pos) // px
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+2*vtxSz, ioff+2*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, 0, x0, segs, segs, pos)     // nx
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+3*vtxSz, ioff+3*idxSz, math32.X, math32.Z, 1, 1, uw, uw, x0, z0, ht, segs, segs, pos)     // py <-
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+4*vtxSz, ioff+4*idxSz, math32.X, math32.Y, 1, -1, uw, ht, x0, 0, z0+uw, segs, segs, pos)  // pz
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff, ioff, math32.X, math32.Y, -1, -1, uw, ht, x0, 0, z0, segs, segs, pos)                       // nz
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+1*vtxSz, ioff+1*idxSz, math32.Z, math32.Y, -1, -1, uw, ht, z0, base, x0+uw, segs, segs, pos) // px
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+2*vtxSz, ioff+2*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, base, x0, segs, segs, pos)     // nx
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+3*vtxSz, ioff+3*idxSz, math32.X, math32.Z, 1, 1, uw, uw, x0, z0, ht, segs, segs, pos)        // py <-
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+4*vtxSz, ioff+4*idxSz, math32.X, math32.Y, 1, -1, uw, ht, x0, base, z0+uw, segs, segs, pos)  // pz
 			} else {
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff, ioff, math32.X, math32.Y, 1, -1, uw, ht, x0, -ht, z0, segs, segs, pos)                    // nz = pz norm
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+1*vtxSz, ioff+1*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, -ht, x0+uw, segs, segs, pos) // px = nx norm
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+2*vtxSz, ioff+2*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, -ht, x0, segs, segs, pos)    // nx
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+3*vtxSz, ioff+3*idxSz, math32.X, math32.Z, 1, 1, uw, uw, x0, z0, -ht, segs, segs, pos)     // ny <-
-				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+4*vtxSz, ioff+4*idxSz, math32.X, math32.Y, 1, -1, uw, ht, x0, -ht, z0+uw, segs, segs, pos) // pz
+				base = -ht
+				//
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff, ioff, math32.X, math32.Y, 1, -1, uw, ht, x0, base, z0, segs, segs, pos)                    // nz = pz norm
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+3*vtxSz, ioff+3*idxSz, math32.X, math32.Z, 1, 1, uw, uw, x0, z0, base, segs, segs, pos)     // ny <-
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+1*vtxSz, ioff+1*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, base, x0+uw, segs, segs, pos) // px = nx norm
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+2*vtxSz, ioff+2*idxSz, math32.Z, math32.Y, 1, -1, uw, ht, z0, base, x0, segs, segs, pos)    // nx
+				shape.SetPlane(vtxAry, normAry, texAry, idxAry, poff+4*vtxSz, ioff+4*idxSz, math32.X, math32.Y, 1, -1, uw, ht, x0, base, z0+uw, segs, segs, pos) // pz
 			}
 			pidx++
 		}

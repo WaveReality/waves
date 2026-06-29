@@ -20,20 +20,26 @@ var icon string
 
 func main() {
 	core.AppIcon = icon
+
+	runCfg := 0
+
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
-			// sim.Config.Equation = wavesim.Wave3D
-			// sim.Config.Size.Set(100, 100, 1)
-
-			sim.Config.Equation = wavesim.Wave1D
-			sim.Config.Size.Set(100, 1, 1)
+			switch runCfg {
+			case 0:
+				sim.Config.Equation = wavesim.Wave3D
+				sim.Config.Size.Set(100, 100, 1)
+			case 1:
+				sim.Config.Equation = wavesim.Wave1D
+				sim.Config.Size.Set(100, 1, 1)
+			}
 		},
 		func(sim *wavesim.Sim) {
-			if sim.GUI.View != nil {
-				sim.GUI.View.Settings.Mode = wavesim.Bars
-				sim.GUI.View.Panels[0].Mode = wavesim.Bars
+			switch runCfg {
+			case 0:
+				sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
+			case 1:
+				sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1.5)
 			}
-			// sim.Sine(wavesim.WavePos, math32.X, 27, 0, 1, 0)
-			sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1.5)
 		})
 }
