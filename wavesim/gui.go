@@ -143,6 +143,9 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	gui.sim = sim
 	gui.Splits = split
 	gui.SimForm = core.NewForm(split).SetStruct(sim)
+	gui.SimForm.OnChange(func(e events.Event) {
+		sim.Params.Update()
+	})
 	gui.SimForm.Name = "sim-form"
 	if gui.Body != nil {
 		gui.Body.AddTopBar(func(bar *core.Frame) {

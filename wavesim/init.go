@@ -60,7 +60,7 @@ func (ss *Sim) MovingWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vecto
 	prv := ctx.PrevState()
 	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
 	var diroff math32.Vector3
-	diroff.SetDim(dim, dir*ss.Params.Units.C)
+	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
 	tp := float32(2.0 * math32.Pi)
 	var c math32.Vector3i

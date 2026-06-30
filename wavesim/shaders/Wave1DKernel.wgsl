@@ -8,7 +8,7 @@ var<storage, read> TensorStrides: array<u32>;
 var<storage, read> Params: array<Parameters>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
-var<storage, read_write> Ctx: array<Context>;
+var<storage, read> Ctx: array<Context>;
 @group(1) @binding(1)
 var<storage, read_write> State: array<f32>;
 
@@ -56,7 +56,7 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "enumgen.go"
 const GPUVarsN: GPUVars = 5;
-const EquationsN: Equations = 2;
+const EquationsN: Equations = 3;
 const EdgesN: Edges = 2;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
@@ -65,29 +65,28 @@ const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
 
+//////// import: "klein-gordon.go"
+
 //////// import: "params.go"
 alias Equations = i32; //enums:enum
 const  Wave1D: Equations = 0;
 const  Wave3D: Equations = 1;
+const  KleinGordon: Equations = 2;
 alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
+const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
+const  TwoPi    = 2 * Pi;
+const  InvTwoPi = 1.0 / TwoPi;
 struct Parameters {
 	Edges: Edges,
 	DoEnergy: i32,
-	pad: i32,
-	pad1: i32,
-	Units: Units,
-}
-struct Display {
-	On: bool,
-	Interval: i32,
-}
-struct Units {
 	C: f32,
 	CSq: f32,
 	Inv2CSq: f32,
-	pad: f32,
+	HBar: f32,
+	Mass: f32,
+	MassCOverHBarSq: f32,
 }
 
 //////// import: "settings.go"
@@ -111,7 +110,7 @@ const  WaveKinetic: WaveStates = 3;
 const  WavePotential: WaveStates = 4;
 const  WaveEnergy: WaveStates = 5;
 fn Wave1DKernel(i: u32) { //gosl:kernel
-var ctx = Ctx[0];; var x: i32;
+let ctx = Ctx[0];; var x: i32;
 var y: i32;
 var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; if (!ok) {
@@ -123,11 +122,11 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var posm1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(WavePos), u32(prv))];
 ; var posp1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x + 1), u32(WavePos), u32(prv))];
 ; var force = (posm1 + posp1) - 2*ppos;
-; var vel = pvel + Params[0].Units.CSq*force;
+; var vel = pvel + Params[0].CSq*force;
 ; var pos = ppos + vel;
 ; if (Params[0].DoEnergy == 1) {
 	var midVel = 0.5 * (pvel + vel);
-	var kinetic = Params[0].Units.Inv2CSq * midVel * midVel;
+	var kinetic = Params[0].Inv2CSq * midVel * midVel;
 	var pm1d = posm1 - ppos;
 	var pp1d = posp1 - ppos;
 	var potential = 0.5 * (pm1d*pm1d + pp1d*pp1d);

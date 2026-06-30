@@ -18,7 +18,10 @@ import (
 // Sim contains everything for the simulation.
 type Sim struct {
 	// Params contains the current simulation parameters.
-	Params *Parameters `new-window:"+" display:"no-inline"`
+	Params *Parameters `display:"add-fields"`
+
+	// Units convert between real-world SI units and per-cube computational units.
+	Units Units `new-window:"+" display:"no-inline"`
 
 	// Config contains the broader running configuration.
 	Config *Config `new-window:"+" display:"no-inline"`
@@ -105,8 +108,8 @@ func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi
 	sim.ConfigFunc = configFunc
 	sim.InitFunc = initFunc
 	sim.ConfigSim()
-	sim.Init()
 	sim.ConfigGUI(parent)
+	sim.Init()
 	return sim
 }
 
@@ -115,6 +118,7 @@ func (ss *Sim) ConfigSim() {
 	tensorfs.CurRoot = ss.Root
 	ss.RandSeeds.Init(100) // max 100 runs
 	ss.InitRandSeed(0)
+	ss.ConfigVars()
 	if ss.ConfigFunc != nil {
 		ss.ConfigFunc(ss)
 	}
@@ -124,10 +128,11 @@ func (ss *Sim) ConfigSim() {
 		GPUInit()
 		UseGPU = true
 	}
-	ss.ConfigVars()
 	switch ss.Config.Equation {
 	case Wave1D, Wave3D:
 		ss.WaveConfig()
+	case KleinGordon:
+		ss.KleinGordonConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -198,6 +203,8 @@ func (ss *Sim) StepRun() {
 		RunWave3DKernel(ns)
 	case Wave1D:
 		RunWave1DKernel(ns)
+	case KleinGordon:
+		RunKleinGordon3DKernel(ns)
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()

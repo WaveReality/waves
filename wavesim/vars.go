@@ -31,6 +31,7 @@ var (
 
 	// Ctx has the Context state values.
 	//gosl:group State
+	//gosl:read-only
 	Ctx []Context
 
 	// State is the overall wave state, with inner-most index being the current

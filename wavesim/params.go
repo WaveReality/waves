@@ -4,7 +4,17 @@
 
 package wavesim
 
-import "cogentcore.org/lab/gosl/slbool"
+import (
+	"slices"
+
+	"cogentcore.org/lab/gosl/slbool"
+)
+
+// ParamsShouldDisplay should be set to an equation-specific list of
+// Parameters field names to display. To simplify the
+// GPU configuration, it is important to only have one struct
+// with everything in it, so this simplifies things.
+var ParamsShouldDisplay []string
 
 //gosl:start
 
@@ -17,6 +27,9 @@ const (
 
 	// Wave3D is the basic wave equation in three dimensions.
 	Wave3D
+
+	// KleinGordon is the 3D Klein-Gordon massive particle wave function.
+	KleinGordon
 )
 
 // Edges determines how to handle the edges.
@@ -31,8 +44,17 @@ const (
 	EdgesWrap
 )
 
-// Parameters contains the full set of simulation parameters.
-// this is uploaded to the GPU.
+// The following are constants used across many equations.
+const (
+	Pi       = 3.14159265358979323846264338327950288419716939937510582097494459
+	TwoPi    = 2 * Pi
+	InvTwoPi = 1.0 / TwoPi
+)
+
+// Parameters contains the full set of simulation parameters,
+// for all equations. These are the bare computational values,
+// uploaded to the GPU.
+// Use Units to set values relative to a particular set of units.
 type Parameters struct {
 	// Edges determines how to handle the edges.
 	Edges Edges
@@ -40,52 +62,46 @@ type Parameters struct {
 	// DoEnergy determines if energy is computed (when not necessary).
 	DoEnergy slbool.Bool
 
-	pad, pad1 int32
-
-	// Units are the relevant unit factors.
-	Units Units
-}
-
-func (pr *Parameters) Defaults() {
-	pr.Units.Defaults()
-	pr.DoEnergy.SetBool(true)
-}
-
-func (pr *Parameters) Update() {
-	pr.Units.Update()
-}
-
-// Display contains display parameters.
-type Display struct {
-	// On determines if display is updated.
-	On bool
-
-	// Interval is the number of time steps between display updates.
-	Interval int
-}
-
-// Units contains all the relevant units
-type Units struct {
-	// C is the speed of light factor
+	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
 
 	// CSq = C^2
-	CSq float32 `edit:"-"`
+	CSq float32 `display:"-"`
 
 	// Inv2CSq = 1 / 2C^2
-	Inv2CSq float32 `edit:"-"`
+	Inv2CSq float32 `display:"-"`
 
-	pad float32
+	// HBar = h / 2pi = reduced Planck constant.
+	HBar float32
+
+	// Mass is a general mass term, e.g., for the KleinGordon equations.
+	Mass float32
+
+	// MassCOverHBarSq = Mass^2 C^2 / HBar^2 is the mass drag factor in KleinGordon and related equations.
+	MassCOverHBarSq float32 `display:"-"`
+
+	// int32
 }
 
-func (un *Units) Defaults() {
-	un.C = 0.5
-	un.Update()
-}
-
-func (un *Units) Update() {
-	un.CSq = un.C * un.C
-	un.Inv2CSq = 1.0 / (2 * un.CSq)
+func (pr *Parameters) Update() {
+	pr.CSq = pr.C * pr.C
+	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
+	pr.MassCOverHBarSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.HBar * pr.HBar)
 }
 
 //gosl:end
+
+func (pr *Parameters) Defaults() {
+	pr.C = 0.5
+	pr.HBar = 1.0
+	pr.Mass = 1.0
+	pr.DoEnergy.SetBool(true)
+	pr.Update()
+}
+
+func (pr *Parameters) ShouldDisplay(field string) bool {
+	if ParamsShouldDisplay != nil {
+		return slices.Contains(ParamsShouldDisplay, field)
+	}
+	return true
+}

@@ -51,20 +51,20 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _EquationsValues = []Equations{0, 1}
+var _EquationsValues = []Equations{0, 1, 2}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 2
+const EquationsN Equations = 3
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave1D`: 0, `Wave3D`: 1}
+var _EquationsValueMap = map[string]Equations{`Wave1D`: 0, `Wave3D`: 1, `KleinGordon`: 2}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave1D is the basic wave equation in one dimension (X).`, 1: `Wave3D is the basic wave equation in three dimensions.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave1D is the basic wave equation in one dimension (X).`, 1: `Wave3D is the basic wave equation in three dimensions.`, 2: `KleinGordon is the 3D Klein-Gordon massive particle wave function.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave1D`, 1: `Wave3D`}
+var _EquationsMap = map[Equations]string{0: `Wave1D`, 1: `Wave3D`, 2: `KleinGordon`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }

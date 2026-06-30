@@ -31,10 +31,6 @@ const (
 	WaveEnergy
 )
 
-func (ws WaveStates) SetVarSettings(vs *VarSettings) {
-	// todo: can set per variable here
-}
-
 // Wave3DKernel is the kernel for computing the Wave3D equations.
 func Wave3DKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
@@ -48,12 +44,12 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
 	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
-	vel := pvel + Params[0].Units.CSq*force
+	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].DoEnergy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
-		kinetic := Params[0].Units.Inv2CSq * midVel * midVel
+		kinetic := Params[0].Inv2CSq * midVel * midVel
 		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
 
 		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
@@ -80,12 +76,12 @@ func Wave1DKernel(i uint32) { //gosl:kernel
 	posm1 := State.Value(int(z), int(y), int(x-1), int(WavePos), int(prv))
 	posp1 := State.Value(int(z), int(y), int(x+1), int(WavePos), int(prv))
 	force := (posm1 + posp1) - 2*ppos
-	vel := pvel + Params[0].Units.CSq*force
+	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].DoEnergy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
-		kinetic := Params[0].Units.Inv2CSq * midVel * midVel
+		kinetic := Params[0].Inv2CSq * midVel * midVel
 		pm1d := posm1 - ppos
 		pp1d := posp1 - ppos
 		potential := 0.5 * (pm1d*pm1d + pp1d*pp1d)
@@ -101,7 +97,12 @@ func Wave1DKernel(i uint32) { //gosl:kernel
 
 //gosl:end
 
+func (ws WaveStates) SetVarSettings(vs *VarSettings) {
+	// todo: can set per variable here
+}
+
 func (ss *Sim) WaveConfig() {
+	ParamsShouldDisplay = WaveShouldDisplay
 	ss.StateVars = WaveStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
@@ -111,7 +112,10 @@ func (ss *Sim) WaveConfig() {
 	})
 }
 
-// Wave1DViewAll configures the
+// WaveShouldDisplay determines which Parameters fields to display.
+var WaveShouldDisplay = []string{"Edges", "DoEnergy", "C"}
+
+// Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
 func Wave1DViewAll(view *View) {
 	view.Settings.NPanels = PanelsFour
 	view.Settings.Camera = 2

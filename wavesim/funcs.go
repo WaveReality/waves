@@ -13,8 +13,6 @@ import (
 	"cogentcore.org/lab/tensor"
 )
 
-//gosl:start
-
 func (ss *Sim) ConfigVars() {
 	if Params != nil {
 		return
@@ -22,6 +20,7 @@ func (ss *Sim) ConfigVars() {
 	Params = make([]Parameters, 1)
 	Params[0].Defaults()
 	ss.Params = &Params[0]
+	ss.Units.Defaults()
 	Ctx = make([]Context, 1)
 	Ctx[0].Init()
 	NeighOffs = tensor.NewInt32(26, 3)
@@ -49,6 +48,8 @@ func (ss *Sim) ConfigVars() {
 		}
 	}
 }
+
+//gosl:start
 
 // Laplacian26 computes the 3D Laplacian across 26 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
