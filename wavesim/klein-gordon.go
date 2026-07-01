@@ -25,7 +25,7 @@ func KleinGordon3DKernel(i uint32) { //gosl:kernel
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
-	if Params[0].DoEnergy.IsTrue() {
+	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
@@ -50,4 +50,4 @@ func (ss *Sim) KleinGordonConfig() {
 }
 
 // KGShouldDisplay determines which Parameters fields to display.
-var KGShouldDisplay = []string{"Edges", "DoEnergy", "C", "HBar", "Mass"}
+var KGShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength"}

@@ -34,15 +34,15 @@ func (ss *Sim) CopyCurToPrev() {
 
 // WavePacket returns value for a gaussian * cosine wave packet for given
 // linear dimension value x and 3D distance d.
-func WavePacket(x, d, period, width, phase, amp float32) float32 {
-	cos := amp * math32.Cos(TwoPi*((x/period)+phase))
+func WavePacket(x, d, wavelength, width, phase, amp float32) float32 {
+	cos := amp * math32.Cos(TwoPi*((x/wavelength)+phase))
 	d /= width
 	gauss := math32.FastExp(-d * d)
 	return cos * gauss
 }
 
 // Sine adds sine wave values along given dimension, to given variable.
-func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off float32) {
+func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
@@ -53,7 +53,7 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off floa
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
 				dv := float32(c.Dim(dim))
-				v := off + amp*math32.Sin(TwoPi*((dv+phase)/period))
+				v := off + amp*math32.Sin(TwoPi*((dv+phase)/wavelength))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 			}
 		}
@@ -63,7 +63,7 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, period, phase, amp, off floa
 // PosWavePacket adds a gaussian * cosine wave packet along given dimension,
 // with given parameters, to just the current and previous position variables.
 // This will produce two moving wave packets that split off into opposite directions.
-func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, period, width, phase, amp float32) {
+func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, wavelength, width, phase, amp float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
@@ -79,12 +79,12 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 				f := c.AddScalar(1)
 				ff := math32.Vec3(float32(f.X), float32(f.Y), float32(f.Z))
 				d := ff.Sub(ctrf)
-				cv := WavePacket(d.Dim(dim), d.Length(), period, width, phase, amp)
+				cv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
-				pv := WavePacket(d.Dim(dim), d.Length(), period, width, phase, amp)
+				pv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
@@ -94,22 +94,22 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 // MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
 // with given parameters, to both the position and velocity variables in current
 // and previous states, which results in a single wave packet moving in given direction.
-func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, period, width, phase, amp float32) {
+func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, wavelength, width, phase, amp float32) {
 	posI := int(posVar.Int64())
 	velI := int(velVar.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	// these values are fit from small 8 wide, 8 period packets:
-	vamp := amp * 2 * math32.Sqrt(1.0/period)
-	vperiod := period * 0.94
+	// these values are fit from small 8 wide, 8 wavelength packets:
+	vamp := amp * 2 * math32.Sqrt(1.0/wavelength)
+	vwavelength := wavelength * 0.94
 	vwidth := width * 0.92
 	vphase := phase + .06
-	veloff := 1 + period/8
-	if period > 20 { // these are for bigger wave packets
+	veloff := 1 + wavelength/8
+	if wavelength > 20 { // these are for bigger wave packets
 		vphase = phase + 0.5
 		vamp = amp * 0.0746 // 0.0746
-		veloff = 1 + 2*math32.Sqrt(period)
+		veloff = 1 + 2*math32.Sqrt(wavelength)
 	}
 	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
 	var diroff math32.Vector3
@@ -122,24 +122,30 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 				f := c.AddScalar(1)
 				ff := math32.Vec3(float32(f.X), float32(f.Y), float32(f.Z))
 				d := ff.Sub(ctrf)
-				cp := WavePacket(d.Dim(dim), d.Length(), period, width, phase, amp)
+				cp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cp, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
-				pp := WavePacket(d.Dim(dim), d.Length(), period, width, phase, amp)
+				pp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(pp, int(f.Z), int(f.Y), int(f.X), int(posI), int(prv))
 
 				ff.SetAdd(diroff.MulScalar(-veloff))
 				d = ff.Sub(ctrf)
-				cv := WavePacket(d.Dim(dim), d.Length(), vperiod, vwidth, vphase, vamp)
+				cv := WavePacket(d.Dim(dim), d.Length(), vwavelength, vwidth, vphase, vamp)
 				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(velI), int(cur))
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
-				pv := WavePacket(d.Dim(dim), d.Length(), 0.996*vperiod, 0.997*vwidth, vphase, vamp)
+				pv := WavePacket(d.Dim(dim), d.Length(), 0.996*vwavelength, 0.997*vwidth, vphase, vamp)
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(velI), int(prv))
 			}
 		}
 	}
+}
+
+// MovingWavePacketParamWavelength is a version of [MovingWavePacket] that takes its
+// wavelength variable from [Params.Wavelength]
+func (ss *Sim) MovingWavePacketParamWavelength(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, width, phase, amp float32) {
+	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, width, phase, amp)
 }

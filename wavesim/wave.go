@@ -47,7 +47,7 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
-	if Params[0].DoEnergy.IsTrue() {
+	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
@@ -79,7 +79,7 @@ func Wave1DKernel(i uint32) { //gosl:kernel
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
-	if Params[0].DoEnergy.IsTrue() {
+	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		pm1d := posm1 - ppos
@@ -113,7 +113,7 @@ func (ss *Sim) WaveConfig() {
 }
 
 // WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"Edges", "DoEnergy", "C"}
+var WaveShouldDisplay = []string{"Edges", "Energy", "C"}
 
 // Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
 func Wave1DViewAll(view *View) {

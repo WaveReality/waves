@@ -80,13 +80,17 @@ const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
 struct Parameters {
 	Edges: Edges,
-	DoEnergy: i32,
+	Energy: i32,
 	C: f32,
 	CSq: f32,
 	Inv2CSq: f32,
 	HBar: f32,
 	Mass: f32,
 	MassCOverHBarSq: f32,
+	Wavelength: f32,
+	pad: f32,
+	pad1: f32,
+	pad2: f32,
 }
 
 //////// import: "settings.go"
@@ -124,7 +128,7 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var force = (posm1 + posp1) - 2*ppos;
 ; var vel = pvel + Params[0].CSq*force;
 ; var pos = ppos + vel;
-; if (Params[0].DoEnergy == 1) {
+; if (Params[0].Energy == 1) {
 	var midVel = 0.5 * (pvel + vel);
 	var kinetic = Params[0].Inv2CSq * midVel * midVel;
 	var pm1d = posm1 - ppos;

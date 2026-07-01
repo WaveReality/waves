@@ -34,41 +34,41 @@ func FitPacketMain() {
 		func(sim *wavesim.Sim) {
 			if !done {
 				FitPacketOpen(sim, "../oned_wvpacket_lg.tsr.gz", 500, 250, 80, 80, 0, 0.5)
-				// FitPacketOpen(sim, "../oned_wvpacket.tsr", 40, 25, 8, 8, 0, 1)
+				// FitPacketOpen(sim, "../oned_wvpacket_sm.tsr.gz", 40, 25, 8, 8, 0, 1)
 				done = true
 			}
 		})
 }
 
-func FitPacketOpen(sim *wavesim.Sim, filename string, maxX int, pos, period, width, phase, amp float32) {
+func FitPacketOpen(sim *wavesim.Sim, filename string, maxX int, pos, wavelength, width, phase, amp float32) {
 	sim.OpenState(fsx.Filename(filename))
 	st := wavesim.State
 
-	FitPacketVar(st, maxX, int(wavesim.WavePos), 0, pos, period, width, phase, amp)
-	FitPacketVar(st, maxX, int(wavesim.WavePos), 1, pos, period, width, phase, amp)
-	FitPacketVar(st, maxX, int(wavesim.WaveVel), 0, pos, period, width, phase, amp)
-	FitPacketVar(st, maxX, int(wavesim.WaveVel), 1, pos, period, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WavePos), 0, pos, wavelength, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WavePos), 1, pos, wavelength, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WaveVel), 0, pos, wavelength, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WaveVel), 1, pos, wavelength, width, phase, amp)
 }
 
-func FitPacketVar(st *tensor.Float32, maxX int, vidx, curprv int, pos, period, width, phase, amp float32) {
+func FitPacketVar(st *tensor.Float32, maxX int, vidx, curprv int, pos, wavelength, width, phase, amp float32) {
 	fmt.Println("\n##### vidx:", vidx, "cur prv:", curprv)
-	fmt.Printf("start\tpos: %7.4g\tperiod: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\n", pos, period, width, phase, amp)
+	fmt.Printf("start\tpos: %7.4g\twavelength: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\n", pos, wavelength, width, phase, amp)
 
 	step := float32(.01)
-	rmult := period / 8
+	rmult := wavelength / 8
 
 	amp = FitPacketAmp(st, maxX, vidx, curprv) // just gets max
 
 	var er float32
 	for iter := range MaxIter {
-		pos = FitPacketPos(st, maxX, vidx, curprv, pos-4*rmult, pos+4*rmult, 1, period, width, phase, amp)
-		phase = FitPacketPhase(st, maxX, vidx, curprv, 0, 1, 0.01, pos, period, width, amp)
-		period = FitPacketPeriod(st, maxX, vidx, curprv, period-4*rmult, period+4*rmult, step, pos, width, phase, amp)
-		width = FitPacketWidth(st, maxX, vidx, curprv, width-4, width+4, step, pos, period, phase, amp)
-		er = FitPacketErr(false, st, maxX, vidx, curprv, pos, period, width, phase, amp)
-		fmt.Printf("%d\tpos: %7.4g\tperiod: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\terr: %7.4g\n", iter, pos, period, width, phase, amp, er)
+		pos = FitPacketPos(st, maxX, vidx, curprv, pos-4*rmult, pos+4*rmult, 1, wavelength, width, phase, amp)
+		phase = FitPacketPhase(st, maxX, vidx, curprv, 0, 1, 0.01, pos, wavelength, width, amp)
+		wavelength = FitPacketWavelength(st, maxX, vidx, curprv, wavelength-4*rmult, wavelength+4*rmult, step, pos, width, phase, amp)
+		width = FitPacketWidth(st, maxX, vidx, curprv, width-4, width+4, step, pos, wavelength, phase, amp)
+		er = FitPacketErr(false, st, maxX, vidx, curprv, pos, wavelength, width, phase, amp)
+		fmt.Printf("%d\tpos: %7.4g\twavelength: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\terr: %7.4g\n", iter, pos, wavelength, width, phase, amp, er)
 	}
-	// er = FitPacketErr(true, st, maxX, vidx, curprv, pos, period, width, phase, amp)
+	// er = FitPacketErr(true, st, maxX, vidx, curprv, pos, wavelength, width, phase, amp)
 }
 
 // computes the max
@@ -81,11 +81,11 @@ func FitPacketAmp(st *tensor.Float32, maxX, vidx, curprv int) float32 {
 	return mx
 }
 
-func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, stepPos, period, width, phase, amp float32) float32 {
+func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, stepPos, wavelength, width, phase, amp float32) float32 {
 	var best float32
 	minerr := float32(math32.MaxFloat32)
 
-	// fmt.Println("p, w, p, a", period, width, phase, amp)
+	// fmt.Println("p, w, p, a", wavelength, width, phase, amp)
 
 	for pos := minPos; pos <= maxPos; pos += stepPos {
 		er := float32(0)
@@ -95,7 +95,7 @@ func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, st
 				continue
 			}
 			d := float32(x-1) - pos
-			t := math32.Abs(wavesim.WavePacket(d, d, period, width, phase, amp))
+			t := math32.Abs(wavesim.WavePacket(d, d, wavelength, width, phase, amp))
 			erd := math32.Abs(v - t)
 			er += erd
 			//	if math32.Abs(pos - 26.2) < 0.001 {
@@ -111,7 +111,7 @@ func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, st
 	return best
 }
 
-func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, stepWd, pos, period, phase, amp float32) float32 {
+func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, stepWd, pos, wavelength, phase, amp float32) float32 {
 	var best float32
 	minerr := float32(math32.MaxFloat32)
 
@@ -123,7 +123,7 @@ func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, st
 				continue
 			}
 			d := float32(x-1) - pos
-			t := math32.Abs(wavesim.WavePacket(d, d, period, wd, phase, amp))
+			t := math32.Abs(wavesim.WavePacket(d, d, wavelength, wd, phase, amp))
 			erd := math32.Abs(v - t)
 			er += erd
 			//	if math32.Abs(per - 12) < 0.001 {
@@ -139,7 +139,7 @@ func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, st
 	return best
 }
 
-func FitPacketPeriod(st *tensor.Float32, maxX, vidx, curprv int, minPer, maxPer, stepPer, pos, width, phase, amp float32) float32 {
+func FitPacketWavelength(st *tensor.Float32, maxX, vidx, curprv int, minPer, maxPer, stepPer, pos, width, phase, amp float32) float32 {
 	var best float32
 	minerr := float32(math32.MaxFloat32)
 
@@ -163,11 +163,11 @@ func FitPacketPeriod(st *tensor.Float32, maxX, vidx, curprv int, minPer, maxPer,
 			minerr = er
 		}
 	}
-	// fmt.Println("period best, err:", best, minerr)
+	// fmt.Println("wavelength best, err:", best, minerr)
 	return best
 }
 
-func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, stepPhs, pos, period, width, amp float32) float32 {
+func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, stepPhs, pos, wavelength, width, amp float32) float32 {
 	var best float32
 	minerr := float32(math32.MaxFloat32)
 
@@ -176,7 +176,7 @@ func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, 
 		for x := range maxX {
 			v := st.Value(int(1), int(1), int(x), int(vidx), int(curprv))
 			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, period, width, phs, amp)
+			t := wavesim.WavePacket(d, d, wavelength, width, phs, amp)
 			erd := float32(0)
 			if math32.Sign(v) != math32.Sign(t) {
 				erd = 1
@@ -193,12 +193,12 @@ func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, 
 }
 
 // FitPacketErr returns raw Abs error for given params
-func FitPacketErr(print bool, st *tensor.Float32, maxX, vidx, curprv int, pos, period, width, phase, amp float32) float32 {
+func FitPacketErr(print bool, st *tensor.Float32, maxX, vidx, curprv int, pos, wavelength, width, phase, amp float32) float32 {
 	er := float32(0)
 	for x := range maxX {
 		v := st.Value(int(1), int(1), int(x), int(vidx), int(curprv))
 		d := float32(x-1) - pos
-		t := wavesim.WavePacket(d, d, period, width, phase, amp)
+		t := wavesim.WavePacket(d, d, wavelength, width, phase, amp)
 		erd := math32.Abs(v - t)
 		er += erd
 		if print {

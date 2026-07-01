@@ -59,8 +59,8 @@ type Parameters struct {
 	// Edges determines how to handle the edges.
 	Edges Edges
 
-	// DoEnergy determines if energy is computed (when not necessary).
-	DoEnergy slbool.Bool
+	// Energy determines if energy is computed (when not necessary).
+	Energy slbool.Bool
 
 	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
@@ -80,7 +80,12 @@ type Parameters struct {
 	// MassCOverHBarSq = Mass^2 C^2 / HBar^2 is the mass drag factor in KleinGordon and related equations.
 	MassCOverHBarSq float32 `display:"-"`
 
-	// int32
+	// Wavelength is the wavelength to use for functions that use it
+	// (ParamWavelength suffix). Allows user to manipulate the wavelength easily,
+	// e.g., for KG and other matter waves.
+	Wavelength float32
+
+	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -95,7 +100,8 @@ func (pr *Parameters) Defaults() {
 	pr.C = 0.5
 	pr.HBar = 1.0
 	pr.Mass = 1.0
-	pr.DoEnergy.SetBool(true)
+	pr.Wavelength = 8
+	pr.Energy.SetBool(true)
 	pr.Update()
 }
 
