@@ -138,8 +138,10 @@ func (ss *Sim) ConfigSim() {
 	switch ss.Config.Equation {
 	case Wave1D, Wave3D:
 		ss.WaveConfig()
-	case KleinGordon:
+	case KleinGordon1D, KleinGordon3D:
 		ss.KleinGordonConfig()
+	case Schrodinger1D, Schrodinger3D:
+		ss.SchrodingerConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -211,8 +213,12 @@ func (ss *Sim) StepRun() {
 		RunWave3DKernel(ns)
 	case Wave1D:
 		RunWave1DKernel(ns)
-	case KleinGordon:
+	// case KleinGordon1D:
+	// 	RunKleinGordon3DKernel(ns) // TODO: 1D!!!
+	case KleinGordon3D:
 		RunKleinGordon3DKernel(ns)
+	case Schrodinger3D:
+		RunSchrodinger3DKernel(ns)
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()

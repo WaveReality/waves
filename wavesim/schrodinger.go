@@ -8,6 +8,52 @@ package wavesim
 
 //gosl:start
 
+// CabStates are the state variables for wave equations on
+// a wave state with a single complex value,
+// where A = real and B = complex components.
+type CabStates int32 //enums:enum -trim-prefix=Cab
+
+const (
+	// CabPosA is the position (height) wave state variable
+	// for the real complex component A.
+	CabPosA CabStates = iota
+
+	// CabPosB is the position (height) wave state variable
+	// for the imaginary complex component B.
+	CabPosB
+
+	// CabVelA is the velocity of wave state variable
+	// for the real complex component A.
+	CabVelA
+
+	// CabVelB is the velocity of wave state variable
+	// for the imaginary complex component B.
+	CabVelB
+
+	// CabForceA is the net force computed from neighbors
+	// for the real complex component A.
+	CabForceA
+
+	// CabForceB is the net force computed from neighbors
+	// for the imaginary complex component B.
+	CabForceB
+
+	// CabV is an external potential energy factor, that
+	// can be used to push particles around.
+	CabV
+
+	// CabCompConj is the complex conjugate ("squared") wave
+	// value, which represents the total probability or a conserved
+	// charge value.
+	CabCompConj
+
+	// CabKinetic is the total kinetic energy across components.
+	CabKinetic
+
+	// CabEnergy is the total kinetic + potential energy.
+	CabEnergy
+)
+
 // Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.
 func Schrodinger3DKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
@@ -18,34 +64,61 @@ func Schrodinger3DKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
-	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
-	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
-	vel := pvel + Params[0].CSq*force
-	pos := ppos + vel
+	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
+	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
+	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
+
+	// need to alternate the updating for stability
+	// just carry forward other vars.
+	var forceA, velA, posA, forceB, velB, posB float32
+	if cur == 0 {
+		forceA = Laplacian26(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB         // note neg here, not in B
+		velA = pvelA + forceA
+		posA = pposA + velA
+
+		// carry B forward
+		forceB = State.Value(int(z), int(y), int(x), int(CabForceB), int(prv))
+		velB = pvelB
+		posB = pposB
+	} else {
+		forceB = Laplacian26(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA          // todo: not sure about this!!
+		velB = pvelB + forceB
+		posB = pposB + velB
+
+		// carry A forward
+		forceA = State.Value(int(z), int(y), int(x), int(CabForceA), int(prv))
+		velA = pvelA
+		posA = pposA
+	}
 
 	if Params[0].Energy.IsTrue() {
-		midVel := 0.5 * (pvel + vel)
-		kinetic := Params[0].Inv2CSq * midVel * midVel
-		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+		// todo: CompConj!
+		midVel := 0.25 * (pvelA + velA + pvelB + velB)
+		kinetic := Params[0].MassOver2 * midVel * midVel
 
-		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
-		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
-		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
+		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
+		State.Set(kinetic+vpot, int(z), int(y), int(x), int(CabEnergy), int(cur))
 	}
-	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
-	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
-	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+
+	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 }
 
 //gosl:end
 
 func (ss *Sim) SchrodingerConfig() {
 	ParamsShouldDisplay = SchrodShouldDisplay
-	ss.StateVars = WaveStatesN
+	ss.StateVars = CabStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(WavePos, -1)
+		view.SetVar(CabPosA, -1)
 	})
 }
 

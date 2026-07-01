@@ -28,11 +28,17 @@ const (
 	// Wave3D is the basic wave equation in three dimensions.
 	Wave3D
 
-	// KleinGordon is the 3D Klein-Gordon massive particle wave function.
-	KleinGordon
+	// KleinGordon is the 1D Klein-Gordon massive particle wave function.
+	KleinGordon1D
+
+	// KleinGordon3D is the 3D Klein-Gordon massive particle wave function.
+	KleinGordon3D
 
 	// Schrodinger is the 1D Schrodinger wave function.
 	Schrodinger1D
+
+	// Schrodinger is the 3D Schrodinger wave function.
+	Schrodinger3D
 )
 
 // Edges determines how to handle the edges.
@@ -80,8 +86,15 @@ type Parameters struct {
 	// Mass is a general mass term, e.g., for the KleinGordon equations.
 	Mass float32
 
-	// MassCOverHBarSq = Mass^2 C^2 / HBar^2 is the mass drag factor in KleinGordon and related equations.
+	// MassCOverHBarSq = Mass^2 C^2 / HBar^2 is the mass drag factor
+	// in KleinGordon and related equations.
 	MassCOverHBarSq float32 `display:"-"`
+
+	// HBarSqOver2Mass = HBar^2 / 2 Mass is the factor for Schrodinger's equation.
+	HBarSqOver2Mass float32 `display:"-"`
+
+	// MassOver2 = Mass / 2 for computing kinetic energy.
+	MassOver2 float32 `display:"-"`
 
 	// Wavelength is the wavelength to use for functions that use it
 	// (Params suffix). Allows user to manipulate the wavelength easily,
@@ -92,14 +105,14 @@ type Parameters struct {
 	// (Params suffix). Allows user to manipulate the wave parameters easily,
 	// e.g., for KG and other matter waves.
 	PacketWidth float32
-
-	pad, pad1 float32
 }
 
 func (pr *Parameters) Update() {
 	pr.CSq = pr.C * pr.C
 	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
 	pr.MassCOverHBarSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.HBar * pr.HBar)
+	pr.HBarSqOver2Mass = (pr.HBar * pr.HBar) / (2.0 * pr.Mass)
+	pr.MassOver2 = pr.Mass / 2.0
 }
 
 //gosl:end

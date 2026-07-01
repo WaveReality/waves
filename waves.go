@@ -21,7 +21,8 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	eqs := wavesim.KleinGordon
+	// eqs := wavesim.KleinGordon3D
+	eqs := wavesim.Schrodinger3D
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -35,8 +36,11 @@ func main() {
 			case wavesim.Wave3D:
 				sim.Config.Equation = wavesim.Wave3D
 				sim.Config.Size.Set(100, 100, 1)
-			case wavesim.KleinGordon:
-				sim.Config.Equation = wavesim.KleinGordon
+			case wavesim.KleinGordon3D:
+				sim.Config.Equation = wavesim.KleinGordon3D
+				sim.Config.Size.Set(100, 100, 1)
+			case wavesim.Schrodinger3D:
+				sim.Config.Equation = wavesim.Schrodinger3D
 				sim.Config.Size.Set(100, 100, 1)
 			}
 		},
@@ -48,7 +52,9 @@ func main() {
 				// 				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)
 			case wavesim.Wave3D:
 				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
-			case wavesim.KleinGordon:
+			case wavesim.KleinGordon3D:
+				sim.MovingWavePacketParams(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 0), -1, 0, 1.5)
+			case wavesim.Schrodinger3D:
 				sim.MovingWavePacketParams(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 0), -1, 0, 1.5)
 			}
 		})

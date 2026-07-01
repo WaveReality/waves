@@ -68,8 +68,9 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "enumgen.go"
 const GPUVarsN: GPUVars = 5;
-const EquationsN: Equations = 4;
+const EquationsN: Equations = 6;
 const EdgesN: Edges = 2;
+const CabStatesN: CabStates = 10;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const NPanelsN: NPanels = 3;
@@ -86,17 +87,6 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
 	}return avg;
 }
-fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var avg = f32(0);
-	for (var j=0; j<26; j++) {
-		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
-		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
-		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
-		var dv = (nv - ctr);
-		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * dv * dv;
-	}return avg;
-}
 
 //////// import: "klein-gordon.go"
 
@@ -104,8 +94,10 @@ fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 
 alias Equations = i32; //enums:enum
 const  Wave1D: Equations = 0;
 const  Wave3D: Equations = 1;
-const  KleinGordon: Equations = 2;
-const  Schrodinger1D: Equations = 3;
+const  KleinGordon1D: Equations = 2;
+const  KleinGordon3D: Equations = 3;
+const  Schrodinger1D: Equations = 4;
+const  Schrodinger3D: Equations = 5;
 alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
@@ -121,13 +113,24 @@ struct Parameters {
 	HBar: f32,
 	Mass: f32,
 	MassCOverHBarSq: f32,
+	HBarSqOver2Mass: f32,
+	MassOver2: f32,
 	Wavelength: f32,
 	PacketWidth: f32,
-	pad: f32,
-	pad1: f32,
 }
 
 //////// import: "schrodinger.go"
+alias CabStates = i32; //enums:enum -trim-prefix=Cab
+const  CabPosA: CabStates = 0;
+const  CabPosB: CabStates = 1;
+const  CabVelA: CabStates = 2;
+const  CabVelB: CabStates = 3;
+const  CabForceA: CabStates = 4;
+const  CabForceB: CabStates = 5;
+const  CabV: CabStates = 6;
+const  CabCompConj: CabStates = 7;
+const  CabKinetic: CabStates = 8;
+const  CabEnergy: CabStates = 9;
 fn Schrodinger3DKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -139,23 +142,47 @@ fn Schrodinger3DKernel(i: u32) { //gosl:kernel
 	}
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
-	var ppos = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePos), u32(prv))];
-	var pvel = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv))];
-	var force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
-	force -= Params[0].MassCOverHBarSq * ppos; // this is the only diff from standard Wave
-	var vel = pvel + Params[0].CSq*force;
-	var pos = ppos + vel;
-	if (Params[0].Energy == 1) {
-		var midVel = 0.5 * (pvel + vel);
-		var kinetic = Params[0].Inv2CSq * midVel * midVel;
-		var potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur))] = kinetic;
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur))] = potential;
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur))] = kinetic + potential;
+	var pposA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv))];
+	var pposB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv))];
+	var pvelA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelA), u32(prv))];
+	var pvelB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelB), u32(prv))];
+	var vpot = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22],
+	TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabV), u32(prv))];
+	var forceA: f32;
+	var velA: f32;
+	var posA: f32;
+	var forceB: f32;
+	var velB: f32;
+	var posB: f32;
+	if (cur == 0) {
+		forceA = Laplacian26(x, y, z, i32(CabPosB), prv, pposB); // A driven by B
+		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB;         // note neg here, not in B
+		velA = pvelA + forceA;
+		posA = pposA + velA;
+		forceB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceB), u32(prv))];
+		velB = pvelB;
+		posB = pposB;
+	} else {
+		forceB = Laplacian26(x, y, z, i32(CabPosA), prv, pposA); // B driven by A
+		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA;          // todo: not sure about this!!
+		velB = pvelB + forceB;
+		posB = pposB + velB;
+		forceA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceA), u32(prv))];
+		velA = pvelA;
+		posA = pposA;
 	}
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur))] = force;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur))] = vel;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))] = pos;
+	if (Params[0].Energy == 1) {
+		var midVel = 0.25 * (pvelA + velA + pvelB + velB);
+		var kinetic = Params[0].MassOver2 * midVel * midVel;
+		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabKinetic), u32(cur))] = kinetic;
+		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabEnergy), u32(cur))] = kinetic + vpot;
+	}
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur))] = forceA;
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur))] = velA;
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur))] = posA;
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur))] = forceB;
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur))] = velB;
+	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur))] = posB;
 }
 
 //////// import: "settings.go"

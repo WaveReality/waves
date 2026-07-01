@@ -51,20 +51,20 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 4
+const EquationsN Equations = 6
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave1D`: 0, `Wave3D`: 1, `KleinGordon`: 2, `Schrodinger1D`: 3}
+var _EquationsValueMap = map[string]Equations{`Wave1D`: 0, `Wave3D`: 1, `KleinGordon1D`: 2, `KleinGordon3D`: 3, `Schrodinger1D`: 4, `Schrodinger3D`: 5}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave1D is the basic wave equation in one dimension (X).`, 1: `Wave3D is the basic wave equation in three dimensions.`, 2: `KleinGordon is the 3D Klein-Gordon massive particle wave function.`, 3: `Schrodinger is the 1D Schrodinger wave function.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave1D is the basic wave equation in one dimension (X).`, 1: `Wave3D is the basic wave equation in three dimensions.`, 2: `KleinGordon is the 1D Klein-Gordon massive particle wave function.`, 3: `KleinGordon3D is the 3D Klein-Gordon massive particle wave function.`, 4: `Schrodinger is the 1D Schrodinger wave function.`, 5: `Schrodinger is the 3D Schrodinger wave function.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave1D`, 1: `Wave3D`, 2: `KleinGordon`, 3: `Schrodinger1D`}
+var _EquationsMap = map[Equations]string{0: `Wave1D`, 1: `Wave3D`, 2: `KleinGordon1D`, 3: `KleinGordon3D`, 4: `Schrodinger1D`, 5: `Schrodinger3D`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -140,6 +140,53 @@ func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
+
+var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+// CabStatesN is the highest valid value for type CabStates, plus one.
+//
+//gosl:start
+const CabStatesN CabStates = 10
+
+//gosl:end
+
+var _CabStatesValueMap = map[string]CabStates{`PosA`: 0, `PosB`: 1, `VelA`: 2, `VelB`: 3, `ForceA`: 4, `ForceB`: 5, `V`: 6, `CompConj`: 7, `Kinetic`: 8, `Energy`: 9}
+
+var _CabStatesDescMap = map[CabStates]string{0: `CabPosA is the position (height) wave state variable for the real complex component A.`, 1: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 2: `CabVelA is the velocity of wave state variable for the real complex component A.`, 3: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 4: `CabForceA is the net force computed from neighbors for the real complex component A.`, 5: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 6: `CabV is an external potential energy factor, that can be used to push particles around.`, 7: `CabCompConj is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`, 8: `CabKinetic is the total kinetic energy across components.`, 9: `CabEnergy is the total kinetic + potential energy.`}
+
+var _CabStatesMap = map[CabStates]string{0: `PosA`, 1: `PosB`, 2: `VelA`, 3: `VelB`, 4: `ForceA`, 5: `ForceB`, 6: `V`, 7: `CompConj`, 8: `Kinetic`, 9: `Energy`}
+
+// String returns the string representation of this CabStates value.
+func (i CabStates) String() string { return enums.String(i, _CabStatesMap) }
+
+// SetString sets the CabStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *CabStates) SetString(s string) error {
+	return enums.SetString(i, s, _CabStatesValueMap, "CabStates")
+}
+
+// Int64 returns the CabStates value as an int64.
+func (i CabStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the CabStates value from an int64.
+func (i *CabStates) SetInt64(in int64) { *i = CabStates(in) }
+
+// Desc returns the description of the CabStates value.
+func (i CabStates) Desc() string { return enums.Desc(i, _CabStatesDescMap) }
+
+// CabStatesValues returns all possible values for the type CabStates.
+func CabStatesValues() []CabStates { return _CabStatesValues }
+
+// Values returns all possible values for the type CabStates.
+func (i CabStates) Values() []enums.Enum { return enums.Values(_CabStatesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i CabStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *CabStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "CabStates")
+}
 
 var _ViewModesValues = []ViewModes{0, 1}
 

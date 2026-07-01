@@ -68,8 +68,9 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "enumgen.go"
 const GPUVarsN: GPUVars = 5;
-const EquationsN: Equations = 4;
+const EquationsN: Equations = 6;
 const EdgesN: Edges = 2;
+const CabStatesN: CabStates = 10;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const NPanelsN: NPanels = 3;
@@ -133,8 +134,10 @@ fn KleinGordon3DKernel(i: u32) { //gosl:kernel
 alias Equations = i32; //enums:enum
 const  Wave1D: Equations = 0;
 const  Wave3D: Equations = 1;
-const  KleinGordon: Equations = 2;
-const  Schrodinger1D: Equations = 3;
+const  KleinGordon1D: Equations = 2;
+const  KleinGordon3D: Equations = 3;
+const  Schrodinger1D: Equations = 4;
+const  Schrodinger3D: Equations = 5;
 alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
@@ -150,13 +153,24 @@ struct Parameters {
 	HBar: f32,
 	Mass: f32,
 	MassCOverHBarSq: f32,
+	HBarSqOver2Mass: f32,
+	MassOver2: f32,
 	Wavelength: f32,
 	PacketWidth: f32,
-	pad: f32,
-	pad1: f32,
 }
 
 //////// import: "schrodinger.go"
+alias CabStates = i32; //enums:enum -trim-prefix=Cab
+const  CabPosA: CabStates = 0;
+const  CabPosB: CabStates = 1;
+const  CabVelA: CabStates = 2;
+const  CabVelB: CabStates = 3;
+const  CabForceA: CabStates = 4;
+const  CabForceB: CabStates = 5;
+const  CabV: CabStates = 6;
+const  CabCompConj: CabStates = 7;
+const  CabKinetic: CabStates = 8;
+const  CabEnergy: CabStates = 9;
 
 //////// import: "settings.go"
 alias ViewModes = i32; //enums:enum
