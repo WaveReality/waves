@@ -98,6 +98,13 @@ func GPUInit() {
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Schrodinger3DKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Wave1DKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -169,6 +176,48 @@ func RunOneKleinGordon3DKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunKleinGordon3DKernelCPU(n)
+	}
+}
+// RunSchrodinger3DKernel runs the Schrodinger3DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneSchrodinger3DKernel call does Run and Done for a
+// single run-and-sync case.
+func RunSchrodinger3DKernel(n int) {
+	if UseGPU {
+		RunSchrodinger3DKernelGPU(n)
+	} else {
+		RunSchrodinger3DKernelCPU(n)
+	}
+}
+
+// RunSchrodinger3DKernelGPU runs the Schrodinger3DKernel kernel on the GPU. See [RunSchrodinger3DKernel] for more info.
+func RunSchrodinger3DKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["Schrodinger3DKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunSchrodinger3DKernelCPU runs the Schrodinger3DKernel kernel on the CPU.
+func RunSchrodinger3DKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, Schrodinger3DKernel)
+}
+
+// RunOneSchrodinger3DKernel runs the Schrodinger3DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneSchrodinger3DKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunSchrodinger3DKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunSchrodinger3DKernelCPU(n)
 	}
 }
 // RunWave1DKernel runs the Wave1DKernel kernel with given number of elements,

@@ -1,0 +1,51 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+//gosl:start
+
+// Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.
+func Schrodinger3DKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ppos := State[z, y, x, WavePos, prv]
+	pvel := State[z, y, x, WaveVel, prv]
+	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
+	vel := pvel + Params[0].CSq*force
+	pos := ppos + vel
+
+	if Params[0].Energy.IsTrue() {
+		midVel := 0.5 * (pvel + vel)
+		kinetic := Params[0].Inv2CSq * midVel * midVel
+		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+
+		State[z, y, x, WaveKinetic, cur] = kinetic
+		State[z, y, x, WavePotential, cur] = potential
+		State[z, y, x, WaveEnergy, cur] = kinetic + potential
+	}
+	State[z, y, x, WaveForce, cur] = force
+	State[z, y, x, WaveVel, cur] = vel
+	State[z, y, x, WavePos, cur] = pos
+}
+
+//gosl:end
+
+func (ss *Sim) SchrodingerConfig() {
+	ParamsShouldDisplay = SchrodShouldDisplay
+	ss.StateVars = WaveStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(WavePos, -1)
+	})
+}
+
+// SchrodShouldDisplay determines which Parameters fields to display.
+var SchrodShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}

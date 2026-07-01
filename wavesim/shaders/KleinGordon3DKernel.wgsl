@@ -68,7 +68,7 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "enumgen.go"
 const GPUVarsN: GPUVars = 5;
-const EquationsN: Equations = 3;
+const EquationsN: Equations = 4;
 const EdgesN: Edges = 2;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
@@ -134,6 +134,7 @@ alias Equations = i32; //enums:enum
 const  Wave1D: Equations = 0;
 const  Wave3D: Equations = 1;
 const  KleinGordon: Equations = 2;
+const  Schrodinger1D: Equations = 3;
 alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
@@ -154,6 +155,8 @@ struct Parameters {
 	pad: f32,
 	pad1: f32,
 }
+
+//////// import: "schrodinger.go"
 
 //////// import: "settings.go"
 alias ViewModes = i32; //enums:enum

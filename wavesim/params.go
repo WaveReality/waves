@@ -30,6 +30,9 @@ const (
 
 	// KleinGordon is the 3D Klein-Gordon massive particle wave function.
 	KleinGordon
+
+	// Schrodinger is the 1D Schrodinger wave function.
+	Schrodinger1D
 )
 
 // Edges determines how to handle the edges.

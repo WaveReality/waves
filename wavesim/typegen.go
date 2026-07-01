@@ -144,6 +144,8 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Kl
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Schrodinger3DKernel", Doc: "Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run", Args: []string{"configFunc", "initFunc"}, Returns: []string{"Sim"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSim", Args: []string{"cfg", "configFunc", "initFunc"}, Returns: []string{"Sim"}})
