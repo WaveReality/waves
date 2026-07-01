@@ -150,9 +150,9 @@ struct Parameters {
 	Mass: f32,
 	MassCOverHBarSq: f32,
 	Wavelength: f32,
+	PacketWidth: f32,
 	pad: f32,
 	pad1: f32,
-	pad2: f32,
 }
 
 //////// import: "settings.go"

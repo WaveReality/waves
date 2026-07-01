@@ -112,6 +112,7 @@ func init() {
 		"WaveEnergy":                reflect.ValueOf(wavesim.WaveEnergy),
 		"WaveForce":                 reflect.ValueOf(wavesim.WaveForce),
 		"WaveKinetic":               reflect.ValueOf(wavesim.WaveKinetic),
+		"WavePacket":                reflect.ValueOf(wavesim.WavePacket),
 		"WavePos":                   reflect.ValueOf(wavesim.WavePos),
 		"WavePotential":             reflect.ValueOf(wavesim.WavePotential),
 		"WaveShouldDisplay":         reflect.ValueOf(&wavesim.WaveShouldDisplay).Elem(),

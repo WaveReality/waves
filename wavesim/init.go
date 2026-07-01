@@ -144,8 +144,8 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 	}
 }
 
-// MovingWavePacketParamWavelength is a version of [MovingWavePacket] that takes its
-// wavelength variable from [Params.Wavelength]
-func (ss *Sim) MovingWavePacketParamWavelength(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, width, phase, amp float32) {
-	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, width, phase, amp)
+// MovingWavePacketParams is a version of [MovingWavePacket] that takes its
+// wavelength and width variables from [Params]
+func (ss *Sim) MovingWavePacketParams(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
 }

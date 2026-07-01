@@ -81,11 +81,16 @@ type Parameters struct {
 	MassCOverHBarSq float32 `display:"-"`
 
 	// Wavelength is the wavelength to use for functions that use it
-	// (ParamWavelength suffix). Allows user to manipulate the wavelength easily,
+	// (Params suffix). Allows user to manipulate the wavelength easily,
 	// e.g., for KG and other matter waves.
 	Wavelength float32
 
-	pad, pad1, pad2 float32
+	// PacketWidth is the wave packet width to use for functions that use it
+	// (Params suffix). Allows user to manipulate the wave parameters easily,
+	// e.g., for KG and other matter waves.
+	PacketWidth float32
+
+	pad, pad1 float32
 }
 
 func (pr *Parameters) Update() {
@@ -101,6 +106,7 @@ func (pr *Parameters) Defaults() {
 	pr.HBar = 1.0
 	pr.Mass = 1.0
 	pr.Wavelength = 8
+	pr.PacketWidth = 8
 	pr.Energy.SetBool(true)
 	pr.Update()
 }
