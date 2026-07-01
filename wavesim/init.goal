@@ -98,10 +98,17 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	vamp := amp * 0.774
-	vperiod := period * 0.9536
-	vwidth := width * 0.911
+	// these values are fit from small 8 wide, 8 period packets:
+	vamp := amp * 2 * math32.Sqrt(1.0/period)
+	vperiod := period * 0.94
+	vwidth := width * 0.92
 	vphase := phase + .06
+	veloff := 1 + period/8
+	if period > 20 { // these are for bigger wave packets
+		vphase = phase + 0.5
+		vamp = amp * 0.0746 // 0.0746
+		veloff = 1 + 2*math32.Sqrt(period)
+	}
 	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
 	var diroff math32.Vector3
 	diroff.SetDim(dim, dir*ss.Params.C)
@@ -121,7 +128,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 				pp := WavePacket(d.Dim(dim), d.Length(), period, width, phase, amp)
 				State[f.Z, f.Y, f.X, posI, prv] += pp
 
-				ff.SetAdd(diroff.MulScalar(-2))
+				ff.SetAdd(diroff.MulScalar(-veloff))
 				d = ff.Sub(ctrf)
 				cv := WavePacket(d.Dim(dim), d.Length(), vperiod, vwidth, vphase, vamp)
 				State[f.Z, f.Y, f.X, velI, cur] += cv

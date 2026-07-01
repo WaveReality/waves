@@ -30,7 +30,7 @@ type Config struct {
 
 func (cfg *Config) Defaults() {
 	cfg.Size.Set(100, 100, 1)
-	cfg.MaxSteps = 1000
+	cfg.MaxSteps = 100000
 	cfg.ViewInterval = 1
 }
 

@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 
+	"cogentcore.org/core/base/fsx"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/tensor"
 	"github.com/WaveReality/waves/wavesim"
@@ -14,7 +15,9 @@ import (
 
 const (
 	MaxIter = 10
-	MinNorm = 0.1
+	
+	// MinData ignores data points below this level
+	MinData = 0.001
 )
 
 var done = false
@@ -23,46 +26,58 @@ func FitPacketMain() {
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
 			sim.Config.Equation = wavesim.Wave1D
-			sim.Config.Size.Set(80, 1, 1)
+			sim.Config.Size.Set(1000, 1, 1)
+			// sim.Config.Size.Set(80, 1, 1)
 		},
 		func(sim *wavesim.Sim) {
 			if !done {
-				FitPacketOpen(sim, 26, 8, 8, 0, 1)
+				FitPacketOpen(sim, "../oned_wvpacket_lg.tsr.gz", 500, 250, 80, 80, 0, 0.5)
+				// FitPacketOpen(sim, "../oned_wvpacket_sm.tsr.gz", 40, 25, 8, 8, 0, 1)
 				done = true
 			}
 		})
 }
 
-func FitPacketOpen(sim *wavesim.Sim, pos, period, width, phase, amp float32) {
-	sim.OpenState("../oned_wvpacket.tsr")
-
+func FitPacketOpen(sim *wavesim.Sim, filename string, maxX int, pos, period, width, phase, amp float32) {
+	sim.OpenState(fsx.Filename(filename))
 	st := wavesim.State
-	// fmt.Println(st)
-	// for x := range 40 {
-	// 	fmt.Println(x, st[1, 1, x, 0, 0])
-	// }
-	
-	FitPacketVar(st, 40, int(wavesim.WavePos), 0, pos, period, width, phase, amp)
-	FitPacketVar(st, 40, int(wavesim.WavePos), 1, pos, period, width, phase, amp)
-	FitPacketVar(st, 40, int(wavesim.WaveVel), 0, pos, period, width, phase, amp)
-	FitPacketVar(st, 40, int(wavesim.WaveVel), 1, pos, period, width, phase, amp)
+
+	FitPacketVar(st, maxX, int(wavesim.WavePos), 0, pos, period, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WavePos), 1, pos, period, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WaveVel), 0, pos, period, width, phase, amp)
+	FitPacketVar(st, maxX, int(wavesim.WaveVel), 1, pos, period, width, phase, amp)
 }
 
 
 func FitPacketVar(st *tensor.Float32, maxX int, vidx, curprv int, pos, period, width, phase, amp float32) {
 	fmt.Println("\n##### vidx:", vidx, "cur prv:", curprv)
 	fmt.Printf("start\tpos: %7.4g\tperiod: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\n", pos, period, width, phase, amp)
+	
 	step := float32(.01)
-	var er, ner float32
+	rmult := period / 8
+
+	amp = FitPacketAmp(st, maxX, vidx, curprv) // just gets max
+	
+	var er float32
 	for iter := range MaxIter {
-		pos  = FitPacketPos(st, maxX, vidx, curprv, pos-4, pos+4, 1, period, width, phase, amp)
-		amp = FitPacketAmp(st, maxX, vidx, curprv, amp-6, amp+2, step, pos, period, width, phase)
+		pos  = FitPacketPos(st, maxX, vidx, curprv, pos-4*rmult, pos+4*rmult, 1, period, width, phase, amp)
 		phase = FitPacketPhase(st, maxX, vidx, curprv, 0, 1, 0.01, pos, period, width, amp)
-		period = FitPacketPeriod(st, maxX, vidx, curprv, period-4, period+4, step, pos, width, phase, amp)
+		period = FitPacketPeriod(st, maxX, vidx, curprv, period-4*rmult, period+4*rmult, step, pos, width, phase, amp)
 		width = FitPacketWidth(st, maxX, vidx, curprv, width-4, width+4, step, pos, period, phase, amp)
-		er, ner = FitPacketErr(st, maxX, vidx, curprv, pos, period, width, phase, amp)
-		fmt.Printf("%d\tpos: %7.4g\tperiod: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\terr: %7.4g\tner: %7.4g\n", iter, pos, period, width, phase, amp, er, ner)
+		er = FitPacketErr(false, st, maxX, vidx, curprv, pos, period, width, phase, amp)
+		fmt.Printf("%d\tpos: %7.4g\tperiod: %7.4g\t, width: %7.4g\tphase: %7.4g\tamp: %7.4g\terr: %7.4g\n", iter, pos, period, width, phase, amp, er)
 	}
+	// er = FitPacketErr(true, st, maxX, vidx, curprv, pos, period, width, phase, amp)
+}
+
+// computes the max
+func FitPacketAmp(st *tensor.Float32, maxX, vidx, curprv int) float32 {
+	mx := float32(0)
+	for x := range maxX {
+		v := st[1, 1, x, vidx, curprv]
+		mx = max(math32.Abs(v), mx)
+	}
+	return mx
 }
 
 func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, stepPos, period, width, phase, amp float32) float32 {
@@ -74,9 +89,12 @@ func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, st
 	for pos := minPos; pos <= maxPos; pos += stepPos {
 		er := float32(0)
 		for x := range maxX {
-			v := st[1, 1, x, vidx, curprv]
+			v := math32.Abs(st[1, 1, x, vidx, curprv])
+			if v < MinData {
+				continue
+			}
 			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, period, width, phase, amp)
+			t := math32.Abs(wavesim.WavePacket(d, d, period, width, phase, amp))
 			erd := math32.Abs(v - t)
 			er += erd
 			// if math32.Abs(pos - 26.2) < 0.001 {
@@ -92,31 +110,6 @@ func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, st
 	return best
 }
 
-func FitPacketAmp(st *tensor.Float32, maxX, vidx, curprv int, minAmp, maxAmp, stepAmp, pos, period, width, phase float32) float32 {
-	var best float32
-	minerr := float32(math32.MaxFloat32)
-
-	for amp := minAmp; amp <= maxAmp; amp += stepAmp {
-		er := float32(0)
-		for x := range maxX {
-			v := st[1, 1, x, vidx, curprv]
-			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, period, width, phase, amp)
-			erd := math32.Abs(v - t)
-			er += erd
-			// if math32.Abs(amp - 0.77) < 0.001 {
-			// 	fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
-			// }
-		}
-		if er < minerr {
-			best = amp
-			minerr = er
-		}
-	}
-	// fmt.Println("amp best, err:", best, minerr)
-	return best
-}
-
 func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, stepWd, pos, period, phase, amp float32) float32 {
 	var best float32
 	minerr := float32(math32.MaxFloat32)
@@ -124,10 +117,13 @@ func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, st
 	for wd := minWd; wd <= maxWd; wd += stepWd {
 		er := float32(0)
 		for x := range maxX {
-			v := st[1, 1, x, vidx, curprv]
+			v := math32.Abs(st[1, 1, x, vidx, curprv])
+			if v < MinData {
+				continue
+			}
 			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, period, wd, phase, amp)
-			erd := math32.Abs(v - t) / max(v, MinNorm)
+			t := math32.Abs(wavesim.WavePacket(d, d, period, wd, phase, amp))
+			erd := math32.Abs(v - t)
 			er += erd
 			// if math32.Abs(per - 12) < 0.001 {
 			// 	fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
@@ -150,13 +146,16 @@ func FitPacketPeriod(st *tensor.Float32, maxX, vidx, curprv int, minPer, maxPer,
 		er := float32(0)
 		for x := range maxX {
 			v := st[1, 1, x, vidx, curprv]
+			if v < MinData {
+				continue
+			}
 			d := float32(x-1) - pos
 			t := wavesim.WavePacket(d, d, per, width, phase, amp)
-			erd := math32.Abs(v - t) / max(v, MinNorm)
+			erd := float32(0)
+			if math32.Sign(v) != math32.Sign(t) {
+				erd = 1
+			}
 			er += erd
-			// if math32.Abs(per - 12) < 0.001 {
-			// 	fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
-			// }
 		}
 		if er < minerr {
 			best = per
@@ -177,11 +176,11 @@ func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, 
 			v := st[1, 1, x, vidx, curprv]
 			d := float32(x-1) - pos
 			t := wavesim.WavePacket(d, d, period, width, phs, amp)
-			erd := math32.Abs(v - t) / max(v, MinNorm)
+			erd := float32(0)
+			if math32.Sign(v) != math32.Sign(t) {
+				erd = 1
+			}
 			er += erd
-			// if math32.Abs(phs - 12) < 0.001 {
-			// 	fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
-			// }
 		}
 		if er < minerr {
 			best = phs
@@ -192,21 +191,20 @@ func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, 
 	return best
 }
 
-// FitPacketErr returns raw and normalized error for given params.
-func FitPacketErr(st *tensor.Float32, maxX, vidx, curprv int, pos, period, width, phase, amp float32) (float32, float32) {
+// FitPacketErr returns raw Abs error for given params
+func FitPacketErr(print bool, st *tensor.Float32, maxX, vidx, curprv int, pos, period, width, phase, amp float32) float32 {
 	er := float32(0)
-	ner := float32(0)
 	for x := range maxX {
 		v := st[1, 1, x, vidx, curprv]
 		d := float32(x-1) - pos
 		t := wavesim.WavePacket(d, d, period, width, phase, amp)
 		erd := math32.Abs(v - t) 
-		norm := erd / max(v, MinNorm)
 		er += erd
-		ner += norm
-		// fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
+		if print {
+			fmt.Printf("%d\t%14.4g\t%14.4g\t%14.4g\n", x-1, v, t, erd)
+		}
 	}
-	// fmt.Println("err:", er, "norm:", ner)
-	return er, ner
+	// fmt.Println("err:", er)
+	return er
 }
 
