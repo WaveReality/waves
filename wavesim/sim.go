@@ -5,6 +5,12 @@
 package wavesim
 
 import (
+	"fmt"
+	"io"
+
+	"cogentcore.org/core/base/errors"
+	"cogentcore.org/core/base/fsx"
+	"cogentcore.org/core/base/iox/gzipx"
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/tree"
@@ -122,6 +128,7 @@ func (ss *Sim) ConfigSim() {
 	if ss.ConfigFunc != nil {
 		ss.ConfigFunc(ss)
 	}
+	ss.Params.Update()
 	if ss.Config.GPU {
 		// gpu.DebugAdapter = true
 		// gpu.SelectAdapter = ss.Config.Run.GPUDevice
@@ -149,6 +156,7 @@ func (ss *Sim) ConfigState() {
 		State = tensor.NewFloat32()
 	}
 	fs := ctx.SizeFull()
+	fmt.Println(fs)
 	State.SetShapeSizes(int(fs.Z), int(fs.Y), int(fs.X), nvar, 2)
 }
 
@@ -240,6 +248,7 @@ func (ss *Sim) callViewInit(view *View) {
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
 	vw := ss.GUI.AddView("View")
+	vw.sim = ss
 	vw.Size = ss.Config.Size
 	vw.Size.Z = 3
 	vw.Start.X = 1
@@ -260,7 +269,26 @@ func (ss *Sim) UpdateView() {
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		return
 	}
+	ss.GUI.View.SetCounters(fmt.Sprintf("Step: %d Cur: %d", ctx.Step, ctx.CurState))
 	ss.GUI.View.GoUpdateView()
+}
+
+// SaveState saves the state to given file.
+// If filename ends in .gz, it is gzipped.
+func (ss *Sim) SaveState(filename fsx.Filename) error { //types:add
+	err := gzipx.Save(string(filename), func(w io.Writer) error {
+		return tensor.WriteCSV(State, w, tensor.Tab)
+	})
+	return errors.Log(err)
+}
+
+// OpenState opens the state from given file.
+// If filename ends in .gz, it is un-gzipped.
+func (ss *Sim) OpenState(filename fsx.Filename) error { //types:add
+	err := gzipx.Open(string(filename), func(r io.Reader) error {
+		return tensor.ReadCSV(State, r, tensor.Tab)
+	})
+	return errors.Log(err)
 }
 
 func (ss *Sim) RunNoGUI() {

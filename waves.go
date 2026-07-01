@@ -21,13 +21,14 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	runCfg := 2
+	runCfg := 1
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
 			switch runCfg {
 			case 0:
 				sim.Config.Equation = wavesim.Wave1D
+				sim.Params.C = 1
 				sim.Config.Size.Set(80, 1, 1)
 				sim.ViewInit(wavesim.Wave1DViewAll)
 			case 1:
@@ -41,9 +42,10 @@ func main() {
 		func(sim *wavesim.Sim) {
 			switch runCfg {
 			case 0:
-				sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1.5)
+				// sim.PosWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1.5)
+				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1.5)
 			case 1, 2:
-				sim.MovingWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
+				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
 			}
 		})
 }

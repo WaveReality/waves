@@ -6,6 +6,7 @@ package wavesim
 
 import (
 	"fmt"
+	"image"
 
 	"cogentcore.org/core/colors/colormap"
 	"cogentcore.org/core/core"
@@ -32,6 +33,16 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 					})
 				d.RunWindowDialog(vw)
 			})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetText("State").SetType(core.ButtonAction).SetMenu(func(m *core.Scene, pos image.Point) {
+			fb := core.NewFuncButton(m).SetFunc(vw.sim.SaveState)
+			fb.SetIcon(icons.Save)
+			fb.Args[0].SetTag(`extension:".tsr,.tsr.gz"`)
+			fb = core.NewFuncButton(m).SetFunc(vw.sim.OpenState)
+			fb.SetIcon(icons.Open)
+			fb.Args[0].SetTag(`extension:".tsr,.tsr.gz"`)
+		})
 	})
 	tree.Add(p, func(w *core.Separator) {})
 

@@ -78,6 +78,7 @@ type View struct {
 	// current number of panels rendered -- if changes, do full rebuild.
 	curNPanels int
 
+	sim      *Sim
 	midFrame *core.Frame
 	scene    *Scene
 	// SceneDBG  *Scene
