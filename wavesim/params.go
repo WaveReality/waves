@@ -22,23 +22,19 @@ var ParamsShouldDisplay []string
 type Equations int32 //enums:enum
 
 const (
-	// Wave1D is the basic wave equation in one dimension (X).
-	Wave1D Equations = iota
+	// Wave is the basic wave equation in one dimension (X).
+	Wave Equations = iota
 
-	// Wave3D is the basic wave equation in three dimensions.
-	Wave3D
+	// KleinGordon is the Klein-Gordon massive particle wave function,
+	// on a scalar wave state.
+	KleinGordon
 
-	// KleinGordon is the 1D Klein-Gordon massive particle wave function.
-	KleinGordon1D
+	// KleinGordonC is the Klein-Gordon massive particle wave function,
+	// on a complex wave state.
+	KleinGordonC
 
-	// KleinGordon3D is the 3D Klein-Gordon massive particle wave function.
-	KleinGordon3D
-
-	// Schrodinger is the 1D Schrodinger wave function.
-	Schrodinger1D
-
-	// Schrodinger is the 3D Schrodinger wave function.
-	Schrodinger3D
+	// Schrodinger is the 1D Schrodinger wave function on complex state.
+	Schrodinger
 )
 
 // Edges determines how to handle the edges.
@@ -65,8 +61,8 @@ const (
 // uploaded to the GPU.
 // Use Units to set values relative to a particular set of units.
 type Parameters struct {
-	// Edges determines how to handle the edges.
-	Edges Edges
+	// ThreeD runs the 3D version of wave equations, else 1D.
+	ThreeD slbool.Bool
 
 	// Energy determines if energy is computed (when not necessary).
 	Energy slbool.Bool
@@ -105,6 +101,11 @@ type Parameters struct {
 	// (Params suffix). Allows user to manipulate the wave parameters easily,
 	// e.g., for KG and other matter waves.
 	PacketWidth float32
+
+	// Edges determines how to handle the edges.
+	Edges Edges
+
+	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {

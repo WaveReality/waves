@@ -140,11 +140,13 @@ func (ss *Sim) ConfigSim() {
 		UseGPU = true
 	}
 	switch ss.Config.Equation {
-	case Wave1D, Wave3D:
+	case Wave:
 		ss.WaveConfig()
-	case KleinGordon1D, KleinGordon3D:
+	case KleinGordon:
 		ss.KleinGordonConfig()
-	case Schrodinger1D, Schrodinger3D:
+	case KleinGordonC:
+		ss.KleinGordonCConfig()
+	case Schrodinger:
 		ss.SchrodingerConfig()
 	}
 	ss.ConfigState()
@@ -214,18 +216,14 @@ func (ss *Sim) StepRun() {
 	ToGPU(CtxVar)
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
 	switch ss.Config.Equation {
-	case Wave3D:
-		RunWave3DKernel(ns)
-	case Wave1D:
-		RunWave1DKernel(ns)
-	case KleinGordon1D:
-		RunKleinGordon1DKernel(ns)
-	case KleinGordon3D:
-		RunKleinGordon3DKernel(ns)
-	case Schrodinger3D:
-		RunSchrodinger3DKernel(ns)
-	case Schrodinger1D:
-		RunSchrodinger1DKernel(ns)
+	case Wave:
+		RunWaveKernel(ns)
+	case KleinGordon:
+		RunKleinGordonKernel(ns)
+	case KleinGordonC:
+		RunKleinGordonCKernel(ns)
+	case Schrodinger:
+		RunSchrodingerKernel(ns)
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()
@@ -262,6 +260,9 @@ func (ss *Sim) callViewInit(view *View) {
 func (ss *Sim) ConfigGUI(b tree.Node) {
 	ss.GUI.MakeBody(b, ss, ss.Root, "Waves", "Waves", "Wave simulator")
 	vw := ss.GUI.AddView("View")
+	if ss.Params.ThreeD.IsFalse() {
+		vw.SetMode(Bars, -1)
+	}
 	vw.sim = ss
 	vw.Size = ss.Config.Size
 	vw.Size.Z = 3

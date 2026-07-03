@@ -31,8 +31,8 @@ const (
 	WaveEnergy
 )
 
-// Wave3DKernel is the kernel for computing the Wave3D equations.
-func Wave3DKernel(i uint32) { //gosl:kernel
+// WaveKernel is the kernel for computing the Wave equations.
+func WaveKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
 	ok := ctx.StateCoords(i, &x, &y, &z)
@@ -43,44 +43,24 @@ func Wave3DKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+	var force float32
+	if Params[0].ThreeD.IsTrue() {
+		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+	} else {
+		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
+	}
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
-		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
-
-		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
-		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
-		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
-	}
-	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
-	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
-	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
-}
-
-// Wave1DKernel is the kernel for computing the Wave1D equations.
-func Wave1DKernel(i uint32) { //gosl:kernel
-	ctx := GetCtx(0)
-	var x, y, z int32
-	ok := ctx.StateCoords(i, &x, &y, &z)
-	if !ok {
-		return
-	}
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
-	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	force := Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
-	vel := pvel + Params[0].CSq*force
-	pos := ppos + vel
-
-	if Params[0].Energy.IsTrue() {
-		midVel := 0.5 * (pvel + vel)
-		kinetic := Params[0].Inv2CSq * midVel * midVel
-		potential := PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
+		var potential float32
+		if Params[0].ThreeD.IsTrue() {
+			potential = PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+		} else {
+			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
+		}
 
 		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
 		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
@@ -102,9 +82,6 @@ func (ss *Sim) WaveConfig() {
 	ss.StateVars = WaveStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
-		if ss.Config.Equation == Wave1D {
-			view.SetMode(Bars, -1)
-		}
 	})
 }
 

@@ -50,12 +50,15 @@ const (
 	// CabKinetic is the total kinetic energy across components.
 	CabKinetic
 
+	// CabPotential is the total potential energy across components (only for KGC).
+	CabPotential
+
 	// CabEnergy is the total kinetic + potential energy.
 	CabEnergy
 )
 
-// Schrodinger1DKernel is the kernel for computing the Schrodinger1D equations.
-func Schrodinger1DKernel(i uint32) { //gosl:kernel
+// SchrodingerKernel is the kernel for computing the Schrodinger equations.
+func SchrodingerKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
 	ok := ctx.StateCoords(i, &x, &y, &z)
@@ -74,9 +77,13 @@ func Schrodinger1DKernel(i uint32) { //gosl:kernel
 	// just carry forward other vars.
 	var forceA, velA, posA, forceB, velB, posB float32
 	if cur == 0 {
-		forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
-		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB         // note neg here, not in B
-		velA = forceA                                             // first order, not +=
+		if Params[0].ThreeD.IsTrue() {
+			forceA = Laplacian26(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+		} else {
+			forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+		}
+		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB // note neg here, not in B
+		velA = forceA                                     // first order, not +=
 		posA = pposA + velA
 
 		// carry B forward
@@ -84,9 +91,13 @@ func Schrodinger1DKernel(i uint32) { //gosl:kernel
 		velB = pvelB
 		posB = pposB
 	} else {
-		forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
-		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA          // todo: not sure about this!!
-		velB = forceB                                             // first order, not +=
+		if Params[0].ThreeD.IsTrue() {
+			forceB = Laplacian26(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+		} else {
+			forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+		}
+		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA // todo: not sure about this!!
+		velB = forceB                                    // first order, not +=
 		posB = pposB + velB
 
 		// carry A forward
@@ -113,64 +124,6 @@ func Schrodinger1DKernel(i uint32) { //gosl:kernel
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 }
 
-// Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.
-func Schrodinger3DKernel(i uint32) { //gosl:kernel
-	ctx := GetCtx(0)
-	var x, y, z int32
-	ok := ctx.StateCoords(i, &x, &y, &z)
-	if !ok {
-		return
-	}
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
-	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
-
-	// need to alternate the updating for stability
-	// just carry forward other vars.
-	var forceA, velA, posA, forceB, velB, posB float32
-	if cur == 0 {
-		forceA = Laplacian26(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
-		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB         // note neg here, not in B
-		velA = forceA                                             // first order, not +=
-		posA = pposA + velA
-
-		// carry B forward
-		forceB = State.Value(int(z), int(y), int(x), int(CabForceB), int(prv))
-		velB = pvelB
-		posB = pposB
-	} else {
-		forceB = Laplacian26(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
-		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA          // todo: not sure about this!!
-		velB = forceB                                             // first order, not +=
-		posB = pposB + velB
-
-		// carry A forward
-		forceA = State.Value(int(z), int(y), int(x), int(CabForceA), int(prv))
-		velA = pvelA
-		posA = pposA
-	}
-
-	if Params[0].Energy.IsTrue() {
-		// todo: CompConj!
-		midVel := 0.25 * (pvelA + velA + pvelB + velB)
-		kinetic := Params[0].MassOver2 * midVel * midVel
-
-		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
-		State.Set(kinetic+vpot, int(z), int(y), int(x), int(CabEnergy), int(cur))
-	}
-	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
-
-	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
-	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
-}
-
 //gosl:end
 
 func (ss *Sim) SchrodingerConfig() {
@@ -178,9 +131,6 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.StateVars = CabStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabPosA, -1)
-		if ss.Config.Equation == Schrodinger1D {
-			view.SetMode(Bars, -1)
-		}
 	})
 }
 

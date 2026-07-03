@@ -6,8 +6,9 @@ package wavesim
 
 //gosl:start
 
-// KleinGordon1DKernel is the kernel for computing the KleinGordon1D equations.
-func KleinGordon1DKernel(i uint32) { //gosl:kernel
+// KleinGordonKernel is the kernel for computing the KleinGordon equations,
+// on scalar state values (WaveStates).
+func KleinGordonKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
 	ok := ctx.StateCoords(i, &x, &y, &z)
@@ -18,7 +19,12 @@ func KleinGordon1DKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State[z, y, x, WavePos, prv]
 	pvel := State[z, y, x, WaveVel, prv]
-	force := Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
+	var force float32
+	if Params[0].ThreeD.IsTrue() {
+		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+	} else {
+		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
+	}
 	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
@@ -26,7 +32,12 @@ func KleinGordon1DKernel(i uint32) { //gosl:kernel
 	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
-		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+		var potential float32
+		if Params[0].ThreeD.IsTrue() {
+			potential = PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+		} else {
+			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
+		}
 
 		State[z, y, x, WaveKinetic, cur] = kinetic
 		State[z, y, x, WavePotential, cur] = potential
@@ -37,8 +48,9 @@ func KleinGordon1DKernel(i uint32) { //gosl:kernel
 	State[z, y, x, WavePos, cur] = pos
 }
 
-// KleinGordon3DKernel is the kernel for computing the KleinGordon3D equations.
-func KleinGordon3DKernel(i uint32) { //gosl:kernel
+// KleinGordonCKernel is the kernel for computing the KleinGordonC equations,
+// on complex wave state.
+func KleinGordonCKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
 	ok := ctx.StateCoords(i, &x, &y, &z)
@@ -47,25 +59,50 @@ func KleinGordon3DKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ppos := State[z, y, x, WavePos, prv]
-	pvel := State[z, y, x, WaveVel, prv]
-	force := Laplacian26(x, y, z, int32(WavePos), prv, ppos)
-	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
-	vel := pvel + Params[0].CSq*force
-	pos := ppos + vel
+	pposA := State[z, y, x, CabPosA, prv]
+	pposB := State[z, y, x, CabPosB, prv]
+	pvelA := State[z, y, x, CabVelA, prv]
+	pvelB := State[z, y, x, CabVelB, prv]
+
+	var forceA, forceB float32
+	if Params[0].ThreeD.IsTrue() {
+		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
+		forceB = Laplacian26(x, y, z, int32(CabPosB), prv, pposB)
+	} else {
+		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
+		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
+	}
+	forceA -= Params[0].MassCOverHBarSq * pposA // this is the only diff from standard Wave
+	velA := pvelA + Params[0].CSq*forceA
+	posA := pposA + velA
+
+	forceB -= Params[0].MassCOverHBarSq * pposB // this is the only diff from standard Wave
+	velB := pvelB + Params[0].CSq*forceB
+	posB := pposB + velB
 
 	if Params[0].Energy.IsTrue() {
-		midVel := 0.5 * (pvel + vel)
+		cc := posA*posA + posB*posB
+		midVel := 0.25 * (pvelA + velA + pvelB + velB)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
-		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+		var potential float32
+		if Params[0].ThreeD.IsTrue() {
+			potential = PotentialEnergy26(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy26(x, y, z, int32(CabPosB), prv, pposB)
+		} else {
+			potential = PotentialEnergy1D(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy1D(x, y, z, int32(CabPosB), prv, pposB)
+		}
 
-		State[z, y, x, WaveKinetic, cur] = kinetic
-		State[z, y, x, WavePotential, cur] = potential
-		State[z, y, x, WaveEnergy, cur] = kinetic + potential
+		State[z, y, x, CabCC, cur] = cc
+		State[z, y, x, CabKinetic, cur] = kinetic
+		State[z, y, x, CabPotential, cur] = potential
+		State[z, y, x, CabEnergy, cur] = kinetic + potential
 	}
-	State[z, y, x, WaveForce, cur] = force
-	State[z, y, x, WaveVel, cur] = vel
-	State[z, y, x, WavePos, cur] = pos
+	State[z, y, x, CabForceA, cur] = forceA
+	State[z, y, x, CabVelA, cur] = velA
+	State[z, y, x, CabPosA, cur] = posA
+
+	State[z, y, x, CabForceB, cur] = forceB
+	State[z, y, x, CabVelB, cur] = velB
+	State[z, y, x, CabPosB, cur] = posB
 }
 
 //gosl:end
@@ -75,9 +112,14 @@ func (ss *Sim) KleinGordonConfig() {
 	ss.StateVars = WaveStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
-		if ss.Config.Equation == KleinGordon1D {
-			view.SetMode(Bars, -1)
-		}
+	})
+}
+
+func (ss *Sim) KleinGordonCConfig() {
+	ParamsShouldDisplay = KGShouldDisplay
+	ss.StateVars = CabStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(CabPosA, -1)
 	})
 }
 
