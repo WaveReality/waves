@@ -44,6 +44,9 @@ type Sim struct {
 	// use ViewInit method to add.
 	viewInitFuncs []func(view *View) `display:"-"`
 
+	// StatFuncs are the stats functions that have been added.
+	StatFuncs []func(init bool) `display:"-"`
+
 	// Root is the root tensorfs directory, where all stats and other misc sim data goes.
 	Root *tensorfs.Node `display:"-"`
 
@@ -122,6 +125,7 @@ func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi
 func (ss *Sim) ConfigSim() {
 	ss.Root, _ = tensorfs.NewDir("Root")
 	tensorfs.CurRoot = ss.Root
+	ss.Stats = ss.Root.Dir("Stats")
 	ss.RandSeeds.Init(100) // max 100 runs
 	ss.InitRandSeed(0)
 	ss.ConfigVars()
@@ -177,6 +181,7 @@ func (ss *Sim) Init() {
 	}
 	ToGPUTensorStrides()
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
+	ss.RunStats(true)
 }
 
 // Run runs until stopped or Step > MaxSteps. Must be called by goroutine.
@@ -226,8 +231,9 @@ func (ss *Sim) StepRun() {
 		RunDone()
 	} else {
 		RunDone(StateVar)
+		ss.RunStats(false)
+		ss.UpdateView()
 	}
-	ss.UpdateView()
 }
 
 // Stopped should be called whenever running stops.
@@ -266,6 +272,7 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 		vw.Start.Z = 1
 	}
 	ss.callViewInit(vw)
+	ss.RunStats(true)
 	ss.GUI.FinalizeGUI(false)
 }
 

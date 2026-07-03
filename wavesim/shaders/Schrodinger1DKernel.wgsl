@@ -112,7 +112,7 @@ const  CabVelB: CabStates = 3;
 const  CabForceA: CabStates = 4;
 const  CabForceB: CabStates = 5;
 const  CabV: CabStates = 6;
-const  CabCompConj: CabStates = 7;
+const  CabCC: CabStates = 7;
 const  CabKinetic: CabStates = 8;
 const  CabEnergy: CabStates = 9;
 fn Schrodinger1DKernel(i: u32) { //gosl:kernel
@@ -156,8 +156,10 @@ fn Schrodinger1DKernel(i: u32) { //gosl:kernel
 		posA = pposA;
 	}
 	if (Params[0].Energy == 1) {
+		var cc = posA*posA + posB*posB;
 		var midVel = 0.25 * (pvelA + velA + pvelB + velB);
 		var kinetic = Params[0].MassOver2 * midVel * midVel;
+		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabCC), u32(cur))] = cc;
 		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabKinetic), u32(cur))] = kinetic;
 		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabEnergy), u32(cur))] = kinetic + vpot;
 	}

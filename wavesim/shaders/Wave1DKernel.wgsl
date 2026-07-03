@@ -119,7 +119,7 @@ const  CabVelB: CabStates = 3;
 const  CabForceA: CabStates = 4;
 const  CabForceB: CabStates = 5;
 const  CabV: CabStates = 6;
-const  CabCompConj: CabStates = 7;
+const  CabCC: CabStates = 7;
 const  CabKinetic: CabStates = 8;
 const  CabEnergy: CabStates = 9;
 

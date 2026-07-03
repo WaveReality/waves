@@ -150,11 +150,11 @@ const CabStatesN CabStates = 10
 
 //gosl:end
 
-var _CabStatesValueMap = map[string]CabStates{`PosA`: 0, `PosB`: 1, `VelA`: 2, `VelB`: 3, `ForceA`: 4, `ForceB`: 5, `V`: 6, `CompConj`: 7, `Kinetic`: 8, `Energy`: 9}
+var _CabStatesValueMap = map[string]CabStates{`PosA`: 0, `PosB`: 1, `VelA`: 2, `VelB`: 3, `ForceA`: 4, `ForceB`: 5, `V`: 6, `CC`: 7, `Kinetic`: 8, `Energy`: 9}
 
-var _CabStatesDescMap = map[CabStates]string{0: `CabPosA is the position (height) wave state variable for the real complex component A.`, 1: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 2: `CabVelA is the velocity of wave state variable for the real complex component A.`, 3: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 4: `CabForceA is the net force computed from neighbors for the real complex component A.`, 5: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 6: `CabV is an external potential energy factor, that can be used to push particles around.`, 7: `CabCompConj is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`, 8: `CabKinetic is the total kinetic energy across components.`, 9: `CabEnergy is the total kinetic + potential energy.`}
+var _CabStatesDescMap = map[CabStates]string{0: `CabPosA is the position (height) wave state variable for the real complex component A.`, 1: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 2: `CabVelA is the velocity of wave state variable for the real complex component A.`, 3: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 4: `CabForceA is the net force computed from neighbors for the real complex component A.`, 5: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 6: `CabV is an external potential energy factor, that can be used to push particles around.`, 7: `CabCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`, 8: `CabKinetic is the total kinetic energy across components.`, 9: `CabEnergy is the total kinetic + potential energy.`}
 
-var _CabStatesMap = map[CabStates]string{0: `PosA`, 1: `PosB`, 2: `VelA`, 3: `VelB`, 4: `ForceA`, 5: `ForceB`, 6: `V`, 7: `CompConj`, 8: `Kinetic`, 9: `Energy`}
+var _CabStatesMap = map[CabStates]string{0: `PosA`, 1: `PosB`, 2: `VelA`, 3: `VelB`, 4: `ForceA`, 5: `ForceB`, 6: `V`, 7: `CC`, 8: `Kinetic`, 9: `Energy`}
 
 // String returns the string representation of this CabStates value.
 func (i CabStates) String() string { return enums.String(i, _CabStatesMap) }

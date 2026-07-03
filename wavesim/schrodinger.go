@@ -42,10 +42,10 @@ const (
 	// can be used to push particles around.
 	CabV
 
-	// CabCompConj is the complex conjugate ("squared") wave
+	// CabCC is the complex conjugate ("squared") wave
 	// value, which represents the total probability or a conserved
 	// charge value.
-	CabCompConj
+	CabCC
 
 	// CabKinetic is the total kinetic energy across components.
 	CabKinetic
@@ -96,10 +96,11 @@ func Schrodinger1DKernel(i uint32) { //gosl:kernel
 	}
 
 	if Params[0].Energy.IsTrue() {
-		// todo: CompConj!
+		cc := posA*posA + posB*posB
 		midVel := 0.25 * (pvelA + velA + pvelB + velB)
 		kinetic := Params[0].MassOver2 * midVel * midVel
 
+		State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
 		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
 		State.Set(kinetic+vpot, int(z), int(y), int(x), int(CabEnergy), int(cur))
 	}
@@ -196,4 +197,10 @@ func Cab1DViewAll(view *View) {
 	view.Panels[2].Var = CabPosB
 	view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = CabPosB
+}
+
+func (ss *Sim) SchrodingerStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(CabCC))
+	ss.AddStat(ss.StatSum(CabEnergy))
 }

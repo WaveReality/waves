@@ -23,7 +23,7 @@ func main() {
 
 	// eqs := wavesim.Wave1D
 	eqs := wavesim.KleinGordon1D
-	// eqs := wavesim.Schrodinger3D
+	// eqs := wavesim.Schrodinger1D
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -34,23 +34,29 @@ func main() {
 				// sim.Config.Size.Set(80, 1, 1)
 				sim.Config.Size.Set(1000, 1, 1)
 				sim.ViewInit(wavesim.Wave1DViewAll)
+				sim.WaveStats()
 			case wavesim.Wave3D:
 				sim.Config.Equation = wavesim.Wave3D
 				sim.Config.Size.Set(100, 100, 1)
+				sim.WaveStats()
 			case wavesim.KleinGordon1D:
 				sim.Config.Equation = wavesim.KleinGordon1D
 				sim.Config.Size.Set(500, 1, 1)
 				sim.ViewInit(wavesim.Wave1DViewAll)
+				sim.WaveStats()
 			case wavesim.KleinGordon3D:
 				sim.Config.Equation = wavesim.KleinGordon3D
 				sim.Config.Size.Set(100, 100, 1)
+				sim.WaveStats()
 			case wavesim.Schrodinger1D:
 				sim.Config.Equation = wavesim.Schrodinger1D
 				sim.Config.Size.Set(500, 1, 1)
 				sim.ViewInit(wavesim.Cab1DViewAll)
+				sim.SchrodingerStats()
 			case wavesim.Schrodinger3D:
 				sim.Config.Equation = wavesim.Schrodinger3D
 				sim.Config.Size.Set(100, 100, 1)
+				sim.SchrodingerStats()
 			}
 		},
 		func(sim *wavesim.Sim) {

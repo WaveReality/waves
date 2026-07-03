@@ -122,3 +122,10 @@ func Wave1DViewAll(view *View) {
 	view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = WaveVel
 }
+
+func (ss *Sim) WaveStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(WaveKinetic))
+	ss.AddStat(ss.StatSum(WavePotential))
+	ss.AddStat(ss.StatSum(WaveEnergy))
+}
