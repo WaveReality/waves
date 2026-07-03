@@ -54,6 +54,64 @@ const (
 	CabEnergy
 )
 
+// Schrodinger1DKernel is the kernel for computing the Schrodinger1D equations.
+func Schrodinger1DKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
+	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
+	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
+
+	// need to alternate the updating for stability
+	// just carry forward other vars.
+	var forceA, velA, posA, forceB, velB, posB float32
+	if cur == 0 {
+		forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB         // note neg here, not in B
+		velA = forceA                                             // first order, not +=
+		posA = pposA + velA
+
+		// carry B forward
+		forceB = State.Value(int(z), int(y), int(x), int(CabForceB), int(prv))
+		velB = pvelB
+		posB = pposB
+	} else {
+		forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA          // todo: not sure about this!!
+		velB = forceB                                             // first order, not +=
+		posB = pposB + velB
+
+		// carry A forward
+		forceA = State.Value(int(z), int(y), int(x), int(CabForceA), int(prv))
+		velA = pvelA
+		posA = pposA
+	}
+
+	if Params[0].Energy.IsTrue() {
+		// todo: CompConj!
+		midVel := 0.25 * (pvelA + velA + pvelB + velB)
+		kinetic := Params[0].MassOver2 * midVel * midVel
+
+		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
+		State.Set(kinetic+vpot, int(z), int(y), int(x), int(CabEnergy), int(cur))
+	}
+	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+
+	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+}
+
 // Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.
 func Schrodinger3DKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
@@ -76,7 +134,7 @@ func Schrodinger3DKernel(i uint32) { //gosl:kernel
 	if cur == 0 {
 		forceA = Laplacian26(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
 		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB         // note neg here, not in B
-		velA = pvelA + forceA
+		velA = forceA                                             // first order, not +=
 		posA = pposA + velA
 
 		// carry B forward
@@ -86,7 +144,7 @@ func Schrodinger3DKernel(i uint32) { //gosl:kernel
 	} else {
 		forceB = Laplacian26(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
 		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA          // todo: not sure about this!!
-		velB = pvelB + forceB
+		velB = forceB                                             // first order, not +=
 		posB = pposB + velB
 
 		// carry A forward
@@ -119,8 +177,23 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.StateVars = CabStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabPosA, -1)
+		if ss.Config.Equation == Schrodinger1D {
+			view.SetMode(Bars, -1)
+		}
 	})
 }
 
 // SchrodShouldDisplay determines which Parameters fields to display.
 var SchrodShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}
+
+// Cab1DViewAll configures the View to display A and B, Cur and Prev
+func Cab1DViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	// view.SetVarMinMax(WavePos, -0.8, 0.8)
+	view.Settings.Height = 0.8
+	view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = CabPosB
+	view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = CabPosB
+}

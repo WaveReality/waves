@@ -71,18 +71,14 @@ func Wave1DKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State[z, y, x, WavePos, prv]
 	pvel := State[z, y, x, WaveVel, prv]
-	posm1 := State[z, y, x-1, WavePos, prv]
-	posp1 := State[z, y, x+1, WavePos, prv]
-	force := (posm1 + posp1) - 2 * ppos
+	force := Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
-		pm1d := posm1 - ppos
-		pp1d := posp1 - ppos
-		potential := 0.5 * (pm1d * pm1d + pp1d * pp1d)
+		potential := PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 
 		State[z, y, x, WaveKinetic, cur] = kinetic
 		State[z, y, x, WavePotential, cur] = potential
@@ -123,5 +119,4 @@ func Wave1DViewAll(view *View) {
 	view.Panels[2].Var = WaveVel
 	view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = WaveVel
-}	
-
+}

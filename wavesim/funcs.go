@@ -51,6 +51,15 @@ func (ss *Sim) ConfigVars() {
 
 //gosl:start
 
+// Laplacian1D computes the 1D Laplacian across 2 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
+	m1 := State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx))
+	p1 := State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx))
+	return (m1 + p1) - 2*ctr
+}
+
 // Laplacian26 computes the 3D Laplacian across 26 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
@@ -64,6 +73,17 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 		avg += LaplacianWts.Value(j) * (nv - ctr)
 	}
 	return avg
+}
+
+// PotentialEnergy1D computes the 1D potential energy across 2 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+func PotentialEnergy1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
+	m1 := State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx))
+	p1 := State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx))
+	pm1d := m1 - ctr
+	pp1d := p1 - ctr
+	return 0.5 * (pm1d*pm1d + pp1d*pp1d)
 }
 
 // PotentialEnergy26 computes the 3D potential energy across 26 neighbors,

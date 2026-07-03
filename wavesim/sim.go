@@ -213,12 +213,14 @@ func (ss *Sim) StepRun() {
 		RunWave3DKernel(ns)
 	case Wave1D:
 		RunWave1DKernel(ns)
-	// case KleinGordon1D:
-	// 	RunKleinGordon3DKernel(ns) // TODO: 1D!!!
+	case KleinGordon1D:
+		RunKleinGordon1DKernel(ns)
 	case KleinGordon3D:
 		RunKleinGordon3DKernel(ns)
 	case Schrodinger3D:
 		RunSchrodinger3DKernel(ns)
+	case Schrodinger1D:
+		RunSchrodinger1DKernel(ns)
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()

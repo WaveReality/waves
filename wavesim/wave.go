@@ -73,18 +73,14 @@ func Wave1DKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	posm1 := State.Value(int(z), int(y), int(x-1), int(WavePos), int(prv))
-	posp1 := State.Value(int(z), int(y), int(x+1), int(WavePos), int(prv))
-	force := (posm1 + posp1) - 2*ppos
+	force := Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].Energy.IsTrue() {
 		midVel := 0.5 * (pvel + vel)
 		kinetic := Params[0].Inv2CSq * midVel * midVel
-		pm1d := posm1 - ppos
-		pp1d := posp1 - ppos
-		potential := 0.5 * (pm1d*pm1d + pp1d*pp1d)
+		potential := PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 
 		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
 		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))

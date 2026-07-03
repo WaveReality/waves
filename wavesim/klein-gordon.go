@@ -8,6 +8,37 @@ package wavesim
 
 //gosl:start
 
+// KleinGordon1DKernel is the kernel for computing the KleinGordon1D equations.
+func KleinGordon1DKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
+	force := Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
+	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
+	vel := pvel + Params[0].CSq*force
+	pos := ppos + vel
+
+	if Params[0].Energy.IsTrue() {
+		midVel := 0.5 * (pvel + vel)
+		kinetic := Params[0].Inv2CSq * midVel * midVel
+		potential := PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+
+		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
+		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
+		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
+	}
+	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+}
+
 // KleinGordon3DKernel is the kernel for computing the KleinGordon3D equations.
 func KleinGordon3DKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
@@ -46,6 +77,9 @@ func (ss *Sim) KleinGordonConfig() {
 	ss.StateVars = WaveStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
+		if ss.Config.Equation == KleinGordon1D {
+			view.SetMode(Bars, -1)
+		}
 	})
 }
 

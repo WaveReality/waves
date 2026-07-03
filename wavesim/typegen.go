@@ -90,7 +90,11 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Wa
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian1D", Doc: "Laplacian1D computes the 1D Laplacian across 2 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.PotentialEnergy1D", Doc: "PotentialEnergy1D computes the 1D potential energy across 2 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.PotentialEnergy26", Doc: "PotentialEnergy26 computes the 3D potential energy across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
@@ -105,6 +109,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordon3DKernelCPU", Doc: "RunKleinGordon3DKernelCPU runs the KleinGordon3DKernel kernel on the CPU.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneKleinGordon3DKernel", Doc: "RunOneKleinGordon3DKernel runs the KleinGordon3DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodinger1DKernel", Doc: "RunSchrodinger1DKernel runs the Schrodinger1DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneSchrodinger1DKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodinger1DKernelGPU", Doc: "RunSchrodinger1DKernelGPU runs the Schrodinger1DKernel kernel on the GPU. See [RunSchrodinger1DKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodinger1DKernelCPU", Doc: "RunSchrodinger1DKernelCPU runs the Schrodinger1DKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneSchrodinger1DKernel", Doc: "RunOneSchrodinger1DKernel runs the Schrodinger1DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodinger3DKernel", Doc: "RunSchrodinger3DKernel runs the Schrodinger3DKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneSchrodinger3DKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
@@ -150,11 +162,17 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ne
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WavePacket", Doc: "WavePacket returns value for a gaussian * cosine wave packet for given\nlinear dimension value x and 3D distance d.", Args: []string{"x", "d", "wavelength", "width", "phase", "amp"}, Returns: []string{"float32"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordon3DKernel", Doc: "KleinGordon3DKernel is the kernel for computing the KleinGordon3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordon1DKernel", Doc: "KleinGordon1DKernel is the kernel for computing the KleinGordon1D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordon3DKernel", Doc: "KleinGordon3DKernel is the kernel for computing the KleinGordon3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Schrodinger1DKernel", Doc: "Schrodinger1DKernel is the kernel for computing the Schrodinger1D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Schrodinger3DKernel", Doc: "Schrodinger3DKernel is the kernel for computing the Schrodinger3D equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Cab1DViewAll", Doc: "Cab1DViewAll configures the View to display A and B, Cur and Prev", Args: []string{"view"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Run", Args: []string{"configFunc", "initFunc"}, Returns: []string{"Sim"}})
 

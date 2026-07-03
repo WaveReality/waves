@@ -65,6 +65,19 @@ const NPanelsN: NPanels = 3;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
+fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+	var m1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))];
+	var p1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24],
+	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))];
+return (m1 + p1) - 2*ctr;
+}
+fn PotentialEnergy1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+	var m1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))];
+	var p1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))];
+	var pm1d = m1 - ctr;
+	var pp1d = p1 - ctr;
+return 0.5 * (pm1d*pm1d + pp1d*pp1d);
+}
 
 //////// import: "klein-gordon.go"
 
@@ -140,17 +153,13 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var prv = Context_PrevState(ctx);
 ; var ppos = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePos), u32(prv))];
 ; var pvel = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv))];
-; var posm1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(WavePos), u32(prv))];
-; var posp1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x + 1), u32(WavePos), u32(prv))];
-; var force = (posm1 + posp1) - 2*ppos;
+; var force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
 ; var vel = pvel + Params[0].CSq*force;
 ; var pos = ppos + vel;
 ; if (Params[0].Energy == 1) {
 	var midVel = 0.5 * (pvel + vel);
 	var kinetic = Params[0].Inv2CSq * midVel * midVel;
-	var pm1d = posm1 - ppos;
-	var pp1d = posp1 - ppos;
-	var potential = 0.5 * (pm1d*pm1d + pp1d*pp1d);
+	var potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
 	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur))] = kinetic;
 	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur))] = potential;
 	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur))] = kinetic + potential;

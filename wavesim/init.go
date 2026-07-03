@@ -91,6 +91,12 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 	}
 }
 
+// PosWavePacketParams is a version of [PosWavePacket] that gets parameters from
+// [Parameters]
+func (ss *Sim) PosWavePacketParams(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+	ss.PosWavePacket(vr, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
+}
+
 // MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
 // with given parameters, to both the position and velocity variables in current
 // and previous states, which results in a single wave packet moving in given direction.
@@ -145,7 +151,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 }
 
 // MovingWavePacketParams is a version of [MovingWavePacket] that takes its
-// wavelength and width variables from [Params]
+// wavelength and width variables from [Parameters]
 func (ss *Sim) MovingWavePacketParams(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
 	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
 }

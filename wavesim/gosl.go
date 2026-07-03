@@ -91,11 +91,23 @@ func GPUInit() {
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordon1DKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordon3DKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Schrodinger1DKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/Schrodinger3DKernel.wgsl", sy)
@@ -136,6 +148,48 @@ func GPURelease() {
 	ComputeGPU = nil
 }
 
+// RunKleinGordon1DKernel runs the KleinGordon1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneKleinGordon1DKernel call does Run and Done for a
+// single run-and-sync case.
+func RunKleinGordon1DKernel(n int) {
+	if UseGPU {
+		RunKleinGordon1DKernelGPU(n)
+	} else {
+		RunKleinGordon1DKernelCPU(n)
+	}
+}
+
+// RunKleinGordon1DKernelGPU runs the KleinGordon1DKernel kernel on the GPU. See [RunKleinGordon1DKernel] for more info.
+func RunKleinGordon1DKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["KleinGordon1DKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunKleinGordon1DKernelCPU runs the KleinGordon1DKernel kernel on the CPU.
+func RunKleinGordon1DKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, KleinGordon1DKernel)
+}
+
+// RunOneKleinGordon1DKernel runs the KleinGordon1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneKleinGordon1DKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunKleinGordon1DKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunKleinGordon1DKernelCPU(n)
+	}
+}
 // RunKleinGordon3DKernel runs the KleinGordon3DKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
@@ -176,6 +230,48 @@ func RunOneKleinGordon3DKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunKleinGordon3DKernelCPU(n)
+	}
+}
+// RunSchrodinger1DKernel runs the Schrodinger1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneSchrodinger1DKernel call does Run and Done for a
+// single run-and-sync case.
+func RunSchrodinger1DKernel(n int) {
+	if UseGPU {
+		RunSchrodinger1DKernelGPU(n)
+	} else {
+		RunSchrodinger1DKernelCPU(n)
+	}
+}
+
+// RunSchrodinger1DKernelGPU runs the Schrodinger1DKernel kernel on the GPU. See [RunSchrodinger1DKernel] for more info.
+func RunSchrodinger1DKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["Schrodinger1DKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunSchrodinger1DKernelCPU runs the Schrodinger1DKernel kernel on the CPU.
+func RunSchrodinger1DKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, Schrodinger1DKernel)
+}
+
+// RunOneSchrodinger1DKernel runs the Schrodinger1DKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneSchrodinger1DKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunSchrodinger1DKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunSchrodinger1DKernelCPU(n)
 	}
 }
 // RunSchrodinger3DKernel runs the Schrodinger3DKernel kernel with given number of elements,
