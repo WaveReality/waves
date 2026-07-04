@@ -66,7 +66,25 @@ fn Context_PrevState(ctx: Context) -> i32 {
 	return 1 - ctx.CurState;
 }
 
+//////// import: "dirac.go"
+
+//////// import: "em.go"
+alias EMStates = i32; //enums:enum
+const  A0Pos: EMStates = 0;
+const  AXPos: EMStates = 1;
+const  AYPos: EMStates = 2;
+const  AZPos: EMStates = 3;
+const  A0Vel: EMStates = 4;
+const  AXVel: EMStates = 5;
+const  AYVel: EMStates = 6;
+const  AZVel: EMStates = 7;
+const  Charge: EMStates = 8;
+const  CurrentX: EMStates = 9;
+const  CurrentY: EMStates = 10;
+const  CurrentZ: EMStates = 11;
+
 //////// import: "enumgen.go"
+const EMStatesN: EMStates = 12;
 const GPUVarsN: GPUVars = 5;
 const EquationsN: Equations = 4;
 const EdgesN: Edges = 2;
@@ -119,12 +137,12 @@ struct Parameters {
 	MassCOverHBarSq: f32,
 	HBarSqOver2Mass: f32,
 	MassOver2: f32,
+	Mu0: f32,
+	Eps0: f32,
+	OneoEps0: f32,
 	Wavelength: f32,
 	PacketWidth: f32,
 	Edges: Edges,
-	pad: f32,
-	pad1: f32,
-	pad2: f32,
 }
 
 //////// import: "schrodinger.go"

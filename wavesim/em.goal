@@ -1,0 +1,125 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+//gosl:start
+
+// EMStates are the state variables for EM wave equations.
+type EMStates int32 //enums:enum
+
+const (
+	// A0Pos is the position (height) wave state variable
+	// for the EM A0 electrical (scalar) potential field.
+	A0Pos EMStates = iota
+
+	// AXPos is the position (height) wave state variable
+	// for the EM AX magnetic (vector) potential field, X component.
+	AXPos
+
+	// AYPos is the position (height) wave state variable
+	// for the EM AY magnetic (vector) potential field, Y component.
+	AYPos
+
+	// AZPos is the position (height) wave state variable
+	// for the EM AZ magnetic (vector) potential field, Z component.
+	AZPos
+
+	// A0Vel is the velocity of wave state variable
+	// for the EM A0 electrical (scalar) potential field.
+	A0Vel
+
+	// AXVel is the velocity of wave state variable
+	// for the EM AX magnetic (vector) potential field, X component.
+	AXVel
+
+	// AYVel is the velocity of wave state variable
+	// for the EM AY magnetic (vector) potential field, Y component.
+	AYVel
+
+	// AZVel is the velocity of wave state variable
+	// for the EM AZ magnetic (vector) potential field, Z component.
+	AZVel
+
+	// Charge is the density of charge, drives A0.
+	Charge
+
+	// CurrentX is the density of current, X component, drives AX.
+	CurrentX
+
+	// CurrentY is the density of current, Y component, drives AY.
+	CurrentY
+
+	// CurrentZ is the density of current, Z component, drives AZ.
+	CurrentZ
+)
+
+// EMKernel is the kernel for computing the EM equations,
+// on EM state values (EMStates).
+func EMKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	a0pp := State[z, y, x, A0Pos, prv]
+	aXpp := State[z, y, x, AXPos, prv]
+	aYpp := State[z, y, x, AYPos, prv]
+	aZpp := State[z, y, x, AZPos, prv]
+	var f0, fX, fY, fZ float32
+	if Params[0].ThreeD.IsTrue() {
+		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
+		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
+		fY = Laplacian26(x, y, z, int32(AYPos), prv, aYpp)
+		fZ = Laplacian26(x, y, z, int32(AZPos), prv, aZpp)
+	} else {
+		f0 = Laplacian1D(x, y, z, int32(A0Pos), prv, a0pp)
+		fX = Laplacian1D(x, y, z, int32(AXPos), prv, aXpp)
+		fY = Laplacian1D(x, y, z, int32(AYPos), prv, aYpp)
+		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
+	}
+	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*State[z, y, x, Charge, prv]
+	a0vc := State[z, y, x, A0Vel, prv] + f0
+	a0pc := a0pp + a0vc
+
+	fX = Params[0].CSq*fX + Params[0].Mu0*State[z, y, x, CurrentX, prv]
+	aXvc := State[z, y, x, AXVel, prv] + fX
+	aXpc := aXpp + aXvc
+
+	fY = Params[0].CSq*fY + Params[0].Mu0*State[z, y, x, CurrentY, prv]
+	aYvc := State[z, y, x, AYVel, prv] + fY
+	aYpc := aYpp + aYvc
+
+	fZ = Params[0].CSq*fZ + Params[0].Mu0*State[z, y, x, CurrentZ, prv]
+	aZvc := State[z, y, x, AZVel, prv] + fZ
+	aZpc := aZpp + aZvc
+
+	State[z, y, x, A0Vel, cur] = a0vc
+	State[z, y, x, A0Pos, cur] = a0pc
+
+	State[z, y, x, AXVel, cur] = aXvc
+	State[z, y, x, AXPos, cur] = aXpc
+
+	State[z, y, x, AYVel, cur] = aYvc
+	State[z, y, x, AYPos, cur] = aYpc
+
+	State[z, y, x, AZVel, cur] = aZvc
+	State[z, y, x, AZPos, cur] = aZpc
+}
+
+//gosl:end
+
+func (ss *Sim) EMConfig() {
+	ParamsShouldDisplay = EMShouldDisplay
+	ss.StateVars = WaveStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(WavePos, -1)
+	})
+}
+
+// EMShouldDisplay determines which Parameters fields to display.
+var EMShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}

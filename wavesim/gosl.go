@@ -91,6 +91,20 @@ func GPUInit() {
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/DiracKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EMKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -138,6 +152,90 @@ func GPURelease() {
 	ComputeGPU = nil
 }
 
+// RunDiracKernel runs the DiracKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneDiracKernel call does Run and Done for a
+// single run-and-sync case.
+func RunDiracKernel(n int) {
+	if UseGPU {
+		RunDiracKernelGPU(n)
+	} else {
+		RunDiracKernelCPU(n)
+	}
+}
+
+// RunDiracKernelGPU runs the DiracKernel kernel on the GPU. See [RunDiracKernel] for more info.
+func RunDiracKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["DiracKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunDiracKernelCPU runs the DiracKernel kernel on the CPU.
+func RunDiracKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, DiracKernel)
+}
+
+// RunOneDiracKernel runs the DiracKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneDiracKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunDiracKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunDiracKernelCPU(n)
+	}
+}
+// RunEMKernel runs the EMKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneEMKernel call does Run and Done for a
+// single run-and-sync case.
+func RunEMKernel(n int) {
+	if UseGPU {
+		RunEMKernelGPU(n)
+	} else {
+		RunEMKernelCPU(n)
+	}
+}
+
+// RunEMKernelGPU runs the EMKernel kernel on the GPU. See [RunEMKernel] for more info.
+func RunEMKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["EMKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunEMKernelCPU runs the EMKernel kernel on the CPU.
+func RunEMKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, EMKernel)
+}
+
+// RunOneEMKernel runs the EMKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneEMKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunEMKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunEMKernelCPU(n)
+	}
+}
 // RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched

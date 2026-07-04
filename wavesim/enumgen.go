@@ -6,6 +6,51 @@ import (
 	"cogentcore.org/core/enums"
 )
 
+var _EMStatesValues = []EMStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+
+// EMStatesN is the highest valid value for type EMStates, plus one.
+//
+//gosl:start
+const EMStatesN EMStates = 12
+
+//gosl:end
+
+var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11}
+
+var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `Charge is the density of charge, drives A0.`, 9: `CurrentX is the density of current, X component, drives AX.`, 10: `CurrentY is the density of current, Y component, drives AY.`, 11: `CurrentZ is the density of current, Z component, drives AZ.`}
+
+var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`}
+
+// String returns the string representation of this EMStates value.
+func (i EMStates) String() string { return enums.String(i, _EMStatesMap) }
+
+// SetString sets the EMStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *EMStates) SetString(s string) error {
+	return enums.SetString(i, s, _EMStatesValueMap, "EMStates")
+}
+
+// Int64 returns the EMStates value as an int64.
+func (i EMStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the EMStates value from an int64.
+func (i *EMStates) SetInt64(in int64) { *i = EMStates(in) }
+
+// Desc returns the description of the EMStates value.
+func (i EMStates) Desc() string { return enums.Desc(i, _EMStatesDescMap) }
+
+// EMStatesValues returns all possible values for the type EMStates.
+func EMStatesValues() []EMStates { return _EMStatesValues }
+
+// Values returns all possible values for the type EMStates.
+func (i EMStates) Values() []enums.Enum { return enums.Values(_EMStatesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
+
 var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4}
 
 // GPUVarsN is the highest valid value for type GPUVars, plus one.

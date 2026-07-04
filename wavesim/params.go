@@ -92,6 +92,17 @@ type Parameters struct {
 	// MassOver2 = Mass / 2 for computing kinetic energy.
 	MassOver2 float32 `display:"-"`
 
+	// Mu0 is mu_0, or the permeability of free space, which weights
+	// the impact of current on the magnetic vector potential.
+	Mu0 float32
+
+	// Eps0 is epsilon_0, or the permittivity of free space, which weights
+	// the impact of charge on the electrical scalar potential = 1 / (mu0 c^2)
+	Eps0 float32 `edit:"-"`
+
+	// OneoEps0 = 1 / Eps0
+	OneoEps0 float32 `display:"-"`
+
 	// Wavelength is the wavelength to use for functions that use it
 	// (Params suffix). Allows user to manipulate the wavelength easily,
 	// e.g., for KG and other matter waves.
@@ -104,8 +115,6 @@ type Parameters struct {
 
 	// Edges determines how to handle the edges.
 	Edges Edges
-
-	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -114,6 +123,8 @@ func (pr *Parameters) Update() {
 	pr.MassCOverHBarSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.HBar * pr.HBar)
 	pr.HBarSqOver2Mass = (pr.HBar * pr.HBar) / (2.0 * pr.Mass)
 	pr.MassOver2 = pr.Mass / 2.0
+	pr.Eps0 = 1.0 / (pr.Mu0 * pr.C * pr.C)
+	pr.OneoEps0 = 1.0 / pr.Eps0
 }
 
 //gosl:end
@@ -122,6 +133,7 @@ func (pr *Parameters) Defaults() {
 	pr.C = 0.5
 	pr.HBar = 1.0
 	pr.Mass = 1.0
+	pr.Mu0 = 1.0
 	pr.Wavelength = 8
 	pr.PacketWidth = 8
 	pr.Energy.SetBool(true)

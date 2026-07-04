@@ -144,7 +144,7 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	gui.Splits = split
 	gui.SimForm = core.NewForm(split).SetStruct(sim)
 	gui.SimForm.OnChange(func(e events.Event) {
-		sim.Params.Update()
+		sim.UpdateUnits()
 	})
 	gui.SimForm.Name = "sim-form"
 	if gui.Body != nil {
@@ -215,7 +215,7 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
 	})
 	tree.AddAt(p, "Stop", func(w *core.Button) {
-		w.SetText("Stop").SetIcon(icons.PlayArrow).
+		w.SetText("Stop").SetIcon(icons.Stop).
 			SetTooltip("Stop a running simulation").OnClick(func(e events.Event) {
 			if gui.IsRunning() {
 				gui.SetStopNow()

@@ -172,9 +172,21 @@ func (ss *Sim) InitRandSeed(run int) {
 	ss.RandSeeds.Set(run)
 }
 
+// UpdateUnits updates Units from Params and vice-versa.
+func (ss *Sim) UpdateUnits() {
+	ss.Units.C = float64(ss.Params.C)
+	ss.Units.HBar = float64(ss.Params.HBar)
+	ss.Units.EMass = float64(ss.Params.Mass)
+	ss.Units.Update()
+	ss.Params.Mu0 = float32(ss.Units.CuMu0)
+	ss.Params.Eps0 = float32(ss.Units.CuEps0)
+	ss.Params.Update()
+}
+
 // Init initializes the state and prepares everything for running.
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
+	ss.UpdateUnits()
 	ctx := GetCtx(0)
 	ctx.Init()
 	State.SetZeros()
