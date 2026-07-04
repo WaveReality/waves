@@ -33,20 +33,11 @@ const (
 	// on a complex wave state.
 	KleinGordonC
 
-	// Schrodinger is the 1D Schrodinger wave function on complex state.
+	// Schrodinger is the Schrodinger wave function on complex state.
 	Schrodinger
-)
 
-// Edges determines how to handle the edges.
-type Edges int32 //enums:enum
-
-const (
-	// EdgesFixed keeps the edge values fixed at initial values
-	EdgesFixed Edges = iota
-
-	// EdgesWrap copies edge values from other side, effectively wrapping
-	// the space around on itself like a torus.
-	EdgesWrap
+	// Maxwell is Maxwell's equations for electromagnetic (EM) waves.
+	Maxwell
 )
 
 // The following are constants used across many equations.

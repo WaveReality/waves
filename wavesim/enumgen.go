@@ -6,50 +6,48 @@ import (
 	"cogentcore.org/core/enums"
 )
 
-var _EMStatesValues = []EMStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+var _EdgesValues = []Edges{0, 1}
 
-// EMStatesN is the highest valid value for type EMStates, plus one.
+// EdgesN is the highest valid value for type Edges, plus one.
 //
 //gosl:start
-const EMStatesN EMStates = 12
+const EdgesN Edges = 2
 
 //gosl:end
 
-var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11}
+var _EdgesValueMap = map[string]Edges{`EdgesFixed`: 0, `EdgesWrap`: 1}
 
-var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `Charge is the density of charge, drives A0.`, 9: `CurrentX is the density of current, X component, drives AX.`, 10: `CurrentY is the density of current, Y component, drives AY.`, 11: `CurrentZ is the density of current, Z component, drives AZ.`}
+var _EdgesDescMap = map[Edges]string{0: `EdgesFixed keeps the edge values fixed at initial values`, 1: `EdgesWrap copies edge values from other side, effectively wrapping the space around on itself like a torus.`}
 
-var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`}
+var _EdgesMap = map[Edges]string{0: `EdgesFixed`, 1: `EdgesWrap`}
 
-// String returns the string representation of this EMStates value.
-func (i EMStates) String() string { return enums.String(i, _EMStatesMap) }
+// String returns the string representation of this Edges value.
+func (i Edges) String() string { return enums.String(i, _EdgesMap) }
 
-// SetString sets the EMStates value from its string representation,
+// SetString sets the Edges value from its string representation,
 // and returns an error if the string is invalid.
-func (i *EMStates) SetString(s string) error {
-	return enums.SetString(i, s, _EMStatesValueMap, "EMStates")
-}
+func (i *Edges) SetString(s string) error { return enums.SetString(i, s, _EdgesValueMap, "Edges") }
 
-// Int64 returns the EMStates value as an int64.
-func (i EMStates) Int64() int64 { return int64(i) }
+// Int64 returns the Edges value as an int64.
+func (i Edges) Int64() int64 { return int64(i) }
 
-// SetInt64 sets the EMStates value from an int64.
-func (i *EMStates) SetInt64(in int64) { *i = EMStates(in) }
+// SetInt64 sets the Edges value from an int64.
+func (i *Edges) SetInt64(in int64) { *i = Edges(in) }
 
-// Desc returns the description of the EMStates value.
-func (i EMStates) Desc() string { return enums.Desc(i, _EMStatesDescMap) }
+// Desc returns the description of the Edges value.
+func (i Edges) Desc() string { return enums.Desc(i, _EdgesDescMap) }
 
-// EMStatesValues returns all possible values for the type EMStates.
-func EMStatesValues() []EMStates { return _EMStatesValues }
+// EdgesValues returns all possible values for the type Edges.
+func EdgesValues() []Edges { return _EdgesValues }
 
-// Values returns all possible values for the type EMStates.
-func (i EMStates) Values() []enums.Enum { return enums.Values(_EMStatesValues) }
+// Values returns all possible values for the type Edges.
+func (i Edges) Values() []enums.Enum { return enums.Values(_EdgesValues) }
 
 // MarshalText implements the [encoding.TextMarshaler] interface.
-func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
-func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
+func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
 var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4}
 
@@ -96,20 +94,65 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3}
+var _EMStatesValues = []EMStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+
+// EMStatesN is the highest valid value for type EMStates, plus one.
+//
+//gosl:start
+const EMStatesN EMStates = 12
+
+//gosl:end
+
+var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11}
+
+var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `Charge is the density of charge, drives A0.`, 9: `CurrentX is the density of current, X component, drives AX.`, 10: `CurrentY is the density of current, Y component, drives AY.`, 11: `CurrentZ is the density of current, Z component, drives AZ.`}
+
+var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`}
+
+// String returns the string representation of this EMStates value.
+func (i EMStates) String() string { return enums.String(i, _EMStatesMap) }
+
+// SetString sets the EMStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *EMStates) SetString(s string) error {
+	return enums.SetString(i, s, _EMStatesValueMap, "EMStates")
+}
+
+// Int64 returns the EMStates value as an int64.
+func (i EMStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the EMStates value from an int64.
+func (i *EMStates) SetInt64(in int64) { *i = EMStates(in) }
+
+// Desc returns the description of the EMStates value.
+func (i EMStates) Desc() string { return enums.Desc(i, _EMStatesDescMap) }
+
+// EMStatesValues returns all possible values for the type EMStates.
+func EMStatesValues() []EMStates { return _EMStatesValues }
+
+// Values returns all possible values for the type EMStates.
+func (i EMStates) Values() []enums.Enum { return enums.Values(_EMStatesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
+
+var _EquationsValues = []Equations{0, 1, 2, 3, 4}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 4
+const EquationsN Equations = 5
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the 1D Schrodinger wave function on complex state.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -142,49 +185,6 @@ func (i Equations) MarshalText() ([]byte, error) { return []byte(i.String()), ni
 func (i *Equations) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "Equations")
 }
-
-var _EdgesValues = []Edges{0, 1}
-
-// EdgesN is the highest valid value for type Edges, plus one.
-//
-//gosl:start
-const EdgesN Edges = 2
-
-//gosl:end
-
-var _EdgesValueMap = map[string]Edges{`EdgesFixed`: 0, `EdgesWrap`: 1}
-
-var _EdgesDescMap = map[Edges]string{0: `EdgesFixed keeps the edge values fixed at initial values`, 1: `EdgesWrap copies edge values from other side, effectively wrapping the space around on itself like a torus.`}
-
-var _EdgesMap = map[Edges]string{0: `EdgesFixed`, 1: `EdgesWrap`}
-
-// String returns the string representation of this Edges value.
-func (i Edges) String() string { return enums.String(i, _EdgesMap) }
-
-// SetString sets the Edges value from its string representation,
-// and returns an error if the string is invalid.
-func (i *Edges) SetString(s string) error { return enums.SetString(i, s, _EdgesValueMap, "Edges") }
-
-// Int64 returns the Edges value as an int64.
-func (i Edges) Int64() int64 { return int64(i) }
-
-// SetInt64 sets the Edges value from an int64.
-func (i *Edges) SetInt64(in int64) { *i = Edges(in) }
-
-// Desc returns the description of the Edges value.
-func (i Edges) Desc() string { return enums.Desc(i, _EdgesDescMap) }
-
-// EdgesValues returns all possible values for the type Edges.
-func EdgesValues() []Edges { return _EdgesValues }
-
-// Values returns all possible values for the type Edges.
-func (i Edges) Values() []enums.Enum { return enums.Values(_EdgesValues) }
-
-// MarshalText implements the [encoding.TextMarshaler] interface.
-func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
-
-// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
-func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
 var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 

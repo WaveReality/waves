@@ -13,6 +13,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/events/key"
 	"cogentcore.org/core/icons"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/tree"
@@ -220,8 +221,69 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 				vw.UpdateView()
 			})
 	})
+
 	tree.Add(p, func(w *core.Button) {
-		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in")
+		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in size of region displayed")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.ZoomInSize()
+		})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.ZoomOut).SetTooltip("zoom out size of region displayed")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.ZoomOutSize()
+		})
+	})
+	tree.Add(p, func(w *core.Separator) {})
+	tree.Add(p, func(w *core.Text) {
+		w.SetText("Move:").SetTooltip("move region displayed")
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.KeyboardArrowLeft).SetTooltip("Move X left")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.MoveStart(math32.Vec3i(-1, 0, 0))
+		})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.KeyboardArrowUp).SetTooltip("Move Z plane up")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.MoveStart(math32.Vec3i(0, 0, 1))
+		})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.KeyboardArrowDown).SetTooltip("Move Z plane down")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.MoveStart(math32.Vec3i(0, 0, -1))
+		})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.KeyboardArrowRight).SetTooltip("Move X right")
+		w.Styler(func(s *styles.Style) {
+			s.SetAbilities(true, abilities.RepeatClickable)
+		})
+		w.OnClick(func(e events.Event) {
+			vw.MoveStart(math32.Vec3i(1, 0, 0))
+		})
+	})
+	tree.Add(p, func(w *core.Separator) {})
+
+	tree.Add(p, func(w *core.Button) {
+		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in 3D view")
 		w.Styler(func(s *styles.Style) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
@@ -231,7 +293,7 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 		})
 	})
 	tree.Add(p, func(w *core.Button) {
-		w.SetIcon(icons.ZoomOut).SetTooltip("zoom out")
+		w.SetIcon(icons.ZoomOut).SetTooltip("zoom out 3D view")
 		w.Styler(func(s *styles.Style) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
@@ -242,7 +304,7 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 	})
 	tree.Add(p, func(w *core.Separator) {})
 	tree.Add(p, func(w *core.Text) {
-		w.SetText("Rot:").SetTooltip("rotate display")
+		w.SetText("Rot:").SetTooltip("rotate 3D view")
 	})
 	tree.Add(p, func(w *core.Button) {
 		w.SetIcon(icons.KeyboardArrowLeft)

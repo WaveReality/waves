@@ -14,17 +14,17 @@ import (
 // CopyCurToPrev copies the current values to previous values
 // for all variables.
 func (ss *Sim) CopyCurToPrev() {
-	vals := ss.StateVars.Values()
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
+	nvars := ctx.NVars
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				for vi := range vals {
+				for vi := range nvars {
 					State.Set(State.Value(int(f.Z), int(f.Y), int(f.X), int(vi), int(cur)), int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
 				}
 			}
@@ -39,6 +39,24 @@ func WavePacket(x, d, wavelength, width, phase, amp float32) float32 {
 	d /= width
 	gauss := math32.FastExp(-d * d)
 	return cos * gauss
+}
+
+const (
+	CurAndPrev = true
+	CurOnly    = false
+)
+
+// Point adds value to individual point, optionally for both cur and previous values.
+func (ss *Sim) Point(vr enums.Enum, curAndPrev bool, c math32.Vector3i, val float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	f := c.AddScalar(1)
+	State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+	if curAndPrev {
+		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+	}
 }
 
 // Sine adds sine wave values along given dimension, to given variable.
@@ -77,7 +95,7 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := math32.Vec3(float32(f.X), float32(f.Y), float32(f.Z))
+				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
 				d := ff.Sub(ctrf)
 				cv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
@@ -126,7 +144,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := math32.Vec3(float32(f.X), float32(f.Y), float32(f.Z))
+				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
 				d := ff.Sub(ctrf)
 				cp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cp, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
@@ -154,4 +172,29 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 // wavelength and width variables from [Parameters]
 func (ss *Sim) MovingWavePacketParams(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
 	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
+}
+
+// InvR adds 1/r values radiating from given center point,
+// with peak point as given value.
+func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
+				d := ff.Sub(ctrf).Length()
+				if c == ctr {
+					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				} else {
+					State.SetAdd(val/d, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				}
+			}
+		}
+	}
 }

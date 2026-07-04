@@ -17,6 +17,9 @@ type Context struct {
 	// Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim).
 	Size slvec.Vector3i
 
+	// NVars is the number of state variables.
+	NVars int32
+
 	// Step is the current simulation timestep.
 	Step int32
 
@@ -24,7 +27,7 @@ type Context struct {
 	// are currently being updated on this compute pass.
 	CurState int32
 
-	pad, pad1 int32
+	pad int32
 }
 
 func (ctx *Context) Init() {

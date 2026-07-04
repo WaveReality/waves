@@ -490,3 +490,63 @@ func (vw *View) PlaneAtNumber(no int) *xyz.Group {
 	}
 	return pl.(*xyz.Group)
 }
+
+func (vw *View) ZoomInSize() {
+	if vw.Size.X <= 4 || vw.Size.Y <= 4 {
+		return
+	}
+	vw.Size.X -= 2
+	vw.Size.Y -= 2
+	vw.Start.X += 1
+	vw.Start.Y += 1
+	vw.UpdateView()
+}
+
+func (vw *View) ZoomOutSize() {
+	ctx := GetCtx(0)
+	sz := ctx.Size
+	fs := ctx.SizeFull()
+	vw.Size.X += 2
+	vw.Size.Y += 2
+	vw.Start.X -= 1
+	vw.Start.Y -= 1
+	if vw.Size.X >= sz.X || vw.Size.Y >= sz.Y {
+		vw.Size.X = sz.X
+		vw.Size.Y = sz.Y
+	}
+	if vw.Start.X+vw.Size.X >= fs.X {
+		vw.Start.X = (fs.X - 1) - vw.Size.X
+	}
+	if vw.Start.Y+vw.Size.Y >= fs.Y {
+		vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+	}
+	vw.UpdateView()
+}
+
+func (vw *View) MoveStart(mv math32.Vector3i) {
+	ctx := GetCtx(0)
+	sz := ctx.Size
+	fs := ctx.SizeFull()
+	if mv.Z != 0 {
+		vw.Start.Z += mv.Z
+		if vw.Start.Z < 0 {
+			vw.Start.Z = 0
+		} else if vw.Start.Z > sz.Z+1 {
+			vw.Start.Z = sz.Z + 1
+		}
+		return
+	}
+	vw.Start.SetAdd(mv)
+	if vw.Start.X < 0 {
+		vw.Start.X = 0
+	}
+	if vw.Start.Y < 0 {
+		vw.Start.Y = 0
+	}
+	if vw.Start.X+vw.Size.X >= fs.X {
+		vw.Start.X = (fs.X - 1) - vw.Size.X
+	}
+	if vw.Start.Y+vw.Size.Y >= fs.Y {
+		vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+	}
+}

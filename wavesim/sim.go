@@ -148,6 +148,8 @@ func (ss *Sim) ConfigSim() {
 		ss.KleinGordonCConfig()
 	case Schrodinger:
 		ss.SchrodingerConfig()
+	case Maxwell:
+		ss.MaxwellConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -160,11 +162,12 @@ func (ss *Sim) ConfigState() {
 	ctx := GetCtx(0)
 	ctx.Size.SetV(ss.Config.Size)
 	nvar := int(ss.StateVars.Int64())
+	ctx.NVars = int32(nvar)
 	if State == nil {
 		State = tensor.NewFloat32()
 	}
 	fs := ctx.SizeFull()
-	fmt.Println(fs)
+	// fmt.Println(fs)
 	State.SetShapeSizes(int(fs.Z), int(fs.Y), int(fs.X), nvar, 2)
 }
 
@@ -236,6 +239,15 @@ func (ss *Sim) StepRun() {
 		RunKleinGordonCKernel(ns)
 	case Schrodinger:
 		RunSchrodingerKernel(ns)
+	case Maxwell:
+		RunMaxwellKernel(ns)
+	}
+	if ss.Params.Edges != EdgesFixed {
+		ne := int(ctx.EdgesN())
+		switch ss.Params.Edges {
+		case EdgesWrap:
+			RunEdgesTestKernel(ne)
+		}
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()
@@ -277,13 +289,15 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	}
 	vw.sim = ss
 	vw.Size = ss.Config.Size
-	vw.Size.Z = 3
-	vw.Start.X = 1
-	vw.Start.Y = 1
-	vw.Start.Z = vw.Size.Z / 2
+	fs := ss.Config.SizeFull()
+	vw.Size = fs
+	vw.Start.X = 0
+	vw.Start.Y = 0
+	vw.Start.Z = fs.Z / 2
 	if vw.Start.Z == 0 {
 		vw.Start.Z = 1
 	}
+	fmt.Println("start:", vw.Start)
 	ss.callViewInit(vw)
 	ss.RunStats(true)
 	ss.GUI.FinalizeGUI(false)

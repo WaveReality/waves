@@ -23,9 +23,10 @@ func main() {
 
 	// threed := false
 	threed := true
-	// eqs := wavesim.Wave
-	eqs := wavesim.KleinGordonC
+	eqs := wavesim.Wave
+	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
+	// eqs := wavesim.Maxwell
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -33,9 +34,14 @@ func main() {
 			switch eqs {
 			case wavesim.Wave:
 				sim.Params.C = 1
+				sim.Params.Edges = wavesim.EdgesWrap
+				sim.ViewInit(func(vw *wavesim.View) {
+					vw.SetMode(wavesim.Bars, -1)
+				})
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 1)
+					// sim.Config.Size.Set(100, 100, 1)
+					sim.Config.Size.Set(10, 20, 30)
 				} else {
 					// sim.Config.Size.Set(80, 1, 1)
 					sim.Config.Size.Set(1000, 1, 1)
@@ -63,12 +69,19 @@ func main() {
 			case wavesim.Schrodinger:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
+					sim.Config.Size.Set(100, 100, 1)
+				} else {
 					sim.Config.Size.Set(500, 1, 1)
 					sim.ViewInit(wavesim.Cab1DViewAll)
-				} else {
-					sim.Config.Size.Set(100, 100, 1)
 				}
 				sim.SchrodingerStats()
+			case wavesim.Maxwell:
+				if threed {
+					sim.Params.ThreeD.SetBool(true)
+					sim.Config.Size.Set(100, 100, 100)
+				} else {
+					sim.Config.Size.Set(500, 1, 1)
+				}
 			}
 		},
 		func(sim *wavesim.Sim) {
@@ -99,6 +112,13 @@ func main() {
 					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 0), -1, 0, 1)
 				} else {
 					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
+				}
+			case wavesim.Maxwell:
+				if threed {
+					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 50, 50), 1)
+					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
+				} else {
+					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 0, 0), 1)
 				}
 			}
 		})

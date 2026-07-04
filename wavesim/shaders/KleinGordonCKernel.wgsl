@@ -42,10 +42,10 @@ fn Index5D(s0: u32, s1: u32, s2: u32, s3: u32, s4: u32, i0: u32, i1: u32, i2: u3
 //////// import: "context.go"
 struct Context {
 	Size: vec4<i32>,
+	NVars: i32,
 	Step: i32,
 	CurState: i32,
 	pad: i32,
-	pad1: i32,
 }
 fn Context_StateCoords(ctx: Context, idx: u32, x: ptr<function,i32>,y: ptr<function,i32>,z: ptr<function,i32>) -> bool {
 	var szxy = ctx.Size.x * ctx.Size.y;
@@ -68,26 +68,16 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "dirac.go"
 
-//////// import: "em.go"
-alias EMStates = i32; //enums:enum
-const  A0Pos: EMStates = 0;
-const  AXPos: EMStates = 1;
-const  AYPos: EMStates = 2;
-const  AZPos: EMStates = 3;
-const  A0Vel: EMStates = 4;
-const  AXVel: EMStates = 5;
-const  AYVel: EMStates = 6;
-const  AZVel: EMStates = 7;
-const  Charge: EMStates = 8;
-const  CurrentX: EMStates = 9;
-const  CurrentY: EMStates = 10;
-const  CurrentZ: EMStates = 11;
+//////// import: "edges.go"
+alias Edges = i32; //enums:enum
+const  EdgesFixed: Edges = 0;
+const  EdgesWrap: Edges = 1;
 
 //////// import: "enumgen.go"
-const EMStatesN: EMStates = 12;
-const GPUVarsN: GPUVars = 5;
-const EquationsN: Equations = 4;
 const EdgesN: Edges = 2;
+const GPUVarsN: GPUVars = 5;
+const EMStatesN: EMStates = 12;
+const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
@@ -184,15 +174,28 @@ fn KleinGordonCKernel(i: u32) { //gosl:kernel
 	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur))] = posB;
 }
 
+//////// import: "maxwell.go"
+alias EMStates = i32; //enums:enum
+const  A0Pos: EMStates = 0;
+const  AXPos: EMStates = 1;
+const  AYPos: EMStates = 2;
+const  AZPos: EMStates = 3;
+const  A0Vel: EMStates = 4;
+const  AXVel: EMStates = 5;
+const  AYVel: EMStates = 6;
+const  AZVel: EMStates = 7;
+const  Charge: EMStates = 8;
+const  CurrentX: EMStates = 9;
+const  CurrentY: EMStates = 10;
+const  CurrentZ: EMStates = 11;
+
 //////// import: "params.go"
 alias Equations = i32; //enums:enum
 const  Wave: Equations = 0;
 const  KleinGordon: Equations = 1;
 const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
-alias Edges = i32; //enums:enum
-const  EdgesFixed: Edges = 0;
-const  EdgesWrap: Edges = 1;
+const  Maxwell: Equations = 4;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;

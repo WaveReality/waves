@@ -5,6 +5,8 @@
 package wavesim
 
 import (
+	"fmt"
+
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/text/text"
@@ -112,7 +114,9 @@ func (vw *View) UpdatePlanes() {
 		// but then the front and back fight against each other, causing flickering
 
 		txt := plg.Child(1).(*xyz.Text2D)
-		ntxt := vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String()
+		ed := vw.Start.Add(vw.Size)
+		vwpos := fmt.Sprintf("[%d-%d, %d-%d, %d]", vw.Start.X, ed.X, vw.Start.Y, ed.Y, vw.Start.Z)
+		ntxt := vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String() + " " + vwpos
 		if txt.Text != ntxt {
 			txt.Defaults()
 			txt.Pose.Scale = math32.Vector3Scalar(vw.Settings.LabelSize)

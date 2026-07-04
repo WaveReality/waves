@@ -98,12 +98,9 @@ func GPUInit() {
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EMKernel.wgsl", sy)
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesTestKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
-		pl.AddVarUsed(0, "NeighOffs")
-		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
@@ -113,6 +110,13 @@ func GPUInit() {
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
@@ -194,46 +198,46 @@ func RunOneDiracKernel(n int, syncVars ...GPUVars) {
 		RunDiracKernelCPU(n)
 	}
 }
-// RunEMKernel runs the EMKernel kernel with given number of elements,
+// RunEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
 // in the same command submission on the GPU, which is by far the most efficient.
 // MUST call RunDone (with optional vars to sync) after all Run calls.
-// Alternatively, a single-shot RunOneEMKernel call does Run and Done for a
+// Alternatively, a single-shot RunOneEdgesTestKernel call does Run and Done for a
 // single run-and-sync case.
-func RunEMKernel(n int) {
+func RunEdgesTestKernel(n int) {
 	if UseGPU {
-		RunEMKernelGPU(n)
+		RunEdgesTestKernelGPU(n)
 	} else {
-		RunEMKernelCPU(n)
+		RunEdgesTestKernelCPU(n)
 	}
 }
 
-// RunEMKernelGPU runs the EMKernel kernel on the GPU. See [RunEMKernel] for more info.
-func RunEMKernelGPU(n int) {
+// RunEdgesTestKernelGPU runs the EdgesTestKernel kernel on the GPU. See [RunEdgesTestKernel] for more info.
+func RunEdgesTestKernelGPU(n int) {
 	sy := GPUSystem
-	pl := sy.ComputePipelines["EMKernel"]
+	pl := sy.ComputePipelines["EdgesTestKernel"]
 	ce, _ := sy.BeginComputePass()
 	pl.Dispatch1D(ce, n, 64)
 }
 
-// RunEMKernelCPU runs the EMKernel kernel on the CPU.
-func RunEMKernelCPU(n int) {
-	gpu.VectorizeFunc(0, n, EMKernel)
+// RunEdgesTestKernelCPU runs the EdgesTestKernel kernel on the CPU.
+func RunEdgesTestKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, EdgesTestKernel)
 }
 
-// RunOneEMKernel runs the EMKernel kernel with given number of elements,
+// RunOneEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // This version then calls RunDone with the given variables to sync
 // after the Run, for a single-shot Run-and-Done call. If multiple kernels
 // can be run in sequence, it is much more efficient to do multiple Run*
 // calls followed by a RunDone call.
-func RunOneEMKernel(n int, syncVars ...GPUVars) {
+func RunOneEdgesTestKernel(n int, syncVars ...GPUVars) {
 	if UseGPU {
-		RunEMKernelGPU(n)
+		RunEdgesTestKernelGPU(n)
 		RunDone(syncVars...)
 	} else {
-		RunEMKernelCPU(n)
+		RunEdgesTestKernelCPU(n)
 	}
 }
 // RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,
@@ -318,6 +322,48 @@ func RunOneKleinGordonKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunKleinGordonKernelCPU(n)
+	}
+}
+// RunMaxwellKernel runs the MaxwellKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneMaxwellKernel call does Run and Done for a
+// single run-and-sync case.
+func RunMaxwellKernel(n int) {
+	if UseGPU {
+		RunMaxwellKernelGPU(n)
+	} else {
+		RunMaxwellKernelCPU(n)
+	}
+}
+
+// RunMaxwellKernelGPU runs the MaxwellKernel kernel on the GPU. See [RunMaxwellKernel] for more info.
+func RunMaxwellKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["MaxwellKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunMaxwellKernelCPU runs the MaxwellKernel kernel on the CPU.
+func RunMaxwellKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, MaxwellKernel)
+}
+
+// RunOneMaxwellKernel runs the MaxwellKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneMaxwellKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunMaxwellKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunMaxwellKernelCPU(n)
 	}
 }
 // RunSchrodingerKernel runs the SchrodingerKernel kernel with given number of elements,
