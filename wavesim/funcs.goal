@@ -5,7 +5,7 @@
 package wavesim
 
 import (
-	// "fmt"
+	"fmt"
 	
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/tensor"
@@ -23,7 +23,9 @@ func (ss *Sim) ConfigVars() {
 	Ctx[0].Init()
 	NeighOffs = tensor.NewInt32(26,3)
 	LaplacianWts = tensor.NewFloat32(26)
+	AverageWts = tensor.NewFloat32(27)
 	lnorm := float32(3.0 / 13.0)
+	sum := float32(0)
 	idx := 0
 	for z := -1; z <= 1; z++ {
 		for y := -1; y <= 1; y++ {
@@ -37,14 +39,23 @@ func (ss *Sim) ConfigVars() {
 				
 				v := math32.Vec3(float32(x),float32(y),float32(z))
 				d2 := v.LengthSquared()
-				// d := v.Length()
 				invD2 := 1.0 / d2
-				// invD := 1.0 / d
-				LaplacianWts.Set(lnorm * invD2, idx)
+				wt := lnorm * invD2
+				LaplacianWts.Set(wt, idx)
+				
+				d := v.Length()
+				invD := 1.0 / d
+				sum += invD
+				AverageWts.Set(invD, idx)
+				
 				idx++
 			}
 		}
 	}
+	AverageWts.Set(1.0, idx)
+	sum += 1.0
+	
+	fmt.Println("sum:", sum)
 }
 
 //gosl:start
@@ -73,9 +84,32 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	return avg
 }
 
-// InBounds returns true if given coordinate is >= 1 and < s.
-func InBounds(x, y, z, sx, sy, sz int32) bool {
+// NeighAverage27 computes the 3D average of Laplacian across 27 neighbors,
+// including the center, for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
+	avg := float32(0)
+	for j := range 26 {
+		xo := NeighOffs[j, math32.X]
+		yo := NeighOffs[j, math32.Y]
+		zo := NeighOffs[j, math32.Z]
+		nv := State[z+zo, y+yo, x+xo, vidx, tidx]
+		avg += AverageWts.Value(j) * nv
+	}
+	avg += AverageWts.Value(26) * State[z, y, x, vidx, tidx]
+	return avg
+}
+
+//////// Edges
+
+// EdgeInBounds1 returns true if given coordinate is >= 1 and < s.
+func EdgeInBounds1(x, y, z, sx, sy, sz int32) bool {
 	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz
+}
+
+// EdgeInBounds0 returns true if given coordinate is >= 0 and <= s.
+func EdgeInBounds0(x, y, z, sx, sy, sz int32) bool {
+	return x >= 0 && x <= sx && y >= 0 && y <= sy && z >= 0 && z <= sz
 }
 
 // LaplacianEdge1D computes the 1D Laplacian across 2 X dim neighbors,
@@ -84,10 +118,10 @@ func InBounds(x, y, z, sx, sy, sz int32) bool {
 // For computation at the edge, checks against given full size bounds.
 func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
 	sum := float32(0)
-	if InBounds(x,y,x-1, sx, sy, sz) {
+	if EdgeInBounds1(x-1,y,z, sx, sy, sz) {
 		sum += State[z, y, x-1, vidx, tidx] - ctr
 	}
-	if InBounds(x,y,x+1, sx, sy, sz) {
+	if EdgeInBounds1(x+1,y,z, sx, sy, sz) {
 		sum += State[z, y, x+1, vidx, tidx] - ctr
 	}
 	return sum
@@ -103,7 +137,7 @@ func LaplacianEdge26(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]
-		if InBounds(z+zo, y+yo, x+xo, sx, sy, sz) {
+		if EdgeInBounds1(x+xo, y+yo, z+zo, sx, sy, sz) {
 			nv := State[z+zo, y+yo, x+xo, vidx, tidx]
 			avg += LaplacianWts.Value(j) * (nv - ctr)
 		}

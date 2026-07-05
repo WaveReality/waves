@@ -107,6 +107,76 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 }
 
+// KleinGordonDampKernel is the kernel for computing the KleinGordon equations,
+// on scalar state values (WaveStates),
+// at damped edges. Does Sommerfield damping where velocity = force.
+func KleinGordonDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+	var force float32
+	if Params[0].ThreeD.IsTrue() {
+		force = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+	} else {
+		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+	}
+	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
+	vel := Params[0].CSq * force              // key damp: no +=
+	pos := ppos + vel
+
+	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+}
+
+// KleinGordonCDampKernel is the kernel for computing the KleinGordonC equations,
+// on complex wave state,
+// at damped edges. Does Sommerfield damping where velocity = force.
+func KleinGordonCDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
+
+	var forceA, forceB float32
+	if Params[0].ThreeD.IsTrue() {
+		forceA = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
+		forceB = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
+	} else {
+		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
+		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
+	}
+	forceA -= Params[0].MassCOverHBarSq * pposA // this is the only diff from standard Wave
+	velA := Params[0].CSq * forceA
+	posA := pposA + velA
+
+	forceB -= Params[0].MassCOverHBarSq * pposB // this is the only diff from standard Wave
+	velB := Params[0].CSq * forceB
+	posB := pposB + velB
+
+	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+
+	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+}
+
 //gosl:end
 
 func (ss *Sim) KleinGordonConfig() {

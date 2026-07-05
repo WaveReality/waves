@@ -8,7 +8,17 @@ var<storage, read> TensorStrides: array<u32>;
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
 @group(1) @binding(1)
-var<storage, read_write> State: array<f32>;
+var<storage, read_write> State0: array<f32>;
+@group(1) @binding(2)
+var<storage, read_write> State1: array<f32>;
+@group(1) @binding(3)
+var<storage, read_write> State2: array<f32>;
+@group(1) @binding(4)
+var<storage, read_write> State3: array<f32>;
+@group(1) @binding(5)
+var<storage, read_write> State4: array<f32>;
+@group(1) @binding(6)
+var<storage, read_write> State5: array<f32>;
 
 alias GPUVars = i32;
 
@@ -16,6 +26,150 @@ alias GPUVars = i32;
 fn main(@builtin(workgroup_id) wgid: vec3<u32>, @builtin(num_workgroups) nwg: vec3<u32>, @builtin(local_invocation_index) loci: u32) {
 	let idx = loci + (wgid.x + wgid.y * nwg.x + wgid.z * nwg.x * nwg.y) * 64;
 	EdgesWrapKernel(idx);
+}
+
+fn StateGet(ix: u32) -> f32 {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		return State0[ix];
+	}
+	case u32(1): {
+		return State1[ix - 536870904];
+	}
+	case u32(2): {
+		return State2[ix - 1073741808];
+	}
+	case u32(3): {
+		return State3[ix - 1610612712];
+	}
+	case u32(4): {
+		return State4[ix - 2147483616];
+	}
+	default: {
+		return State5[ix - 2684354520];
+	}
+	}
+}
+
+fn StateSet(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] = vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] = vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] = vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] = vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] = vl;
+	}
+	default: {
+		State5[ix - 2684354520] = vl;
+	}
+	}
+}
+
+fn StateSetAdd(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] += vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] += vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] += vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] += vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] += vl;
+	}
+	default: {
+		State5[ix - 2684354520] += vl;
+	}
+	}
+}
+
+fn StateSetSub(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] -= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] -= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] -= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] -= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] -= vl;
+	}
+	default: {
+		State5[ix - 2684354520] -= vl;
+	}
+	}
+}
+
+fn StateSetMul(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] *= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] *= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] *= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] *= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] *= vl;
+	}
+	default: {
+		State5[ix - 2684354520] *= vl;
+	}
+	}
+}
+
+fn StateSetDiv(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] /= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] /= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] /= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] /= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] /= vl;
+	}
+	default: {
+		State5[ix - 2684354520] /= vl;
+	}
+	}
 }
 
 fn Index5D(s0: u32, s1: u32, s2: u32, s3: u32, s4: u32, i0: u32, i1: u32, i2: u32, i3: u32, i4: u32) -> u32 {
@@ -206,14 +360,14 @@ fn EdgesWrapKernel(i: u32) { //gosl:kernel
 	var prv = Context_PrevState(ctx);
 	var nvars = ctx.NVars;
 	for (var vi=0; vi<nvars; vi++) {
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(vi), u32(cur))] = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(sz), u32(sy), u32(sx), u32(vi), u32(cur))];
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(vi), u32(prv))] = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(sz), u32(sy), u32(sx), u32(vi), u32(prv))];
+		StateSet(StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(sz), u32(sy), u32(sx), u32(vi), u32(cur))), Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(vi), u32(cur)));
+		StateSet(StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(sz), u32(sy), u32(sx), u32(vi), u32(prv))), Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(vi), u32(prv)));
 	}
 }
 
 //////// import: "enumgen.go"
 const EdgesN: Edges = 3;
-const GPUVarsN: GPUVars = 5;
+const GPUVarsN: GPUVars = 6;
 const EMStatesN: EMStates = 12;
 const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;

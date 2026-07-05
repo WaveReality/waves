@@ -10,11 +10,23 @@ var<storage, read> Params: array<Parameters>;
 var<storage, read_write> NeighOffs: array<i32>;
 @group(0) @binding(3)
 var<storage, read_write> LaplacianWts: array<f32>;
+@group(0) @binding(4)
+var<storage, read_write> AverageWts: array<f32>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
 @group(1) @binding(1)
-var<storage, read_write> State: array<f32>;
+var<storage, read_write> State0: array<f32>;
+@group(1) @binding(2)
+var<storage, read_write> State1: array<f32>;
+@group(1) @binding(3)
+var<storage, read_write> State2: array<f32>;
+@group(1) @binding(4)
+var<storage, read_write> State3: array<f32>;
+@group(1) @binding(5)
+var<storage, read_write> State4: array<f32>;
+@group(1) @binding(6)
+var<storage, read_write> State5: array<f32>;
 
 alias GPUVars = i32;
 
@@ -30,6 +42,150 @@ fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 
 fn Index1D(s0: u32, i0: u32) -> u32 {
 	return s0 * i0;
+}
+
+fn StateGet(ix: u32) -> f32 {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		return State0[ix];
+	}
+	case u32(1): {
+		return State1[ix - 536870904];
+	}
+	case u32(2): {
+		return State2[ix - 1073741808];
+	}
+	case u32(3): {
+		return State3[ix - 1610612712];
+	}
+	case u32(4): {
+		return State4[ix - 2147483616];
+	}
+	default: {
+		return State5[ix - 2684354520];
+	}
+	}
+}
+
+fn StateSet(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] = vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] = vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] = vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] = vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] = vl;
+	}
+	default: {
+		State5[ix - 2684354520] = vl;
+	}
+	}
+}
+
+fn StateSetAdd(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] += vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] += vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] += vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] += vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] += vl;
+	}
+	default: {
+		State5[ix - 2684354520] += vl;
+	}
+	}
+}
+
+fn StateSetSub(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] -= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] -= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] -= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] -= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] -= vl;
+	}
+	default: {
+		State5[ix - 2684354520] -= vl;
+	}
+	}
+}
+
+fn StateSetMul(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] *= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] *= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] *= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] *= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] *= vl;
+	}
+	default: {
+		State5[ix - 2684354520] *= vl;
+	}
+	}
+}
+
+fn StateSetDiv(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] /= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] /= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] /= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] /= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] /= vl;
+	}
+	default: {
+		State5[ix - 2684354520] /= vl;
+	}
+	}
 }
 
 fn Index5D(s0: u32, s1: u32, s2: u32, s3: u32, s4: u32, i0: u32, i1: u32, i2: u32, i3: u32, i4: u32) -> u32 {
@@ -76,7 +232,7 @@ const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
 const EdgesN: Edges = 3;
-const GPUVarsN: GPUVars = 5;
+const GPUVarsN: GPUVars = 6;
 const EMStatesN: EMStates = 12;
 const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;
@@ -87,9 +243,9 @@ const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
 fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))];
-	var p1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24],
-	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))];
+	var m1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
+	var p1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34],
+	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
 return (m1 + p1) - 2*ctr;
 }
 fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
@@ -98,9 +254,23 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
+		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
 	}return avg;
+}
+fn NeighAverage27(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> f32 {
+	var avg = f32(0);
+	for (var j=0; j<26; j++) {
+		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
+		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
+		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
+		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
+		avg += AverageWts[Index1D(TensorStrides[20], u32(j))] * nv;
+	}
+	avg += AverageWts[Index1D(TensorStrides[20], u32(26))] * StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33],
+	TensorStrides[34],
+	u32(z), u32(y), u32(x), u32(vidx), u32(tidx)));
+return avg;
 }
 
 //////// import: "klein-gordon.go"
@@ -130,45 +300,54 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	}
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
-	var a0pp = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(A0Pos), u32(prv))];
-	var aXpp = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AXPos), u32(prv))];
-	var aYpp = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AYPos), u32(prv))];
-	var aZpp = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AZPos), u32(prv))];
+	var a0pp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Pos), u32(prv)));
+	var aXpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXPos), u32(prv)));
+	var aYpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYPos), u32(prv)));
+	var aZpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZPos), u32(prv)));
 	var f0: f32;
 	var fX: f32;
 	var fY: f32;
 	var fZ: f32;
+	var c0: f32;
+	var cX: f32;
+	var cY: f32;
+	var cZ: f32;
 	if (Params[0].ThreeD == 1) {
 		f0 = Laplacian26(x, y, z, i32(A0Pos), prv, a0pp);
 		fX = Laplacian26(x, y, z, i32(AXPos), prv, aXpp);
 		fY = Laplacian26(x, y, z, i32(AYPos), prv, aYpp);
 		fZ = Laplacian26(x, y, z, i32(AZPos), prv, aZpp);
+		c0 = NeighAverage27(x, y, z, i32(Charge), prv);
+		cX = NeighAverage27(x, y, z, i32(CurrentX), prv);
+		cY = NeighAverage27(x, y, z, i32(CurrentY), prv);
+		cZ = NeighAverage27(x, y, z, i32(CurrentZ), prv);
 	} else {
 		f0 = Laplacian1D(x, y, z, i32(A0Pos), prv, a0pp);
 		fX = Laplacian1D(x, y, z, i32(AXPos), prv, aXpp);
 		fY = Laplacian1D(x, y, z, i32(AYPos), prv, aYpp);
 		fZ = Laplacian1D(x, y, z, i32(AZPos), prv, aZpp);
 	}
-	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(Charge), u32(prv))];
-	var a0vc = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(A0Vel), u32(prv))] + f0;
+	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0;
+	var a0vc = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Vel), u32(prv))) + f0;
 	var a0pc = a0pp + a0vc;
-	fX = Params[0].CSq*fX + Params[0].Mu0*State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CurrentX), u32(prv))];
-	var aXvc = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AXVel), u32(prv))] + fX;
+	fX = Params[0].CSq*fX + Params[0].Mu0*cX;
+	var aXvc = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXVel), u32(prv))) + fX;
 	var aXpc = aXpp + aXvc;
-	fY = Params[0].CSq*fY + Params[0].Mu0*State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CurrentY), u32(prv))];
-	var aYvc = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AYVel), u32(prv))] + fY;
+	fY = Params[0].CSq*fY + Params[0].Mu0*cY;
+	var aYvc = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYVel), u32(prv))) + fY;
 	var aYpc = aYpp + aYvc;
-	fZ = Params[0].CSq*fZ + Params[0].Mu0*State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CurrentZ), u32(prv))];
-	var aZvc = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AZVel), u32(prv))] + fZ;
+	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ;
+	var aZvc = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZVel), u32(prv))) + fZ;
 	var aZpc = aZpp + aZvc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(A0Vel), u32(cur))] = a0vc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(A0Pos), u32(cur))] = a0pc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AXVel), u32(cur))] = aXvc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AXPos), u32(cur))] = aXpc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AYVel), u32(cur))] = aYvc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AYPos), u32(cur))] = aYpc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AZVel), u32(cur))] = aZvc;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(AZPos), u32(cur))] = aZpc;
+	StateSet(a0vc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Vel), u32(cur)));
+	StateSet(a0pc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Pos), u32(cur)));
+	StateSet(aXvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXVel), u32(cur)));
+	StateSet(aXpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXPos), u32(cur)));
+	StateSet(aYvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYVel), u32(cur)));
+	StateSet(aYpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYPos), u32(cur)));
+	StateSet(aZvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZVel), u32(cur)));
+	StateSet(aZpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32],
+	TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZPos), u32(cur)));
 }
 
 //////// import: "params.go"

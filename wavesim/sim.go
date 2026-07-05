@@ -197,7 +197,7 @@ func (ss *Sim) Init() {
 		ss.InitFunc(ss)
 	}
 	ToGPUTensorStrides()
-	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, StateVar)
+	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, AverageWtsVar, StateVar)
 	ss.RunStats(true)
 }
 
@@ -251,14 +251,15 @@ func (ss *Sim) StepRun() {
 			switch ss.Config.Equation {
 			case Wave:
 				RunWaveDampKernel(ne)
-				// case KleinGordon:
-				// 	RunKleinGordonKernel(ns)
-				// case KleinGordonC:
-				// 	RunKleinGordonCKernel(ns)
+			case KleinGordon:
+				RunKleinGordonDampKernel(ne)
+			case KleinGordonC:
+				RunKleinGordonCDampKernel(ne)
+				// note: there is no damping for Schrodinger
 				// case Schrodinger:
-				// 	RunSchrodingerKernel(ns)
-				// case Maxwell:
-				// 	RunMaxwellKernel(ns)
+				// 	RunSchrodingerDampKernel(ne)
+			case Maxwell:
+				RunMaxwellDampKernel(ne)
 			}
 		}
 	}
@@ -303,9 +304,9 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	vw.sim = ss
 	vw.Size = ss.Config.Size
 	fs := ss.Config.SizeFull()
-	vw.Size = fs
-	vw.Start.X = 0
-	vw.Start.Y = 0
+	// vw.Size = fs
+	vw.Start.X = 1
+	vw.Start.Y = 1
 	vw.Start.Z = fs.Z / 2
 	if vw.Start.Z == 0 {
 		vw.Start.Z = 1

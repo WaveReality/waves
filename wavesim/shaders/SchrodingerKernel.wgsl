@@ -14,7 +14,17 @@ var<storage, read_write> LaplacianWts: array<f32>;
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
 @group(1) @binding(1)
-var<storage, read_write> State: array<f32>;
+var<storage, read_write> State0: array<f32>;
+@group(1) @binding(2)
+var<storage, read_write> State1: array<f32>;
+@group(1) @binding(3)
+var<storage, read_write> State2: array<f32>;
+@group(1) @binding(4)
+var<storage, read_write> State3: array<f32>;
+@group(1) @binding(5)
+var<storage, read_write> State4: array<f32>;
+@group(1) @binding(6)
+var<storage, read_write> State5: array<f32>;
 
 alias GPUVars = i32;
 
@@ -30,6 +40,150 @@ fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 
 fn Index1D(s0: u32, i0: u32) -> u32 {
 	return s0 * i0;
+}
+
+fn StateGet(ix: u32) -> f32 {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		return State0[ix];
+	}
+	case u32(1): {
+		return State1[ix - 536870904];
+	}
+	case u32(2): {
+		return State2[ix - 1073741808];
+	}
+	case u32(3): {
+		return State3[ix - 1610612712];
+	}
+	case u32(4): {
+		return State4[ix - 2147483616];
+	}
+	default: {
+		return State5[ix - 2684354520];
+	}
+	}
+}
+
+fn StateSet(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] = vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] = vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] = vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] = vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] = vl;
+	}
+	default: {
+		State5[ix - 2684354520] = vl;
+	}
+	}
+}
+
+fn StateSetAdd(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] += vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] += vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] += vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] += vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] += vl;
+	}
+	default: {
+		State5[ix - 2684354520] += vl;
+	}
+	}
+}
+
+fn StateSetSub(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] -= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] -= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] -= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] -= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] -= vl;
+	}
+	default: {
+		State5[ix - 2684354520] -= vl;
+	}
+	}
+}
+
+fn StateSetMul(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] *= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] *= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] *= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] *= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] *= vl;
+	}
+	default: {
+		State5[ix - 2684354520] *= vl;
+	}
+	}
+}
+
+fn StateSetDiv(vl: f32, ix: u32) {
+	let ii = ix / 536870904;
+	switch ii {
+	case u32(0): {
+		State0[ix] /= vl;
+	}
+	case u32(1): {
+		State1[ix - 536870904] /= vl;
+	}
+	case u32(2): {
+		State2[ix - 1073741808] /= vl;
+	}
+	case u32(3): {
+		State3[ix - 1610612712] /= vl;
+	}
+	case u32(4): {
+		State4[ix - 2147483616] /= vl;
+	}
+	default: {
+		State5[ix - 2684354520] /= vl;
+	}
+	}
 }
 
 fn Index5D(s0: u32, s1: u32, s2: u32, s3: u32, s4: u32, i0: u32, i1: u32, i2: u32, i3: u32, i4: u32) -> u32 {
@@ -76,7 +230,7 @@ const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
 const EdgesN: Edges = 3;
-const GPUVarsN: GPUVars = 5;
+const GPUVarsN: GPUVars = 6;
 const EMStatesN: EMStates = 12;
 const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;
@@ -87,9 +241,9 @@ const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
 fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))];
-	var p1 = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24],
-	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))];
+	var m1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
+	var p1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34],
+	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
 return (m1 + p1) - 2*ctr;
 }
 fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
@@ -98,7 +252,7 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx))];
+		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
 	}return avg;
 }
@@ -173,12 +327,12 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 	}
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
-	var pposA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv))];
-	var pposB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv))];
-	var pvelA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelA), u32(prv))];
-	var pvelB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelB), u32(prv))];
-	var vpot = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22],
-	TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabV), u32(prv))];
+	var pposA = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv)));
+	var pposB = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv)));
+	var pvelA = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelA), u32(prv)));
+	var pvelB = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelB), u32(prv)));
+	var vpot = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32],
+	TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabV), u32(prv)));
 	var forceA: f32;
 	var velA: f32;
 	var posA: f32;
@@ -194,7 +348,7 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB; // note neg here, not in B
 		velA = forceA;                                     // first order, not +=
 		posA = pposA + velA;
-		forceB = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceB), u32(prv))];
+		forceB = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceB), u32(prv)));
 		velB = pvelB;
 		posB = pposB;
 	} else {
@@ -206,7 +360,7 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA; // todo: not sure about this!!
 		velB = forceB;                                    // first order, not +=
 		posB = pposB + velB;
-		forceA = State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceA), u32(prv))];
+		forceA = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceA), u32(prv)));
 		velA = pvelA;
 		posA = pposA;
 	}
@@ -214,16 +368,16 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 		var cc = posA*posA + posB*posB;
 		var midVel = 0.25 * (pvelA + velA + pvelB + velB);
 		var kinetic = Params[0].MassOver2 * midVel * midVel;
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabCC), u32(cur))] = cc;
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabKinetic), u32(cur))] = kinetic;
-		State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabEnergy), u32(cur))] = kinetic + vpot;
+		StateSet(cc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabCC), u32(cur)));
+		StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabKinetic), u32(cur)));
+		StateSet(kinetic + vpot, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabEnergy), u32(cur)));
 	}
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur))] = forceA;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur))] = velA;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur))] = posA;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur))] = forceB;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur))] = velB;
-	State[Index5D(TensorStrides[20], TensorStrides[21], TensorStrides[22], TensorStrides[23], TensorStrides[24], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur))] = posB;
+	StateSet(forceA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));
+	StateSet(velA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));
+	StateSet(posA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));
+	StateSet(forceB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));
+	StateSet(velB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));
+	StateSet(posB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));
 }
 
 //////// import: "settings.go"

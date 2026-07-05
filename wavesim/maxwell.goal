@@ -70,32 +70,98 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	aXpp := State[z, y, x, AXPos, prv]
 	aYpp := State[z, y, x, AYPos, prv]
 	aZpp := State[z, y, x, AZPos, prv]
-	var f0, fX, fY, fZ float32
+	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
 	if Params[0].ThreeD.IsTrue() {
 		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
 		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
 		fY = Laplacian26(x, y, z, int32(AYPos), prv, aYpp)
 		fZ = Laplacian26(x, y, z, int32(AZPos), prv, aZpp)
+
+		c0 = NeighAverage27(x, y, z, int32(Charge), prv)
+		cX = NeighAverage27(x, y, z, int32(CurrentX), prv)
+		cY = NeighAverage27(x, y, z, int32(CurrentY), prv)
+		cZ = NeighAverage27(x, y, z, int32(CurrentZ), prv)
 	} else {
 		f0 = Laplacian1D(x, y, z, int32(A0Pos), prv, a0pp)
 		fX = Laplacian1D(x, y, z, int32(AXPos), prv, aXpp)
 		fY = Laplacian1D(x, y, z, int32(AYPos), prv, aYpp)
 		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
 	}
-	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*State[z, y, x, Charge, prv]
+	// if c0 > 0 {
+	// 	fmt.Println(x, y, z, c0, Params[0].OneoEps0, a0pp)
+	// }
+	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0
 	a0vc := State[z, y, x, A0Vel, prv] + f0
 	a0pc := a0pp + a0vc
 
-	fX = Params[0].CSq*fX + Params[0].Mu0*State[z, y, x, CurrentX, prv]
+	fX = Params[0].CSq*fX + Params[0].Mu0*cX
 	aXvc := State[z, y, x, AXVel, prv] + fX
 	aXpc := aXpp + aXvc
 
-	fY = Params[0].CSq*fY + Params[0].Mu0*State[z, y, x, CurrentY, prv]
+	fY = Params[0].CSq*fY + Params[0].Mu0*cY
 	aYvc := State[z, y, x, AYVel, prv] + fY
 	aYpc := aYpp + aYvc
 
-	fZ = Params[0].CSq*fZ + Params[0].Mu0*State[z, y, x, CurrentZ, prv]
+	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ
 	aZvc := State[z, y, x, AZVel, prv] + fZ
+	aZpc := aZpp + aZvc
+
+	State[z, y, x, A0Vel, cur] = a0vc
+	State[z, y, x, A0Pos, cur] = a0pc
+
+	State[z, y, x, AXVel, cur] = aXvc
+	State[z, y, x, AXPos, cur] = aXpc
+
+	State[z, y, x, AYVel, cur] = aYvc
+	State[z, y, x, AYPos, cur] = aYpc
+
+	State[z, y, x, AZVel, cur] = aZvc
+	State[z, y, x, AZPos, cur] = aZpc
+}
+
+// MaxwellDampKernel is the kernel for computing the Maxwell EM equations,
+// on EM state values (EMStates),
+// at damped edges. Does Sommerfield damping where velocity = force.
+func MaxwellDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	a0pp := State[z, y, x, A0Pos, prv]
+	aXpp := State[z, y, x, AXPos, prv]
+	aYpp := State[z, y, x, AYPos, prv]
+	aZpp := State[z, y, x, AZPos, prv]
+	var f0, fX, fY, fZ float32
+	if Params[0].ThreeD.IsTrue() {
+		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
+		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
+		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
+		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+	} else {
+		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
+		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
+		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
+		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+	}
+	f0 = Params[0].CSq * f0
+	a0vc := f0
+	a0pc := a0pp + a0vc
+
+	fX = Params[0].CSq * fX
+	aXvc := fX
+	aXpc := aXpp + aXvc
+
+	fY = Params[0].CSq * fY
+	aYvc := fY
+	aYpc := aYpp + aYvc
+
+	fZ = Params[0].CSq * fZ
+	aZvc := fZ
 	aZpc := aZpp + aZvc
 
 	State[z, y, x, A0Vel, cur] = a0vc

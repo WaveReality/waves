@@ -49,20 +49,20 @@ func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
-var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4}
+var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4, 5}
 
 // GPUVarsN is the highest valid value for type GPUVars, plus one.
 //
 //gosl:start
-const GPUVarsN GPUVars = 5
+const GPUVarsN GPUVars = 6
 
 //gosl:end
 
-var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `LaplacianWtsVar`: 2, `CtxVar`: 3, `StateVar`: 4}
+var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `LaplacianWtsVar`: 2, `AverageWtsVar`: 3, `CtxVar`: 4, `StateVar`: 5}
 
-var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``}
+var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``, 5: ``}
 
-var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `LaplacianWtsVar`, 3: `CtxVar`, 4: `StateVar`}
+var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `LaplacianWtsVar`, 3: `AverageWtsVar`, 4: `CtxVar`, 5: `StateVar`}
 
 // String returns the string representation of this GPUVars value.
 func (i GPUVars) String() string { return enums.String(i, _GPUVarsMap) }

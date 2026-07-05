@@ -42,8 +42,9 @@ const (
 	ParamsVar GPUVars = 0
 	NeighOffsVar GPUVars = 1
 	LaplacianWtsVar GPUVars = 2
-	CtxVar GPUVars = 3
-	StateVar GPUVars = 4
+	AverageWtsVar GPUVars = 3
+	CtxVar GPUVars = 4
+	StateVar GPUVars = 5
 )
 
 // Tensor stride variables
@@ -79,6 +80,7 @@ func GPUInit() {
 			vr.ReadOnly = true
 			vr = sgp.Add("NeighOffs", gpu.Int32, 1, gpu.ComputeShader)
 			vr = sgp.Add("LaplacianWts", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("AverageWts", gpu.Float32, 1, gpu.ComputeShader)
 			sgp.SetNValues(1)
 		}
 		{
@@ -87,7 +89,12 @@ func GPUInit() {
 			_ = vr
 			vr = sgp.AddStruct("Ctx", int(unsafe.Sizeof(Context{})), 1, gpu.ComputeShader)
 			vr.ReadOnly = true
-			vr = sgp.Add("State", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State0", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State1", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State2", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State3", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State4", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State5", gpu.Float32, 1, gpu.ComputeShader)
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
@@ -97,53 +104,130 @@ func GPUInit() {
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesWrapKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCDampKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonDampKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellKernel.wgsl", sy)
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(0, "AverageWts")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "State")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		sy.Config()
 	}
 }
@@ -247,6 +331,48 @@ func RunOneEdgesWrapKernel(n int, syncVars ...GPUVars) {
 		RunEdgesWrapKernelCPU(n)
 	}
 }
+// RunKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneKleinGordonCDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunKleinGordonCDampKernel(n int) {
+	if UseGPU {
+		RunKleinGordonCDampKernelGPU(n)
+	} else {
+		RunKleinGordonCDampKernelCPU(n)
+	}
+}
+
+// RunKleinGordonCDampKernelGPU runs the KleinGordonCDampKernel kernel on the GPU. See [RunKleinGordonCDampKernel] for more info.
+func RunKleinGordonCDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["KleinGordonCDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunKleinGordonCDampKernelCPU runs the KleinGordonCDampKernel kernel on the CPU.
+func RunKleinGordonCDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, KleinGordonCDampKernel)
+}
+
+// RunOneKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneKleinGordonCDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunKleinGordonCDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunKleinGordonCDampKernelCPU(n)
+	}
+}
 // RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
@@ -289,6 +415,48 @@ func RunOneKleinGordonCKernel(n int, syncVars ...GPUVars) {
 		RunKleinGordonCKernelCPU(n)
 	}
 }
+// RunKleinGordonDampKernel runs the KleinGordonDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneKleinGordonDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunKleinGordonDampKernel(n int) {
+	if UseGPU {
+		RunKleinGordonDampKernelGPU(n)
+	} else {
+		RunKleinGordonDampKernelCPU(n)
+	}
+}
+
+// RunKleinGordonDampKernelGPU runs the KleinGordonDampKernel kernel on the GPU. See [RunKleinGordonDampKernel] for more info.
+func RunKleinGordonDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["KleinGordonDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunKleinGordonDampKernelCPU runs the KleinGordonDampKernel kernel on the CPU.
+func RunKleinGordonDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, KleinGordonDampKernel)
+}
+
+// RunOneKleinGordonDampKernel runs the KleinGordonDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneKleinGordonDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunKleinGordonDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunKleinGordonDampKernelCPU(n)
+	}
+}
 // RunKleinGordonKernel runs the KleinGordonKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
@@ -329,6 +497,48 @@ func RunOneKleinGordonKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunKleinGordonKernelCPU(n)
+	}
+}
+// RunMaxwellDampKernel runs the MaxwellDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneMaxwellDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunMaxwellDampKernel(n int) {
+	if UseGPU {
+		RunMaxwellDampKernelGPU(n)
+	} else {
+		RunMaxwellDampKernelCPU(n)
+	}
+}
+
+// RunMaxwellDampKernelGPU runs the MaxwellDampKernel kernel on the GPU. See [RunMaxwellDampKernel] for more info.
+func RunMaxwellDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["MaxwellDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunMaxwellDampKernelCPU runs the MaxwellDampKernel kernel on the CPU.
+func RunMaxwellDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, MaxwellDampKernel)
+}
+
+// RunOneMaxwellDampKernel runs the MaxwellDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneMaxwellDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunMaxwellDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunMaxwellDampKernelCPU(n)
 	}
 }
 // RunMaxwellKernel runs the MaxwellKernel kernel with given number of elements,
@@ -533,12 +743,22 @@ func ToGPU(vars ...GPUVars) {
 		case LaplacianWtsVar:
 			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
 			gpu.SetValueFrom(v, LaplacianWts.Values)
+		case AverageWtsVar:
+			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
+			gpu.SetValueFrom(v, AverageWts.Values)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			gpu.SetValueFrom(v, Ctx)
 		case StateVar:
-			v, _ := syVars.ValueByIndex(1, "State", 0)
-			gpu.SetValueFrom(v, State.Values)
+			bsz := 536870904
+			n := State.Len()
+			nb := int(math.Ceil(float64(n) / float64(bsz)))
+			for bi := range nb {
+				v, _ := syVars.ValueByIndex(1, fmt.Sprintf("State%d", bi), 0)
+				st := bsz * bi
+				ed := min(bsz * (bi+1), n)
+				gpu.SetValueFrom(v, State.Values[st:ed])
+			}
 		}
 	}
 }
@@ -560,15 +780,16 @@ func ToGPUTensorStrides() {
 	}
 	sy := GPUSystem
 	syVars := sy.Vars()
-	TensorStrides.SetShapeSizes(30)
+	TensorStrides.SetShapeSizes(40)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[0], 0)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[1], 1)
 	TensorStrides.SetInt1D(LaplacianWts.Shape().Strides[0], 10)
-	TensorStrides.SetInt1D(State.Shape().Strides[0], 20)
-	TensorStrides.SetInt1D(State.Shape().Strides[1], 21)
-	TensorStrides.SetInt1D(State.Shape().Strides[2], 22)
-	TensorStrides.SetInt1D(State.Shape().Strides[3], 23)
-	TensorStrides.SetInt1D(State.Shape().Strides[4], 24)
+	TensorStrides.SetInt1D(AverageWts.Shape().Strides[0], 20)
+	TensorStrides.SetInt1D(State.Shape().Strides[0], 30)
+	TensorStrides.SetInt1D(State.Shape().Strides[1], 31)
+	TensorStrides.SetInt1D(State.Shape().Strides[2], 32)
+	TensorStrides.SetInt1D(State.Shape().Strides[3], 33)
+	TensorStrides.SetInt1D(State.Shape().Strides[4], 34)
 	v, _ := syVars.ValueByIndex(0, "TensorStrides", 0)
 	gpu.SetValueFrom(v, TensorStrides.Values)
 }
@@ -588,12 +809,20 @@ func ReadFromGPU(vars ...GPUVars) {
 		case LaplacianWtsVar:
 			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
 			v.GPUToRead(sy.CommandEncoder)
+		case AverageWtsVar:
+			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
+			v.GPUToRead(sy.CommandEncoder)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			v.GPUToRead(sy.CommandEncoder)
 		case StateVar:
-			v, _ := syVars.ValueByIndex(1, "State", 0)
-			v.GPUToRead(sy.CommandEncoder)
+			bsz := 536870904
+			n := State.Len()
+			nb := int(math.Ceil(float64(n) / float64(bsz)))
+			for bi := range nb {
+				v, _ := syVars.ValueByIndex(1, fmt.Sprintf("State%d", bi), 0)
+				v.GPUToRead(sy.CommandEncoder)
+			}
 		}
 	}
 }
@@ -616,14 +845,25 @@ func SyncFromGPU(vars ...GPUVars) {
 			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
 			v.ReadSync()
 			gpu.ReadToBytes(v, LaplacianWts.Values)
+		case AverageWtsVar:
+			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
+			v.ReadSync()
+			gpu.ReadToBytes(v, AverageWts.Values)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			v.ReadSync()
 			gpu.ReadToBytes(v, Ctx)
 		case StateVar:
-			v, _ := syVars.ValueByIndex(1, "State", 0)
-			v.ReadSync()
-			gpu.ReadToBytes(v, State.Values)
+			bsz := 536870904
+			n := State.Len()
+			nb := int(math.Ceil(float64(n) / float64(bsz)))
+			for bi := range nb {
+				v, _ := syVars.ValueByIndex(1, fmt.Sprintf("State%d", bi), 0)
+				v.ReadSync()
+				st := bsz * bi
+				ed := min(bsz * (bi+1), n)
+				gpu.ReadToBytes(v, State.Values[st:ed])
+			}
 		}
 	}
 }

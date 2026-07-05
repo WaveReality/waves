@@ -100,7 +100,11 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.La
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.InBounds", Doc: "InBounds returns true if given coordinate is >= 1 and < s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NeighAverage27", Doc: "NeighAverage27 computes the 3D average of Laplacian across 27 neighbors,\nincluding the center, for given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgeInBounds1", Doc: "EdgeInBounds1 returns true if given coordinate is >= 1 and < s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgeInBounds0", Doc: "EdgeInBounds0 returns true if given coordinate is >= 0 and <= s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.LaplacianEdge1D", Doc: "LaplacianEdge1D computes the 1D Laplacian across 2 X dim neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.\nFor computation at the edge, checks against given full size bounds.", Args: []string{"x", "y", "z", "sx", "sy", "sz", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
@@ -130,6 +134,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneEdgesWrapKernel", Doc: "RunOneEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCDampKernel", Doc: "RunKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneKleinGordonCDampKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCDampKernelGPU", Doc: "RunKleinGordonCDampKernelGPU runs the KleinGordonCDampKernel kernel on the GPU. See [RunKleinGordonCDampKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCDampKernelCPU", Doc: "RunKleinGordonCDampKernelCPU runs the KleinGordonCDampKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneKleinGordonCDampKernel", Doc: "RunOneKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCKernel", Doc: "RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneKleinGordonCKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCKernelGPU", Doc: "RunKleinGordonCKernelGPU runs the KleinGordonCKernel kernel on the GPU. See [RunKleinGordonCKernel] for more info.", Args: []string{"n"}})
@@ -138,6 +150,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneKleinGordonCKernel", Doc: "RunOneKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonDampKernel", Doc: "RunKleinGordonDampKernel runs the KleinGordonDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneKleinGordonDampKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonDampKernelGPU", Doc: "RunKleinGordonDampKernelGPU runs the KleinGordonDampKernel kernel on the GPU. See [RunKleinGordonDampKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonDampKernelCPU", Doc: "RunKleinGordonDampKernelCPU runs the KleinGordonDampKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneKleinGordonDampKernel", Doc: "RunOneKleinGordonDampKernel runs the KleinGordonDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonKernel", Doc: "RunKleinGordonKernel runs the KleinGordonKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneKleinGordonKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonKernelGPU", Doc: "RunKleinGordonKernelGPU runs the KleinGordonKernel kernel on the GPU. See [RunKleinGordonKernel] for more info.", Args: []string{"n"}})
@@ -145,6 +165,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonKernelCPU", Doc: "RunKleinGordonKernelCPU runs the KleinGordonKernel kernel on the CPU.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneKleinGordonKernel", Doc: "RunOneKleinGordonKernel runs the KleinGordonKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunMaxwellDampKernel", Doc: "RunMaxwellDampKernel runs the MaxwellDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneMaxwellDampKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunMaxwellDampKernelGPU", Doc: "RunMaxwellDampKernelGPU runs the MaxwellDampKernel kernel on the GPU. See [RunMaxwellDampKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunMaxwellDampKernelCPU", Doc: "RunMaxwellDampKernelCPU runs the MaxwellDampKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneMaxwellDampKernel", Doc: "RunOneMaxwellDampKernel runs the MaxwellDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunMaxwellKernel", Doc: "RunMaxwellKernel runs the MaxwellKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneMaxwellKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
@@ -202,7 +230,13 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Kl
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonCKernel", Doc: "KleinGordonCKernel is the kernel for computing the KleinGordonC equations,\non complex wave state.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonDampKernel", Doc: "KleinGordonDampKernel is the kernel for computing the KleinGordon equations,\non scalar state values (WaveStates),\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonCDampKernel", Doc: "KleinGordonCDampKernel is the kernel for computing the KleinGordonC equations,\non complex wave state,\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.MaxwellKernel", Doc: "MaxwellKernel is the kernel for computing the Maxwell EM equations,\non EM state values (EMStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.MaxwellDampKernel", Doc: "MaxwellDampKernel is the kernel for computing the Maxwell EM equations,\non EM state values (EMStates),\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 

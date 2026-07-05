@@ -29,6 +29,10 @@ var (
 	//gosl:dims 1
 	LaplacianWts *tensor.Float32
 
+	// AverageWts are neighborhood average weighting factors for 3D 26 neighbors + center.
+	//gosl:dims 1
+	AverageWts *tensor.Float32
+
 	// Ctx has the Context state values.
 	//gosl:group State
 	//gosl:read-only
@@ -38,6 +42,7 @@ var (
 	// and previous states. [Z][Y][X][VarsN][2]
 	// The display shows X-Y planes stacked in the Z dimension.
 	//gosl:dims 5
+	//gosl:nbuffs 6
 	State *tensor.Float32
 )
 
