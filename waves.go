@@ -34,9 +34,10 @@ func main() {
 			switch eqs {
 			case wavesim.Wave:
 				sim.Params.C = 1
-				sim.Params.Edges = wavesim.EdgesWrap
+				// sim.Params.Edges = wavesim.EdgesWrap
+				sim.Params.Edges = wavesim.EdgesDamp
 				sim.ViewInit(func(vw *wavesim.View) {
-					vw.Settings.NPanels = wavesim.PanelsTwo
+					// vw.Settings.NPanels = wavesim.PanelsTwo
 					// vw.SetMode(wavesim.Bars, -1)
 				})
 				if threed {

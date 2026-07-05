@@ -130,6 +130,13 @@ func GPUInit() {
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -406,6 +413,48 @@ func RunOneSchrodingerKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunSchrodingerKernelCPU(n)
+	}
+}
+// RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneWaveDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunWaveDampKernel(n int) {
+	if UseGPU {
+		RunWaveDampKernelGPU(n)
+	} else {
+		RunWaveDampKernelCPU(n)
+	}
+}
+
+// RunWaveDampKernelGPU runs the WaveDampKernel kernel on the GPU. See [RunWaveDampKernel] for more info.
+func RunWaveDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["WaveDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunWaveDampKernelCPU runs the WaveDampKernel kernel on the CPU.
+func RunWaveDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, WaveDampKernel)
+}
+
+// RunOneWaveDampKernel runs the WaveDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneWaveDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunWaveDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunWaveDampKernelCPU(n)
 	}
 }
 // RunWaveKernel runs the WaveKernel kernel with given number of elements,

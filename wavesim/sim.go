@@ -247,6 +247,19 @@ func (ss *Sim) StepRun() {
 		switch ss.Params.Edges {
 		case EdgesWrap:
 			RunEdgesWrapKernel(ne)
+		case EdgesDamp:
+			switch ss.Config.Equation {
+			case Wave:
+				RunWaveDampKernel(ne)
+				// case KleinGordon:
+				// 	RunKleinGordonKernel(ns)
+				// case KleinGordonC:
+				// 	RunKleinGordonCKernel(ns)
+				// case Schrodinger:
+				// 	RunSchrodingerKernel(ns)
+				// case Maxwell:
+				// 	RunMaxwellKernel(ns)
+			}
 		}
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {

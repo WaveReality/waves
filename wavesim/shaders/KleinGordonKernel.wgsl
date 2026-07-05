@@ -69,7 +69,7 @@ fn Context_PrevState(ctx: Context) -> i32 {
 //////// import: "dirac.go"
 
 //////// import: "edges.go"
-alias Edges = i32; //enums:enum
+alias Edges = i32; //enums:enum -trim-prefix=Edges
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;

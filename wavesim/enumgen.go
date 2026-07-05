@@ -15,11 +15,11 @@ const EdgesN Edges = 3
 
 //gosl:end
 
-var _EdgesValueMap = map[string]Edges{`EdgesFixed`: 0, `EdgesWrap`: 1, `EdgesDamp`: 2}
+var _EdgesValueMap = map[string]Edges{`Fixed`: 0, `Wrap`: 1, `Damp`: 2}
 
 var _EdgesDescMap = map[Edges]string{0: `EdgesFixed keeps the edge values fixed at initial values`, 1: `EdgesWrap copies edge values from other side, effectively wrapping the space around on itself like a torus.`, 2: `EdgesDamp implements damping of edge values.`}
 
-var _EdgesMap = map[Edges]string{0: `EdgesFixed`, 1: `EdgesWrap`, 2: `EdgesDamp`}
+var _EdgesMap = map[Edges]string{0: `Fixed`, 1: `Wrap`, 2: `Damp`}
 
 // String returns the string representation of this Edges value.
 func (i Edges) String() string { return enums.String(i, _EdgesMap) }

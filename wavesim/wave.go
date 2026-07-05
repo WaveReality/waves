@@ -71,6 +71,33 @@ func WaveKernel(i uint32) { //gosl:kernel
 	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
+// WaveDampKernel is the kernel for computing the Wave equations
+// at damped edges. Does Sommerfield damping where velocity = force.
+func WaveDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+	var force float32
+	if Params[0].ThreeD.IsTrue() {
+		force = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+	} else {
+		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+	}
+	vel := Params[0].CSq * force // key damp: no +=
+	pos := ppos + vel
+
+	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+}
+
 //gosl:end
 
 func (ws WaveStates) SetVarSettings(vs *VarSettings) {

@@ -51,7 +51,7 @@ func (ss *Sim) ConfigVars() {
 
 //gosl:start
 
-// Laplacian1D computes the 1D Laplacian across 2 neighbors,
+// Laplacian1D computes the 1D Laplacian across 2 X dim neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
 func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
@@ -71,6 +71,44 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 		zo := NeighOffs.Value(int(j), int(math32.Z))
 		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 		avg += LaplacianWts.Value(j) * (nv - ctr)
+	}
+	return avg
+}
+
+// InBounds returns true if given coordinate is >= 1 and < s.
+func InBounds(x, y, z, sx, sy, sz int32) bool {
+	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz
+}
+
+// LaplacianEdge1D computes the 1D Laplacian across 2 X dim neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+// For computation at the edge, checks against given full size bounds.
+func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+	sum := float32(0)
+	if InBounds(x, y, x-1, sx, sy, sz) {
+		sum += State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx)) - ctr
+	}
+	if InBounds(x, y, x+1, sx, sy, sz) {
+		sum += State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx)) - ctr
+	}
+	return sum
+}
+
+// LaplacianEdge26 computes the 3D Laplacian across 26 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+// For computation at the edge, checks against given full size bounds.
+func LaplacianEdge26(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+	avg := float32(0)
+	for j := range 26 {
+		xo := NeighOffs.Value(int(j), int(math32.X))
+		yo := NeighOffs.Value(int(j), int(math32.Y))
+		zo := NeighOffs.Value(int(j), int(math32.Z))
+		if InBounds(z+zo, y+yo, x+xo, sx, sy, sz) {
+			nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+			avg += LaplacianWts.Value(j) * (nv - ctr)
+		}
 	}
 	return avg
 }

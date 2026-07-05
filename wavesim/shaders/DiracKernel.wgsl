@@ -108,7 +108,7 @@ fn DiracKernel(i: u32) { //gosl:kernel
 }
 
 //////// import: "edges.go"
-alias Edges = i32; //enums:enum
+alias Edges = i32; //enums:enum -trim-prefix=Edges
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;

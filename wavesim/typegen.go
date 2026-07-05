@@ -96,9 +96,15 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ed
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian1D", Doc: "Laplacian1D computes the 1D Laplacian across 2 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian1D", Doc: "Laplacian1D computes the 1D Laplacian across 2 X dim neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.InBounds", Doc: "InBounds returns true if given coordinate is >= 1 and < s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.LaplacianEdge1D", Doc: "LaplacianEdge1D computes the 1D Laplacian across 2 X dim neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.\nFor computation at the edge, checks against given full size bounds.", Args: []string{"x", "y", "z", "sx", "sy", "sz", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.LaplacianEdge26", Doc: "LaplacianEdge26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.\nFor computation at the edge, checks against given full size bounds.", Args: []string{"x", "y", "z", "sx", "sy", "sz", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.PotentialEnergy1D", Doc: "PotentialEnergy1D computes the 1D potential energy across 2 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
@@ -115,14 +121,6 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunDiracKernelCPU", Doc: "RunDiracKernelCPU runs the DiracKernel kernel on the CPU.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneDiracKernel", Doc: "RunOneDiracKernel runs the DiracKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
-
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesTestKernel", Doc: "RunEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneEdgesTestKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
-
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesTestKernelGPU", Doc: "RunEdgesTestKernelGPU runs the EdgesTestKernel kernel on the GPU. See [RunEdgesTestKernel] for more info.", Args: []string{"n"}})
-
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesTestKernelCPU", Doc: "RunEdgesTestKernelCPU runs the EdgesTestKernel kernel on the CPU.", Args: []string{"n"}})
-
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneEdgesTestKernel", Doc: "RunOneEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesWrapKernel", Doc: "RunEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneEdgesWrapKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
@@ -163,6 +161,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodingerKernelCPU", Doc: "RunSchrodingerKernelCPU runs the SchrodingerKernel kernel on the CPU.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneSchrodingerKernel", Doc: "RunOneSchrodingerKernel runs the SchrodingerKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWaveDampKernel", Doc: "RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneWaveDampKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWaveDampKernelGPU", Doc: "RunWaveDampKernelGPU runs the WaveDampKernel kernel on the GPU. See [RunWaveDampKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWaveDampKernelCPU", Doc: "RunWaveDampKernelCPU runs the WaveDampKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneWaveDampKernel", Doc: "RunOneWaveDampKernel runs the WaveDampKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunWaveKernel", Doc: "RunWaveKernel runs the WaveKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneWaveKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
@@ -213,5 +219,7 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Em
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateSum", Doc: "StateSum computes the sum of given variable at given cur vs. prev state\nwith given non-edge size.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WaveKernel", Doc: "WaveKernel is the kernel for computing the Wave equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WaveDampKernel", Doc: "WaveDampKernel is the kernel for computing the Wave equations\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Wave1DViewAll", Doc: "Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev", Args: []string{"view"}})

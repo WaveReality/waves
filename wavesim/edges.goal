@@ -43,7 +43,7 @@ import (
 //gosl:start
 
 // Edges determines how to handle the edges.
-type Edges int32 //enums:enum
+type Edges int32 //enums:enum -trim-prefix=Edges
 
 const (
 	// EdgesFixed keeps the edge values fixed at initial values
@@ -59,7 +59,7 @@ const (
 
 // EdgesN returns the number of points along the edges (and corners).
 func (ctx *Context) EdgesN() int32 {
-	p := ctx.Size.V().Add(math32.Vec3i(1, 1, 1))
+	p := ctx.SizePlus1()
 	return 2 + 2*(p.Y*p.Z+p.X*p.Y+p.X*p.Z)
 }
 
@@ -68,7 +68,7 @@ func (ctx *Context) EdgesN() int32 {
 // returns the face / corner number we're at (0-6) or -1 for none
 func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 	i := int32(idx)
-	p := ctx.Size.V().Add(math32.Vec3i(1, 1, 1))
+	p := ctx.SizePlus1()
 	xy := p.X * p.Y
 	yz := p.Y * p.Z
 	xz := p.X * p.Z
@@ -306,20 +306,6 @@ func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32
 	}
 	return -1
 }
-
-// EdgesDampKernel is the kernel for damping the edges.
-// func EdgesDampKernel(i uint32) { //gosl:kernel
-// 	ctx := GetCtx(0)
-// 	var x, y, z int32
-// 	ok := ctx.StateCoords(i, &x, &y, &z)
-// 	if !ok {
-// 		return
-// 	}
-// 	nvars := ctx.NVars
-// 	for vi := range nvars {
-// 		State[z, y, x, vi, prv] = ff
-// 	}
-// }
 
 // EdgesWrapKernel is the kernel for wrapping edge values
 func EdgesWrapKernel(i uint32) { //gosl:kernel

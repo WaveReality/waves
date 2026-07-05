@@ -35,8 +35,14 @@ func (ctx *Context) Init() {
 	ctx.CurState = 0
 }
 
+// SizeFull returns the full size of the state, including edges on either side.
 func (ctx *Context) SizeFull() math32.Vector3i {
-	return ctx.Size.V().AddScalar(2)
+	return ctx.Size.V().Add(math32.Vec3i(2, 2, 2))
+}
+
+// SizePlus1 returns Size + 1. Used for edge bounds checking.
+func (ctx *Context) SizePlus1() math32.Vector3i {
+	return ctx.Size.V().Add(math32.Vec3i(1, 1, 1))
 }
 
 // StateCoords returns the x,y,z coordinates for given index into
