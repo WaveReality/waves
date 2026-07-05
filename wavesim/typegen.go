@@ -92,7 +92,7 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Wa
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.DiracKernel", Doc: "DiracKernel is the kernel for computing the Dirac equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgesTestKernel", Doc: "EdgesTestKernel is the kernel for testing the edge indexes.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgesWrapKernel", Doc: "EdgesWrapKernel is the kernel for wrapping edge values", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
@@ -123,6 +123,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesTestKernelCPU", Doc: "RunEdgesTestKernelCPU runs the EdgesTestKernel kernel on the CPU.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneEdgesTestKernel", Doc: "RunOneEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesWrapKernel", Doc: "RunEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneEdgesWrapKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesWrapKernelGPU", Doc: "RunEdgesWrapKernelGPU runs the EdgesWrapKernel kernel on the GPU. See [RunEdgesWrapKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunEdgesWrapKernelCPU", Doc: "RunEdgesWrapKernelCPU runs the EdgesWrapKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneEdgesWrapKernel", Doc: "RunOneEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunKleinGordonCKernel", Doc: "RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneKleinGordonCKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 

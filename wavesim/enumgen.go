@@ -6,20 +6,20 @@ import (
 	"cogentcore.org/core/enums"
 )
 
-var _EdgesValues = []Edges{0, 1}
+var _EdgesValues = []Edges{0, 1, 2}
 
 // EdgesN is the highest valid value for type Edges, plus one.
 //
 //gosl:start
-const EdgesN Edges = 2
+const EdgesN Edges = 3
 
 //gosl:end
 
-var _EdgesValueMap = map[string]Edges{`EdgesFixed`: 0, `EdgesWrap`: 1}
+var _EdgesValueMap = map[string]Edges{`EdgesFixed`: 0, `EdgesWrap`: 1, `EdgesDamp`: 2}
 
-var _EdgesDescMap = map[Edges]string{0: `EdgesFixed keeps the edge values fixed at initial values`, 1: `EdgesWrap copies edge values from other side, effectively wrapping the space around on itself like a torus.`}
+var _EdgesDescMap = map[Edges]string{0: `EdgesFixed keeps the edge values fixed at initial values`, 1: `EdgesWrap copies edge values from other side, effectively wrapping the space around on itself like a torus.`, 2: `EdgesDamp implements damping of edge values.`}
 
-var _EdgesMap = map[Edges]string{0: `EdgesFixed`, 1: `EdgesWrap`}
+var _EdgesMap = map[Edges]string{0: `EdgesFixed`, 1: `EdgesWrap`, 2: `EdgesDamp`}
 
 // String returns the string representation of this Edges value.
 func (i Edges) String() string { return enums.String(i, _EdgesMap) }

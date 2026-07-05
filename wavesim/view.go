@@ -128,8 +128,7 @@ func (vw *View) Init() {
 			se.SetCamera(strconv.Itoa(vw.Settings.Camera))
 		})
 		w.OnShow(func(e events.Event) {
-			vw.UpdateView()
-			vw.SceneXYZ().Rebuild()
+			vw.RebuildView()
 		})
 	})
 	tree.AddChildAt(vw, "counters", func(w *core.Text) {
@@ -252,6 +251,12 @@ func (vw *View) UpdateView() {
 	sw := vw.scene
 	vw.UpdateImpl()
 	sw.NeedsRender()
+}
+
+// RebuildView does a full update and then rebuild of view data
+func (vw *View) RebuildView() {
+	vw.UpdateView()
+	vw.SceneXYZ().Rebuild()
 }
 
 // UpdateImpl does the guts of updating -- backend for Update or GoUpdate
@@ -508,8 +513,10 @@ func (vw *View) ZoomOutSize() {
 	fs := ctx.SizeFull()
 	vw.Size.X += 2
 	vw.Size.Y += 2
-	vw.Start.X -= 1
-	vw.Start.Y -= 1
+	if vw.Start.X > 1 && vw.Start.Y > 1 {
+		vw.Start.X -= 1
+		vw.Start.Y -= 1
+	}
 	if vw.Size.X >= sz.X || vw.Size.Y >= sz.Y {
 		vw.Size.X = sz.X
 		vw.Size.Y = sz.Y
@@ -534,6 +541,7 @@ func (vw *View) MoveStart(mv math32.Vector3i) {
 		} else if vw.Start.Z > sz.Z+1 {
 			vw.Start.Z = sz.Z + 1
 		}
+		vw.UpdateView()
 		return
 	}
 	vw.Start.SetAdd(mv)
@@ -549,4 +557,5 @@ func (vw *View) MoveStart(mv math32.Vector3i) {
 	if vw.Start.Y+vw.Size.Y >= fs.Y {
 		vw.Start.Y = (fs.Y - 1) - vw.Size.Y
 	}
+	vw.UpdateView()
 }

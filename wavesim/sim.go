@@ -246,7 +246,7 @@ func (ss *Sim) StepRun() {
 		ne := int(ctx.EdgesN())
 		switch ss.Params.Edges {
 		case EdgesWrap:
-			RunEdgesTestKernel(ne)
+			RunEdgesWrapKernel(ne)
 		}
 	}
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {

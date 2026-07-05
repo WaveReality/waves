@@ -98,7 +98,7 @@ func GPUInit() {
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesTestKernel.wgsl", sy)
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesWrapKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(1, "State")
@@ -198,46 +198,46 @@ func RunOneDiracKernel(n int, syncVars ...GPUVars) {
 		RunDiracKernelCPU(n)
 	}
 }
-// RunEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,
+// RunEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
 // in the same command submission on the GPU, which is by far the most efficient.
 // MUST call RunDone (with optional vars to sync) after all Run calls.
-// Alternatively, a single-shot RunOneEdgesTestKernel call does Run and Done for a
+// Alternatively, a single-shot RunOneEdgesWrapKernel call does Run and Done for a
 // single run-and-sync case.
-func RunEdgesTestKernel(n int) {
+func RunEdgesWrapKernel(n int) {
 	if UseGPU {
-		RunEdgesTestKernelGPU(n)
+		RunEdgesWrapKernelGPU(n)
 	} else {
-		RunEdgesTestKernelCPU(n)
+		RunEdgesWrapKernelCPU(n)
 	}
 }
 
-// RunEdgesTestKernelGPU runs the EdgesTestKernel kernel on the GPU. See [RunEdgesTestKernel] for more info.
-func RunEdgesTestKernelGPU(n int) {
+// RunEdgesWrapKernelGPU runs the EdgesWrapKernel kernel on the GPU. See [RunEdgesWrapKernel] for more info.
+func RunEdgesWrapKernelGPU(n int) {
 	sy := GPUSystem
-	pl := sy.ComputePipelines["EdgesTestKernel"]
+	pl := sy.ComputePipelines["EdgesWrapKernel"]
 	ce, _ := sy.BeginComputePass()
 	pl.Dispatch1D(ce, n, 64)
 }
 
-// RunEdgesTestKernelCPU runs the EdgesTestKernel kernel on the CPU.
-func RunEdgesTestKernelCPU(n int) {
-	gpu.VectorizeFunc(0, n, EdgesTestKernel)
+// RunEdgesWrapKernelCPU runs the EdgesWrapKernel kernel on the CPU.
+func RunEdgesWrapKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, EdgesWrapKernel)
 }
 
-// RunOneEdgesTestKernel runs the EdgesTestKernel kernel with given number of elements,
+// RunOneEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // This version then calls RunDone with the given variables to sync
 // after the Run, for a single-shot Run-and-Done call. If multiple kernels
 // can be run in sequence, it is much more efficient to do multiple Run*
 // calls followed by a RunDone call.
-func RunOneEdgesTestKernel(n int, syncVars ...GPUVars) {
+func RunOneEdgesWrapKernel(n int, syncVars ...GPUVars) {
 	if UseGPU {
-		RunEdgesTestKernelGPU(n)
+		RunEdgesWrapKernelGPU(n)
 		RunDone(syncVars...)
 	} else {
-		RunEdgesTestKernelCPU(n)
+		RunEdgesWrapKernelCPU(n)
 	}
 }
 // RunKleinGordonCKernel runs the KleinGordonCKernel kernel with given number of elements,

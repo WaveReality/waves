@@ -36,12 +36,13 @@ func main() {
 				sim.Params.C = 1
 				sim.Params.Edges = wavesim.EdgesWrap
 				sim.ViewInit(func(vw *wavesim.View) {
-					vw.SetMode(wavesim.Bars, -1)
+					vw.Settings.NPanels = wavesim.PanelsTwo
+					// vw.SetMode(wavesim.Bars, -1)
 				})
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
 					// sim.Config.Size.Set(100, 100, 1)
-					sim.Config.Size.Set(10, 20, 30)
+					sim.Config.Size.Set(100, 100, 100)
 				} else {
 					// sim.Config.Size.Set(80, 1, 1)
 					sim.Config.Size.Set(1000, 1, 1)
@@ -88,7 +89,7 @@ func main() {
 			switch eqs {
 			case wavesim.Wave:
 				if threed {
-					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 0), -1, 8, 8, 0, 1.5)
+					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 50), -1, 8, 8, 0, 1.5)
 				} else {
 					// sim.PosWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1)
 					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)

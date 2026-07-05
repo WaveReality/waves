@@ -111,9 +111,10 @@ fn DiracKernel(i: u32) { //gosl:kernel
 alias Edges = i32; //enums:enum
 const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
+const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
-const EdgesN: Edges = 2;
+const EdgesN: Edges = 3;
 const GPUVarsN: GPUVars = 5;
 const EMStatesN: EMStates = 12;
 const EquationsN: Equations = 5;

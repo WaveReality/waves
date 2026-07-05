@@ -4,7 +4,9 @@
 
 package wavesim
 
-import "cogentcore.org/core/math32"
+import (
+	"cogentcore.org/core/math32"
+)
 
 // see fig_cube_sides_edges_labeled.svg for graphical version
 //
@@ -36,6 +38,7 @@ import "cogentcore.org/core/math32"
 
 // 0=Y[0-m],Z[1-n] 1=X[0-m],Y[1-n] 2=X[1-n],Z[0-m]
 // 3=Y[1-n],Z[0-m] 4=X[1-n],Y[0-m] 5=X[0-m],Z[1-n]
+// 6 = 8 corners
 
 //gosl:start
 
@@ -54,15 +57,15 @@ const (
 	EdgesDamp
 )
 
-// EdgesN returns the number of points along the edges
+// EdgesN returns the number of points along the edges (and corners).
 func (ctx *Context) EdgesN() int32 {
 	p := ctx.Size.V().Add(math32.Vec3i(1, 1, 1))
-	return 2 * (p.Y*p.Z + p.X*p.Y + p.X*p.Z)
+	return 2 + 2*(p.Y*p.Z+p.X*p.Y+p.X*p.Z)
 }
 
 // EdgeCoords returns the x,y,z coordinates for given index into
-// the full state, using non-shared edge patterns per above.
-// returns the face number we're at (0-5) or -1 for none
+// the edge state, using non-shared edge patterns per above.
+// returns the face / corner number we're at (0-6) or -1 for none
 func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 	i := int32(idx)
 	p := ctx.Size.V().Add(math32.Vec3i(1, 1, 1))
@@ -70,10 +73,26 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 	yz := p.Y * p.Z
 	xz := p.X * p.Z
 
+	if i < 2 { // 6 corner
+		if i == 0 {
+			*x = 0
+			*y = 0
+			*z = 0
+			return 6
+		}
+		*x = p.X
+		*y = p.Y
+		*z = p.Z
+		return 6
+	}
+	i -= 2
 	if i < yz { // 0
 		*y = i / p.Z
 		*z = 1 + i%p.Z
 		*x = 0
+		if *y == 0 && *z == p.Z {
+			return 6
+		}
 		return 0
 	}
 	i -= yz
@@ -81,6 +100,9 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 		*x = i / p.Y
 		*y = 1 + i%p.Y
 		*z = 0
+		if *x == 0 && *y == p.Y {
+			return 6
+		}
 		return 1
 	}
 	i -= xy
@@ -88,6 +110,9 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 		*x = 1 + i/p.Z
 		*z = i % p.Z
 		*y = 0
+		if *x == p.X && *z == 0 {
+			return 6
+		}
 		return 2
 	}
 	i -= xz
@@ -95,6 +120,9 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 		*y = 1 + i/p.Z
 		*z = i % p.Z
 		*x = p.X
+		if *y == p.Y && *z == 0 {
+			return 6
+		}
 		return 3
 	}
 	i -= yz
@@ -102,6 +130,9 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 		*x = 1 + i/p.Y
 		*y = i % p.Y
 		*z = p.Z
+		if *x == p.X && *y == 0 {
+			return 6
+		}
 		return 4
 	}
 	i -= xy
@@ -109,6 +140,168 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 		*x = i / p.Z
 		*z = 1 + i%p.Z
 		*y = p.Y
+		if *x == 0 && *z == p.Z {
+			return 6
+		}
+		return 5
+	}
+	return -1
+}
+
+// EdgeCoordsWrap returns the x,y,z coordinates for given index into
+// the edge state, using non-shared edge patterns per above,
+// and also the source state for wrapping the value around as in a torus.
+// returns the face / corner number we're at (0-6) or -1 for none
+func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32 {
+	i := int32(idx)
+	s := ctx.Size.V()
+	p := s.Add(math32.Vec3i(1, 1, 1))
+	xy := p.X * p.Y
+	yz := p.Y * p.Z
+	xz := p.X * p.Z
+
+	if i < 2 { // 6 corner
+		if i == 0 {
+			*x = 0
+			*y = 0
+			*z = 0
+			*xs = s.X
+			*ys = s.Y
+			*zs = s.Z
+			return 6
+		}
+		*x = p.X
+		*y = p.Y
+		*z = p.Z
+		*xs = 1
+		*ys = 1
+		*zs = 1
+		return 6
+	}
+	i -= 2
+	if i < yz { // 0
+		*y = i / p.Z
+		*z = 1 + i%p.Z
+		*x = 0
+		*xs = s.X
+		if *y == 0 && *z == p.Z {
+			*ys = s.Y
+			*zs = 1
+			return 6
+		}
+		*ys = *y
+		if *ys == 0 {
+			*ys = s.Y
+		}
+		*zs = *z
+		if *zs == p.Z {
+			*zs = 1
+		}
+		return 0
+	}
+	i -= yz
+	if i < xy { // 1
+		*x = i / p.Y
+		*y = 1 + i%p.Y
+		*z = 0
+		*zs = s.Z
+		if *x == 0 && *y == p.Y {
+			*xs = s.X
+			*ys = 1
+			return 6
+		}
+		*xs = *x
+		if *xs == 0 {
+			*xs = s.X
+		}
+		*ys = *y
+		if *ys == p.Y {
+			*ys = 1
+		}
+		return 1
+	}
+	i -= xy
+	if i < xz { // 2
+		*x = 1 + i/p.Z
+		*z = i % p.Z
+		*y = 0
+		*ys = s.Y
+		if *x == p.X && *z == 0 {
+			*xs = 1
+			*zs = s.Z
+			return 6
+		}
+		*xs = *x
+		if *xs == p.X {
+			*xs = 1
+		}
+		*zs = *z
+		if *zs == 0 {
+			*zs = s.Z
+		}
+		return 2
+	}
+	i -= xz
+	if i < yz { // 3
+		*y = 1 + i/p.Z
+		*z = i % p.Z
+		*x = p.X
+		*xs = 1
+		if *y == p.Y && *z == 0 {
+			*ys = 1
+			*zs = s.Z
+			return 6
+		}
+		*ys = *y
+		if *ys == p.Y {
+			*ys = 1
+		}
+		*zs = *z
+		if *zs == 0 {
+			*zs = s.Z
+		}
+		return 3
+	}
+	i -= yz
+	if i < xy { // 4
+		*x = 1 + i/p.Y
+		*y = i % p.Y
+		*z = p.Z
+		*zs = 1
+		if *x == p.X && *y == 0 {
+			*xs = 1
+			*ys = s.Y
+			return 6
+		}
+		*xs = *x
+		if *xs == p.X {
+			*xs = 1
+		}
+		*ys = *y
+		if *ys == 0 {
+			*ys = s.Y
+		}
+		return 4
+	}
+	i -= xy
+	if i < xz { // 2
+		*x = i / p.Z
+		*z = 1 + i%p.Z
+		*y = p.Y
+		*ys = 1
+		if *x == 0 && *z == p.Z {
+			*xs = s.X
+			*zs = 1
+			return 6
+		}
+		*xs = *x
+		if *xs == 0 {
+			*xs = s.X
+		}
+		*zs = *z
+		if *zs == p.Z {
+			*zs = 1
+		}
 		return 5
 	}
 	return -1
@@ -128,22 +321,21 @@ func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
 // 	}
 // }
 
-// EdgesTestKernel is the kernel for testing the edge indexes.
-// func EdgesTestKernel(i uint32) { //gosl:kernel
-// 	ctx := GetCtx(0)
-// 	var x, y, z int32
-// 	face := ctx.EdgeCoords(i, &x, &y, &z)
-// 	if face < 0 {
-// 		return
-// 	}
-// 	ff := float32(face+1) / 6.0
-// 	cur := ctx.CurState
-// 	prv := ctx.PrevState()
-// 	nvars := ctx.NVars
-// 	for vi := range nvars {
-// 		State[z, y, x, vi, prv] = ff
-// 		State[z, y, x, vi, cur] = ff
-// 	}
-// }
+// EdgesWrapKernel is the kernel for wrapping edge values
+func EdgesWrapKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z, sx, sy, sz int32
+	face := ctx.EdgeCoordsWrap(i, &x, &y, &z, &sx, &sy, &sz)
+	if face < 0 {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+	}
+}
 
 //gosl:end
