@@ -6,6 +6,53 @@ import (
 	"cogentcore.org/core/enums"
 )
 
+var _DiracStatesValues = []DiracStates{0, 1, 2, 3, 4, 5, 6, 7, 8}
+
+// DiracStatesN is the highest valid value for type DiracStates, plus one.
+//
+//gosl:start
+const DiracStatesN DiracStates = 9
+
+//gosl:end
+
+var _DiracStatesValueMap = map[string]DiracStates{`Pos1A`: 0, `Pos1B`: 1, `Pos2A`: 2, `Pos2B`: 3, `Vel1A`: 4, `Vel1B`: 5, `Vel2A`: 6, `Vel2B`: 7, `CC`: 8}
+
+var _DiracStatesDescMap = map[DiracStates]string{0: `DiracPos1A is the position (height) wave state variable 1 for the real complex component A.`, 1: `DiracPos1B is the position (height) wave state variable 1 for the imaginary complex component B.`, 2: `DiracPos2A is the position (height) wave state variable 2 for the real complex component A.`, 3: `DiracPos2B is the position (height) wave state variable 2 for the imaginary complex component B.`, 4: `DiracVel1A is the velocity of wave state variable 1 for the real complex component A.`, 5: `DiracVel1B is the velocity of wave state variable 1 for the imaginary complex component B.`, 6: `DiracVel2A is the velocity of wave state variable 2 for the real complex component A.`, 7: `DiracVel2B is the velocity of wave state variable 2 for the imaginary complex component B.`, 8: `DiracCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`}
+
+var _DiracStatesMap = map[DiracStates]string{0: `Pos1A`, 1: `Pos1B`, 2: `Pos2A`, 3: `Pos2B`, 4: `Vel1A`, 5: `Vel1B`, 6: `Vel2A`, 7: `Vel2B`, 8: `CC`}
+
+// String returns the string representation of this DiracStates value.
+func (i DiracStates) String() string { return enums.String(i, _DiracStatesMap) }
+
+// SetString sets the DiracStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *DiracStates) SetString(s string) error {
+	return enums.SetString(i, s, _DiracStatesValueMap, "DiracStates")
+}
+
+// Int64 returns the DiracStates value as an int64.
+func (i DiracStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the DiracStates value from an int64.
+func (i *DiracStates) SetInt64(in int64) { *i = DiracStates(in) }
+
+// Desc returns the description of the DiracStates value.
+func (i DiracStates) Desc() string { return enums.Desc(i, _DiracStatesDescMap) }
+
+// DiracStatesValues returns all possible values for the type DiracStates.
+func DiracStatesValues() []DiracStates { return _DiracStatesValues }
+
+// Values returns all possible values for the type DiracStates.
+func (i DiracStates) Values() []enums.Enum { return enums.Values(_DiracStatesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i DiracStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *DiracStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "DiracStates")
+}
+
 var _EdgesValues = []Edges{0, 1, 2}
 
 // EdgesN is the highest valid value for type Edges, plus one.
@@ -49,6 +96,100 @@ func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
+var _MinusPlusOneValues = []MinusPlusOne{0, 1}
+
+// MinusPlusOneN is the highest valid value for type MinusPlusOne, plus one.
+//
+//gosl:start
+const MinusPlusOneN MinusPlusOne = 2
+
+//gosl:end
+
+var _MinusPlusOneValueMap = map[string]MinusPlusOne{`Minus1`: 0, `Plus1`: 1}
+
+var _MinusPlusOneDescMap = map[MinusPlusOne]string{0: ``, 1: ``}
+
+var _MinusPlusOneMap = map[MinusPlusOne]string{0: `Minus1`, 1: `Plus1`}
+
+// String returns the string representation of this MinusPlusOne value.
+func (i MinusPlusOne) String() string { return enums.String(i, _MinusPlusOneMap) }
+
+// SetString sets the MinusPlusOne value from its string representation,
+// and returns an error if the string is invalid.
+func (i *MinusPlusOne) SetString(s string) error {
+	return enums.SetString(i, s, _MinusPlusOneValueMap, "MinusPlusOne")
+}
+
+// Int64 returns the MinusPlusOne value as an int64.
+func (i MinusPlusOne) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the MinusPlusOne value from an int64.
+func (i *MinusPlusOne) SetInt64(in int64) { *i = MinusPlusOne(in) }
+
+// Desc returns the description of the MinusPlusOne value.
+func (i MinusPlusOne) Desc() string { return enums.Desc(i, _MinusPlusOneDescMap) }
+
+// MinusPlusOneValues returns all possible values for the type MinusPlusOne.
+func MinusPlusOneValues() []MinusPlusOne { return _MinusPlusOneValues }
+
+// Values returns all possible values for the type MinusPlusOne.
+func (i MinusPlusOne) Values() []enums.Enum { return enums.Values(_MinusPlusOneValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i MinusPlusOne) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *MinusPlusOne) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "MinusPlusOne")
+}
+
+var _NeighWeightsValues = []NeighWeights{0, 1, 2}
+
+// NeighWeightsN is the highest valid value for type NeighWeights, plus one.
+//
+//gosl:start
+const NeighWeightsN NeighWeights = 3
+
+//gosl:end
+
+var _NeighWeightsValueMap = map[string]NeighWeights{`LaplacianWts`: 0, `AverageWts`: 1, `Grad18Wts`: 2}
+
+var _NeighWeightsDescMap = map[NeighWeights]string{0: `LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)`, 1: `AverageWts are 26 + 1 ctr average weights = 1 / d`, 2: `Grad18Wts are 18 neighbor gradaients`}
+
+var _NeighWeightsMap = map[NeighWeights]string{0: `LaplacianWts`, 1: `AverageWts`, 2: `Grad18Wts`}
+
+// String returns the string representation of this NeighWeights value.
+func (i NeighWeights) String() string { return enums.String(i, _NeighWeightsMap) }
+
+// SetString sets the NeighWeights value from its string representation,
+// and returns an error if the string is invalid.
+func (i *NeighWeights) SetString(s string) error {
+	return enums.SetString(i, s, _NeighWeightsValueMap, "NeighWeights")
+}
+
+// Int64 returns the NeighWeights value as an int64.
+func (i NeighWeights) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the NeighWeights value from an int64.
+func (i *NeighWeights) SetInt64(in int64) { *i = NeighWeights(in) }
+
+// Desc returns the description of the NeighWeights value.
+func (i NeighWeights) Desc() string { return enums.Desc(i, _NeighWeightsDescMap) }
+
+// NeighWeightsValues returns all possible values for the type NeighWeights.
+func NeighWeightsValues() []NeighWeights { return _NeighWeightsValues }
+
+// Values returns all possible values for the type NeighWeights.
+func (i NeighWeights) Values() []enums.Enum { return enums.Values(_NeighWeightsValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i NeighWeights) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *NeighWeights) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "NeighWeights")
+}
+
 var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4, 5}
 
 // GPUVarsN is the highest valid value for type GPUVars, plus one.
@@ -58,11 +199,11 @@ const GPUVarsN GPUVars = 6
 
 //gosl:end
 
-var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `LaplacianWtsVar`: 2, `AverageWtsVar`: 3, `CtxVar`: 4, `StateVar`: 5}
+var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `FaceOffsVar`: 2, `NeighWtsVar`: 3, `CtxVar`: 4, `StateVar`: 5}
 
 var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``, 5: ``}
 
-var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `LaplacianWtsVar`, 3: `AverageWtsVar`, 4: `CtxVar`, 5: `StateVar`}
+var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `FaceOffsVar`, 3: `NeighWtsVar`, 4: `CtxVar`, 5: `StateVar`}
 
 // String returns the string representation of this GPUVars value.
 func (i GPUVars) String() string { return enums.String(i, _GPUVarsMap) }
@@ -94,20 +235,20 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _EMStatesValues = []EMStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+var _EMStatesValues = []EMStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17}
 
 // EMStatesN is the highest valid value for type EMStates, plus one.
 //
 //gosl:start
-const EMStatesN EMStates = 12
+const EMStatesN EMStates = 18
 
 //gosl:end
 
-var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11}
+var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `EX`: 8, `EY`: 9, `EZ`: 10, `BX`: 11, `BY`: 12, `BZ`: 13, `Charge`: 14, `CurrentX`: 15, `CurrentY`: 16, `CurrentZ`: 17}
 
-var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `Charge is the density of charge, drives A0.`, 9: `CurrentX is the density of current, X component, drives AX.`, 10: `CurrentY is the density of current, Y component, drives AY.`, 11: `CurrentZ is the density of current, Z component, drives AZ.`}
+var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt`, 9: `EY is the electrical vector field, Y component: -grad A_0 - d \vec{A}/dt`, 10: `EZ is the electrical vector field, Z component: -grad A_0 - d \vec{A}/dt`, 11: `BX is the magnetic vector field, X component: curl \vec{A}`, 12: `BY is the magnetic vector field, Y component: curl \vec{A}`, 13: `BZ is the magnetic vector field, Z component: curl \vec{A}`, 14: `Charge is the density of charge, drives A0.`, 15: `CurrentX is the density of current, X component, drives AX.`, 16: `CurrentY is the density of current, Y component, drives AY.`, 17: `CurrentZ is the density of current, Z component, drives AZ.`}
 
-var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`}
+var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `EX`, 9: `EY`, 10: `EZ`, 11: `BX`, 12: `BY`, 13: `BZ`, 14: `Charge`, 15: `CurrentX`, 16: `CurrentY`, 17: `CurrentZ`}
 
 // String returns the string representation of this EMStates value.
 func (i EMStates) String() string { return enums.String(i, _EMStatesMap) }

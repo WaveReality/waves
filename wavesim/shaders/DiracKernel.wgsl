@@ -8,8 +8,8 @@ var<storage, read> TensorStrides: array<u32>;
 var<storage, read> Params: array<Parameters>;
 @group(0) @binding(2)
 var<storage, read_write> NeighOffs: array<i32>;
-@group(0) @binding(3)
-var<storage, read_write> LaplacianWts: array<f32>;
+@group(0) @binding(4)
+var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
@@ -36,10 +36,6 @@ fn main(@builtin(workgroup_id) wgid: vec3<u32>, @builtin(num_workgroups) nwg: ve
 
 fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 	return s0 * i0 + s1 * i1;
-}
-
-fn Index1D(s0: u32, i0: u32) -> u32 {
-	return s0 * i0;
 }
 
 fn StateGet(ix: u32) -> f32 {
@@ -221,45 +217,47 @@ fn Context_PrevState(ctx: Context) -> i32 {
 }
 
 //////// import: "dirac.go"
+alias DiracStates = i32; //enums:enum -trim-prefix=Dirac
+const  DiracPos1A: DiracStates = 0;
+const  DiracPos1B: DiracStates = 1;
+const  DiracPos2A: DiracStates = 2;
+const  DiracPos2B: DiracStates = 3;
+const  DiracVel1A: DiracStates = 4;
+const  DiracVel1B: DiracStates = 5;
+const  DiracVel2A: DiracStates = 6;
+const  DiracVel2B: DiracStates = 7;
+const  DiracCC: DiracStates = 8;
 fn DiracKernel(i: u32) { //gosl:kernel
-	let ctx = Ctx[0];
-	var x: i32;
-	var y: i32;
-	var z: i32;
-	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-	if (!ok) {
-		return;
-	}
-	var cur = ctx.CurState;
-	var prv = Context_PrevState(ctx);
-	var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
-	var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
-	var force: f32;
+let ctx = Ctx[0];; var x: i32;
+var y: i32;
+var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+; if (!ok) {
+	return;
+}; var cur = ctx.CurState;
+; var prv = Context_PrevState(ctx);
+; var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
+; var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+; var force: f32;; if (Params[0].ThreeD == 1) {
+	force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+} else {
+	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+}; force -= Params[0].MassCOverHBarSq * ppos;
+; // this is the only diff from standard Wave
+var vel = pvel + Params[0].CSq*force;
+; var pos = ppos + vel;
+; if (Params[0].Energy == 1) {
+	var midVel = 0.5 * (pvel + vel);
+	var kinetic = Params[0].Inv2CSq * midVel * midVel;
+	var potential: f32;
 	if (Params[0].ThreeD == 1) {
-		force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+		potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
 	} else {
-		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+		potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
 	}
-	force -= Params[0].MassCOverHBarSq * ppos; // this is the only diff from standard Wave
-	var vel = pvel + Params[0].CSq*force;
-	var pos = ppos + vel;
-	if (Params[0].Energy == 1) {
-		var midVel = 0.5 * (pvel + vel);
-		var kinetic = Params[0].Inv2CSq * midVel * midVel;
-		var potential: f32;
-		if (Params[0].ThreeD == 1) {
-			potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
-		} else {
-			potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
-		}
-		StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
-		StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
-		StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
-	}
-	StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));
-	StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));
-	StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur)));
-}
+	StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
+	StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
+	StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
+}; StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -268,9 +266,12 @@ const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
+const DiracStatesN: DiracStates = 9;
 const EdgesN: Edges = 3;
+const MinusPlusOneN: MinusPlusOne = 2;
+const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
-const EMStatesN: EMStates = 12;
+const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;
 const ViewModesN: ViewModes = 2;
@@ -279,6 +280,15 @@ const NPanelsN: NPanels = 3;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
+alias MinusPlusOne = i32; //enums:enum
+const  Minus1: MinusPlusOne = 0;
+const  Plus1: MinusPlusOne  = 1;
+alias NeighWeights = i32; //enums:enum
+const  LaplacianWts: NeighWeights = 0;
+const  AverageWts: NeighWeights = 1;
+const  Grad18Wts: NeighWeights = 2;
+const  Average27Sum = f32(20.104084);
+const  OneoAverage27Sum = 0.049741138;
 fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var m1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
 	var p1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34],
@@ -292,7 +302,7 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
-		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
+		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
 fn PotentialEnergy1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
@@ -310,7 +320,7 @@ fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		var dv = (nv - ctr);
-		avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * dv * dv;
+		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * dv * dv;
 	}return avg;
 }
 
@@ -326,10 +336,16 @@ const  A0Vel: EMStates = 4;
 const  AXVel: EMStates = 5;
 const  AYVel: EMStates = 6;
 const  AZVel: EMStates = 7;
-const  Charge: EMStates = 8;
-const  CurrentX: EMStates = 9;
-const  CurrentY: EMStates = 10;
-const  CurrentZ: EMStates = 11;
+const  EX: EMStates = 8;
+const  EY: EMStates = 9;
+const  EZ: EMStates = 10;
+const  BX: EMStates = 11;
+const  BY: EMStates = 12;
+const  BZ: EMStates = 13;
+const  Charge: EMStates = 14;
+const  CurrentX: EMStates = 15;
+const  CurrentY: EMStates = 16;
+const  CurrentZ: EMStates = 17;
 
 //////// import: "params.go"
 alias Equations = i32; //enums:enum

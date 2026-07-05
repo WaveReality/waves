@@ -79,6 +79,7 @@ func main() {
 				sim.SchrodingerStats()
 			case wavesim.Maxwell:
 				if threed {
+					sim.Params.C = 1
 					sim.Params.Edges = wavesim.EdgesDamp
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)

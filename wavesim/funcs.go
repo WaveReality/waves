@@ -7,7 +7,7 @@
 package wavesim
 
 import (
-	"fmt"
+	// "fmt"
 
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/tensor"
@@ -24,10 +24,9 @@ func (ss *Sim) ConfigVars() {
 	Ctx = make([]Context, 1)
 	Ctx[0].Init()
 	NeighOffs = tensor.NewInt32(26, 3)
-	LaplacianWts = tensor.NewFloat32(26)
-	AverageWts = tensor.NewFloat32(27)
+	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
 	lnorm := float32(3.0 / 13.0)
-	sum := float32(0)
+	// sum := float32(0)
 	idx := 0
 	for z := -1; z <= 1; z++ {
 		for y := -1; y <= 1; y++ {
@@ -43,24 +42,107 @@ func (ss *Sim) ConfigVars() {
 				d2 := v.LengthSquared()
 				invD2 := 1.0 / d2
 				wt := lnorm * invD2
-				LaplacianWts.Set(wt, idx)
+				NeighWts.Set(wt, int(LaplacianWts), int(idx))
 
 				d := v.Length()
 				invD := 1.0 / d
-				sum += invD
-				AverageWts.Set(invD, idx)
+				// sum += invD
+				NeighWts.Set(invD, int(AverageWts), int(idx))
 
 				idx++
 			}
 		}
 	}
-	AverageWts.Set(1.0, idx)
-	sum += 1.0
+	NeighWts.Set(1.0, int(AverageWts), int(idx))
+	// sum += 1.0
+	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 
-	fmt.Println("sum:", sum)
+	n := math32.Vec3i(-1, 0, 0)
+	idx = 0
+	sum := float32(0)
+	for n.Z = -1; n.Z <= 1; n.Z++ {
+		for n.Y = -1; n.Y <= 1; n.Y++ {
+			FaceOffs.Set(n.X, int(math32.X), int(Minus1), int(idx), int(math32.X))
+			FaceOffs.Set(n.Y, int(math32.X), int(Minus1), int(idx), int(math32.Y))
+			FaceOffs.Set(n.Z, int(math32.X), int(Minus1), int(idx), int(math32.Z))
+			o := n.MulScalar(-1)
+			FaceOffs.Set(o.X, int(math32.X), int(Plus1), int(idx), int(math32.X))
+			FaceOffs.Set(o.Y, int(math32.X), int(Plus1), int(idx), int(math32.Y))
+			FaceOffs.Set(o.Z, int(math32.X), int(Plus1), int(idx), int(math32.Z))
+
+			var v math32.Vector3
+			v.SetFromVector3i(n)
+			wt := 1.0 / v.Length()
+			NeighWts.Set(wt, int(Grad18Wts), int(idx))
+			sum += wt
+			idx++
+		}
+	}
+	n.Y = -1
+	idx = 0
+	for n.Z = -1; n.Z <= 1; n.Z++ {
+		for n.X = -1; n.X <= 1; n.X++ {
+			FaceOffs.Set(n.X, int(math32.Y), int(Minus1), int(idx), int(math32.X))
+			FaceOffs.Set(n.Y, int(math32.Y), int(Minus1), int(idx), int(math32.Y))
+			FaceOffs.Set(n.Z, int(math32.Y), int(Minus1), int(idx), int(math32.Z))
+			o := n.MulScalar(-1)
+			FaceOffs.Set(o.X, int(math32.Y), int(Plus1), int(idx), int(math32.X))
+			FaceOffs.Set(o.Y, int(math32.Y), int(Plus1), int(idx), int(math32.Y))
+			FaceOffs.Set(o.Z, int(math32.Y), int(Plus1), int(idx), int(math32.Z))
+			idx++
+		}
+	}
+	n.Z = -1
+	idx = 0
+	for n.Y = -1; n.Y <= 1; n.Y++ {
+		for n.X = -1; n.X <= 1; n.X++ {
+			FaceOffs.Set(n.X, int(math32.Z), int(Minus1), int(idx), int(math32.X))
+			FaceOffs.Set(n.Y, int(math32.Z), int(Minus1), int(idx), int(math32.Y))
+			FaceOffs.Set(n.Z, int(math32.Z), int(Minus1), int(idx), int(math32.Z))
+			o := n.MulScalar(-1)
+			FaceOffs.Set(o.X, int(math32.Z), int(Plus1), int(idx), int(math32.X))
+			FaceOffs.Set(o.Y, int(math32.Z), int(Plus1), int(idx), int(math32.Y))
+			FaceOffs.Set(o.Z, int(math32.Z), int(Plus1), int(idx), int(math32.Z))
+			idx++
+		}
+	}
+	sum *= 2
+	for j := range 9 {
+		NeighWts.SetDiv(sum, int(Grad18Wts), int(j))
+	}
 }
 
 //gosl:start
+
+// MinusPlusOne is minus1 and plus1
+type MinusPlusOne int32 //enums:enum
+
+const (
+	Minus1 MinusPlusOne = iota
+	Plus1
+)
+
+// NeighWeights
+type NeighWeights int32 //enums:enum
+
+const (
+	// LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)
+	LaplacianWts NeighWeights = iota
+
+	// AverageWts are 26 + 1 ctr average weights = 1 / d
+	AverageWts
+
+	// Grad18Wts are 18 neighbor gradaients
+	Grad18Wts
+)
+
+const (
+	// Average27Sum is the sum of the AverageWts
+	Average27Sum = float32(20.104084)
+
+	// OneoAverage27Sum is 1.0/ sum of the AverageWts, for actual averaging
+	OneoAverage27Sum = 0.049741138
+)
 
 // Laplacian1D computes the 1D Laplacian across 2 X dim neighbors,
 // for given x,y,z center coordinates, variable index vidx,
@@ -81,7 +163,7 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 		yo := NeighOffs.Value(int(j), int(math32.Y))
 		zo := NeighOffs.Value(int(j), int(math32.Z))
 		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-		avg += LaplacianWts.Value(j) * (nv - ctr)
+		avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
 	}
 	return avg
 }
@@ -96,10 +178,34 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 		yo := NeighOffs.Value(int(j), int(math32.Y))
 		zo := NeighOffs.Value(int(j), int(math32.Z))
 		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-		avg += AverageWts.Value(j) * nv
+		avg += NeighWts.Value(int(AverageWts), int(j)) * nv
 	}
-	avg += AverageWts.Value(26) * State.Value(int(z), int(y), int(x), int(vidx), int(tidx))
+	avg += NeighWts.Value(int(AverageWts), int(26)) * State.Value(int(z), int(y), int(x), int(vidx), int(tidx))
 	return avg
+}
+
+// todo: Curl18
+
+// Gradient18 computes the 3D gradient across 18 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx.
+func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
+	var dv math32.Vector3
+	for j := range 9 {
+		for xyz := range 3 {
+			xp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.X))
+			xm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.X))
+			yp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Y))
+			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
+			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
+			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
+			grad := NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
+			dv.SetDim(math32.Dims(xyz), grad)
+		}
+	}
+	*dx = dv.X
+	*dy = dv.Y
+	*dz = dv.Z
 }
 
 //////// Edges
@@ -141,7 +247,7 @@ func LaplacianEdge26(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 		zo := NeighOffs.Value(int(j), int(math32.Z))
 		if EdgeInBounds1(x+xo, y+yo, z+zo, sx, sy, sz) {
 			nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-			avg += LaplacianWts.Value(j) * (nv - ctr)
+			avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
 		}
 	}
 	return avg
@@ -169,7 +275,7 @@ func PotentialEnergy26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 		zo := NeighOffs.Value(int(j), int(math32.Z))
 		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 		dv := (nv - ctr)
-		avg += LaplacianWts.Value(j) * dv * dv
+		avg += NeighWts.Value(int(LaplacianWts), int(j)) * dv * dv
 	}
 	return avg
 }

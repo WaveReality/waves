@@ -44,6 +44,24 @@ const (
 	// for the EM AZ magnetic (vector) potential field, Z component.
 	AZVel
 
+	// EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt
+	EX
+
+	// EY is the electrical vector field, Y component: -grad A_0 - d \vec{A}/dt
+	EY
+
+	// EZ is the electrical vector field, Z component: -grad A_0 - d \vec{A}/dt
+	EZ
+
+	// BX is the magnetic vector field, X component: curl \vec{A}
+	BX
+
+	// BY is the magnetic vector field, Y component: curl \vec{A}
+	BY
+
+	// BZ is the magnetic vector field, Z component: curl \vec{A}
+	BZ
+
 	// Charge is the density of charge, drives A0.
 	Charge
 
@@ -72,7 +90,7 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	aXpp := State.Value(int(z), int(y), int(x), int(AXPos), int(prv))
 	aYpp := State.Value(int(z), int(y), int(x), int(AYPos), int(prv))
 	aZpp := State.Value(int(z), int(y), int(x), int(AZPos), int(prv))
-	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
+	var f0, fX, fY, fZ, c0, cX, cY, cZ, dX, dY, dZ float32
 	if Params[0].ThreeD.IsTrue() {
 		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
 		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
@@ -89,9 +107,6 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 		fY = Laplacian1D(x, y, z, int32(AYPos), prv, aYpp)
 		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
 	}
-	//	if c0 > 0 {
-	//		fmt.Println(x, y, z, c0, Params[0].OneoEps0, a0pp)
-	//	}
 	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0
 	a0vc := State.Value(int(z), int(y), int(x), int(A0Vel), int(prv)) + f0
 	a0pc := a0pp + a0vc
@@ -107,6 +122,12 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ
 	aZvc := State.Value(int(z), int(y), int(x), int(AZVel), int(prv)) + fZ
 	aZpc := aZpp + aZvc
+
+	Gradient18(x, y, z, int32(A0Pos), prv, &dX, &dY, &dZ)
+
+	State.Set(dX-aXvc, int(z), int(y), int(x), int(EX), int(cur))
+	State.Set(dY-aYvc, int(z), int(y), int(x), int(EY), int(cur))
+	State.Set(dZ-aZvc, int(z), int(y), int(x), int(EZ), int(cur))
 
 	State.Set(a0vc, int(z), int(y), int(x), int(A0Vel), int(cur))
 	State.Set(a0pc, int(z), int(y), int(x), int(A0Pos), int(cur))

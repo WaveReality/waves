@@ -197,7 +197,7 @@ func (ss *Sim) Init() {
 		ss.InitFunc(ss)
 	}
 	ToGPUTensorStrides()
-	ToGPU(ParamsVar, CtxVar, NeighOffsVar, LaplacianWtsVar, AverageWtsVar, StateVar)
+	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, StateVar)
 	ss.RunStats(true)
 }
 

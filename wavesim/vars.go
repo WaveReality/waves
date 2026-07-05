@@ -25,13 +25,14 @@ var (
 	//gosl:dims 2
 	NeighOffs *tensor.Int32
 
-	// LaplacianWts are Laplacian weighting factors for 3D 26 neighbors.
-	//gosl:dims 1
-	LaplacianWts *tensor.Float32
+	// FaceOffs are neighborhood offsets for 3D 18 faces: [x,y,z][-,+][9][3]
+	//gosl:dims 4
+	FaceOffs *tensor.Int32
 
-	// AverageWts are neighborhood average weighting factors for 3D 26 neighbors + center.
-	//gosl:dims 1
-	AverageWts *tensor.Float32
+	// NeighWts are weighting factors for 3D 26 neighbors.
+	// [NeighWeightsN][27]
+	//gosl:dims 2
+	NeighWts *tensor.Float32
 
 	// Ctx has the Context state values.
 	//gosl:group State

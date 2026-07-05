@@ -6,6 +6,50 @@ package wavesim
 
 //gosl:start
 
+// DiracStates are the state variables for wave equations on
+// a wave state with a single complex value,
+// where A = real and B = complex components.
+type DiracStates int32 //enums:enum -trim-prefix=Dirac
+
+const (
+	// DiracPos1A is the position (height) wave state variable
+	// 1 for the real complex component A.
+	DiracPos1A DiracStates = iota
+
+	// DiracPos1B is the position (height) wave state variable
+	// 1 for the imaginary complex component B.
+	DiracPos1B
+
+	// DiracPos2A is the position (height) wave state variable
+	// 2 for the real complex component A.
+	DiracPos2A
+
+	// DiracPos2B is the position (height) wave state variable
+	// 2 for the imaginary complex component B.
+	DiracPos2B
+
+	// DiracVel1A is the velocity of wave state variable
+	// 1 for the real complex component A.
+	DiracVel1A
+
+	// DiracVel1B is the velocity of wave state variable
+	// 1 for the imaginary complex component B.
+	DiracVel1B
+
+	// DiracVel2A is the velocity of wave state variable
+	// 2 for the real complex component A.
+	DiracVel2A
+
+	// DiracVel2B is the velocity of wave state variable
+	// 2 for the imaginary complex component B.
+	DiracVel2B
+
+	// DiracCC is the complex conjugate ("squared") wave
+	// value, which represents the total probability or a conserved
+	// charge value.
+	DiracCC
+)
+
 // DiracKernel is the kernel for computing the Dirac equations,
 // on scalar state values (WaveStates).
 func DiracKernel(i uint32) { //gosl:kernel

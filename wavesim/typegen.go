@@ -13,6 +13,8 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Co
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "NVars", Doc: "NVars is the number of state variables."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}}})
 
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.DiracStates", IDName: "dirac-states", Doc: "DiracStates are the state variables for wave equations on\na wave state with a single complex value,\nwhere A = real and B = complex components."})
+
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Edges", IDName: "edges", Doc: "Edges determines how to handle the edges."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Scene", IDName: "scene", Doc: "Scene is a Widget for managing the 3D Scene of the NetView", Embeds: []types.Field{{Name: "Scene"}}, Fields: []types.Field{{Name: "View"}}})
@@ -23,6 +25,10 @@ func NewScene(parent ...tree.Node) *Scene { return tree.New[Scene](parent...) }
 
 // SetView sets the [Scene.View]
 func (t *Scene) SetView(v *View) *Scene { t.View = v; return t }
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.MinusPlusOne", IDName: "minus-plus-one", Doc: "MinusPlusOne is minus1 and plus1"})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.NeighWeights", IDName: "neigh-weights", Doc: "NeighWeights"})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GPUVars", IDName: "gpu-vars", Doc: "GPUVars is an enum for GPU variables, for specifying what to sync."})
 
@@ -90,17 +96,19 @@ func (t *View) SetSettings(v Settings) *View { t.Settings = v; return t }
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.WaveStates", IDName: "wave-states", Doc: "WaveStates are the state variables for Wave equations."})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.DiracKernel", Doc: "DiracKernel is the kernel for computing the Dirac equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.DiracKernel", Doc: "DiracKernel is the kernel for computing the Dirac equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgesWrapKernel", Doc: "EdgesWrapKernel is the kernel for wrapping edge values", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.FormDialog", Doc: "FormDialog opens a dialog in a new, separate window\nfor viewing / editing the given struct object, in\nthe context of the given ctx widget.", Args: []string{"ctx", "v", "title"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian1D", Doc: "Laplacian1D computes the 1D Laplacian across 2 X dim neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian1D", Doc: "Laplacian1D computes the 1D Laplacian across 2 X dim neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Laplacian26", Doc: "Laplacian26 computes the 3D Laplacian across 26 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx", "ctr"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NeighAverage27", Doc: "NeighAverage27 computes the 3D average of Laplacian across 27 neighbors,\nincluding the center, for given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Gradient18", Doc: "Gradient18 computes the 3D gradient across 18 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx.", Args: []string{"x", "y", "z", "vidx", "tidx", "dx", "dy", "dz"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgeInBounds1", Doc: "EdgeInBounds1 returns true if given coordinate is >= 1 and < s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
 

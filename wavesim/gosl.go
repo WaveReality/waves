@@ -41,8 +41,8 @@ type GPUVars int32 //enums:enum
 const (
 	ParamsVar GPUVars = 0
 	NeighOffsVar GPUVars = 1
-	LaplacianWtsVar GPUVars = 2
-	AverageWtsVar GPUVars = 3
+	FaceOffsVar GPUVars = 2
+	NeighWtsVar GPUVars = 3
 	CtxVar GPUVars = 4
 	StateVar GPUVars = 5
 )
@@ -79,8 +79,8 @@ func GPUInit() {
 			vr = sgp.AddStruct("Params", int(unsafe.Sizeof(Parameters{})), 1, gpu.ComputeShader)
 			vr.ReadOnly = true
 			vr = sgp.Add("NeighOffs", gpu.Int32, 1, gpu.ComputeShader)
-			vr = sgp.Add("LaplacianWts", gpu.Float32, 1, gpu.ComputeShader)
-			vr = sgp.Add("AverageWts", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("FaceOffs", gpu.Int32, 1, gpu.ComputeShader)
+			vr = sgp.Add("NeighWts", gpu.Float32, 1, gpu.ComputeShader)
 			sgp.SetNValues(1)
 		}
 		{
@@ -101,8 +101,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/DiracKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -122,8 +122,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -134,8 +134,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -146,8 +146,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -158,8 +158,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -170,8 +170,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -181,10 +181,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
-		pl.AddVarUsed(0, "AverageWts")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
+		pl.AddVarUsed(0, "FaceOffs")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -195,8 +195,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -207,8 +207,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -219,8 +219,8 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "LaplacianWts")
 		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
@@ -740,12 +740,12 @@ func ToGPU(vars ...GPUVars) {
 		case NeighOffsVar:
 			v, _ := syVars.ValueByIndex(0, "NeighOffs", 0)
 			gpu.SetValueFrom(v, NeighOffs.Values)
-		case LaplacianWtsVar:
-			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
-			gpu.SetValueFrom(v, LaplacianWts.Values)
-		case AverageWtsVar:
-			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
-			gpu.SetValueFrom(v, AverageWts.Values)
+		case FaceOffsVar:
+			v, _ := syVars.ValueByIndex(0, "FaceOffs", 0)
+			gpu.SetValueFrom(v, FaceOffs.Values)
+		case NeighWtsVar:
+			v, _ := syVars.ValueByIndex(0, "NeighWts", 0)
+			gpu.SetValueFrom(v, NeighWts.Values)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			gpu.SetValueFrom(v, Ctx)
@@ -783,8 +783,12 @@ func ToGPUTensorStrides() {
 	TensorStrides.SetShapeSizes(40)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[0], 0)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[1], 1)
-	TensorStrides.SetInt1D(LaplacianWts.Shape().Strides[0], 10)
-	TensorStrides.SetInt1D(AverageWts.Shape().Strides[0], 20)
+	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[0], 10)
+	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[1], 11)
+	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[2], 12)
+	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[3], 13)
+	TensorStrides.SetInt1D(NeighWts.Shape().Strides[0], 20)
+	TensorStrides.SetInt1D(NeighWts.Shape().Strides[1], 21)
 	TensorStrides.SetInt1D(State.Shape().Strides[0], 30)
 	TensorStrides.SetInt1D(State.Shape().Strides[1], 31)
 	TensorStrides.SetInt1D(State.Shape().Strides[2], 32)
@@ -806,11 +810,11 @@ func ReadFromGPU(vars ...GPUVars) {
 		case NeighOffsVar:
 			v, _ := syVars.ValueByIndex(0, "NeighOffs", 0)
 			v.GPUToRead(sy.CommandEncoder)
-		case LaplacianWtsVar:
-			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
+		case FaceOffsVar:
+			v, _ := syVars.ValueByIndex(0, "FaceOffs", 0)
 			v.GPUToRead(sy.CommandEncoder)
-		case AverageWtsVar:
-			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
+		case NeighWtsVar:
+			v, _ := syVars.ValueByIndex(0, "NeighWts", 0)
 			v.GPUToRead(sy.CommandEncoder)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
@@ -841,14 +845,14 @@ func SyncFromGPU(vars ...GPUVars) {
 			v, _ := syVars.ValueByIndex(0, "NeighOffs", 0)
 			v.ReadSync()
 			gpu.ReadToBytes(v, NeighOffs.Values)
-		case LaplacianWtsVar:
-			v, _ := syVars.ValueByIndex(0, "LaplacianWts", 0)
+		case FaceOffsVar:
+			v, _ := syVars.ValueByIndex(0, "FaceOffs", 0)
 			v.ReadSync()
-			gpu.ReadToBytes(v, LaplacianWts.Values)
-		case AverageWtsVar:
-			v, _ := syVars.ValueByIndex(0, "AverageWts", 0)
+			gpu.ReadToBytes(v, FaceOffs.Values)
+		case NeighWtsVar:
+			v, _ := syVars.ValueByIndex(0, "NeighWts", 0)
 			v.ReadSync()
-			gpu.ReadToBytes(v, AverageWts.Values)
+			gpu.ReadToBytes(v, NeighWts.Values)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			v.ReadSync()

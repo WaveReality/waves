@@ -8,8 +8,8 @@ var<storage, read> TensorStrides: array<u32>;
 var<storage, read> Params: array<Parameters>;
 @group(0) @binding(2)
 var<storage, read_write> NeighOffs: array<i32>;
-@group(0) @binding(3)
-var<storage, read_write> LaplacianWts: array<f32>;
+@group(0) @binding(4)
+var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
@@ -36,10 +36,6 @@ fn main(@builtin(workgroup_id) wgid: vec3<u32>, @builtin(num_workgroups) nwg: ve
 
 fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 	return s0 * i0 + s1 * i1;
-}
-
-fn Index1D(s0: u32, i0: u32) -> u32 {
-	return s0 * i0;
 }
 
 fn StateGet(ix: u32) -> f32 {
@@ -209,6 +205,16 @@ fn Context_PrevState(ctx: Context) -> i32 {
 }
 
 //////// import: "dirac.go"
+alias DiracStates = i32; //enums:enum -trim-prefix=Dirac
+const  DiracPos1A: DiracStates = 0;
+const  DiracPos1B: DiracStates = 1;
+const  DiracPos2A: DiracStates = 2;
+const  DiracPos2B: DiracStates = 3;
+const  DiracVel1A: DiracStates = 4;
+const  DiracVel1B: DiracStates = 5;
+const  DiracVel2A: DiracStates = 6;
+const  DiracVel2B: DiracStates = 7;
+const  DiracCC: DiracStates = 8;
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -290,9 +296,12 @@ fn Context_EdgeCoords(ctx: Context, idx: u32, x: ptr<function,i32>,y: ptr<functi
 }
 
 //////// import: "enumgen.go"
+const DiracStatesN: DiracStates = 9;
 const EdgesN: Edges = 3;
+const MinusPlusOneN: MinusPlusOne = 2;
+const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
-const EMStatesN: EMStates = 12;
+const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 5;
 const CabStatesN: CabStates = 11;
 const ViewModesN: ViewModes = 2;
@@ -301,6 +310,15 @@ const NPanelsN: NPanels = 3;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
+alias MinusPlusOne = i32; //enums:enum
+const  Minus1: MinusPlusOne = 0;
+const  Plus1: MinusPlusOne  = 1;
+alias NeighWeights = i32; //enums:enum
+const  LaplacianWts: NeighWeights = 0;
+const  AverageWts: NeighWeights = 1;
+const  Grad18Wts: NeighWeights = 2;
+const  Average27Sum = f32(20.104084);
+const  OneoAverage27Sum = 0.049741138;
 fn EdgeInBounds1(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32) -> bool {
 	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz;
 }
@@ -322,7 +340,7 @@ fn LaplacianEdge26(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: 
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		if (EdgeInBounds1(x+xo, y+yo, z+zo, sx, sy, sz)) {
 			var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
-			avg += LaplacianWts[Index1D(TensorStrides[10], u32(j))] * (nv - ctr);
+			avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 		}
 	}return avg;
 }
@@ -375,10 +393,16 @@ const  A0Vel: EMStates = 4;
 const  AXVel: EMStates = 5;
 const  AYVel: EMStates = 6;
 const  AZVel: EMStates = 7;
-const  Charge: EMStates = 8;
-const  CurrentX: EMStates = 9;
-const  CurrentY: EMStates = 10;
-const  CurrentZ: EMStates = 11;
+const  EX: EMStates = 8;
+const  EY: EMStates = 9;
+const  EZ: EMStates = 10;
+const  BX: EMStates = 11;
+const  BY: EMStates = 12;
+const  BZ: EMStates = 13;
+const  Charge: EMStates = 14;
+const  CurrentX: EMStates = 15;
+const  CurrentY: EMStates = 16;
+const  CurrentZ: EMStates = 17;
 
 //////// import: "params.go"
 alias Equations = i32; //enums:enum
