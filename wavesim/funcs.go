@@ -23,8 +23,8 @@ func (ss *Sim) ConfigVars() {
 	ss.Units.Defaults()
 	Ctx = make([]Context, 1)
 	Ctx[0].Init()
-	NeighOffs = tensor.NewInt32(26, 3)
 	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
+	NeighOffs = tensor.NewInt32(26, 3)
 	lnorm := float32(3.0 / 13.0)
 	// sum := float32(0)
 	idx := 0
@@ -57,6 +57,7 @@ func (ss *Sim) ConfigVars() {
 	// sum += 1.0
 	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 
+	FaceOffs = tensor.NewInt32(3, 2, 9, 3)
 	n := math32.Vec3i(-1, 0, 0)
 	idx = 0
 	sum := float32(0)
@@ -184,15 +185,13 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	return avg
 }
 
-// todo: Curl18
-
 // Gradient18 computes the 3D gradient across 18 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
 func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
-	var dv math32.Vector3
-	for j := range 9 {
-		for xyz := range 3 {
+	for xyz := range 3 {
+		sum := float32(0)
+		for j := range 9 {
 			xp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.X))
 			xm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.X))
 			yp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Y))
@@ -200,12 +199,82 @@ func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
 			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
 			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
 			grad := NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
-			dv.SetDim(math32.Dims(xyz), grad)
+			sum += grad
+		}
+		switch xyz {
+		case 0:
+			*dx = sum
+		case 1:
+			*dy = sum
+		case 2:
+			*dz = sum
+		default:
 		}
 	}
-	*dx = dv.X
-	*dy = dv.Y
-	*dz = dv.Z
+}
+
+// Divergence18 computes the 3D divergence across 18 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. Div = sum of gradients.
+func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
+	sum := float32(0)
+	for xyz := range 3 {
+		for j := range 9 {
+			xp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.X))
+			xm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.X))
+			yp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Y))
+			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
+			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
+			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
+			grad := NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
+			sum += grad
+		}
+	}
+	return sum
+}
+
+// Curl18 computes the 3D curl across 18 neighbors on a field vector,
+// for given x,y,z center coordinates, variable index vidx (to X component),
+// and cur / prev time index tidx.
+func Curl18(x, y, z, vidx, tidx int32, cx, cy, cz *float32) {
+	var dzdy, dydz, dxdz, dzdx, dydx, dxdy float32
+	dimX := vidx + int32(math32.X)
+	dimY := vidx + int32(math32.Y)
+	dimZ := vidx + int32(math32.Z)
+	for j := range 9 {
+		xpX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.X))
+		xmX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.X))
+		ypX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.Y))
+		ymX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.Y))
+		zpX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.Z))
+		zmX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.Z))
+
+		xpY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.X))
+		xmY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.X))
+		ypY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.Y))
+		ymY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.Y))
+		zpY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.Z))
+		zmY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.Z))
+
+		xpZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.X))
+		xmZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.X))
+		ypZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.Y))
+		ymZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.Y))
+		zpZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.Z))
+		zmZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.Z))
+
+		dzdy += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimZ), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimZ), int(tidx)))
+		dydz += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimY), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimY), int(tidx)))
+
+		dxdz += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimX), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimX), int(tidx)))
+		dzdx += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimZ), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimZ), int(tidx)))
+
+		dydx += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimY), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimY), int(tidx)))
+		dxdy += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimX), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimX), int(tidx)))
+	}
+	*cx = dzdy - dydz
+	*cy = dxdz - dzdx
+	*cz = dydx - dxdy
 }
 
 //////// Edges

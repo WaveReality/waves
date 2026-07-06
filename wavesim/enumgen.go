@@ -6,28 +6,30 @@ import (
 	"cogentcore.org/core/enums"
 )
 
-var _DiracStatesValues = []DiracStates{0, 1, 2, 3, 4, 5, 6, 7, 8}
+var _DiracStatesValues = []DiracStates{18, 19, 20, 21, 22, 23, 24, 25, 26}
 
 // DiracStatesN is the highest valid value for type DiracStates, plus one.
 //
 //gosl:start
-const DiracStatesN DiracStates = 9
+const DiracStatesN DiracStates = 27
 
 //gosl:end
 
-var _DiracStatesValueMap = map[string]DiracStates{`Pos1A`: 0, `Pos1B`: 1, `Pos2A`: 2, `Pos2B`: 3, `Vel1A`: 4, `Vel1B`: 5, `Vel2A`: 6, `Vel2B`: 7, `CC`: 8}
+var _DiracStatesValueMap = map[string]DiracStates{`Pos1A`: 18, `Pos1B`: 19, `Pos2A`: 20, `Pos2B`: 21, `Vel1A`: 22, `Vel1B`: 23, `Vel2A`: 24, `Vel2B`: 25, `CC`: 26}
 
-var _DiracStatesDescMap = map[DiracStates]string{0: `DiracPos1A is the position (height) wave state variable 1 for the real complex component A.`, 1: `DiracPos1B is the position (height) wave state variable 1 for the imaginary complex component B.`, 2: `DiracPos2A is the position (height) wave state variable 2 for the real complex component A.`, 3: `DiracPos2B is the position (height) wave state variable 2 for the imaginary complex component B.`, 4: `DiracVel1A is the velocity of wave state variable 1 for the real complex component A.`, 5: `DiracVel1B is the velocity of wave state variable 1 for the imaginary complex component B.`, 6: `DiracVel2A is the velocity of wave state variable 2 for the real complex component A.`, 7: `DiracVel2B is the velocity of wave state variable 2 for the imaginary complex component B.`, 8: `DiracCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`}
+var _DiracStatesDescMap = map[DiracStates]string{18: `DiracPos1A is the position (height) wave state variable 1 for the real complex component A.`, 19: `DiracPos1B is the position (height) wave state variable 1 for the imaginary complex component B.`, 20: `DiracPos2A is the position (height) wave state variable 2 for the real complex component A.`, 21: `DiracPos2B is the position (height) wave state variable 2 for the imaginary complex component B.`, 22: `DiracVel1A is the velocity of wave state variable 1 for the real complex component A.`, 23: `DiracVel1B is the velocity of wave state variable 1 for the imaginary complex component B.`, 24: `DiracVel2A is the velocity of wave state variable 2 for the real complex component A.`, 25: `DiracVel2B is the velocity of wave state variable 2 for the imaginary complex component B.`, 26: `DiracCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`}
 
-var _DiracStatesMap = map[DiracStates]string{0: `Pos1A`, 1: `Pos1B`, 2: `Pos2A`, 3: `Pos2B`, 4: `Vel1A`, 5: `Vel1B`, 6: `Vel2A`, 7: `Vel2B`, 8: `CC`}
+var _DiracStatesMap = map[DiracStates]string{18: `Pos1A`, 19: `Pos1B`, 20: `Pos2A`, 21: `Pos2B`, 22: `Vel1A`, 23: `Vel1B`, 24: `Vel2A`, 25: `Vel2B`, 26: `CC`}
 
 // String returns the string representation of this DiracStates value.
-func (i DiracStates) String() string { return enums.String(i, _DiracStatesMap) }
+func (i DiracStates) String() string {
+	return enums.StringExtended[DiracStates, EMStates](i, _DiracStatesMap)
+}
 
 // SetString sets the DiracStates value from its string representation,
 // and returns an error if the string is invalid.
 func (i *DiracStates) SetString(s string) error {
-	return enums.SetString(i, s, _DiracStatesValueMap, "DiracStates")
+	return enums.SetStringExtended(i, (*EMStates)(i), s, _DiracStatesValueMap)
 }
 
 // Int64 returns the DiracStates value as an int64.
@@ -37,13 +39,19 @@ func (i DiracStates) Int64() int64 { return int64(i) }
 func (i *DiracStates) SetInt64(in int64) { *i = DiracStates(in) }
 
 // Desc returns the description of the DiracStates value.
-func (i DiracStates) Desc() string { return enums.Desc(i, _DiracStatesDescMap) }
+func (i DiracStates) Desc() string {
+	return enums.DescExtended[DiracStates, EMStates](i, _DiracStatesDescMap)
+}
 
 // DiracStatesValues returns all possible values for the type DiracStates.
-func DiracStatesValues() []DiracStates { return _DiracStatesValues }
+func DiracStatesValues() []DiracStates {
+	return enums.ValuesGlobalExtended(_DiracStatesValues, EMStatesValues())
+}
 
 // Values returns all possible values for the type DiracStates.
-func (i DiracStates) Values() []enums.Enum { return enums.Values(_DiracStatesValues) }
+func (i DiracStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_DiracStatesValues, EMStatesValues())
+}
 
 // MarshalText implements the [encoding.TextMarshaler] interface.
 func (i DiracStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
@@ -280,20 +288,20 @@ func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3, 4}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 5
+const EquationsN Equations = 6
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }

@@ -26,7 +26,8 @@ func main() {
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
-	eqs := wavesim.Maxwell
+	// eqs := wavesim.Maxwell
+	eqs := wavesim.Dirac
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -86,6 +87,14 @@ func main() {
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
+			case wavesim.Dirac:
+				if threed {
+					sim.Params.Edges = wavesim.EdgesDamp
+					sim.Params.ThreeD.SetBool(true)
+					sim.Config.Size.Set(100, 100, 100)
+				} else {
+					sim.Config.Size.Set(500, 1, 1)
+				}
 			}
 		},
 		func(sim *wavesim.Sim) {
@@ -121,6 +130,14 @@ func main() {
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 50, 50), 1)
 					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
+				} else {
+					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(250, 0, 0), 1)
+				}
+			case wavesim.Dirac:
+				if threed {
+					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 50, 50), 1)
+					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
+					sim.MovingWavePacketParams(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
 					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(250, 0, 0), 1)
 				}

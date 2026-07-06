@@ -150,6 +150,8 @@ func (ss *Sim) ConfigSim() {
 		ss.SchrodingerConfig()
 	case Maxwell:
 		ss.MaxwellConfig()
+	case Dirac:
+		ss.DiracConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -241,6 +243,9 @@ func (ss *Sim) StepRun() {
 		RunSchrodingerKernel(ns)
 	case Maxwell:
 		RunMaxwellKernel(ns)
+	case Dirac:
+		RunMaxwellKernel(ns)
+		RunDiracKernel(ns)
 	}
 	if ss.Params.Edges != EdgesFixed {
 		ne := int(ctx.EdgesN())
@@ -260,6 +265,9 @@ func (ss *Sim) StepRun() {
 				// 	RunSchrodingerDampKernel(ne)
 			case Maxwell:
 				RunMaxwellDampKernel(ne)
+			case Dirac:
+				RunMaxwellDampKernel(ne)
+				// RunDiracDampKernel(ne) // todo
 			}
 		}
 	}

@@ -217,47 +217,55 @@ fn Context_PrevState(ctx: Context) -> i32 {
 }
 
 //////// import: "dirac.go"
-alias DiracStates = i32; //enums:enum -trim-prefix=Dirac
-const  DiracPos1A: DiracStates = 0;
-const  DiracPos1B: DiracStates = 1;
-const  DiracPos2A: DiracStates = 2;
-const  DiracPos2B: DiracStates = 3;
-const  DiracVel1A: DiracStates = 4;
-const  DiracVel1B: DiracStates = 5;
-const  DiracVel2A: DiracStates = 6;
-const  DiracVel2B: DiracStates = 7;
-const  DiracCC: DiracStates = 8;
+alias DiracStates = EMStates; //enums:enum -trim-prefix=Dirac
+const  DiracPos1A: DiracStates = DiracStates(EMStatesN) + iota;
+const  DiracPos1BDiracStates;
+const  DiracPos2ADiracStates;
+const  DiracPos2BDiracStates;
+const  DiracVel1ADiracStates;
+const  DiracVel1BDiracStates;
+const  DiracVel2ADiracStates;
+const  DiracVel2BDiracStates;
+const  DiracCCDiracStates;
 fn DiracKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-; if (!ok) {
-	return;
-}; var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
-; var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
-; var force: f32;; if (Params[0].ThreeD == 1) {
-	force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
-} else {
-	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
-}; force -= Params[0].MassCOverHBarSq * ppos;
-; // this is the only diff from standard Wave
-var vel = pvel + Params[0].CSq*force;
-; var pos = ppos + vel;
-; if (Params[0].Energy == 1) {
-	var midVel = 0.5 * (pvel + vel);
-	var kinetic = Params[0].Inv2CSq * midVel * midVel;
-	var potential: f32;
-	if (Params[0].ThreeD == 1) {
-		potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
-	} else {
-		potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+	if (!ok) {
+		return;
 	}
-	StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
-	StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
-	StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
-}; StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
+	var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+	var force: f32;
+	if (Params[0].ThreeD == 1) {
+		force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+	} else {
+		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+	}
+	force -= Params[0].MassCOverHBarSq * ppos; // this is the only diff from standard Wave
+	var vel = pvel + Params[0].CSq*force;
+	var pos = ppos + vel;
+	if (Params[0].Energy == 1) {
+		var midVel = 0.5 * (pvel + vel);
+		var kinetic = Params[0].Inv2CSq * midVel * midVel;
+		var potential: f32;
+		if (Params[0].ThreeD == 1) {
+			potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
+		} else {
+			potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
+		}
+		StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
+		StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
+		StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
+	}
+	StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));
+	StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));
+	StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur)));
+}
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -266,13 +274,13 @@ const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 9;
+const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 5;
+const EquationsN: Equations = 6;
 const CabStatesN: CabStates = 11;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
@@ -354,6 +362,7 @@ const  KleinGordon: Equations = 1;
 const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
+const  Dirac: Equations = 5;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;

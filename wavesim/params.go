@@ -38,6 +38,9 @@ const (
 
 	// Maxwell is Maxwell's equations for electromagnetic (EM) waves.
 	Maxwell
+
+	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
+	Dirac
 )
 
 // The following are constants used across many equations.

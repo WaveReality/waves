@@ -13,7 +13,7 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Co
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Context", IDName: "context", Doc: "Context contains all simulation counters and other context.\nThis is only other state shared with GPU.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}}, Fields: []types.Field{{Name: "Size", Doc: "Size is the 3D size of the state, EXCLUSIVE of edges (add 2 to each dim)."}, {Name: "NVars", Doc: "NVars is the number of state variables."}, {Name: "Step", Doc: "Step is the current simulation timestep."}, {Name: "CurState", Doc: "CurState is either 0 or 1, indicating which state variables\nare currently being updated on this compute pass."}, {Name: "pad"}}})
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.DiracStates", IDName: "dirac-states", Doc: "DiracStates are the state variables for wave equations on\na wave state with a single complex value,\nwhere A = real and B = complex components."})
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.DiracStates", IDName: "dirac-states", Doc: "DiracStates are the state variables for wave equations on\na wave state with two complex values (1, 2),\nwhere A = real and B = complex components."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Edges", IDName: "edges", Doc: "Edges determines how to handle the edges."})
 
@@ -109,6 +109,10 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.La
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NeighAverage27", Doc: "NeighAverage27 computes the 3D average of Laplacian across 27 neighbors,\nincluding the center, for given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. ctr is the center value.", Args: []string{"x", "y", "z", "vidx", "tidx"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Gradient18", Doc: "Gradient18 computes the 3D gradient across 18 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx.", Args: []string{"x", "y", "z", "vidx", "tidx", "dx", "dy", "dz"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Divergence18", Doc: "Divergence18 computes the 3D divergence across 18 neighbors,\nfor given x,y,z center coordinates, variable index vidx,\nand cur / prev time index tidx. Div = sum of gradients.", Args: []string{"x", "y", "z", "vidx", "tidx", "dx", "dy", "dz"}, Returns: []string{"float32"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Curl18", Doc: "Curl18 computes the 3D curl across 18 neighbors on a field vector,\nfor given x,y,z center coordinates, variable index vidx (to X component),\nand cur / prev time index tidx.", Args: []string{"x", "y", "z", "vidx", "tidx", "cx", "cy", "cz"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.EdgeInBounds1", Doc: "EdgeInBounds1 returns true if given coordinate is >= 1 and < s.", Args: []string{"x", "y", "z", "sx", "sy", "sz"}, Returns: []string{"bool"}})
 

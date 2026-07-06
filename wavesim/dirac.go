@@ -9,14 +9,14 @@ package wavesim
 //gosl:start
 
 // DiracStates are the state variables for wave equations on
-// a wave state with a single complex value,
+// a wave state with two complex values (1, 2),
 // where A = real and B = complex components.
-type DiracStates int32 //enums:enum -trim-prefix=Dirac
+type DiracStates EMStates //enums:enum -trim-prefix=Dirac
 
 const (
 	// DiracPos1A is the position (height) wave state variable
 	// 1 for the real complex component A.
-	DiracPos1A DiracStates = iota
+	DiracPos1A DiracStates = DiracStates(EMStatesN) + iota
 
 	// DiracPos1B is the position (height) wave state variable
 	// 1 for the imaginary complex component B.
@@ -98,9 +98,9 @@ func DiracKernel(i uint32) { //gosl:kernel
 
 func (ss *Sim) DiracConfig() {
 	ParamsShouldDisplay = DiracShouldDisplay
-	ss.StateVars = WaveStatesN
+	ss.StateVars = DiracStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(WavePos, -1)
+		view.SetVar(DiracPos1A, -1)
 	})
 }
 

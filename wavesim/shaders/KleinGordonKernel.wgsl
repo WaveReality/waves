@@ -217,16 +217,16 @@ fn Context_PrevState(ctx: Context) -> i32 {
 }
 
 //////// import: "dirac.go"
-alias DiracStates = i32; //enums:enum -trim-prefix=Dirac
-const  DiracPos1A: DiracStates = 0;
-const  DiracPos1B: DiracStates = 1;
-const  DiracPos2A: DiracStates = 2;
-const  DiracPos2B: DiracStates = 3;
-const  DiracVel1A: DiracStates = 4;
-const  DiracVel1B: DiracStates = 5;
-const  DiracVel2A: DiracStates = 6;
-const  DiracVel2B: DiracStates = 7;
-const  DiracCC: DiracStates = 8;
+alias DiracStates = EMStates; //enums:enum -trim-prefix=Dirac
+const  DiracPos1A: DiracStates = DiracStates(EMStatesN) + iota;
+const  DiracPos1BDiracStates;
+const  DiracPos2ADiracStates;
+const  DiracPos2BDiracStates;
+const  DiracVel1ADiracStates;
+const  DiracVel1BDiracStates;
+const  DiracVel2ADiracStates;
+const  DiracVel2BDiracStates;
+const  DiracCCDiracStates;
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -235,13 +235,13 @@ const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 9;
+const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 5;
+const EquationsN: Equations = 6;
 const CabStatesN: CabStates = 11;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
@@ -363,6 +363,7 @@ const  KleinGordon: Equations = 1;
 const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
+const  Dirac: Equations = 5;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;

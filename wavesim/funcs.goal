@@ -21,8 +21,8 @@ func (ss *Sim) ConfigVars() {
 	ss.Units.Defaults()
 	Ctx = make([]Context, 1)
 	Ctx[0].Init()
-	NeighOffs = tensor.NewInt32(26,3)
 	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
+	NeighOffs = tensor.NewInt32(26,3)
 	lnorm := float32(3.0 / 13.0)
 	// sum := float32(0)
 	idx := 0
@@ -55,6 +55,7 @@ func (ss *Sim) ConfigVars() {
 	// sum += 1.0
 	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 	
+	FaceOffs = tensor.NewInt32(3, 2, 9, 3)
 	n := math32.Vec3i(-1, 0, 0)
 	idx = 0
 	sum := float32(0)
@@ -182,15 +183,13 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	return avg
 }
 
-// todo: Curl18
-
 // Gradient18 computes the 3D gradient across 18 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
 func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
-	var dv math32.Vector3
-	for j := range 9 {
-		for xyz := range 3 {
+	for xyz := range 3 {
+		sum := float32(0)
+		for j := range 9 {
 			xp := FaceOffs[xyz, Plus1, j, math32.X]
 			xm := FaceOffs[xyz, Minus1, j, math32.X]
 			yp := FaceOffs[xyz, Plus1, j, math32.Y]
@@ -198,14 +197,83 @@ func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
 			zp := FaceOffs[xyz, Plus1, j, math32.Z]
 			zm := FaceOffs[xyz, Minus1, j, math32.Z]
 			grad := NeighWts[Grad18Wts, j] * (State[z+zp, y+yp, x+xp, vidx, tidx] - State[z+zm, y+ym, x+xm, vidx, tidx])
-			dv.SetDim(math32.Dims(xyz), grad)
+			sum += grad
+		}
+		switch xyz {
+		case 0:
+			*dx = sum
+		case 1:
+			*dy = sum
+		case 2:
+			*dz = sum
+		default:
 		}
 	}
-	*dx = dv.X
-	*dy = dv.Y
-	*dz = dv.Z
 }
 
+// Divergence18 computes the 3D divergence across 18 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. Div = sum of gradients.
+func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
+	sum := float32(0)
+	for xyz := range 3 {
+		for j := range 9 {
+			xp := FaceOffs[xyz, Plus1, j, math32.X]
+			xm := FaceOffs[xyz, Minus1, j, math32.X]
+			yp := FaceOffs[xyz, Plus1, j, math32.Y]
+			ym := FaceOffs[xyz, Minus1, j, math32.Y]
+			zp := FaceOffs[xyz, Plus1, j, math32.Z]
+			zm := FaceOffs[xyz, Minus1, j, math32.Z]
+			grad := NeighWts[Grad18Wts, j] * (State[z+zp, y+yp, x+xp, vidx, tidx] - State[z+zm, y+ym, x+xm, vidx, tidx])
+			sum += grad
+		}
+	}
+	return sum
+}
+
+// Curl18 computes the 3D curl across 18 neighbors on a field vector,
+// for given x,y,z center coordinates, variable index vidx (to X component),
+// and cur / prev time index tidx.
+func Curl18(x, y, z, vidx, tidx int32, cx, cy, cz *float32) {
+	var dzdy, dydz, dxdz, dzdx, dydx, dxdy float32
+	dimX := vidx + int32(math32.X)
+	dimY := vidx + int32(math32.Y)
+	dimZ := vidx + int32(math32.Z)
+	for j := range 9 {
+		xpX := FaceOffs[math32.X, Plus1, j, math32.X]
+		xmX := FaceOffs[math32.X, Minus1, j, math32.X]
+		ypX := FaceOffs[math32.X, Plus1, j, math32.Y]
+		ymX := FaceOffs[math32.X, Minus1, j, math32.Y]
+		zpX := FaceOffs[math32.X, Plus1, j, math32.Z]
+		zmX := FaceOffs[math32.X, Minus1, j, math32.Z]
+
+		xpY := FaceOffs[math32.Y, Plus1, j, math32.X]
+		xmY := FaceOffs[math32.Y, Minus1, j, math32.X]
+		ypY := FaceOffs[math32.Y, Plus1, j, math32.Y]
+		ymY := FaceOffs[math32.Y, Minus1, j, math32.Y]
+		zpY := FaceOffs[math32.Y, Plus1, j, math32.Z]
+		zmY := FaceOffs[math32.Y, Minus1, j, math32.Z]
+
+		xpZ := FaceOffs[math32.Z, Plus1, j, math32.X]
+		xmZ := FaceOffs[math32.Z, Minus1, j, math32.X]
+		ypZ := FaceOffs[math32.Z, Plus1, j, math32.Y]
+		ymZ := FaceOffs[math32.Z, Minus1, j, math32.Y]
+		zpZ := FaceOffs[math32.Z, Plus1, j, math32.Z]
+		zmZ := FaceOffs[math32.Z, Minus1, j, math32.Z]
+		
+		dzdy += NeighWts[Grad18Wts, j] * (State[z+zpY, y+ypY, x+xpY, dimZ, tidx] - State[z+zmY, y+ymY, x+xmY, dimZ, tidx])
+		dydz += NeighWts[Grad18Wts, j] * (State[z+zpZ, y+ypZ, x+xpZ, dimY, tidx] - State[z+zmZ, y+ymZ, x+xmZ, dimY, tidx])
+
+		dxdz += NeighWts[Grad18Wts, j] * (State[z+zpZ, y+ypZ, x+xpZ, dimX, tidx] - State[z+zmZ, y+ymZ, x+xmZ, dimX, tidx])
+		dzdx += NeighWts[Grad18Wts, j] * (State[z+zpX, y+ypX, x+xpX, dimZ, tidx] - State[z+zmX, y+ymX, x+xmX, dimZ, tidx])
+		
+		dydx += NeighWts[Grad18Wts, j] * (State[z+zpX, y+ypX, x+xpX, dimY, tidx] - State[z+zmX, y+ymX, x+xmX, dimY, tidx])
+		dxdy += NeighWts[Grad18Wts, j] * (State[z+zpY, y+ypY, x+xpY, dimX, tidx] - State[z+zmY, y+ymY, x+xmY, dimX, tidx])
+	}
+	*cx = dzdy - dydz
+	*cy = dxdz - dzdx
+	*cz = dydx - dxdy
+}
 
 //////// Edges
 

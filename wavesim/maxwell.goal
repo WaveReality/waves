@@ -88,7 +88,13 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	aXpp := State[z, y, x, AXPos, prv]
 	aYpp := State[z, y, x, AYPos, prv]
 	aZpp := State[z, y, x, AZPos, prv]
-	var f0, fX, fY, fZ, c0, cX, cY, cZ, dX, dY, dZ float32
+
+	a0vp := State[z, y, x, A0Vel, prv]
+	aXvp := State[z, y, x, AXVel, prv]
+	aYvp := State[z, y, x, AYVel, prv]
+	aZvp := State[z, y, x, AZVel, prv]
+
+	var f0, fX, fY, fZ, c0, cX, cY, cZ, dX, dY, dZ, bX, bY, bZ float32
 	if Params[0].ThreeD.IsTrue() {
 		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
 		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
@@ -106,26 +112,34 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
 	}
 	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0
-	a0vc := State[z, y, x, A0Vel, prv] + f0
+	a0vc := a0vp + f0
 	a0pc := a0pp + a0vc
 
 	fX = Params[0].CSq*fX + Params[0].Mu0*cX
-	aXvc := State[z, y, x, AXVel, prv] + fX
+	aXvc := aXvp + fX
 	aXpc := aXpp + aXvc
 
 	fY = Params[0].CSq*fY + Params[0].Mu0*cY
-	aYvc := State[z, y, x, AYVel, prv] + fY
+	aYvc := aYvp + fY
 	aYpc := aYpp + aYvc
 
 	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ
-	aZvc := State[z, y, x, AZVel, prv] + fZ
+	aZvc := aZvp + fZ
 	aZpc := aZpp + aZvc
 
+	// note: these were done on cur, not prv, in emewave
+	// could do as a second pass here -- check if affects stability.
 	Gradient18(x, y, z, int32(A0Pos), prv, &dX, &dY, &dZ)
+	Curl18(x, y, z, int32(AXPos), prv, &bX, &bY, &bZ)
 
-	State[z, y, x, EX, cur] = dX - aXvc
-	State[z, y, x, EY, cur] = dY - aYvc
-	State[z, y, x, EZ, cur] = dZ - aZvc
+	// E = -grad A0 - dA/dt
+	State[z, y, x, EX, cur] = -dX - aXvp
+	State[z, y, x, EY, cur] = -dY - aYvp
+	State[z, y, x, EZ, cur] = -dZ - aZvp
+
+	State[z, y, x, BX, cur] = bX
+	State[z, y, x, BY, cur] = bY
+	State[z, y, x, BZ, cur] = bZ
 
 	State[z, y, x, A0Vel, cur] = a0vc
 	State[z, y, x, A0Pos, cur] = a0pc
