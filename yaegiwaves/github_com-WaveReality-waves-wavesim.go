@@ -57,6 +57,7 @@ func init() {
 		"CurrentX":                     reflect.ValueOf(wavesim.CurrentX),
 		"CurrentY":                     reflect.ValueOf(wavesim.CurrentY),
 		"CurrentZ":                     reflect.ValueOf(wavesim.CurrentZ),
+		"Dirac":                        reflect.ValueOf(wavesim.Dirac),
 		"DiracCC":                      reflect.ValueOf(wavesim.DiracCC),
 		"DiracKernel":                  reflect.ValueOf(wavesim.DiracKernel),
 		"DiracPos1A":                   reflect.ValueOf(wavesim.DiracPos1A),
