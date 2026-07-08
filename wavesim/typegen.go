@@ -34,6 +34,8 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GP
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.GUI", IDName: "gui", Doc: "GUI manages all standard elements of a simulation Graphical User Interface", Embeds: []types.Field{{Name: "Browser"}}, Fields: []types.Field{{Name: "Active", Doc: "Active is true if the GUI is configured and running"}, {Name: "SimForm", Doc: "SimForm displays the Sim object fields in the left panel."}, {Name: "Body", Doc: "Body is the entire content of the sim window."}, {Name: "isRunning", Doc: "isRunning is true if sim is running."}, {Name: "stopNow", Doc: "stopNow can be set via SetStopNow method under mutex protection\nto signal the current sim to stop running.\nIt is not used directly in the looper-based control logic, which has\nits own direct Stop function, but it is set there in case there are\nother processes that are looking at this flag."}, {Name: "View", Doc: "view if created."}, {Name: "sim", Doc: "the sim"}, {Name: "runMu"}}})
 
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.CabStates", IDName: "cab-states", Doc: "CabStates are the state variables for wave equations on\na wave state with a single complex value,\nwhere A = real and B = complex components."})
+
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.EMStates", IDName: "em-states", Doc: "EMStates are the state variables for EM wave equations."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Equations", IDName: "equations", Doc: "Equations are the different implemented equations to simulate."})
@@ -48,11 +50,11 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Pl
 // PlaneObj is the Plane 3D object within the View
 func NewPlaneObj(parent ...tree.Node) *PlaneObj { return tree.New[PlaneObj](parent...) }
 
-var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.CabStates", IDName: "cab-states", Doc: "CabStates are the state variables for wave equations on\na wave state with a single complex value,\nwhere A = real and B = complex components."})
-
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.ViewModes", IDName: "view-modes", Doc: "ViewModes are different ways of displaying wave states."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.CurPrev", IDName: "cur-prev", Doc: "CurPrev for Current vs Previous state access."})
+
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.CurPrevBoth", IDName: "cur-prev-both", Doc: "CurPrevBoth allows selecting current only, previous only, or both."})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.NPanels", IDName: "n-panels", Doc: "NPanels selects number of panels."})
 
@@ -194,6 +196,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ru
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneMaxwellKernel", Doc: "RunOneMaxwellKernel runs the MaxwellKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunParticleKGCKernel", Doc: "RunParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneParticleKGCKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunParticleKGCKernelGPU", Doc: "RunParticleKGCKernelGPU runs the ParticleKGCKernel kernel on the GPU. See [RunParticleKGCKernel] for more info.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunParticleKGCKernelCPU", Doc: "RunParticleKGCKernelCPU runs the ParticleKGCKernel kernel on the CPU.", Args: []string{"n"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunOneParticleKGCKernel", Doc: "RunOneParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nThis version then calls RunDone with the given variables to sync\nafter the Run, for a single-shot Run-and-Done call. If multiple kernels\ncan be run in sequence, it is much more efficient to do multiple Run*\ncalls followed by a RunDone call.", Args: []string{"n", "syncVars"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodingerKernel", Doc: "RunSchrodingerKernel runs the SchrodingerKernel kernel with given number of elements,\non either the CPU or GPU depending on the UseGPU variable.\nCan call multiple Run* kernels in a row, which are then all launched\nin the same command submission on the GPU, which is by far the most efficient.\nMUST call RunDone (with optional vars to sync) after all Run calls.\nAlternatively, a single-shot RunOneSchrodingerKernel call does Run and Done for a\nsingle run-and-sync case.", Args: []string{"n"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.RunSchrodingerKernelGPU", Doc: "RunSchrodingerKernelGPU runs the SchrodingerKernel kernel on the GPU. See [RunSchrodingerKernel] for more info.", Args: []string{"n"}})
@@ -238,7 +248,7 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ne
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WavePacket", Doc: "WavePacket returns value for a gaussian * cosine wave packet for given\nlinear dimension value x and 3D distance d.", Args: []string{"x", "d", "wavelength", "width", "phase", "amp"}, Returns: []string{"float32"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonKernel", Doc: "KleinGordonKernel is the kernel for computing the KleinGordon equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonKernel", Doc: "KleinGordonKernel is the kernel for computing the KleinGordon equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonCKernel", Doc: "KleinGordonCKernel is the kernel for computing the KleinGordonC equations,\non complex wave state.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
@@ -250,9 +260,13 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ma
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.MaxwellDampKernel", Doc: "MaxwellDampKernel is the kernel for computing the Maxwell EM equations,\non EM state values (EMStates),\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ParticleKGCKernel", Doc: "ParticleKGCKernel is the kernel for computing the stochastic\nparticle based on KG on complex wave state.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ParticleKGCViewAll", Doc: "ParticleKGCViewAll configures the View to display ParticleKGC values", Args: []string{"view"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.SchrodingerKernel", Doc: "SchrodingerKernel is the kernel for computing the Schrodinger equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.SchrodingerKernel", Doc: "SchrodingerKernel is the kernel for computing the Schrodinger equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "start"}, {Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Cab1DViewAll", Doc: "Cab1DViewAll configures the View to display A and B, Cur and Prev", Args: []string{"view"}})
 

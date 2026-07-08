@@ -41,20 +41,17 @@ func WavePacket(x, d, wavelength, width, phase, amp float32) float32 {
 	return cos * gauss
 }
 
-const (
-	CurAndPrev = true
-	CurOnly    = false
-)
-
 // Point adds value to individual point, optionally for both cur and previous values.
-func (ss *Sim) Point(vr enums.Enum, curAndPrev bool, c math32.Vector3i, val float32) {
+func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	f := c.AddScalar(1)
-	State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-	if curAndPrev {
+	if curPrev == CurOnly || curPrev == Both {
+		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+	}
+	if curPrev == PrevOnly || curPrev == Both {
 		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 	}
 }

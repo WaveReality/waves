@@ -1,0 +1,118 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+//gosl:start
+
+// ParticleKGCKernel is the kernel for computing the stochastic
+// particle based on KG on complex wave state.
+func ParticleKGCKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pposA := State[z, y, x, CabPosA, prv]
+	pposB := State[z, y, x, CabPosB, prv]
+	pvelA := State[z, y, x, CabVelA, prv]
+	pvelB := State[z, y, x, CabVelB, prv]
+
+	var forceA, forceB float32
+	if Params[0].ThreeD.IsTrue() {
+		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
+		forceB = Laplacian26(x, y, z, int32(CabPosB), prv, pposB)
+	} else {
+		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
+		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
+	}
+
+	// self prev = simple harmonic oscillator
+	spPosA := State[z, y, x, CabSelfPosA, prv]
+	spPosB := State[z, y, x, CabSelfPosB, prv]
+	spVelA := State[z, y, x, CabSelfVelA, prv]
+	spVelB := State[z, y, x, CabSelfVelB, prv]
+
+	// force is previous
+	sVelA := spVelA - Params[0].CSq*spPosA
+	sPosA := spPosA + sVelA
+
+	sVelB := spVelB - Params[0].CSq*spPosB
+	sPosB := spPosB + sVelB
+
+	se := spPosB*spVelA - spPosA*spVelB
+
+	// self-energy is mass term in surrounding KG
+	forceA -= Params[0].MassCOverHBarSq * se * pposA
+	velA := pvelA + Params[0].CSq*forceA
+	posA := pposA + velA
+
+	forceB -= Params[0].MassCOverHBarSq * se * pposB
+	velB := pvelB + Params[0].CSq*forceB
+	posB := pposB + velB
+
+	var grAX, grAY, grAZ, grBX, grBY, grBZ float32
+	Gradient18(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
+	Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+
+	chg := pposB*pvelA - pposA*pvelB
+
+	curX := pposA*grBX - pposB*grAX
+	curY := pposA*grBY - pposB*grAY
+	curZ := pposA*grBZ - pposB*grAZ
+
+	State[z, y, x, CabForceA, cur] = forceA
+	State[z, y, x, CabVelA, cur] = velA
+	State[z, y, x, CabPosA, cur] = posA
+
+	State[z, y, x, CabForceB, cur] = forceB
+	State[z, y, x, CabVelB, cur] = velB
+	State[z, y, x, CabPosB, cur] = posB
+
+	State[z, y, x, CabCharge, cur] = chg
+	State[z, y, x, CabCurrentX, cur] = curX
+	State[z, y, x, CabCurrentY, cur] = curY
+	State[z, y, x, CabCurrentZ, cur] = curZ
+
+	State[z, y, x, CabSelfPosA, cur] = sPosA
+	State[z, y, x, CabSelfVelA, cur] = sVelA
+
+	State[z, y, x, CabSelfPosB, cur] = sPosB
+	State[z, y, x, CabSelfVelB, cur] = sVelB
+
+	State[z, y, x, CabSelfE, cur] = se
+}
+
+//gosl:end
+
+func (ss *Sim) ParticleKGCConfig() {
+	ParamsShouldDisplay = KGShouldDisplay
+	ss.StateVars = CabStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(CabSelfPosA, -1)
+	})
+}
+
+// ParticleKGCViewAll configures the View to display ParticleKGC values
+func ParticleKGCViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = CabSelfPosA
+	view.Panels[1].Var = CabSelfPosA
+	view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = CabPosA
+	// view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = CabVelA
+}
+
+func (ss *Sim) ParticleKGCStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(CabCC))
+	ss.AddStat(ss.StatSum(CabCharge))
+	ss.AddStat(ss.StatSum(CabSelfE))
+}

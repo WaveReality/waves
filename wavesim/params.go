@@ -41,6 +41,9 @@ const (
 
 	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
 	Dirac
+
+	// ParticleKGC is the Klein-Gordon complex version of stochastic particles.
+	ParticleKGC
 )
 
 // The following are constants used across many equations.

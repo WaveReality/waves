@@ -152,6 +152,8 @@ func (ss *Sim) ConfigSim() {
 		ss.MaxwellConfig()
 	case Dirac:
 		ss.DiracConfig()
+	case ParticleKGC:
+		ss.ParticleKGCConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -246,6 +248,8 @@ func (ss *Sim) StepRun() {
 	case Dirac:
 		RunMaxwellKernel(ns)
 		RunDiracKernel(ns)
+	case ParticleKGC:
+		RunParticleKGCKernel(ns)
 	}
 	if ss.Params.Edges != EdgesFixed {
 		ne := int(ctx.EdgesN())
@@ -268,6 +272,8 @@ func (ss *Sim) StepRun() {
 			case Dirac:
 				RunMaxwellDampKernel(ne)
 				// RunDiracDampKernel(ne) // todo
+			case ParticleKGC:
+				RunKleinGordonCDampKernel(ne)
 			}
 		}
 	}

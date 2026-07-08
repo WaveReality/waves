@@ -8,6 +8,82 @@ package wavesim
 
 //gosl:start
 
+// CabStates are the state variables for wave equations on
+// a wave state with a single complex value,
+// where A = real and B = complex components.
+type CabStates int32 //enums:enum -trim-prefix=Cab
+
+const (
+	// CabPosA is the position (height) wave state variable
+	// for the real complex component A.
+	CabPosA CabStates = iota
+
+	// CabPosB is the position (height) wave state variable
+	// for the imaginary complex component B.
+	CabPosB
+
+	// CabVelA is the velocity of wave state variable
+	// for the real complex component A.
+	CabVelA
+
+	// CabVelB is the velocity of wave state variable
+	// for the imaginary complex component B.
+	CabVelB
+
+	// CabForceA is the net force computed from neighbors
+	// for the real complex component A.
+	CabForceA
+
+	// CabForceB is the net force computed from neighbors
+	// for the imaginary complex component B.
+	CabForceB
+
+	// CabV is an external potential energy factor, that
+	// can be used to push particles around.
+	CabV
+
+	// CabCC is the complex conjugate ("squared") wave
+	// value, which represents the total probability or a conserved
+	// charge value.
+	CabCC
+
+	// CabCharge is the charge density.
+	CabCharge
+
+	// CabCurrentX is the current density.
+	CabCurrentX
+
+	// CabCurrentY is the current density.
+	CabCurrentY
+
+	// CabCurrentZ is the current density.
+	CabCurrentZ
+
+	// CabKinetic is the total kinetic energy across components.
+	CabKinetic
+
+	// CabPotential is the total potential energy across components (only for KGC).
+	CabPotential
+
+	// CabEnergy is the total kinetic + potential energy.
+	CabEnergy
+
+	// CabSelfPosA is the self discrete particle position A
+	CabSelfPosA
+
+	// CabSelfPosB is the self discrete particle position B
+	CabSelfPosB
+
+	// CabSelfVelA is the self discrete particle velocity A
+	CabSelfVelA
+
+	// CabSelfVelB is the self discrete particle velocity B
+	CabSelfVelB
+
+	// CabSelfE is the self time-like energy value
+	CabSelfE
+)
+
 // KleinGordonKernel is the kernel for computing the KleinGordon equations,
 // on scalar state values (WaveStates).
 func KleinGordonKernel(i uint32) { //gosl:kernel

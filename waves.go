@@ -21,13 +21,14 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	// threed := false
-	threed := true
+	threed := false
+	// threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
-	eqs := wavesim.Dirac
+	// eqs := wavesim.Dirac
+	eqs := wavesim.ParticleKGC
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -95,6 +96,15 @@ func main() {
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
+			case wavesim.ParticleKGC:
+				if threed {
+					sim.Params.ThreeD.SetBool(true)
+					sim.Config.Size.Set(100, 100, 100)
+				} else {
+					sim.Config.Size.Set(500, 1, 1)
+				}
+				sim.ViewInit(wavesim.ParticleKGCViewAll)
+				sim.ParticleKGCStats()
 			}
 		},
 		func(sim *wavesim.Sim) {
@@ -128,18 +138,27 @@ func main() {
 				}
 			case wavesim.Maxwell:
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 50, 50), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(50, 50, 50), 1)
 					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(250, 0, 0), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
 				}
 			case wavesim.Dirac:
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(50, 50, 50), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(50, 50, 50), 1)
 					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
 					sim.MovingWavePacketParams(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.CurAndPrev, math32.Vec3i(250, 0, 0), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
+				}
+			case wavesim.ParticleKGC:
+				if threed {
+					// sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
+					sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, math32.Vec3i(50, 50, 50), 1)
+				} else {
+					// sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
+					sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, math32.Vec3i(250, 0, 0), 1)
+					sim.Point(wavesim.CabSelfPosB, wavesim.PrevOnly, math32.Vec3i(250, 0, 0), -1)
 				}
 			}
 		})

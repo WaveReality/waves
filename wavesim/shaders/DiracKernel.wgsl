@@ -218,54 +218,46 @@ fn Context_PrevState(ctx: Context) -> i32 {
 
 //////// import: "dirac.go"
 alias DiracStates = EMStates; //enums:enum -trim-prefix=Dirac
-const  DiracPos1A: DiracStates = DiracStates(EMStatesN) + iota;
-const  DiracPos1BDiracStates;
-const  DiracPos2ADiracStates;
-const  DiracPos2BDiracStates;
-const  DiracVel1ADiracStates;
-const  DiracVel1BDiracStates;
-const  DiracVel2ADiracStates;
-const  DiracVel2BDiracStates;
-const  DiracCCDiracStates;
+const  DiracPos1A: DiracStates = 18;
+const  DiracPos1B: DiracStates = 19;
+const  DiracPos2A: DiracStates = 20;
+const  DiracPos2B: DiracStates = 21;
+const  DiracVel1A: DiracStates = 22;
+const  DiracVel1B: DiracStates = 23;
+const  DiracVel2A: DiracStates = 24;
+const  DiracVel2B: DiracStates = 25;
+const  DiracCC: DiracStates = 26;
 fn DiracKernel(i: u32) { //gosl:kernel
-	let ctx = Ctx[0];
-	var x: i32;
-	var y: i32;
-	var z: i32;
-	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-	if (!ok) {
-		return;
-	}
-	var cur = ctx.CurState;
-	var prv = Context_PrevState(ctx);
-	var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
-	var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
-	var force: f32;
+let ctx = Ctx[0];; var x: i32;
+var y: i32;
+var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+; if (!ok) {
+	return;
+}; var cur = ctx.CurState;
+; var prv = Context_PrevState(ctx);
+; var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
+; var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+; var force: f32;; if (Params[0].ThreeD == 1) {
+	force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+} else {
+	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+}; force -= Params[0].MassCOverHBarSq * ppos;
+; // this is the only diff from standard Wave
+var vel = pvel + Params[0].CSq*force;
+; var pos = ppos + vel;
+; if (Params[0].Energy == 1) {
+	var midVel = 0.5 * (pvel + vel);
+	var kinetic = Params[0].Inv2CSq * midVel * midVel;
+	var potential: f32;
 	if (Params[0].ThreeD == 1) {
-		force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+		potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
 	} else {
-		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+		potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
 	}
-	force -= Params[0].MassCOverHBarSq * ppos; // this is the only diff from standard Wave
-	var vel = pvel + Params[0].CSq*force;
-	var pos = ppos + vel;
-	if (Params[0].Energy == 1) {
-		var midVel = 0.5 * (pvel + vel);
-		var kinetic = Params[0].Inv2CSq * midVel * midVel;
-		var potential: f32;
-		if (Params[0].ThreeD == 1) {
-			potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
-		} else {
-			potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
-		}
-		StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
-		StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
-		StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
-	}
-	StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));
-	StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));
-	StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur)));
-}
+	StateSet(kinetic, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
+	StateSet(potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
+	StateSet(kinetic + potential, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
+}; StateSet(force, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -279,11 +271,12 @@ const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
+const CabStatesN: CabStates = 20;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 6;
-const CabStatesN: CabStates = 11;
+const EquationsN: Equations = 7;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
+const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const WaveStatesN: WaveStates = 6;
 
@@ -333,6 +326,27 @@ fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 
 }
 
 //////// import: "klein-gordon.go"
+alias CabStates = i32; //enums:enum -trim-prefix=Cab
+const  CabPosA: CabStates = 0;
+const  CabPosB: CabStates = 1;
+const  CabVelA: CabStates = 2;
+const  CabVelB: CabStates = 3;
+const  CabForceA: CabStates = 4;
+const  CabForceB: CabStates = 5;
+const  CabV: CabStates = 6;
+const  CabCC: CabStates = 7;
+const  CabCharge: CabStates = 8;
+const  CabCurrentX: CabStates = 9;
+const  CabCurrentY: CabStates = 10;
+const  CabCurrentZ: CabStates = 11;
+const  CabKinetic: CabStates = 12;
+const  CabPotential: CabStates = 13;
+const  CabEnergy: CabStates = 14;
+const  CabSelfPosA: CabStates = 15;
+const  CabSelfPosB: CabStates = 16;
+const  CabSelfVelA: CabStates = 17;
+const  CabSelfVelB: CabStates = 18;
+const  CabSelfE: CabStates = 19;
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -363,6 +377,7 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
+const  ParticleKGC: Equations = 6;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -385,19 +400,9 @@ struct Parameters {
 	Edges: Edges,
 }
 
+//////// import: "particle-kg.go"
+
 //////// import: "schrodinger.go"
-alias CabStates = i32; //enums:enum -trim-prefix=Cab
-const  CabPosA: CabStates = 0;
-const  CabPosB: CabStates = 1;
-const  CabVelA: CabStates = 2;
-const  CabVelB: CabStates = 3;
-const  CabForceA: CabStates = 4;
-const  CabForceB: CabStates = 5;
-const  CabV: CabStates = 6;
-const  CabCC: CabStates = 7;
-const  CabKinetic: CabStates = 8;
-const  CabPotential: CabStates = 9;
-const  CabEnergy: CabStates = 10;
 
 //////// import: "settings.go"
 alias ViewModes = i32; //enums:enum
@@ -406,6 +411,10 @@ const  Bars: ViewModes = 1;
 alias CurPrev = i32; //enums:enum
 const  Current: CurPrev = 0;
 const  Previous: CurPrev = 1;
+alias CurPrevBoth = i32; //enums:enum
+const  CurOnly: CurPrevBoth = 0;
+const  PrevOnly: CurPrevBoth = 1;
+const  Both: CurPrevBoth = 2;
 alias NPanels = i32; //enums:enum -trim-prefix=Panels
 const  PanelsOne: NPanels = 0;
 const  PanelsTwo: NPanels = 1;

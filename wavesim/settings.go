@@ -35,6 +35,20 @@ const (
 	Previous
 )
 
+// CurPrevBoth allows selecting current only, previous only, or both.
+type CurPrevBoth int32 //enums:enum
+
+const (
+	// CurOnly sets only current states.
+	CurOnly CurPrevBoth = iota
+
+	// PrevOnly sets only previous states.
+	PrevOnly
+
+	// Both sets both current and previous states.
+	Both
+)
+
 // NPanels selects number of panels.
 type NPanels int32 //enums:enum -trim-prefix=Panels
 

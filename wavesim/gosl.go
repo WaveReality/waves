@@ -192,6 +192,19 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ParticleKGCKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -581,6 +594,48 @@ func RunOneMaxwellKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunMaxwellKernelCPU(n)
+	}
+}
+// RunParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneParticleKGCKernel call does Run and Done for a
+// single run-and-sync case.
+func RunParticleKGCKernel(n int) {
+	if UseGPU {
+		RunParticleKGCKernelGPU(n)
+	} else {
+		RunParticleKGCKernelCPU(n)
+	}
+}
+
+// RunParticleKGCKernelGPU runs the ParticleKGCKernel kernel on the GPU. See [RunParticleKGCKernel] for more info.
+func RunParticleKGCKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["ParticleKGCKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunParticleKGCKernelCPU runs the ParticleKGCKernel kernel on the CPU.
+func RunParticleKGCKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, ParticleKGCKernel)
+}
+
+// RunOneParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneParticleKGCKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunParticleKGCKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunParticleKGCKernelCPU(n)
 	}
 }
 // RunSchrodingerKernel runs the SchrodingerKernel kernel with given number of elements,
