@@ -185,8 +185,8 @@ func (ss *Sim) UpdateUnits() {
 	ss.Units.HBar = float64(ss.Params.HBar)
 	ss.Units.EMass = float64(ss.Params.Mass)
 	ss.Units.Update()
-	ss.Params.Mu0 = float32(ss.Units.CuMu0)
-	ss.Params.Eps0 = float32(ss.Units.CuEps0)
+	ss.Params.Mu0 = float32(ss.Units.Mu0)
+	ss.Params.Eps0 = float32(ss.Units.Eps0)
 	ss.Params.Update()
 }
 

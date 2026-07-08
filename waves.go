@@ -97,6 +97,8 @@ func main() {
 					sim.Config.Size.Set(500, 1, 1)
 				}
 			case wavesim.ParticleKGC:
+				sim.Params.Edges = wavesim.EdgesDamp
+				sim.Params.Mass = 0.1
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
@@ -152,14 +154,14 @@ func main() {
 					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
 				}
 			case wavesim.ParticleKGC:
+				pos := math32.Vec3i(250, 0, 0)
 				if threed {
-					// sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
-					sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, math32.Vec3i(50, 50, 50), 1)
-				} else {
-					// sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
-					sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, math32.Vec3i(250, 0, 0), 1)
-					sim.Point(wavesim.CabSelfPosB, wavesim.PrevOnly, math32.Vec3i(250, 0, 0), -1)
+					pos = math32.Vec3i(50, 50, 50)
 				}
+				sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, pos, 1)
+				sim.Point(wavesim.CabSelfVelB, wavesim.CurOnly, pos, -1*0.05)
+				sim.InvR(wavesim.CabPosA, pos, .2)
+				sim.InvR(wavesim.CabVelB, pos, .2)
 			}
 		})
 }

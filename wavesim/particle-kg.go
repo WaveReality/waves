@@ -24,6 +24,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
 
+	mchsq := Params[0].MassCOverHBarSq
+
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
 		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
@@ -40,20 +42,25 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	spVelB := State.Value(int(z), int(y), int(x), int(CabSelfVelB), int(prv))
 
 	// force is previous
-	sVelA := spVelA - Params[0].CSq*spPosA
+	sVelA := spVelA - mchsq*spPosA
 	sPosA := spPosA + sVelA
 
-	sVelB := spVelB - Params[0].CSq*spPosB
+	sVelB := spVelB - mchsq*spPosB
 	sPosB := spPosB + sVelB
 
 	se := spPosB*spVelA - spPosA*spVelB
 
+	saavg := NeighAverage27(x, y, z, int32(CabSelfPosA), prv)
+	sbavg := NeighAverage27(x, y, z, int32(CabSelfPosB), prv)
+
 	// self-energy is mass term in surrounding KG
-	forceA -= Params[0].MassCOverHBarSq * se * pposA
+	// forceA -= Params[0].MassCOverHBarSq * seavg * pposA
+	forceA += saavg - pposA // direct drive!
 	velA := pvelA + Params[0].CSq*forceA
 	posA := pposA + velA
 
-	forceB -= Params[0].MassCOverHBarSq * se * pposB
+	// forceB -= Params[0].MassCOverHBarSq * seavg * pposB
+	forceB += sbavg - pposB
 	velB := pvelB + Params[0].CSq*forceB
 	posB := pposB + velB
 
@@ -62,6 +69,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
 
 	chg := pposB*pvelA - pposA*pvelB
+
+	cc := pposB*pposB + pposA*pposA
 
 	curX := pposA*grBX - pposB*grAX
 	curY := pposA*grBY - pposB*grAY
@@ -75,6 +84,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 
+	State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
 	State.Set(chg, int(z), int(y), int(x), int(CabCharge), int(cur))
 	State.Set(curX, int(z), int(y), int(x), int(CabCurrentX), int(cur))
 	State.Set(curY, int(z), int(y), int(x), int(CabCurrentY), int(cur))
@@ -105,11 +115,11 @@ func ParticleKGCViewAll(view *View) {
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
 	view.Panels[0].Var = CabSelfPosA
-	view.Panels[1].Var = CabSelfPosA
-	view.SetCurPrev(Previous, 1)
+	view.Panels[1].Var = CabSelfPosB
+	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = CabPosA
 	// view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabVelA
+	view.Panels[3].Var = CabPosB
 }
 
 func (ss *Sim) ParticleKGCStats() {

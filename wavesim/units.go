@@ -67,7 +67,7 @@ type Units struct {
 	// i.e., how many cubes long is the Compton wavelength of the electron.
 	// This fixes the length dimension of a cube, as the inverse of this times
 	// the numerical value of this quantity (LambdaBarE).
-	ComptonE float64 `default:"8" min:"4"`
+	ComptonE float64 `default:"16" min:"4"`
 
 	// C is the speed of light in a vacuum in units of cube length / time step.
 	// For Dirac waves, 0.5 is the maximum stable value. This fixes the time
@@ -78,10 +78,21 @@ type Units struct {
 	// given length (from ComptonE) and time (from C).
 	HBar float64
 
-	// EMass is the proportion of the electron mass that is due to the self-field.
-	EMass float64
+	// E is the electric charge constant in cubic units, which determines the
+	// electric potential units, C = A s
+	// 0.302822 causes Mu0 and Eps0 to both be 1, if C and Hbar are both 1
+	E float64
 
-	// todo: compute Eps0, Mu0 in these units!
+	// EMass is the rest mass of the electron, in cubic units.
+	EMass float64 `edit:"-"`
+
+	// Mu0 is the computed Mu0 magnetic constant, permeability of free space
+	// N/A^2 = m kg / s^2 A^2
+	Mu0 float64 `edit:"-"`
+
+	// Eps0 is the computed Eps0 electric constant, permittivity of free space
+	// F/m = (s^4 A^2) / (m^3 kg)
+	Eps0 float64 `edit:"-"`
 
 	// CuM is the computed length of a cubic element, in meters.
 	CuM float64 `edit:"-"`
@@ -92,9 +103,6 @@ type Units struct {
 	// CuKg is the computed cube unit of mass, in Kg.
 	CuKg float64 `edit:"-"`
 
-	// CuC is the computed cube unit of charge, in Coulombs.
-	CuC float64 `edit:"-"`
-
 	// CuN is the computed unit of force, in Newtons: kg m / s^2.
 	CuN float64 `edit:"-"`
 
@@ -104,22 +112,17 @@ type Units struct {
 	// CuW is the computed unit of power, in Watts: J / s = kg m^2 / s^3.
 	CuW float64 `edit:"-"`
 
-	// CuA is the computed unit of current, in Ampheres: A = C / s.
+	// CuA is the computed unit of current, in Ampheres: A = C / s; Esi / (E * S).
 	CuA float64 `edit:"-"`
+
+	// CuC is the computed cube unit of charge, in Coulombs: C = A * s.
+	CuC float64 `edit:"-"`
 
 	// CuV is the computed unit of electrical potential, in Volts: V = W / A = kg m^2.
 	CuV float64 `edit:"-"`
 
 	// CuF is the computed unit of capacitance, in Farads = C / V: 1/kg 1/m^2 s^4 A^2
 	CuF float64 `edit:"-"`
-
-	// CuMu0 is the computed Mu0 magnetic constant, permeability of free space
-	// N/A^2 = m kg / s^2 A^2
-	CuMu0 float64 `edit:"-"`
-
-	// CuEps0 is the computed Eps0 electric constant, permittivity of free space
-	// F/m = (s^4 A^2) / (m^3 kg)
-	CuEps0 float64 `edit:"-"`
 
 	//////// SI units: m, kg, s, A
 
@@ -159,11 +162,11 @@ type Units struct {
 }
 
 func (un *Units) Defaults() {
-	un.ComptonE = 8
+	un.ComptonE = 16
 	un.C = 0.5
 	un.HBar = 1
-	un.EMass = 0.01
-
+	un.E = 1.0
+	un.EMass = 1
 	un.Csi = C
 	un.HBarSi = HBar
 	un.Esi = E
@@ -181,13 +184,16 @@ func (un *Units) Update() {
 	un.CuM = LambdaBarE / un.ComptonE
 	un.CuS = (un.CuM * un.C) / C
 	un.CuKg = ((un.CuS / (un.CuM * un.CuM)) * HBar) / un.HBar
-	un.CuC = E
 	un.CuN = (un.CuKg * un.CuM) / (un.CuS * un.CuS)
 	un.CuJ = un.CuN * un.CuM
 	un.CuW = un.CuJ * un.CuM
-	un.CuA = un.CuC / un.CuS
+
+	un.CuA = E / (un.E * un.CuS) // un.E = Esi / (un.A * un.S); A * E = Esi / S; A = Esi / (E * S)
+	un.CuC = un.CuA * un.CuS
 	un.CuV = un.CuW / un.CuA
 	un.CuF = un.CuC / un.CuV
-	un.CuMu0 = Mu0 * ((un.CuS * un.CuS * un.CuA * un.CuA) / (un.CuM * un.CuKg))
-	un.CuEps0 = 1.0 / (un.CuMu0 * un.C * un.C)
+
+	un.EMass = EMass / un.CuKg
+	un.Mu0 = Mu0 * ((un.CuS * un.CuS * un.CuA * un.CuA) / (un.CuM * un.CuKg))
+	un.Eps0 = 1.0 / (un.Mu0 * un.C * un.C)
 }
