@@ -246,9 +246,10 @@ const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 6;
-const CabStatesN: CabStates = 20;
+const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
+const ParticleKGCStatesN: ParticleKGCStates = 30;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -380,11 +381,6 @@ const  CabCurrentZ: CabStates = 11;
 const  CabKinetic: CabStates = 12;
 const  CabPotential: CabStates = 13;
 const  CabEnergy: CabStates = 14;
-const  CabSelfPosA: CabStates = 15;
-const  CabSelfPosB: CabStates = 16;
-const  CabSelfVelA: CabStates = 17;
-const  CabSelfVelB: CabStates = 18;
-const  CabSelfE: CabStates = 19;
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -517,6 +513,22 @@ struct Parameters {
 }
 
 //////// import: "particle-kg.go"
+alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
+const  PKGCMomX: ParticleKGCStates = 15;
+const  PKGCMomY: ParticleKGCStates = 16;
+const  PKGCMomZ: ParticleKGCStates = 17;
+const  PKGCMomXP: ParticleKGCStates = 18;
+const  PKGCMomXPv: ParticleKGCStates = 19;
+const  PKGCMomXN: ParticleKGCStates = 20;
+const  PKGCMomXNv: ParticleKGCStates = 21;
+const  PKGCMomYP: ParticleKGCStates = 22;
+const  PKGCMomYPv: ParticleKGCStates = 23;
+const  PKGCMomYN: ParticleKGCStates = 24;
+const  PKGCMomYNv: ParticleKGCStates = 25;
+const  PKGCMomZP: ParticleKGCStates = 26;
+const  PKGCMomZPv: ParticleKGCStates = 27;
+const  PKGCMomZN: ParticleKGCStates = 28;
+const  PKGCMomZNv: ParticleKGCStates = 29;
 
 //////// import: "schrodinger.go"
 

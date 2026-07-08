@@ -8,8 +8,61 @@ package wavesim
 
 //gosl:start
 
-// ParticleKGCKernel is the kernel for computing the stochastic
-// particle based on KG on complex wave state.
+// ParticleKGCStates are the state variables for particles in context
+// of KGC complex wave equations on a wave state with two complex values (1, 2),
+// where A = real and B = complex components.
+type ParticleKGCStates CabStates //enums:enum -trim-prefix=PKGC
+
+const (
+	// PKGCMomX is the particle momentum along X axis
+	PKGCMomX ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
+
+	// PKGCMomY is the particle momentum along Y axis
+	PKGCMomY
+
+	// PKGCMomZ is the particle momentum along Z axis
+	PKGCMomZ
+
+	// PKGCMomXP is the SHO position for momentum along positive X axis.
+	PKGCMomXP
+
+	// PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.
+	PKGCMomXPv
+
+	// PKGCMomXN is the SHO position for momentum along negative X axis.
+	PKGCMomXN
+
+	// PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.
+	PKGCMomXNv
+
+	// PKGCMomYP is the SHO position for momentum along positive Y axis.
+	PKGCMomYP
+
+	// PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.
+	PKGCMomYPv
+
+	// PKGCMomYN is the SHO position for momentum along negative Y axis.
+	PKGCMomYN
+
+	// PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.
+	PKGCMomYNv
+
+	// PKGCMomZP is the SHO position for momentum along positive Z axis.
+	PKGCMomZP
+
+	// PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.
+	PKGCMomZPv
+
+	// PKGCMomZN is the SHO position for momentum along negative Z axis.
+	PKGCMomZN
+
+	// PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.
+	PKGCMomZNv
+)
+
+// ParticleKGCKernel is the kernel for computing the stochastic particle
+// with simple harmonic oscillator self-momentum factors along positive
+// and negative directions for each axis, based on KG on complex wave state.
 func ParticleKGCKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -35,32 +88,48 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
 
-	// self prev = simple harmonic oscillator
-	spPosA := State.Value(int(z), int(y), int(x), int(CabSelfPosA), int(prv))
-	spPosB := State.Value(int(z), int(y), int(x), int(CabSelfPosB), int(prv))
-	spVelA := State.Value(int(z), int(y), int(x), int(CabSelfVelA), int(prv))
-	spVelB := State.Value(int(z), int(y), int(x), int(CabSelfVelB), int(prv))
+	momXP := State.Value(int(z), int(y), int(x), int(PKGCMomXP), int(prv))
+	momXPv := State.Value(int(z), int(y), int(x), int(PKGCMomXPv), int(prv))
+	momXN := State.Value(int(z), int(y), int(x), int(PKGCMomXN), int(prv))
+	momXNv := State.Value(int(z), int(y), int(x), int(PKGCMomXNv), int(prv))
 
-	// force is previous
-	sVelA := spVelA - mchsq*spPosA
-	sPosA := spPosA + sVelA
+	momYP := State.Value(int(z), int(y), int(x), int(PKGCMomYP), int(prv))
+	momYPv := State.Value(int(z), int(y), int(x), int(PKGCMomYPv), int(prv))
+	momYN := State.Value(int(z), int(y), int(x), int(PKGCMomYN), int(prv))
+	momYNv := State.Value(int(z), int(y), int(x), int(PKGCMomYNv), int(prv))
 
-	sVelB := spVelB - mchsq*spPosB
-	sPosB := spPosB + sVelB
+	momZP := State.Value(int(z), int(y), int(x), int(PKGCMomZP), int(prv))
+	momZPv := State.Value(int(z), int(y), int(x), int(PKGCMomZPv), int(prv))
+	momZN := State.Value(int(z), int(y), int(x), int(PKGCMomZN), int(prv))
+	momZNv := State.Value(int(z), int(y), int(x), int(PKGCMomZNv), int(prv))
 
-	se := spPosB*spVelA - spPosA*spVelB
+	momXPv += -mchsq * momXP
+	momXP += momXPv
 
-	saavg := NeighAverage27(x, y, z, int32(CabSelfPosA), prv)
-	sbavg := NeighAverage27(x, y, z, int32(CabSelfPosB), prv)
+	momYPv += -mchsq * momYP
+	momYP += momYPv
+
+	momZPv += -mchsq * momZP
+	momZP += momZPv
+
+	momX := momXP*momXNv - momXN*momXPv
+	momY := momYP*momYNv - momYN*momYPv
+	momZ := momZP*momZNv - momZN*momZPv
+
+	// everyone to the left of me gets NegX, to right gets PosX, etc
+	nmom := NeighMaxPosNeg(x, y, z, int32(PKGCMomXP), int32(PKGCMomXN), int32(PKGCMomYP), int32(PKGCMomYN), int32(PKGCMomZP), int32(PKGCMomZN), prv)
+
+	// todo: it is not clear what we're doing with these two states -- need to do something
+	// different!!
 
 	// self-energy is mass term in surrounding KG
 	// forceA -= Params[0].MassCOverHBarSq * seavg * pposA
-	forceA += saavg - pposA // direct drive!
+	forceA += nmom - pposA // direct drive!
 	velA := pvelA + Params[0].CSq*forceA
 	posA := pposA + velA
 
 	// forceB -= Params[0].MassCOverHBarSq * seavg * pposB
-	forceB += sbavg - pposB
+	forceB += nmom - pposB
 	velB := pvelB + Params[0].CSq*forceB
 	posB := pposB + velB
 
@@ -69,8 +138,6 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
 
 	chg := pposB*pvelA - pposA*pvelB
-
-	cc := pposB*pposB + pposA*pposA
 
 	curX := pposA*grBX - pposB*grAX
 	curY := pposA*grBY - pposB*grAY
@@ -84,19 +151,35 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 
-	State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
 	State.Set(chg, int(z), int(y), int(x), int(CabCharge), int(cur))
 	State.Set(curX, int(z), int(y), int(x), int(CabCurrentX), int(cur))
 	State.Set(curY, int(z), int(y), int(x), int(CabCurrentY), int(cur))
 	State.Set(curZ, int(z), int(y), int(x), int(CabCurrentZ), int(cur))
 
-	State.Set(sPosA, int(z), int(y), int(x), int(CabSelfPosA), int(cur))
-	State.Set(sVelA, int(z), int(y), int(x), int(CabSelfVelA), int(cur))
+	// todo: decide if jumping based on momentums
+	// and if so, record that in a state var
+	// and then implement it on the next trial,
+	// zeroing out the original and writing
+	// to the new guy.
 
-	State.Set(sPosB, int(z), int(y), int(x), int(CabSelfPosB), int(cur))
-	State.Set(sVelB, int(z), int(y), int(x), int(CabSelfVelB), int(cur))
+	State.Set(momXP, int(z), int(y), int(x), int(PKGCMomXP), int(cur))
+	State.Set(momXPv, int(z), int(y), int(x), int(PKGCMomXPv), int(cur))
+	State.Set(momXN, int(z), int(y), int(x), int(PKGCMomXN), int(cur))
+	State.Set(momXNv, int(z), int(y), int(x), int(PKGCMomXNv), int(cur))
 
-	State.Set(se, int(z), int(y), int(x), int(CabSelfE), int(cur))
+	State.Set(momYP, int(z), int(y), int(x), int(PKGCMomYP), int(cur))
+	State.Set(momYPv, int(z), int(y), int(x), int(PKGCMomYPv), int(cur))
+	State.Set(momYN, int(z), int(y), int(x), int(PKGCMomYN), int(cur))
+	State.Set(momYNv, int(z), int(y), int(x), int(PKGCMomYNv), int(cur))
+
+	State.Set(momZP, int(z), int(y), int(x), int(PKGCMomZP), int(cur))
+	State.Set(momZPv, int(z), int(y), int(x), int(PKGCMomZPv), int(cur))
+	State.Set(momZN, int(z), int(y), int(x), int(PKGCMomZN), int(cur))
+	State.Set(momZNv, int(z), int(y), int(x), int(PKGCMomZNv), int(cur))
+
+	State.Set(momX, int(z), int(y), int(x), int(PKGCMomX), int(cur))
+	State.Set(momY, int(z), int(y), int(x), int(PKGCMomY), int(cur))
+	State.Set(momZ, int(z), int(y), int(x), int(PKGCMomZ), int(cur))
 }
 
 //gosl:end
@@ -105,7 +188,7 @@ func (ss *Sim) ParticleKGCConfig() {
 	ParamsShouldDisplay = KGShouldDisplay
 	ss.StateVars = CabStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(CabSelfPosA, -1)
+		view.SetVar(CabPosA, -1)
 	})
 }
 
@@ -114,8 +197,8 @@ func ParticleKGCViewAll(view *View) {
 	view.Settings.NPanels = PanelsFour
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
-	view.Panels[0].Var = CabSelfPosA
-	view.Panels[1].Var = CabSelfPosB
+	view.Panels[0].Var = PKGCMomXP
+	view.Panels[1].Var = PKGCMomXN
 	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = CabPosA
 	// view.SetCurPrev(Previous, 3)
@@ -126,5 +209,7 @@ func (ss *Sim) ParticleKGCStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(CabCC))
 	ss.AddStat(ss.StatSum(CabCharge))
-	ss.AddStat(ss.StatSum(CabSelfE))
+	ss.AddStat(ss.StatSum(PKGCMomX))
+	ss.AddStat(ss.StatSum(PKGCMomY))
+	ss.AddStat(ss.StatSum(PKGCMomZ))
 }

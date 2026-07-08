@@ -67,21 +67,6 @@ const (
 
 	// CabEnergy is the total kinetic + potential energy.
 	CabEnergy
-
-	// CabSelfPosA is the self discrete particle position A
-	CabSelfPosA
-
-	// CabSelfPosB is the self discrete particle position B
-	CabSelfPosB
-
-	// CabSelfVelA is the self discrete particle velocity A
-	CabSelfVelA
-
-	// CabSelfVelB is the self discrete particle velocity B
-	CabSelfVelB
-
-	// CabSelfE is the self time-like energy value
-	CabSelfE
 )
 
 // KleinGordonKernel is the kernel for computing the KleinGordon equations,

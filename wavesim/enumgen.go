@@ -243,20 +243,20 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}
+var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
 
 // CabStatesN is the highest valid value for type CabStates, plus one.
 //
 //gosl:start
-const CabStatesN CabStates = 20
+const CabStatesN CabStates = 15
 
 //gosl:end
 
-var _CabStatesValueMap = map[string]CabStates{`PosA`: 0, `PosB`: 1, `VelA`: 2, `VelB`: 3, `ForceA`: 4, `ForceB`: 5, `V`: 6, `CC`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11, `Kinetic`: 12, `Potential`: 13, `Energy`: 14, `SelfPosA`: 15, `SelfPosB`: 16, `SelfVelA`: 17, `SelfVelB`: 18, `SelfE`: 19}
+var _CabStatesValueMap = map[string]CabStates{`PosA`: 0, `PosB`: 1, `VelA`: 2, `VelB`: 3, `ForceA`: 4, `ForceB`: 5, `V`: 6, `CC`: 7, `Charge`: 8, `CurrentX`: 9, `CurrentY`: 10, `CurrentZ`: 11, `Kinetic`: 12, `Potential`: 13, `Energy`: 14}
 
-var _CabStatesDescMap = map[CabStates]string{0: `CabPosA is the position (height) wave state variable for the real complex component A.`, 1: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 2: `CabVelA is the velocity of wave state variable for the real complex component A.`, 3: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 4: `CabForceA is the net force computed from neighbors for the real complex component A.`, 5: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 6: `CabV is an external potential energy factor, that can be used to push particles around.`, 7: `CabCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`, 8: `CabCharge is the charge density.`, 9: `CabCurrentX is the current density.`, 10: `CabCurrentY is the current density.`, 11: `CabCurrentZ is the current density.`, 12: `CabKinetic is the total kinetic energy across components.`, 13: `CabPotential is the total potential energy across components (only for KGC).`, 14: `CabEnergy is the total kinetic + potential energy.`, 15: `CabSelfPosA is the self discrete particle position A`, 16: `CabSelfPosB is the self discrete particle position B`, 17: `CabSelfVelA is the self discrete particle velocity A`, 18: `CabSelfVelB is the self discrete particle velocity B`, 19: `CabSelfE is the self time-like energy value`}
+var _CabStatesDescMap = map[CabStates]string{0: `CabPosA is the position (height) wave state variable for the real complex component A.`, 1: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 2: `CabVelA is the velocity of wave state variable for the real complex component A.`, 3: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 4: `CabForceA is the net force computed from neighbors for the real complex component A.`, 5: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 6: `CabV is an external potential energy factor, that can be used to push particles around.`, 7: `CabCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`, 8: `CabCharge is the charge density.`, 9: `CabCurrentX is the current density.`, 10: `CabCurrentY is the current density.`, 11: `CabCurrentZ is the current density.`, 12: `CabKinetic is the total kinetic energy across components.`, 13: `CabPotential is the total potential energy across components (only for KGC).`, 14: `CabEnergy is the total kinetic + potential energy.`}
 
-var _CabStatesMap = map[CabStates]string{0: `PosA`, 1: `PosB`, 2: `VelA`, 3: `VelB`, 4: `ForceA`, 5: `ForceB`, 6: `V`, 7: `CC`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`, 12: `Kinetic`, 13: `Potential`, 14: `Energy`, 15: `SelfPosA`, 16: `SelfPosB`, 17: `SelfVelA`, 18: `SelfVelB`, 19: `SelfE`}
+var _CabStatesMap = map[CabStates]string{0: `PosA`, 1: `PosB`, 2: `VelA`, 3: `VelB`, 4: `ForceA`, 5: `ForceB`, 6: `V`, 7: `CC`, 8: `Charge`, 9: `CurrentX`, 10: `CurrentY`, 11: `CurrentZ`, 12: `Kinetic`, 13: `Potential`, 14: `Energy`}
 
 // String returns the string representation of this CabStates value.
 func (i CabStates) String() string { return enums.String(i, _CabStatesMap) }
@@ -380,6 +380,61 @@ func (i Equations) MarshalText() ([]byte, error) { return []byte(i.String()), ni
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Equations) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "Equations")
+}
+
+var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+
+// ParticleKGCStatesN is the highest valid value for type ParticleKGCStates, plus one.
+//
+//gosl:start
+const ParticleKGCStatesN ParticleKGCStates = 30
+
+//gosl:end
+
+var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`MomX`: 15, `MomY`: 16, `MomZ`: 17, `MomXP`: 18, `MomXPv`: 19, `MomXN`: 20, `MomXNv`: 21, `MomYP`: 22, `MomYPv`: 23, `MomYN`: 24, `MomYNv`: 25, `MomZP`: 26, `MomZPv`: 27, `MomZN`: 28, `MomZNv`: 29}
+
+var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCMomX is the particle momentum along X axis`, 16: `PKGCMomY is the particle momentum along Y axis`, 17: `PKGCMomZ is the particle momentum along Z axis`, 18: `PKGCMomXP is the SHO position for momentum along positive X axis.`, 19: `PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.`, 20: `PKGCMomXN is the SHO position for momentum along negative X axis.`, 21: `PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.`, 22: `PKGCMomYP is the SHO position for momentum along positive Y axis.`, 23: `PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.`, 24: `PKGCMomYN is the SHO position for momentum along negative Y axis.`, 25: `PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.`, 26: `PKGCMomZP is the SHO position for momentum along positive Z axis.`, 27: `PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.`, 28: `PKGCMomZN is the SHO position for momentum along negative Z axis.`, 29: `PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.`}
+
+var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `MomX`, 16: `MomY`, 17: `MomZ`, 18: `MomXP`, 19: `MomXPv`, 20: `MomXN`, 21: `MomXNv`, 22: `MomYP`, 23: `MomYPv`, 24: `MomYN`, 25: `MomYNv`, 26: `MomZP`, 27: `MomZPv`, 28: `MomZN`, 29: `MomZNv`}
+
+// String returns the string representation of this ParticleKGCStates value.
+func (i ParticleKGCStates) String() string {
+	return enums.StringExtended[ParticleKGCStates, CabStates](i, _ParticleKGCStatesMap)
+}
+
+// SetString sets the ParticleKGCStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *ParticleKGCStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*CabStates)(i), s, _ParticleKGCStatesValueMap)
+}
+
+// Int64 returns the ParticleKGCStates value as an int64.
+func (i ParticleKGCStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the ParticleKGCStates value from an int64.
+func (i *ParticleKGCStates) SetInt64(in int64) { *i = ParticleKGCStates(in) }
+
+// Desc returns the description of the ParticleKGCStates value.
+func (i ParticleKGCStates) Desc() string {
+	return enums.DescExtended[ParticleKGCStates, CabStates](i, _ParticleKGCStatesDescMap)
+}
+
+// ParticleKGCStatesValues returns all possible values for the type ParticleKGCStates.
+func ParticleKGCStatesValues() []ParticleKGCStates {
+	return enums.ValuesGlobalExtended(_ParticleKGCStatesValues, CabStatesValues())
+}
+
+// Values returns all possible values for the type ParticleKGCStates.
+func (i ParticleKGCStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_ParticleKGCStatesValues, CabStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i ParticleKGCStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *ParticleKGCStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "ParticleKGCStates")
 }
 
 var _ViewModesValues = []ViewModes{0, 1}

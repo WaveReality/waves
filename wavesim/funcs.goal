@@ -167,7 +167,7 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	return avg
 }
 
-// NeighAverage27 computes the 3D average of Laplacian across 27 neighbors,
+// NeighAverage27 computes the 3D average across 27 neighbors,
 // including the center, for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
 func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
@@ -181,6 +181,91 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	}
 	avg += NeighWts[AverageWts, 26] * State[z, y, x, vidx, tidx]
 	return avg
+}
+
+// NeighMaxPosNeg computes the 3D max across 27 neighbors,
+// including the center which gets abs mag, for given x,y,z center coordinates,
+// variable index xPidx = posX, xNidx = negX, etc.
+// and cur / prev time index tidx. ctr is the center value.
+func NeighMaxPosNeg(x, y, z, pXidx, nXidx, pYidx, nYidx, pZidx, nZidx, tidx int32) float32 {
+	mx := float32(0)
+	mxabs := float32(0)
+	for j := range 26 {
+		xo := NeighOffs[j, math32.X]
+		yo := NeighOffs[j, math32.Y]
+		zo := NeighOffs[j, math32.Z]
+		wt := NeighWts[AverageWts, j]
+		var cx, cy, cz float32
+		if xo < 0 {
+			cx = wt * State[z+zo, y+yo, x+xo, pXidx, tidx] // to my left, get P
+		} else if xo > 0 {
+			cx = wt * State[z+zo, y+yo, x+xo, nXidx, tidx] // to my right, get N
+		}
+		if yo < 0 {
+			cy = wt * State[z+zo, y+yo, x+xo, pYidx, tidx]
+		} else if yo > 0 {
+			cy = wt * State[z+zo, y+yo, x+xo, nYidx, tidx]
+		}
+		if zo < 0 {
+			cz = wt * State[z+zo, y+yo, x+xo, pZidx, tidx]
+		} else if zo > 0 {
+			cz = wt * State[z+zo, y+yo, x+xo, nZidx, tidx]
+		}
+		acx := math32.Abs(cx)
+		acy := math32.Abs(cy)
+		acz := math32.Abs(cz)
+		av := max(max(acx, acy), acz)
+		if av > mxabs {
+			mxabs = av
+			if acx > acy && acx > acz {
+				mx = cx
+			} else if acy > acx && acy > acz {
+				mx = cy
+			} else {
+				mx = cz
+			}
+		}
+	}
+	wt := NeighWts[AverageWts, 26]
+	cxp := wt * State[z, y, x, pXidx, tidx]
+	cxn := wt * State[z, y, x, nXidx, tidx]
+	cyp := wt * State[z, y, x, pYidx, tidx]
+	cyn := wt * State[z, y, x, nYidx, tidx]
+	czp := wt * State[z, y, x, pZidx, tidx]
+	czn := wt * State[z, y, x, nZidx, tidx]
+	acxp := math32.Abs(cxp)
+	acxn := math32.Abs(cxn)
+	acyp := math32.Abs(cyp)
+	acyn := math32.Abs(cyn)
+	aczp := math32.Abs(czp)
+	aczn := math32.Abs(czn)
+	
+	mxx := max(acxp, acxn)
+	mxy := max(acyp, acyn)
+	mxz := max(aczp, aczn)
+
+	if mxx > mxabs && mxx > mxy && mxx > mxz {
+		if acxp > acxn {
+			mx = cxp
+		} else {
+			mx = cxn
+		}
+	}
+	if mxy > mxabs && mxy > mxx && mxy > mxz {
+		if acyp > acyn {
+			mx = cyp
+		} else {
+			mx = cyn
+		}
+	}
+	if mxz > mxabs && mxz > mxx && mxz > mxy {
+		if aczp > aczn {
+			mx = czp
+		} else {
+			mx = czn
+		}
+	}
+	return mx
 }
 
 // Gradient18 computes the 3D gradient across 18 neighbors,
