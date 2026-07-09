@@ -121,22 +121,22 @@ func main() {
 				}
 			case wavesim.KleinGordon:
 				if threed {
-					sim.MovingWavePacketParams(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1.5)
+					sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1.5)
 
 				} else {
-					sim.MovingWavePacketParams(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
 				}
 			case wavesim.KleinGordonC:
 				if threed {
-					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
-					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
 				}
 			case wavesim.Schrodinger:
 				if threed {
-					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
-					sim.MovingWavePacketParams(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
 				}
 			case wavesim.Maxwell:
 				if threed {
@@ -149,7 +149,7 @@ func main() {
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(50, 50, 50), 1)
 					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
-					sim.MovingWavePacketParams(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
 				}
@@ -158,7 +158,7 @@ func main() {
 				if threed {
 					pos = math32.Vec3i(50, 50, 50)
 				}
-				sim.ParticleAt(pos, math32.Vec3(.5, 0, 0), 1)
+				sim.ParticleAtConfig(pos, 1)
 				sim.InvR(wavesim.CabPosA, pos, .2)
 				sim.InvR(wavesim.CabPosB, pos, .2)
 			}

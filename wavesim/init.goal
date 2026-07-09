@@ -106,10 +106,10 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 	}
 }
 
-// PosWavePacketParams is a version of [PosWavePacket] that gets parameters from
-// [Parameters]
-func (ss *Sim) PosWavePacketParams(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
-	ss.PosWavePacket(vr, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
+// PosWavePacketConfig is a version of [PosWavePacket] that gets parameters from
+// [Config]
+func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+	ss.PosWavePacket(vr, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
 }
 
 // MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
@@ -165,10 +165,10 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 	}
 }
 
-// MovingWavePacketParams is a version of [MovingWavePacket] that takes its
-// wavelength and width variables from [Parameters]
-func (ss *Sim) MovingWavePacketParams(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
-	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Params.Wavelength, ss.Params.PacketWidth, phase, amp)
+// MovingWavePacketConfig is a version of [MovingWavePacket] that takes its
+// wavelength and width variables from [Config]
+func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
 }
 
 // InvR adds 1/r values radiating from given center point,
@@ -197,7 +197,7 @@ func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
 }
 
 // ParticleAt adds a particle at given point, setting the normalized momentum (velocity)
-// factors. Need to be clear about velocity vs. momentum really.
+// factors.
 func (ss *Sim) ParticleAt(c math32.Vector3i, mom math32.Vector3, partType float32) {
 	ss.Point(PKGCParticle, Both, c, partType)
 	ss.Point(PKGCMomX, Both, c, mom.X)
@@ -225,4 +225,9 @@ func (ss *Sim) ParticleAt(c math32.Vector3i, mom math32.Vector3, partType float3
 	setN(PKGCMomXN, PKGCMomXNv, mom.X)
 	setN(PKGCMomYN, PKGCMomYNv, mom.Y)
 	setN(PKGCMomZN, PKGCMomZNv, mom.Z)
+}
+
+// ParticleAtConfig is a version of ParticleAt that sets Momentum from [Config]
+func (ss *Sim) ParticleAtConfig(c math32.Vector3i, partType float32) {
+	ss.ParticleAt(c, ss.Config.Momentum, partType)
 }

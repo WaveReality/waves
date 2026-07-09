@@ -26,11 +26,11 @@ type Sim struct {
 	// Params contains the current simulation parameters.
 	Params *Parameters `display:"add-fields"`
 
+	// Config contains the broader running configuration.
+	Config *Config `display:"add-fields"`
+
 	// Units convert between real-world SI units and per-cube computational units.
 	Units Units `new-window:"+" display:"no-inline"`
-
-	// Config contains the broader running configuration.
-	Config *Config `new-window:"+" display:"no-inline"`
 
 	// ConfigFunc is run at initial configuration, after all default configuration,
 	// and can then change any parameters etc.

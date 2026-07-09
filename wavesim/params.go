@@ -112,20 +112,10 @@ type Parameters struct {
 	// OneoEps0 = 1 / Eps0
 	OneoEps0 float32 `display:"-"`
 
-	// Wavelength is the wavelength to use for functions that use it
-	// (Params suffix). Allows user to manipulate the wavelength easily,
-	// e.g., for KG and other matter waves.
-	Wavelength float32
-
-	// PacketWidth is the wave packet width to use for functions that use it
-	// (Params suffix). Allows user to manipulate the wave parameters easily,
-	// e.g., for KG and other matter waves.
-	PacketWidth float32
-
 	// Edges determines how to handle the edges.
 	Edges Edges
 
-	pad float32
+	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -148,8 +138,6 @@ func (pr *Parameters) Defaults() {
 	pr.Mass = 1.0
 	pr.E = 1.0
 	pr.Mu0 = 1.0
-	pr.Wavelength = 8
-	pr.PacketWidth = 8
 	pr.Energy.SetBool(true)
 	pr.Update()
 }
