@@ -182,7 +182,7 @@ func (ss *Sim) InitRandSeed(run int) {
 // UpdateUnits updates Units from Params and vice-versa.
 func (ss *Sim) UpdateUnits() {
 	ss.Units.C = float64(ss.Params.C)
-	ss.Units.HBar = float64(ss.Params.HBar)
+	ss.Units.Hbar = float64(ss.Params.Hbar)
 	ss.Units.EMass = float64(ss.Params.Mass)
 	ss.Units.Update()
 	ss.Params.Mu0 = float32(ss.Units.Mu0)

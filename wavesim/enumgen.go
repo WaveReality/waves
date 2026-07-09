@@ -382,20 +382,20 @@ func (i *Equations) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "Equations")
 }
 
-var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
 
 // ParticleKGCStatesN is the highest valid value for type ParticleKGCStates, plus one.
 //
 //gosl:start
-const ParticleKGCStatesN ParticleKGCStates = 30
+const ParticleKGCStatesN ParticleKGCStates = 32
 
 //gosl:end
 
-var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`MomX`: 15, `MomY`: 16, `MomZ`: 17, `MomXP`: 18, `MomXPv`: 19, `MomXN`: 20, `MomXNv`: 21, `MomYP`: 22, `MomYPv`: 23, `MomYN`: 24, `MomYNv`: 25, `MomZP`: 26, `MomZPv`: 27, `MomZN`: 28, `MomZNv`: 29}
+var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`Particle`: 15, `MomX`: 16, `MomY`: 17, `MomZ`: 18, `MomSq`: 19, `MomXP`: 20, `MomXPv`: 21, `MomXN`: 22, `MomXNv`: 23, `MomYP`: 24, `MomYPv`: 25, `MomYN`: 26, `MomYNv`: 27, `MomZP`: 28, `MomZPv`: 29, `MomZN`: 30, `MomZNv`: 31}
 
-var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCMomX is the particle momentum along X axis`, 16: `PKGCMomY is the particle momentum along Y axis`, 17: `PKGCMomZ is the particle momentum along Z axis`, 18: `PKGCMomXP is the SHO position for momentum along positive X axis.`, 19: `PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.`, 20: `PKGCMomXN is the SHO position for momentum along negative X axis.`, 21: `PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.`, 22: `PKGCMomYP is the SHO position for momentum along positive Y axis.`, 23: `PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.`, 24: `PKGCMomYN is the SHO position for momentum along negative Y axis.`, 25: `PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.`, 26: `PKGCMomZP is the SHO position for momentum along positive Z axis.`, 27: `PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.`, 28: `PKGCMomZN is the SHO position for momentum along negative Z axis.`, 29: `PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.`}
+var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `PKGCMomX is the particle momentum along X axis`, 17: `PKGCMomY is the particle momentum along Y axis`, 18: `PKGCMomZ is the particle momentum along Z axis`, 19: `PKGCMomSq is the squared total particle momentum across all axes.`, 20: `PKGCMomXP is the SHO position for momentum along positive X axis.`, 21: `PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.`, 22: `PKGCMomXN is the SHO position for momentum along negative X axis.`, 23: `PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.`, 24: `PKGCMomYP is the SHO position for momentum along positive Y axis.`, 25: `PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.`, 26: `PKGCMomYN is the SHO position for momentum along negative Y axis.`, 27: `PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.`, 28: `PKGCMomZP is the SHO position for momentum along positive Z axis.`, 29: `PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.`, 30: `PKGCMomZN is the SHO position for momentum along negative Z axis.`, 31: `PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.`}
 
-var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `MomX`, 16: `MomY`, 17: `MomZ`, 18: `MomXP`, 19: `MomXPv`, 20: `MomXN`, 21: `MomXNv`, 22: `MomYP`, 23: `MomYPv`, 24: `MomYN`, 25: `MomYNv`, 26: `MomZP`, 27: `MomZPv`, 28: `MomZN`, 29: `MomZNv`}
+var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `Particle`, 16: `MomX`, 17: `MomY`, 18: `MomZ`, 19: `MomSq`, 20: `MomXP`, 21: `MomXPv`, 22: `MomXN`, 23: `MomXNv`, 24: `MomYP`, 25: `MomYPv`, 26: `MomYN`, 27: `MomYNv`, 28: `MomZP`, 29: `MomZPv`, 30: `MomZN`, 31: `MomZNv`}
 
 // String returns the string representation of this ParticleKGCStates value.
 func (i ParticleKGCStates) String() string {

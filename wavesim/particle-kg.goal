@@ -12,14 +12,21 @@ package wavesim
 type ParticleKGCStates CabStates //enums:enum -trim-prefix=PKGC
 
 const (
+	// PKGCParticle indicates the type of particle present at this cell.
+	// zero indicates no particle.
+	PKGCParticle ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
+
 	// PKGCMomX is the particle momentum along X axis
-	PKGCMomX ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
+	PKGCMomX
 
 	// PKGCMomY is the particle momentum along Y axis
 	PKGCMomY
 
 	// PKGCMomZ is the particle momentum along Z axis
 	PKGCMomZ
+
+	// PKGCMomSq is the squared total particle momentum across all axes.
+	PKGCMomSq
 
 	// PKGCMomXP is the SHO position for momentum along positive X axis.
 	PKGCMomXP
@@ -75,7 +82,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvelA := State[z, y, x, CabVelA, prv]
 	pvelB := State[z, y, x, CabVelB, prv]
 
-	mchsq := Params[0].MassCOverHBarSq
+	mchsq := Params[0].MCOverHSq
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
@@ -84,6 +91,49 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	} else {
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
+	}
+
+	// everyone to the left of me gets NegX, to right gets PosX, etc
+	nmomSq := NeighAverage27(x, y, z, int32(PKGCMomSq), prv)
+
+	forceA += nmomSq * pvelA // drive entrainment instead of damping / self term from mass.
+	forceB += nmomSq * pposB
+
+	// todo: drive A and B out of phase based on particle charge!
+	// probably only for neighbor of particle.
+	velA := pvelA + Params[0].CSq*forceA
+	posA := pposA + velA
+
+	velB := pvelB + Params[0].CSq*forceB
+	posB := pposB + velB
+
+	// todo: later, based on particle..
+	// var grAX, grAY, grAZ, grBX, grBY, grBZ float32
+	// Gradient18(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
+	// Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+	//
+	// chg := pposB*pvelA - pposA*pvelB
+	//
+	// curX := pposA*grBX - pposB*grAX
+	// curY := pposA*grBY - pposB*grAY
+	// curZ := pposA*grBZ - pposB*grAZ
+
+	State[z, y, x, CabForceA, cur] = forceA
+	State[z, y, x, CabVelA, cur] = velA
+	State[z, y, x, CabPosA, cur] = posA
+
+	State[z, y, x, CabForceB, cur] = forceB
+	State[z, y, x, CabVelB, cur] = velB
+	State[z, y, x, CabPosB, cur] = posB
+
+	// State[z, y, x, CabCharge, cur] = chg
+	// State[z, y, x, CabCurrentX, cur] = curX
+	// State[z, y, x, CabCurrentY, cur] = curY
+	// State[z, y, x, CabCurrentZ, cur] = curZ
+
+	particle := State[z, y, x, PKGCParticle, prv]
+	if particle == 0 {
+		return
 	}
 
 	momXP := State[z, y, x, PKGCMomXP, prv]
@@ -103,90 +153,108 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 
 	momXPv += -mchsq * momXP
 	momXP += momXPv
+	momXNv += -mchsq * momXN
+	momXN += momXNv
 
 	momYPv += -mchsq * momYP
 	momYP += momYPv
+	momYNv += -mchsq * momYN
+	momYN += momYNv
 
 	momZPv += -mchsq * momZP
 	momZP += momZPv
+	momZNv += -mchsq * momZN
+	momZN += momZNv
 
-	momX := momXP*momXNv - momXN*momXPv
-	momY := momYP*momYNv - momYN*momYPv
-	momZ := momZP*momZNv - momZN*momZPv
+	homc := Params[0].HOverMC
 
-	// everyone to the left of me gets NegX, to right gets PosX, etc
-	nmom := NeighMaxPosNeg(x, y, z, int32(PKGCMomXP), int32(PKGCMomXN), int32(PKGCMomYP), int32(PKGCMomYN), int32(PKGCMomZP), int32(PKGCMomZN), prv)
+	momX := homc * (momXP*momXNv - momXN*momXPv)
+	momY := homc * (momYP*momYNv - momYN*momYPv)
+	momZ := homc * (momZP*momZNv - momZN*momZPv)
 
-	// todo: it is not clear what we're doing with these two states -- need to do something
-	// different!!
+	momSq := momX*momX + momY*momY + momZ*momZ
 
-	// self-energy is mass term in surrounding KG
-	// forceA -= Params[0].MassCOverHBarSq * seavg * pposA
-	forceA += nmom - pposA // direct drive!
-	velA := pvelA + Params[0].CSq*forceA
-	posA := pposA + velA
+	e := 0.5 * (1.0 + momSq)
+	pXp := 0.5 * (e + momX)
+	pXn := 0.5 * (e - momX)
+	pYp := 0.5 * (e + momY)
+	pYn := 0.5 * (e - momY)
+	pZp := 0.5 * (e + momZ)
+	pZn := 0.5 * (e - momZ)
 
-	// forceB -= Params[0].MassCOverHBarSq * seavg * pposB
-	forceB += nmom - pposB
-	velB := pvelB + Params[0].CSq*forceB
-	posB := pposB + velB
+	rndX := GetRandomNumber(i, ctx.RandCounter.Counter, 0)
+	rndY := GetRandomNumber(i, ctx.RandCounter.Counter, 1)
+	rndZ := GetRandomNumber(i, ctx.RandCounter.Counter, 2)
 
-	var grAX, grAY, grAZ, grBX, grBY, grBZ float32
-	Gradient18(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
-	Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+	mvX := int32(0)
+	if rndX < pXp {
+		mvX = 1
+	} else if rndX < pXp+pXn {
+		mvX = -1
+	}
+	mvY := int32(0)
+	if rndY < pYp {
+		mvY = 1
+	} else if rndY < pYp+pYn {
+		mvY = -1
+	}
+	mvZ := int32(0)
+	if rndZ < pZp {
+		mvZ = 1
+	} else if rndZ < pZp+pZn {
+		mvZ = -1
+	}
+	if Params[0].ThreeD.IsFalse() {
+		mvY = 0
+		mvZ = 0
+	}
 
-	chg := pposB*pvelA - pposA*pvelB
+	moving := false
+	mx := x + mvX
+	my := y + mvY
+	mz := z + mvZ
+	if mvX != 0 || mvY != 0 || mvZ != 0 { // moving..
+		moving = true
+		// fmt.Println("move:", mvX, momX, momXP, momXN)
+	}
 
-	curX := pposA*grBX - pposB*grAX
-	curY := pposA*grBY - pposB*grAY
-	curZ := pposA*grBZ - pposB*grAZ
+	State[mz, my, mx, PKGCMomXP, cur] = momXP
+	State[mz, my, mx, PKGCMomXPv, cur] = momXPv
+	State[mz, my, mx, PKGCMomXN, cur] = momXN
+	State[mz, my, mx, PKGCMomXNv, cur] = momXNv
 
-	State[z, y, x, CabForceA, cur] = forceA
-	State[z, y, x, CabVelA, cur] = velA
-	State[z, y, x, CabPosA, cur] = posA
+	State[mz, my, mx, PKGCMomYP, cur] = momYP
+	State[mz, my, mx, PKGCMomYPv, cur] = momYPv
+	State[mz, my, mx, PKGCMomYN, cur] = momYN
+	State[mz, my, mx, PKGCMomYNv, cur] = momYNv
 
-	State[z, y, x, CabForceB, cur] = forceB
-	State[z, y, x, CabVelB, cur] = velB
-	State[z, y, x, CabPosB, cur] = posB
+	State[mz, my, mx, PKGCMomZP, cur] = momZP
+	State[mz, my, mx, PKGCMomZPv, cur] = momZPv
+	State[mz, my, mx, PKGCMomZN, cur] = momZN
+	State[mz, my, mx, PKGCMomZNv, cur] = momZNv
 
-	State[z, y, x, CabCharge, cur] = chg
-	State[z, y, x, CabCurrentX, cur] = curX
-	State[z, y, x, CabCurrentY, cur] = curY
-	State[z, y, x, CabCurrentZ, cur] = curZ
+	State[mz, my, mx, PKGCMomX, cur] = momX
+	State[mz, my, mx, PKGCMomY, cur] = momY
+	State[mz, my, mx, PKGCMomZ, cur] = momZ
+	State[mz, my, mx, PKGCMomSq, cur] = momSq
 
-	// todo: decide if jumping based on momentums
-	// and if so, record that in a state var
-	// and then implement it on the next trial,
-	// zeroing out the original and writing
-	// to the new guy.
+	State[mz, my, mx, PKGCParticle, cur] = particle
 
-	State[z, y, x, PKGCMomXP, cur] = momXP
-	State[z, y, x, PKGCMomXPv, cur] = momXPv
-	State[z, y, x, PKGCMomXN, cur] = momXN
-	State[z, y, x, PKGCMomXNv, cur] = momXNv
-
-	State[z, y, x, PKGCMomYP, cur] = momYP
-	State[z, y, x, PKGCMomYPv, cur] = momYPv
-	State[z, y, x, PKGCMomYN, cur] = momYN
-	State[z, y, x, PKGCMomYNv, cur] = momYNv
-
-	State[z, y, x, PKGCMomZP, cur] = momZP
-	State[z, y, x, PKGCMomZPv, cur] = momZPv
-	State[z, y, x, PKGCMomZN, cur] = momZN
-	State[z, y, x, PKGCMomZNv, cur] = momZNv
-
-	State[z, y, x, PKGCMomX, cur] = momX
-	State[z, y, x, PKGCMomY, cur] = momY
-	State[z, y, x, PKGCMomZ, cur] = momZ
+	if moving { // clear old data out
+		for vi := int32(PKGCParticle); vi < int32(ParticleKGCStatesN); vi++ {
+			State[z, y, x, vi, cur] = 0.0
+			State[z, y, x, vi, prv] = 0.0
+		}
+	}
 }
 
 //gosl:end
 
 func (ss *Sim) ParticleKGCConfig() {
 	ParamsShouldDisplay = KGShouldDisplay
-	ss.StateVars = CabStatesN
+	ss.StateVars = ParticleKGCStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(CabPosA, -1)
+		view.SetVar(PKGCParticle, -1)
 	})
 }
 
@@ -210,4 +278,5 @@ func (ss *Sim) ParticleKGCStats() {
 	ss.AddStat(ss.StatSum(PKGCMomX))
 	ss.AddStat(ss.StatSum(PKGCMomY))
 	ss.AddStat(ss.StatSum(PKGCMomZ))
+	ss.AddStat(ss.StatSum(PKGCMomSq))
 }

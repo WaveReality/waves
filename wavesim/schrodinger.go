@@ -33,8 +33,8 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 		} else {
 			forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
 		}
-		forceA *= -Params[0].HBarSqOver2Mass + vpot*pposB // note neg here, not in B
-		velA = forceA                                     // first order, not +=
+		forceA *= -Params[0].HSqOver2M + vpot*pposB // note neg here, not in B
+		velA = forceA                               // first order, not +=
 		posA = pposA + velA
 
 		// carry B forward
@@ -47,8 +47,8 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 		} else {
 			forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
 		}
-		forceB *= Params[0].HBarSqOver2Mass + vpot*pposA // todo: not sure about this!!
-		velB = forceB                                    // first order, not +=
+		forceB *= Params[0].HSqOver2M + vpot*pposA // todo: not sure about this!!
+		velB = forceB                              // first order, not +=
 		posB = pposB + velB
 
 		// carry A forward
@@ -60,7 +60,7 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	if Params[0].Energy.IsTrue() {
 		cc := posA*posA + posB*posB
 		midVel := 0.25 * (pvelA + velA + pvelB + velB)
-		kinetic := Params[0].MassOver2 * midVel * midVel
+		kinetic := Params[0].MOver2 * midVel * midVel
 
 		State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
 		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
@@ -86,7 +86,7 @@ func (ss *Sim) SchrodingerConfig() {
 }
 
 // SchrodShouldDisplay determines which Parameters fields to display.
-var SchrodShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}
+var SchrodShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
 
 // Cab1DViewAll configures the View to display A and B, Cur and Prev
 func Cab1DViewAll(view *View) {

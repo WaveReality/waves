@@ -13,8 +13,8 @@ const (
 	// C is the speed of light, m/s
 	C = 299792458.0
 
-	// HBar is the normalized Planck constant h / (2 Pi) = J s = m^2 kg / s
-	HBar = 1.054571628e-34
+	// Hbar is the normalized Planck constant h / (2 Pi) = J s = m^2 kg / s
+	Hbar = 1.054571628e-34
 
 	// E is the unit of electrical charge: C = A s
 	E = 1.602176487e-19
@@ -35,14 +35,14 @@ const (
 
 	// LambdaE is the Compton wavelength of the electron rest mass:
 	// h / (m0 c) = (2 pi hbar) / (m0 c) = 2.42631e-12 m
-	LambdaE = (2.0 * math32.Pi * HBar) / (EMass * C)
+	LambdaE = (2.0 * math32.Pi * Hbar) / (EMass * C)
 
 	// LambdaBarE is the Compton wavelength of the electron rest mass in hbar
 	// hbar / (m0 c) = 3.8615926771197e-13 m
-	LambdaBarE = HBar / (EMass * C)
+	LambdaBarE = Hbar / (EMass * C)
 
 	// A0 is the Bohr radius in hbar: hbar / (m0 c alpha) = 5.2917720859e-11 m
-	A0 = HBar / (EMass * C * Alpha)
+	A0 = Hbar / (EMass * C * Alpha)
 
 	//////// Planck scale constants
 
@@ -74,9 +74,9 @@ type Units struct {
 	// scale given the length scale from ComptonE.
 	C float64
 
-	// HBar = h / 2pi = reduced Planck constant, which determines the mass scale
+	// Hbar = h / 2pi = reduced Planck constant, which determines the mass scale
 	// given length (from ComptonE) and time (from C).
-	HBar float64
+	Hbar float64
 
 	// E is the electric charge constant in cubic units, which determines the
 	// electric potential units, C = A s
@@ -129,8 +129,8 @@ type Units struct {
 	// Csi is the speed of light, m/s
 	Csi float64 `edit:"-"`
 
-	// HBar is the normalized Planck constant h / (2 Pi) = J s = m^2 kg / s
-	HBarSi float64 `edit:"-"`
+	// Hbar is the normalized Planck constant h / (2 Pi) = J s = m^2 kg / s
+	HbarSi float64 `edit:"-"`
 
 	// Esi is the unit of electrical charge: C = A s
 	Esi float64 `edit:"-"`
@@ -164,11 +164,11 @@ type Units struct {
 func (un *Units) Defaults() {
 	un.ComptonE = 16
 	un.C = 0.5
-	un.HBar = 1
+	un.Hbar = 1
 	un.E = 1.0
 	un.EMass = 1
 	un.Csi = C
-	un.HBarSi = HBar
+	un.HbarSi = Hbar
 	un.Esi = E
 	un.EMassSi = EMass
 	un.Mu0si = Mu0
@@ -183,7 +183,7 @@ func (un *Units) Defaults() {
 func (un *Units) Update() {
 	un.CuM = LambdaBarE / un.ComptonE
 	un.CuS = (un.CuM * un.C) / C
-	un.CuKg = ((un.CuS / (un.CuM * un.CuM)) * HBar) / un.HBar
+	un.CuKg = ((un.CuS / (un.CuM * un.CuM)) * Hbar) / un.Hbar
 	un.CuN = (un.CuKg * un.CuM) / (un.CuS * un.CuS)
 	un.CuJ = un.CuN * un.CuM
 	un.CuW = un.CuJ * un.CuM

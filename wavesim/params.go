@@ -7,6 +7,7 @@ package wavesim
 import (
 	"slices"
 
+	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/gosl/slbool"
 )
 
@@ -73,21 +74,32 @@ type Parameters struct {
 	// Inv2CSq = 1 / 2C^2
 	Inv2CSq float32 `display:"-"`
 
-	// HBar = h / 2pi = reduced Planck constant.
-	HBar float32
+	// Hbar = h / 2pi = reduced Planck constant.
+	Hbar float32
 
 	// Mass is a general mass term, e.g., for the KleinGordon equations.
 	Mass float32
 
-	// MassCOverHBarSq = Mass^2 C^2 / HBar^2 is the mass drag factor
+	// MCOverHSq = Mass^2 C^2 / Hbar^2 is the mass drag factor
 	// in KleinGordon and related equations.
-	MassCOverHBarSq float32 `display:"-"`
+	MCOverHSq float32 `display:"-"`
 
-	// HBarSqOver2Mass = HBar^2 / 2 Mass is the factor for Schrodinger's equation.
-	HBarSqOver2Mass float32 `display:"-"`
+	// HSqOver2M = Hbar^2 / 2 Mass is the factor for Schrodinger's equation.
+	HSqOver2M float32 `display:"-"`
 
-	// MassOver2 = Mass / 2 for computing kinetic energy.
-	MassOver2 float32 `display:"-"`
+	// HEOver2MCSq = (Hbar*e) / (2 Mass * CSq) for computing charge.
+	HEOver2MCSq float32 `display:"-"`
+
+	// HOverMC = (Hbar) / (Mass * C) for computing particle momentum from phase.
+	HOverMC float32 `display:"-"`
+
+	// MOver2 = Mass / 2 for computing kinetic energy.
+	MOver2 float32 `display:"-"`
+
+	// E is the electric charge constant, which determines the
+	// electric potential units, C = A s
+	// 0.302822 causes Mu0 and Eps0 to both be 1, if C and Hbar are both 1
+	E float32
 
 	// Mu0 is mu_0, or the permeability of free space, which weights
 	// the impact of current on the magnetic vector potential.
@@ -112,14 +124,18 @@ type Parameters struct {
 
 	// Edges determines how to handle the edges.
 	Edges Edges
+
+	pad float32
 }
 
 func (pr *Parameters) Update() {
 	pr.CSq = pr.C * pr.C
 	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
-	pr.MassCOverHBarSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.HBar * pr.HBar)
-	pr.HBarSqOver2Mass = (pr.HBar * pr.HBar) / (2.0 * pr.Mass)
-	pr.MassOver2 = pr.Mass / 2.0
+	pr.MCOverHSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.Hbar * pr.Hbar)
+	pr.HSqOver2M = (pr.Hbar * pr.Hbar) / (2.0 * pr.Mass)
+	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
+	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
+	pr.MOver2 = pr.Mass / 2.0
 	pr.Eps0 = 1.0 / (pr.Mu0 * pr.C * pr.C)
 	pr.OneoEps0 = 1.0 / pr.Eps0
 }
@@ -128,8 +144,9 @@ func (pr *Parameters) Update() {
 
 func (pr *Parameters) Defaults() {
 	pr.C = 0.5
-	pr.HBar = 1.0
+	pr.Hbar = 1.0
 	pr.Mass = 1.0
+	pr.E = 1.0
 	pr.Mu0 = 1.0
 	pr.Wavelength = 8
 	pr.PacketWidth = 8

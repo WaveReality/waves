@@ -21,8 +21,8 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	threed := false
-	// threed := true
+	// threed := false
+	threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
@@ -103,7 +103,7 @@ func main() {
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
 				} else {
-					sim.Config.Size.Set(500, 1, 1)
+					sim.Config.Size.Set(50, 1, 1)
 				}
 				sim.ViewInit(wavesim.ParticleKGCViewAll)
 				sim.ParticleKGCStats()
@@ -154,14 +154,13 @@ func main() {
 					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
 				}
 			case wavesim.ParticleKGC:
-				pos := math32.Vec3i(250, 0, 0)
+				pos := math32.Vec3i(25, 0, 0)
 				if threed {
 					pos = math32.Vec3i(50, 50, 50)
 				}
-				sim.Point(wavesim.CabSelfPosA, wavesim.CurOnly, pos, 1)
-				sim.Point(wavesim.CabSelfVelB, wavesim.CurOnly, pos, -1*0.05)
+				sim.ParticleAt(pos, math32.Vec3(.5, 0, 0), 1)
 				sim.InvR(wavesim.CabPosA, pos, .2)
-				sim.InvR(wavesim.CabVelB, pos, .2)
+				sim.InvR(wavesim.CabPosB, pos, .2)
 			}
 		})
 }

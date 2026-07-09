@@ -10,6 +10,7 @@ import (
 	// "fmt"
 
 	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/gosl/slrand"
 	"cogentcore.org/lab/tensor"
 )
 
@@ -185,91 +186,6 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	return avg
 }
 
-// NeighMaxPosNeg computes the 3D max across 27 neighbors,
-// including the center which gets abs mag, for given x,y,z center coordinates,
-// variable index xPidx = posX, xNidx = negX, etc.
-// and cur / prev time index tidx. ctr is the center value.
-func NeighMaxPosNeg(x, y, z, pXidx, nXidx, pYidx, nYidx, pZidx, nZidx, tidx int32) float32 {
-	mx := float32(0)
-	mxabs := float32(0)
-	for j := range 26 {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
-		wt := NeighWts.Value(int(AverageWts), int(j))
-		var cx, cy, cz float32
-		if xo < 0 {
-			cx = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(pXidx), int(tidx)) // to my left, get P
-		} else if xo > 0 {
-			cx = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(nXidx), int(tidx)) // to my right, get N
-		}
-		if yo < 0 {
-			cy = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(pYidx), int(tidx))
-		} else if yo > 0 {
-			cy = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(nYidx), int(tidx))
-		}
-		if zo < 0 {
-			cz = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(pZidx), int(tidx))
-		} else if zo > 0 {
-			cz = wt * State.Value(int(z+zo), int(y+yo), int(x+xo), int(nZidx), int(tidx))
-		}
-		acx := math32.Abs(cx)
-		acy := math32.Abs(cy)
-		acz := math32.Abs(cz)
-		av := max(max(acx, acy), acz)
-		if av > mxabs {
-			mxabs = av
-			if acx > acy && acx > acz {
-				mx = cx
-			} else if acy > acx && acy > acz {
-				mx = cy
-			} else {
-				mx = cz
-			}
-		}
-	}
-	wt := NeighWts.Value(int(AverageWts), int(26))
-	cxp := wt * State.Value(int(z), int(y), int(x), int(pXidx), int(tidx))
-	cxn := wt * State.Value(int(z), int(y), int(x), int(nXidx), int(tidx))
-	cyp := wt * State.Value(int(z), int(y), int(x), int(pYidx), int(tidx))
-	cyn := wt * State.Value(int(z), int(y), int(x), int(nYidx), int(tidx))
-	czp := wt * State.Value(int(z), int(y), int(x), int(pZidx), int(tidx))
-	czn := wt * State.Value(int(z), int(y), int(x), int(nZidx), int(tidx))
-	acxp := math32.Abs(cxp)
-	acxn := math32.Abs(cxn)
-	acyp := math32.Abs(cyp)
-	acyn := math32.Abs(cyn)
-	aczp := math32.Abs(czp)
-	aczn := math32.Abs(czn)
-
-	mxx := max(acxp, acxn)
-	mxy := max(acyp, acyn)
-	mxz := max(aczp, aczn)
-
-	if mxx > mxabs && mxx > mxy && mxx > mxz {
-		if acxp > acxn {
-			mx = cxp
-		} else {
-			mx = cxn
-		}
-	}
-	if mxy > mxabs && mxy > mxx && mxy > mxz {
-		if acyp > acyn {
-			mx = cyp
-		} else {
-			mx = cyn
-		}
-	}
-	if mxz > mxabs && mxz > mxx && mxz > mxy {
-		if aczp > aczn {
-			mx = czp
-		} else {
-			mx = czn
-		}
-	}
-	return mx
-}
-
 // Gradient18 computes the 3D gradient across 18 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
@@ -432,6 +348,14 @@ func PotentialEnergy26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 		avg += NeighWts.Value(int(LaplacianWts), int(j)) * dv * dv
 	}
 	return avg
+}
+
+// GetRandomNumber returns a random number that depends on the index,
+// counter and function index.
+// We increment the counter after each cycle, so that we get new random numbers.
+// This whole scheme exists to ensure equal results under different multithreading settings.
+func GetRandomNumber(index uint32, counter uint64, funIndex uint32) float32 {
+	return slrand.Float32(counter, funIndex, index)
 }
 
 //gosl:end

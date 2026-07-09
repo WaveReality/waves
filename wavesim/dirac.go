@@ -71,7 +71,7 @@ func DiracKernel(i uint32) { //gosl:kernel
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
+	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
@@ -105,4 +105,4 @@ func (ss *Sim) DiracConfig() {
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}
+var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}

@@ -196,6 +196,7 @@ struct Context {
 	Step: i32,
 	CurState: i32,
 	pad: i32,
+	RandCounter: RandCounter,
 }
 fn Context_SizePlus1(ctx: Context) -> vec3<i32> {
 	return vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z)+(vec3<i32>(1, 1, 1));
@@ -304,7 +305,7 @@ const GPUVarsN: GPUVars = 6;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
-const ParticleKGCStatesN: ParticleKGCStates = 30;
+const ParticleKGCStatesN: ParticleKGCStates = 32;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -456,36 +457,42 @@ struct Parameters {
 	C: f32,
 	CSq: f32,
 	Inv2CSq: f32,
-	HBar: f32,
+	Hbar: f32,
 	Mass: f32,
-	MassCOverHBarSq: f32,
-	HBarSqOver2Mass: f32,
-	MassOver2: f32,
+	MCOverHSq: f32,
+	HSqOver2M: f32,
+	HEOver2MCSq: f32,
+	HOverMC: f32,
+	MOver2: f32,
+	E: f32,
 	Mu0: f32,
 	Eps0: f32,
 	OneoEps0: f32,
 	Wavelength: f32,
 	PacketWidth: f32,
 	Edges: Edges,
+	pad: f32,
 }
 
 //////// import: "particle-kg.go"
 alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
-const  PKGCMomX: ParticleKGCStates = 15;
-const  PKGCMomY: ParticleKGCStates = 16;
-const  PKGCMomZ: ParticleKGCStates = 17;
-const  PKGCMomXP: ParticleKGCStates = 18;
-const  PKGCMomXPv: ParticleKGCStates = 19;
-const  PKGCMomXN: ParticleKGCStates = 20;
-const  PKGCMomXNv: ParticleKGCStates = 21;
-const  PKGCMomYP: ParticleKGCStates = 22;
-const  PKGCMomYPv: ParticleKGCStates = 23;
-const  PKGCMomYN: ParticleKGCStates = 24;
-const  PKGCMomYNv: ParticleKGCStates = 25;
-const  PKGCMomZP: ParticleKGCStates = 26;
-const  PKGCMomZPv: ParticleKGCStates = 27;
-const  PKGCMomZN: ParticleKGCStates = 28;
-const  PKGCMomZNv: ParticleKGCStates = 29;
+const  PKGCParticle: ParticleKGCStates = 15;
+const  PKGCMomX: ParticleKGCStates = 16;
+const  PKGCMomY: ParticleKGCStates = 17;
+const  PKGCMomZ: ParticleKGCStates = 18;
+const  PKGCMomSq: ParticleKGCStates = 19;
+const  PKGCMomXP: ParticleKGCStates = 20;
+const  PKGCMomXPv: ParticleKGCStates = 21;
+const  PKGCMomXN: ParticleKGCStates = 22;
+const  PKGCMomXNv: ParticleKGCStates = 23;
+const  PKGCMomYP: ParticleKGCStates = 24;
+const  PKGCMomYPv: ParticleKGCStates = 25;
+const  PKGCMomYN: ParticleKGCStates = 26;
+const  PKGCMomYNv: ParticleKGCStates = 27;
+const  PKGCMomZP: ParticleKGCStates = 28;
+const  PKGCMomZPv: ParticleKGCStates = 29;
+const  PKGCMomZN: ParticleKGCStates = 30;
+const  PKGCMomZNv: ParticleKGCStates = 31;
 
 //////// import: "schrodinger.go"
 
@@ -513,3 +520,170 @@ const  WaveForce: WaveStates = 2;
 const  WaveKinetic: WaveStates = 3;
 const  WavePotential: WaveStates = 4;
 const  WaveEnergy: WaveStates = 5;
+
+//////// import: "slrand.wgsl"
+fn Philox2x32round(counter: su64, key: u32) -> su64 {
+	let mul = Uint32Mul64(u32(0xD256D193), counter.x);
+	var ctr: su64;
+	ctr.x = mul.y ^ key ^ counter.y;
+	ctr.y = mul.x;
+	return ctr;
+}
+fn Philox2x32bumpkey(key: u32) -> u32 {
+	return key + u32(0x9E3779B9);
+}
+fn Philox2x32(counter: su64, key: u32) -> vec2<u32> {
+	var ctr = Philox2x32round(counter, key); // 1
+	var ky = Philox2x32bumpkey(key);
+	ctr = Philox2x32round(ctr, ky); // 2
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 3
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 4
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 5
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 6
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 7
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 8
+	ky = Philox2x32bumpkey(ky);
+	ctr = Philox2x32round(ctr, ky); // 9
+	ky = Philox2x32bumpkey(ky);
+	return Philox2x32round(ctr, ky); // 10
+}
+fn RandUint32Vec2(counter: su64, funcIndex: u32, key: u32) -> vec2<u32> {
+	return Philox2x32(Uint64Add32(counter, funcIndex), key);
+}
+fn RandUint32(counter: su64, funcIndex: u32, key: u32) -> u32 {
+	return Philox2x32(Uint64Add32(counter, funcIndex), key).x;
+}
+fn RandFloat32Vec2(counter: su64, funcIndex: u32, key: u32) -> vec2<f32> {
+	return Uint32ToFloat32Vec2(RandUint32Vec2(counter, funcIndex, key));
+}
+fn RandFloat32(counter: su64, funcIndex: u32, key: u32) -> f32 { 
+	return Uint32ToFloat32(RandUint32(counter, funcIndex, key));
+}
+fn RandFloat32Range11Vec2(counter: su64, funcIndex: u32, key: u32) -> vec2<f32> {
+	return Uint32ToFloat32Vec2(RandUint32Vec2(counter, funcIndex, key));
+}
+fn RandFloat32Range11(counter: su64, funcIndex: u32, key: u32) -> f32 { 
+	return Uint32ToFloat32Range11(RandUint32(counter, funcIndex, key));
+}
+fn RandBoolP(counter: su64, funcIndex: u32, key: u32, p: f32) -> bool { 
+	return (RandFloat32(counter, funcIndex, key) < p);
+}
+fn sincospi(x: f32) -> vec2<f32> {
+	let PIf = 3.1415926535897932;
+	var r: vec2<f32>;
+	r.x = cos(PIf*x);
+	r.y = sin(PIf*x);
+	return r;
+}
+fn RandFloat32NormVec2(counter: su64, funcIndex: u32, key: u32) -> vec2<f32> { 
+	let ur = RandUint32Vec2(counter, funcIndex, key);
+	var f = sincospi(Uint32ToFloat32Range11(ur.x));
+	let r = sqrt(-2.0 * log(Uint32ToFloat32(ur.y))); // guaranteed to avoid 0.
+	return f * r;
+}
+fn RandFloat32Norm(counter: su64, funcIndex: u32, key: u32) -> f32 { 
+	return RandFloat32Vec2(counter, funcIndex, key).x;
+}
+fn RandUint32N(counter: su64, funcIndex: u32, key: u32, n: u32) -> u32 { 
+	let v = RandFloat32(counter, funcIndex, key);
+	return u32(v * f32(n));
+}
+struct RandCounter {
+	Counter: su64,
+	HiSeed: u32,
+	pad: u32,
+}
+fn RandCounter_Reset(ct: ptr<function,RandCounter>) {
+	(*ct).Counter.x = u32(0);
+	(*ct).Counter.y = (*ct).HiSeed;
+}
+fn RandCounter_Seed(ct: ptr<function,RandCounter>, seed: u32) {
+	(*ct).HiSeed = seed;
+	RandCounter_Reset(ct);
+}
+fn RandCounter_Add(ct: ptr<function,RandCounter>, inc: u32) {
+	(*ct).Counter = Uint64Add32((*ct).Counter, inc);
+}
+
+//////// import: "sltype.wgsl"
+alias su64 = vec2<u32>;
+fn Uint32Mul64(a: u32, b: u32) -> su64 {
+	let LOMASK = (((u32(1))<<16)-1);
+	var r: su64;
+	r.x = a * b;               /* full low multiply */
+	let ahi = a >> 16;
+	let alo = a & LOMASK;
+	let bhi = b >> 16;
+	let blo = b & LOMASK;
+	let ahbl = ahi * blo;
+	let albh = alo * bhi;
+	let ahbl_albh = ((ahbl&LOMASK) + (albh&LOMASK));
+	var hit = ahi*bhi + (ahbl>>16) +  (albh>>16);
+	hit += ahbl_albh >> 16; /* carry from the sum of lo(ahbl) + lo(albh) ) */
+	/* carry from the sum with alo*blo */
+	if ((r.x >> u32(16)) < (ahbl_albh&LOMASK)) {
+		hit += u32(1);
+	}
+	r.y = hit; 
+	return r;
+}
+/*
+fn Uint32Mul64(a: u32, b: u32) -> su64 {
+	return su64(a) * su64(b);
+}
+*/
+fn Uint64Add32(a: su64, b: u32) -> su64 {
+	if (b == 0) {
+		return a;
+	}
+	var s = a;
+	if (s.x > u32(0xffffffff) - b) {
+		s.y++;
+		s.x = (b - 1) - (u32(0xffffffff) - s.x);
+	} else {
+		s.x += b;
+	}
+	return s;
+}
+fn Uint64Incr(a: su64) -> su64 {
+	var s = a;
+	if(s.x == 0xffffffff) {
+		s.y++;
+		s.x = u32(0);
+	} else {
+		s.x++;
+	}
+	return s;
+}
+fn Uint32ToFloat32(val: u32) -> f32 {
+	let factor = f32(1.0) / (f32(u32(0xffffffff)) + f32(1.0));
+	let halffactor = f32(0.5) * factor;
+	var f = f32(val) * factor + halffactor;
+	if (f == 1.0) { // exclude 1
+		return bitcast<f32>(0x3F7FFFFF);
+	}
+	return f;
+}
+fn Uint32ToFloat32Vec2(val: vec2<u32>) -> vec2<f32> {
+	var r: vec2<f32>;
+	r.x = Uint32ToFloat32(val.x);
+	r.y = Uint32ToFloat32(val.y);
+	return r;
+}
+fn Uint32ToFloat32Range11(val: u32) -> f32 {
+	let factor = f32(1.0) / (f32(i32(0x7fffffff)) + f32(1.0));
+	let halffactor = f32(0.5) * factor;
+	return (f32(val) * factor + halffactor);
+}
+fn Uint32ToFloat32Range11Vec2(val: vec2<u32>) -> vec2<f32> {
+	var r: vec2<f32>;
+	r.x = Uint32ToFloat32Range11(val.x);
+	r.y = Uint32ToFloat32Range11(val.y);
+	return r;
+}

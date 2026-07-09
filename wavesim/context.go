@@ -6,6 +6,7 @@ package wavesim
 
 import (
 	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/gosl/slrand"
 	"cogentcore.org/lab/gosl/slvec"
 )
 
@@ -28,11 +29,18 @@ type Context struct {
 	CurState int32
 
 	pad int32
+
+	// RandCounter is the random counter, incremented by maximum number of
+	// possible random numbers generated per cycle, regardless of how
+	// many are actually used. This is shared across all layers so must
+	// encompass all possible param settings.
+	RandCounter slrand.Counter
 }
 
 func (ctx *Context) Init() {
 	ctx.Step = 0
 	ctx.CurState = 0
+	ctx.RandCounter.Reset()
 }
 
 // SizeFull returns the full size of the state, including edges on either side.
@@ -75,6 +83,7 @@ func (ctx *Context) PrevState() int32 {
 func (ctx *Context) StepInc() {
 	ctx.Step++
 	ctx.CurState = ctx.PrevState()
+	ctx.RandCounter.Add(3) // x, y, z
 }
 
 //gosl:end

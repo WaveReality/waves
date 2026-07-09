@@ -88,7 +88,7 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
+	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
@@ -135,11 +135,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= Params[0].MassCOverHBarSq * pposA // this is the only diff from standard Wave
+	forceA -= Params[0].MCOverHSq * pposA // this is the only diff from standard Wave
 	velA := pvelA + Params[0].CSq*forceA
 	posA := pposA + velA
 
-	forceB -= Params[0].MassCOverHBarSq * pposB // this is the only diff from standard Wave
+	forceB -= Params[0].MCOverHSq * pposB // this is the only diff from standard Wave
 	velB := pvelB + Params[0].CSq*forceB
 	posB := pposB + velB
 
@@ -188,8 +188,8 @@ func KleinGordonDampKernel(i uint32) { //gosl:kernel
 	} else {
 		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MassCOverHBarSq * ppos // this is the only diff from standard Wave
-	vel := Params[0].CSq * force              // key damp: no +=
+	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
+	vel := Params[0].CSq * force        // key damp: no +=
 	pos := ppos + vel
 
 	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
@@ -221,11 +221,11 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
 		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= Params[0].MassCOverHBarSq * pposA // this is the only diff from standard Wave
+	forceA -= Params[0].MCOverHSq * pposA // this is the only diff from standard Wave
 	velA := Params[0].CSq * forceA
 	posA := pposA + velA
 
-	forceB -= Params[0].MassCOverHBarSq * pposB // this is the only diff from standard Wave
+	forceB -= Params[0].MCOverHSq * pposB // this is the only diff from standard Wave
 	velB := Params[0].CSq * forceB
 	posB := pposB + velB
 
@@ -257,4 +257,4 @@ func (ss *Sim) KleinGordonCConfig() {
 }
 
 // KGShouldDisplay determines which Parameters fields to display.
-var KGShouldDisplay = []string{"Edges", "Energy", "C", "HBar", "Mass", "Wavelength", "PacketWidth"}
+var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
