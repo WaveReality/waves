@@ -250,7 +250,7 @@ const GPUVarsN: GPUVars = 6;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
-const ParticleKGCStatesN: ParticleKGCStates = 31;
+const ParticleKGCStatesN: ParticleKGCStates = 32;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -530,15 +530,16 @@ const  PKGCPvelZ: ParticleKGCStates = 18;
 const  PKGCPvelSq: ParticleKGCStates = 19;
 const  PKGCLorentz: ParticleKGCStates = 20;
 const  PKGCPESq: ParticleKGCStates = 21;
-const  PKGCDriver: ParticleKGCStates = 22;
-const  PKGCHoP0: ParticleKGCStates = 23;
-const  PKGCHoV0: ParticleKGCStates = 24;
-const  PKGCHoPX: ParticleKGCStates = 25;
-const  PKGCHoVX: ParticleKGCStates = 26;
-const  PKGCHoPY: ParticleKGCStates = 27;
-const  PKGCHoVY: ParticleKGCStates = 28;
-const  PKGCHoPZ: ParticleKGCStates = 29;
-const  PKGCHoVZ: ParticleKGCStates = 30;
+const  PKGCDist: ParticleKGCStates = 22;
+const  PKGCDriver: ParticleKGCStates = 23;
+const  PKGCHoP0: ParticleKGCStates = 24;
+const  PKGCHoV0: ParticleKGCStates = 25;
+const  PKGCHoPX: ParticleKGCStates = 26;
+const  PKGCHoVX: ParticleKGCStates = 27;
+const  PKGCHoPY: ParticleKGCStates = 28;
+const  PKGCHoVY: ParticleKGCStates = 29;
+const  PKGCHoPZ: ParticleKGCStates = 30;
+const  PKGCHoVZ: ParticleKGCStates = 31;
 
 //////// import: "schrodinger.go"
 

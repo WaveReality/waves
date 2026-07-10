@@ -39,6 +39,9 @@ const (
 	// PKGCPESq is the square of the particle energy.
 	PKGCPESq
 
+	// PKGCDist is the 1 / distance from particle, propagating from source via diffusion.
+	PKGCDist
+
 	// PKGCDriver is the particle driver field propagating by exponential falloff.
 	PKGCDriver
 
@@ -111,15 +114,20 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	// odrv := diff * drv
 
 	nh0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
-	var drv float32
+	var dist, drv float32
 	if nh0 != 0 {
 		drv = nh0
+		dist = 1
 	} else {
+		dist = State.Value(int(z), int(y), int(x), int(PKGCDist), int(prv))
+		distF := Laplacian26(x, y, z, int32(PKGCDist), prv, dist)
+		dist += csq * distF // no velocity
+
 		drv = State.Value(int(z), int(y), int(x), int(PKGCDriver), int(prv))
 		drvF := Laplacian26(x, y, z, int32(PKGCDriver), prv, drv)
 		drv += csq * drvF // no velocity
 	}
-	odrv := drv
+	odrv := drv / max(dist, .0001)
 
 	// todo: drive A and B out of phase based on particle charge!
 	// probably only for neighbor of particle.
@@ -150,7 +158,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 
-	State.Set(odrv, int(z), int(y), int(x), int(PKGCDriver), int(cur))
+	State.Set(dist, int(z), int(y), int(x), int(PKGCDist), int(cur))
+	State.Set(drv, int(z), int(y), int(x), int(PKGCDriver), int(cur))
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX

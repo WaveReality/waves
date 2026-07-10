@@ -244,7 +244,7 @@ const GPUVarsN: GPUVars = 6;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
-const ParticleKGCStatesN: ParticleKGCStates = 31;
+const ParticleKGCStatesN: ParticleKGCStates = 32;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -381,15 +381,16 @@ const  PKGCPvelZ: ParticleKGCStates = 18;
 const  PKGCPvelSq: ParticleKGCStates = 19;
 const  PKGCLorentz: ParticleKGCStates = 20;
 const  PKGCPESq: ParticleKGCStates = 21;
-const  PKGCDriver: ParticleKGCStates = 22;
-const  PKGCHoP0: ParticleKGCStates = 23;
-const  PKGCHoV0: ParticleKGCStates = 24;
-const  PKGCHoPX: ParticleKGCStates = 25;
-const  PKGCHoVX: ParticleKGCStates = 26;
-const  PKGCHoPY: ParticleKGCStates = 27;
-const  PKGCHoVY: ParticleKGCStates = 28;
-const  PKGCHoPZ: ParticleKGCStates = 29;
-const  PKGCHoVZ: ParticleKGCStates = 30;
+const  PKGCDist: ParticleKGCStates = 22;
+const  PKGCDriver: ParticleKGCStates = 23;
+const  PKGCHoP0: ParticleKGCStates = 24;
+const  PKGCHoV0: ParticleKGCStates = 25;
+const  PKGCHoPX: ParticleKGCStates = 26;
+const  PKGCHoVX: ParticleKGCStates = 27;
+const  PKGCHoPY: ParticleKGCStates = 28;
+const  PKGCHoVY: ParticleKGCStates = 29;
+const  PKGCHoPZ: ParticleKGCStates = 30;
+const  PKGCHoVZ: ParticleKGCStates = 31;
 fn ParticleKGCKernel(i: u32) { //gosl:kernel
 let ctx = Ctx[0];; var x: i32;
 var y: i32;
@@ -413,13 +414,18 @@ var forceB: f32;; if (Params[0].ThreeD == 1) {
 	forceB = Laplacian1D(x, y, z, i32(CabPosB), prv, pposB);
 };
 var nh0 = NeighAverage27(x, y, z, i32(PKGCHoP0), prv);
-; var drv: f32;; if (nh0 != 0) {
+; var dist: f32;
+var drv: f32;; if (nh0 != 0) {
 	drv = nh0;
+	dist = f32(1);
 } else {
+	dist = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCDist), u32(prv)));
+	var distF = Laplacian26(x, y, z, i32(PKGCDist), prv, dist);
+	dist += csq * distF; // no velocity
 	drv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCDriver), u32(prv)));
 	var drvF = Laplacian26(x, y, z, i32(PKGCDriver), prv, drv);
 	drv += csq * drvF; // no velocity
-}; var odrv = drv;
+}; var odrv = drv / max(dist, .0001);
 ;
 forceA += odrv - pposA;
 ; var velA = pvelA + csq*forceA;
@@ -428,7 +434,7 @@ forceA += odrv - pposA;
 ; var velB = pvelB + csq*forceB;
 ; var posB = pposB + velB;
 ;
-StateSet(forceA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));; StateSet(velA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));; StateSet(posA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));; StateSet(forceB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));; StateSet(velB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));; StateSet(posB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));; StateSet(odrv, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32],
+StateSet(forceA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));; StateSet(velA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));; StateSet(posA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));; StateSet(forceB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));; StateSet(velB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));; StateSet(posB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));; StateSet(dist, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCDist), u32(cur)));; StateSet(drv, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32],
 TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCDriver), u32(cur)));; var particle = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCParticle), u32(prv)));
 ; if (particle == 0) {
 	return;
