@@ -106,9 +106,20 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 
 	// note: with no weights, favors diagonal; with 1/d or 1/d^2 weights favors
 	// the axes. need to synthesize values?
-	diff := Params[0].Diff
-	drv := NeighMax26(x, y, z, int32(PKGCDriver), prv, diff)
-	odrv := diff * drv
+	// diff := Params[0].Diff
+	// drv := NeighMax26(x, y, z, int32(PKGCDriver), prv, diff)
+	// odrv := diff * drv
+
+	nh0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
+	var drv float32
+	if nh0 != 0 {
+		drv = nh0
+	} else {
+		drv = State.Value(int(z), int(y), int(x), int(PKGCDriver), int(prv))
+		drvF := Laplacian26(x, y, z, int32(PKGCDriver), prv, drv)
+		drv += csq * drvF // no velocity
+	}
+	odrv := drv
 
 	// todo: drive A and B out of phase based on particle charge!
 	// probably only for neighbor of particle.

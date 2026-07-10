@@ -277,20 +277,18 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
-fn NeighMax26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, diff: f32) -> f32 {
-	var mxabs = f32(0);
-	var mx = f32(0);
+fn NeighAverage27(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> f32 {
+	var avg = f32(0);
 	for (var j=0; j<26; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
-		var av = abs(nv);
-		if (av > mxabs) {
-			mxabs = av;
-			mx = pow(diff, 1.0/NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(j))]) * nv;
-		}
-	}return mx;
+		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(j))] * nv;
+	}
+	avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(26))] * StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33],
+	TensorStrides[34], u32(z), u32(y), u32(x), u32(vidx), u32(tidx)));
+return avg;
 }
 fn GetRandomNumber(index: u32, counter: su64, funIndex: u32) -> f32 {
 	return RandFloat32(counter, funIndex, index);
@@ -414,9 +412,14 @@ var forceB: f32;; if (Params[0].ThreeD == 1) {
 	forceA = Laplacian1D(x, y, z, i32(CabPosA), prv, pposA);
 	forceB = Laplacian1D(x, y, z, i32(CabPosB), prv, pposB);
 };
-var diff = Params[0].Diff;
-; var drv = NeighMax26(x, y, z, i32(PKGCDriver), prv, diff);
-; var odrv = diff * drv;
+var nh0 = NeighAverage27(x, y, z, i32(PKGCHoP0), prv);
+; var drv: f32;; if (nh0 != 0) {
+	drv = nh0;
+} else {
+	drv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(PKGCDriver), u32(prv)));
+	var drvF = Laplacian26(x, y, z, i32(PKGCDriver), prv, drv);
+	drv += csq * drvF; // no velocity
+}; var odrv = drv;
 ;
 forceA += odrv - pposA;
 ; var velA = pvelA + csq*forceA;
