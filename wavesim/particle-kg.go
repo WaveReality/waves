@@ -6,6 +6,8 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 //gosl:start
 
 // ParticleKGCStates are the state variables for particles in context
@@ -18,57 +20,60 @@ const (
 	// zero indicates no particle.
 	PKGCParticle ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
 
-	// PKGCMomX is the particle momentum along X axis
-	PKGCMomX
+	// PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis
+	PKGCPvelX
 
-	// PKGCMomY is the particle momentum along Y axis
-	PKGCMomY
+	// PKGCPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis
+	PKGCPvelY
 
-	// PKGCMomZ is the particle momentum along Z axis
-	PKGCMomZ
+	// PKGCPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis
+	PKGCPvelZ
 
-	// PKGCMomSq is the squared total particle momentum across all axes.
-	PKGCMomSq
+	// PKGCPvelSq is the squared total particle velocity across all axes:
+	// X^2 + Y^2 + Z^2
+	PKGCPvelSq
 
-	// PKGCMomXP is the SHO position for momentum along positive X axis.
-	PKGCMomXP
+	// PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-v^2) (v = PvelSq)
+	PKGCLorentz
 
-	// PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.
-	PKGCMomXPv
+	// PKGCPESq is the square of the particle energy.
+	PKGCPESq
 
-	// PKGCMomXN is the SHO position for momentum along negative X axis.
-	PKGCMomXN
+	// PKGCHoP0 is the central time-like SHO position for particle velocity,
+	// which provides the reference against which the 3 axis phases are computed.
+	PKGCHoP0
 
-	// PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.
-	PKGCMomXNv
+	// PKGCHoV0 is the central time-like SHO velocity for particle velocity,
+	// which provides the reference against which the 3 axis phases are computed.
+	PKGCHoV0
 
-	// PKGCMomYP is the SHO position for momentum along positive Y axis.
-	PKGCMomYP
+	// PKGCHoPX is the SHO position for particle velocity along X axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoPX
 
-	// PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.
-	PKGCMomYPv
+	// PKGCHoVX is the SHO velocity for particle velocity along X axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoVX
 
-	// PKGCMomYN is the SHO position for momentum along negative Y axis.
-	PKGCMomYN
+	// PKGCHoPY is the SHO position for particle velocity along Y axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoPY
 
-	// PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.
-	PKGCMomYNv
+	// PKGCHoVY is the SHO velocity for particle velocity along Y axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoVY
 
-	// PKGCMomZP is the SHO position for momentum along positive Z axis.
-	PKGCMomZP
+	// PKGCHoPZ is the SHO position for particle velocity along Z axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoPZ
 
-	// PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.
-	PKGCMomZPv
-
-	// PKGCMomZN is the SHO position for momentum along negative Z axis.
-	PKGCMomZN
-
-	// PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.
-	PKGCMomZNv
+	// PKGCHoVZ is the SHO velocity for particle velocity along Z axis,
+	// with phase relative to central HoV0 driving normalized velocity value.
+	PKGCHoVZ
 )
 
 // ParticleKGCKernel is the kernel for computing the stochastic particle
-// with simple harmonic oscillator self-momentum factors along positive
+// with simple harmonic oscillator velocity and rest-mass factors along positive
 // and negative directions for each axis, based on KG on complex wave state.
 func ParticleKGCKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
@@ -84,7 +89,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
 
-	mchsq := Params[0].MCOverHSq
+	csq := Params[0].CSq
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
@@ -95,18 +100,14 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
 
-	// everyone to the left of me gets NegX, to right gets PosX, etc
-	nmomSq := NeighAverage27(x, y, z, int32(PKGCMomSq), prv)
-
-	forceA += nmomSq * pvelA // drive entrainment instead of damping / self term from mass.
-	forceB += nmomSq * pposB
+	nHoP0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
 
 	// todo: drive A and B out of phase based on particle charge!
 	// probably only for neighbor of particle.
-	velA := pvelA + Params[0].CSq*forceA
+	velA := pvelA + csq*(forceA+nHoP0-pposA)
 	posA := pposA + velA
 
-	velB := pvelB + Params[0].CSq*forceB
+	velB := pvelB + csq*(forceB+nHoP0-pposB)
 	posB := pposB + velB
 
 	// todo: later, based on particle..
@@ -138,51 +139,56 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 		return
 	}
 
-	momXP := State.Value(int(z), int(y), int(x), int(PKGCMomXP), int(prv))
-	momXPv := State.Value(int(z), int(y), int(x), int(PKGCMomXPv), int(prv))
-	momXN := State.Value(int(z), int(y), int(x), int(PKGCMomXN), int(prv))
-	momXNv := State.Value(int(z), int(y), int(x), int(PKGCMomXNv), int(prv))
+	esq := State.Value(int(z), int(y), int(x), int(PKGCPESq), int(prv))
 
-	momYP := State.Value(int(z), int(y), int(x), int(PKGCMomYP), int(prv))
-	momYPv := State.Value(int(z), int(y), int(x), int(PKGCMomYPv), int(prv))
-	momYN := State.Value(int(z), int(y), int(x), int(PKGCMomYN), int(prv))
-	momYNv := State.Value(int(z), int(y), int(x), int(PKGCMomYNv), int(prv))
+	hoP0 := State.Value(int(z), int(y), int(x), int(PKGCHoP0), int(prv))
+	hoV0 := State.Value(int(z), int(y), int(x), int(PKGCHoV0), int(prv))
 
-	momZP := State.Value(int(z), int(y), int(x), int(PKGCMomZP), int(prv))
-	momZPv := State.Value(int(z), int(y), int(x), int(PKGCMomZPv), int(prv))
-	momZN := State.Value(int(z), int(y), int(x), int(PKGCMomZN), int(prv))
-	momZNv := State.Value(int(z), int(y), int(x), int(PKGCMomZNv), int(prv))
+	hoPX := State.Value(int(z), int(y), int(x), int(PKGCHoPX), int(prv))
+	hoVX := State.Value(int(z), int(y), int(x), int(PKGCHoVX), int(prv))
 
-	momXPv += -mchsq * momXP
-	momXP += momXPv
-	momXNv += -mchsq * momXN
-	momXN += momXNv
+	hoPY := State.Value(int(z), int(y), int(x), int(PKGCHoPY), int(prv))
+	hoVY := State.Value(int(z), int(y), int(x), int(PKGCHoVY), int(prv))
 
-	momYPv += -mchsq * momYP
-	momYP += momYPv
-	momYNv += -mchsq * momYN
-	momYN += momYNv
+	hoPZ := State.Value(int(z), int(y), int(x), int(PKGCHoPZ), int(prv))
+	hoVZ := State.Value(int(z), int(y), int(x), int(PKGCHoVZ), int(prv))
 
-	momZPv += -mchsq * momZP
-	momZP += momZPv
-	momZNv += -mchsq * momZN
-	momZN += momZNv
+	// note: esq will get larger than 1!
 
-	homc := Params[0].HOverMC
+	hoV0 += -esq * hoP0
+	hoP0 += hoV0
 
-	momX := homc * (momXP*momXNv - momXN*momXPv)
-	momY := homc * (momYP*momYNv - momYN*momYPv)
-	momZ := homc * (momZP*momZNv - momZN*momZPv)
+	hoVX += -esq * hoPX
+	hoPX += hoVX
 
-	momSq := momX*momX + momY*momY + momZ*momZ
+	hoVY += -esq * hoPY
+	hoPY += hoVY
 
-	e := 0.5 * (1.0 + momSq)
-	pXp := 0.5 * (e + momX)
-	pXn := 0.5 * (e - momX)
-	pYp := 0.5 * (e + momY)
-	pYn := 0.5 * (e - momY)
-	pZp := 0.5 * (e + momZ)
-	pZn := 0.5 * (e - momZ)
+	hoVZ += -esq * hoPZ
+	hoPZ += hoVZ
+
+	// multiply by C to get back to non-normalized units
+	// but it is still a bit strange.
+	homc := Params[0].C * Params[0].HOverMC
+
+	pvX := homc * (hoPX*hoV0 - hoP0*hoVX)
+	pvY := homc * (hoPY*hoV0 - hoP0*hoVY)
+	pvZ := homc * (hoPZ*hoV0 - hoP0*hoVZ)
+
+	pvSq := pvX*pvX + pvY*pvY + pvZ*pvZ
+	lorenz := 1.0 / math32.Sqrt(1.0-(pvSq/csq))
+	esq = Params[0].C6M2 / (csq - pvSq)
+
+	// todo: is this e factor across all dimensions or only within each individual dimension?
+	// Sciaretta21 does only within individual, but that doesn't seem correct.
+	// Need to empirically measure in separate particle-only test simulation.
+	e := 0.5 * (1.0 + pvSq)
+	pXp := 0.5 * (e + pvX)
+	pXn := 0.5 * (e - pvX)
+	pYp := 0.5 * (e + pvY)
+	pYn := 0.5 * (e - pvY)
+	pZp := 0.5 * (e + pvZ)
+	pZn := 0.5 * (e - pvZ)
 
 	rndX := GetRandomNumber(i, ctx.RandCounter.Counter, 0)
 	rndY := GetRandomNumber(i, ctx.RandCounter.Counter, 1)
@@ -206,9 +212,12 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	} else if rndZ < pZp+pZn {
 		mvZ = -1
 	}
-	if Params[0].ThreeD.IsFalse() {
+	if Params[0].ThreeD.IsFalse() || Params[0].Move.IsFalse() {
 		mvY = 0
 		mvZ = 0
+	}
+	if Params[0].Move.IsFalse() {
+		mvX = 0
 	}
 
 	moving := false
@@ -217,28 +226,24 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	mz := z + mvZ
 	if mvX != 0 || mvY != 0 || mvZ != 0 { // moving..
 		moving = true
-		// fmt.Println("move:", mvX, momX, momXP, momXN)
+		// fmt.Println("move:", mvX, pvX, pvXP, pvXN)
 	}
 
-	State.Set(momXP, int(mz), int(my), int(mx), int(PKGCMomXP), int(cur))
-	State.Set(momXPv, int(mz), int(my), int(mx), int(PKGCMomXPv), int(cur))
-	State.Set(momXN, int(mz), int(my), int(mx), int(PKGCMomXN), int(cur))
-	State.Set(momXNv, int(mz), int(my), int(mx), int(PKGCMomXNv), int(cur))
+	State.Set(hoP0, int(mz), int(my), int(mx), int(PKGCHoP0), int(cur))
+	State.Set(hoV0, int(mz), int(my), int(mx), int(PKGCHoV0), int(cur))
 
-	State.Set(momYP, int(mz), int(my), int(mx), int(PKGCMomYP), int(cur))
-	State.Set(momYPv, int(mz), int(my), int(mx), int(PKGCMomYPv), int(cur))
-	State.Set(momYN, int(mz), int(my), int(mx), int(PKGCMomYN), int(cur))
-	State.Set(momYNv, int(mz), int(my), int(mx), int(PKGCMomYNv), int(cur))
+	State.Set(hoPY, int(mz), int(my), int(mx), int(PKGCHoPY), int(cur))
+	State.Set(hoVY, int(mz), int(my), int(mx), int(PKGCHoVY), int(cur))
 
-	State.Set(momZP, int(mz), int(my), int(mx), int(PKGCMomZP), int(cur))
-	State.Set(momZPv, int(mz), int(my), int(mx), int(PKGCMomZPv), int(cur))
-	State.Set(momZN, int(mz), int(my), int(mx), int(PKGCMomZN), int(cur))
-	State.Set(momZNv, int(mz), int(my), int(mx), int(PKGCMomZNv), int(cur))
+	State.Set(hoPZ, int(mz), int(my), int(mx), int(PKGCHoPZ), int(cur))
+	State.Set(hoVZ, int(mz), int(my), int(mx), int(PKGCHoVZ), int(cur))
 
-	State.Set(momX, int(mz), int(my), int(mx), int(PKGCMomX), int(cur))
-	State.Set(momY, int(mz), int(my), int(mx), int(PKGCMomY), int(cur))
-	State.Set(momZ, int(mz), int(my), int(mx), int(PKGCMomZ), int(cur))
-	State.Set(momSq, int(mz), int(my), int(mx), int(PKGCMomSq), int(cur))
+	State.Set(pvX, int(mz), int(my), int(mx), int(PKGCPvelX), int(cur))
+	State.Set(pvY, int(mz), int(my), int(mx), int(PKGCPvelY), int(cur))
+	State.Set(pvZ, int(mz), int(my), int(mx), int(PKGCPvelZ), int(cur))
+	State.Set(pvSq, int(mz), int(my), int(mx), int(PKGCPvelSq), int(cur))
+	State.Set(lorenz, int(mz), int(my), int(mx), int(PKGCLorentz), int(cur))
+	State.Set(esq, int(mz), int(my), int(mx), int(PKGCPESq), int(cur))
 
 	State.Set(particle, int(mz), int(my), int(mx), int(PKGCParticle), int(cur))
 
@@ -253,7 +258,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) ParticleKGCConfig() {
-	ParamsShouldDisplay = KGShouldDisplay
+	ParamsShouldDisplay = ParticleDisplay
 	ss.StateVars = ParticleKGCStatesN
 	ss.ViewInit(func(view *View) {
 		view.SetVar(PKGCParticle, -1)
@@ -265,8 +270,8 @@ func ParticleKGCViewAll(view *View) {
 	view.Settings.NPanels = PanelsFour
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
-	view.Panels[0].Var = PKGCMomXP
-	view.Panels[1].Var = PKGCMomXN
+	view.Panels[0].Var = PKGCHoP0
+	view.Panels[1].Var = PKGCHoPX
 	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = CabPosA
 	// view.SetCurPrev(Previous, 3)
@@ -277,8 +282,12 @@ func (ss *Sim) ParticleKGCStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(CabCC))
 	ss.AddStat(ss.StatSum(CabCharge))
-	ss.AddStat(ss.StatSum(PKGCMomX))
-	ss.AddStat(ss.StatSum(PKGCMomY))
-	ss.AddStat(ss.StatSum(PKGCMomZ))
-	ss.AddStat(ss.StatSum(PKGCMomSq))
+	ss.AddStat(ss.StatSum(PKGCPvelX))
+	ss.AddStat(ss.StatSum(PKGCPvelY))
+	ss.AddStat(ss.StatSum(PKGCPvelZ))
+	ss.AddStat(ss.StatSum(PKGCPvelSq))
+	ss.AddStat(ss.StatSum(PKGCPESq))
 }
+
+// ParticleDisplay determines which Parameters fields to display.
+var ParticleDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move"}

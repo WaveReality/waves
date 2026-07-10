@@ -250,7 +250,7 @@ const GPUVarsN: GPUVars = 6;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
-const ParticleKGCStatesN: ParticleKGCStates = 32;
+const ParticleKGCStatesN: ParticleKGCStates = 30;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -497,6 +497,7 @@ const  InvTwoPi = 1.0 / TwoPi;
 struct Parameters {
 	ThreeD: i32,
 	Energy: i32,
+	Move: i32,
 	C: f32,
 	CSq: f32,
 	Inv2CSq: f32,
@@ -507,35 +508,32 @@ struct Parameters {
 	HEOver2MCSq: f32,
 	HOverMC: f32,
 	MOver2: f32,
+	MCSq: f32,
+	C6M2: f32,
 	E: f32,
 	Mu0: f32,
 	Eps0: f32,
 	OneoEps0: f32,
-	Wavelength: f32,
-	PacketWidth: f32,
 	Edges: Edges,
-	pad: f32,
 }
 
 //////// import: "particle-kg.go"
 alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
 const  PKGCParticle: ParticleKGCStates = 15;
-const  PKGCMomX: ParticleKGCStates = 16;
-const  PKGCMomY: ParticleKGCStates = 17;
-const  PKGCMomZ: ParticleKGCStates = 18;
-const  PKGCMomSq: ParticleKGCStates = 19;
-const  PKGCMomXP: ParticleKGCStates = 20;
-const  PKGCMomXPv: ParticleKGCStates = 21;
-const  PKGCMomXN: ParticleKGCStates = 22;
-const  PKGCMomXNv: ParticleKGCStates = 23;
-const  PKGCMomYP: ParticleKGCStates = 24;
-const  PKGCMomYPv: ParticleKGCStates = 25;
-const  PKGCMomYN: ParticleKGCStates = 26;
-const  PKGCMomYNv: ParticleKGCStates = 27;
-const  PKGCMomZP: ParticleKGCStates = 28;
-const  PKGCMomZPv: ParticleKGCStates = 29;
-const  PKGCMomZN: ParticleKGCStates = 30;
-const  PKGCMomZNv: ParticleKGCStates = 31;
+const  PKGCPvelX: ParticleKGCStates = 16;
+const  PKGCPvelY: ParticleKGCStates = 17;
+const  PKGCPvelZ: ParticleKGCStates = 18;
+const  PKGCPvelSq: ParticleKGCStates = 19;
+const  PKGCLorentz: ParticleKGCStates = 20;
+const  PKGCPESq: ParticleKGCStates = 21;
+const  PKGCHoP0: ParticleKGCStates = 22;
+const  PKGCHoV0: ParticleKGCStates = 23;
+const  PKGCHoPX: ParticleKGCStates = 24;
+const  PKGCHoVX: ParticleKGCStates = 25;
+const  PKGCHoPY: ParticleKGCStates = 26;
+const  PKGCHoVY: ParticleKGCStates = 27;
+const  PKGCHoPZ: ParticleKGCStates = 28;
+const  PKGCHoVZ: ParticleKGCStates = 29;
 
 //////// import: "schrodinger.go"
 

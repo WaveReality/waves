@@ -21,8 +21,8 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	// threed := false
-	threed := true
+	threed := false
+	// threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
@@ -98,7 +98,8 @@ func main() {
 				}
 			case wavesim.ParticleKGC:
 				sim.Params.Edges = wavesim.EdgesDamp
-				sim.Params.Mass = 0.1
+				sim.Params.Mass = 1
+				sim.Params.Move.SetBool(false)
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)

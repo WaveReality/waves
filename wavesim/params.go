@@ -65,6 +65,9 @@ type Parameters struct {
 	// Energy determines if energy is computed (when not necessary).
 	Energy slbool.Bool
 
+	// Move determines if particles actually move according to their momentums.
+	Move slbool.Bool
+
 	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
 
@@ -96,6 +99,12 @@ type Parameters struct {
 	// MOver2 = Mass / 2 for computing kinetic energy.
 	MOver2 float32 `display:"-"`
 
+	// MCSq = (Mass^2 * C^2) for computing total momentum squared
+	MCSq float32 `display:"-"`
+
+	// C6M2= (C^6 * Mass^2) is the numerator for computing total particle energy
+	C6M2 float32 `display:"-"`
+
 	// E is the electric charge constant, which determines the
 	// electric potential units, C = A s
 	// 0.302822 causes Mu0 and Eps0 to both be 1, if C and Hbar are both 1
@@ -114,8 +123,6 @@ type Parameters struct {
 
 	// Edges determines how to handle the edges.
 	Edges Edges
-
-	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -126,6 +133,8 @@ func (pr *Parameters) Update() {
 	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
 	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
 	pr.MOver2 = pr.Mass / 2.0
+	pr.MCSq = pr.Mass * pr.Mass * pr.CSq
+	pr.C6M2 = pr.CSq * pr.CSq * pr.MCSq
 	pr.Eps0 = 1.0 / (pr.Mu0 * pr.C * pr.C)
 	pr.OneoEps0 = 1.0 / pr.Eps0
 }
@@ -139,6 +148,7 @@ func (pr *Parameters) Defaults() {
 	pr.E = 1.0
 	pr.Mu0 = 1.0
 	pr.Energy.SetBool(true)
+	pr.Move.SetBool(true)
 	pr.Update()
 }
 

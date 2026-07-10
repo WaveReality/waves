@@ -198,38 +198,34 @@ func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
 	}
 }
 
-// ParticleAt adds a particle at given point, setting the normalized momentum (velocity)
-// factors.
-func (ss *Sim) ParticleAt(c math32.Vector3i, mom math32.Vector3, partType float32) {
+// ParticleAt adds a particle at given point, setting the normalized particle
+// velocity factors.
+func (ss *Sim) ParticleAt(c math32.Vector3i, pvel math32.Vector3, partType float32) {
 	ss.Point(PKGCParticle, Both, c, partType)
-	ss.Point(PKGCMomX, Both, c, mom.X)
-	ss.Point(PKGCMomY, Both, c, mom.Y)
-	ss.Point(PKGCMomZ, Both, c, mom.Z)
+	ss.Point(PKGCPvelX, Both, c, pvel.X)
+	ss.Point(PKGCPvelY, Both, c, pvel.Y)
+	ss.Point(PKGCPvelZ, Both, c, pvel.Z)
 
-	ss.Point(PKGCMomXP, CurOnly, c, 1.0)
-	ss.Point(PKGCMomXPv, CurOnly, c, 0.0)
-	ss.Point(PKGCMomYP, CurOnly, c, 1.0)
-	ss.Point(PKGCMomYPv, CurOnly, c, 0.0)
-	ss.Point(PKGCMomZP, CurOnly, c, 1.0)
-	ss.Point(PKGCMomZPv, CurOnly, c, 0.0)
+	ss.Point(PKGCHoP0, CurOnly, c, 1.0)
+	ss.Point(PKGCHoV0, CurOnly, c, 0.0)
 
 	mch := math32.Sqrt(Params[0].MCOverHSq)
 
-	setN := func(vip, viv enums.Enum, mom float32) {
-		p := math32.Cos(math32.DegToRad(90 * mom))
-		v := mch * math32.Sin(math32.DegToRad(90*mom))
-		if mom > 0 {
-			fmt.Println("mom:", mom, "p:", p, "v:", v)
+	setN := func(vip, viv enums.Enum, pvel float32) {
+		p := math32.Cos(math32.DegToRad(90 * pvel))
+		v := mch * math32.Sin(math32.DegToRad(90*pvel))
+		if pvel > 0 {
+			fmt.Println("pvel:", pvel, "p:", p, "v:", v)
 		}
 		ss.Point(vip, CurOnly, c, p)
 		ss.Point(viv, CurOnly, c, v)
 	}
-	setN(PKGCMomXN, PKGCMomXNv, mom.X)
-	setN(PKGCMomYN, PKGCMomYNv, mom.Y)
-	setN(PKGCMomZN, PKGCMomZNv, mom.Z)
+	setN(PKGCHoPX, PKGCHoVX, pvel.X)
+	setN(PKGCHoPY, PKGCHoVY, pvel.Y)
+	setN(PKGCHoPZ, PKGCHoVZ, pvel.Z)
 }
 
-// ParticleAtConfig is a version of ParticleAt that sets Momentum from [Config]
+// ParticleAtConfig is a version of ParticleAt that sets Velocity from [Config]
 func (ss *Sim) ParticleAtConfig(c math32.Vector3i, partType float32) {
-	ss.ParticleAt(c, ss.Config.Momentum, partType)
+	ss.ParticleAt(c, ss.Config.Velocity, partType)
 }

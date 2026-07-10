@@ -382,20 +382,20 @@ func (i *Equations) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "Equations")
 }
 
-var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
+var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
 
 // ParticleKGCStatesN is the highest valid value for type ParticleKGCStates, plus one.
 //
 //gosl:start
-const ParticleKGCStatesN ParticleKGCStates = 32
+const ParticleKGCStatesN ParticleKGCStates = 30
 
 //gosl:end
 
-var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`Particle`: 15, `MomX`: 16, `MomY`: 17, `MomZ`: 18, `MomSq`: 19, `MomXP`: 20, `MomXPv`: 21, `MomXN`: 22, `MomXNv`: 23, `MomYP`: 24, `MomYPv`: 25, `MomYN`: 26, `MomYNv`: 27, `MomZP`: 28, `MomZPv`: 29, `MomZN`: 30, `MomZNv`: 31}
+var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`Particle`: 15, `PvelX`: 16, `PvelY`: 17, `PvelZ`: 18, `PvelSq`: 19, `Lorentz`: 20, `PESq`: 21, `HoP0`: 22, `HoV0`: 23, `HoPX`: 24, `HoVX`: 25, `HoPY`: 26, `HoVY`: 27, `HoPZ`: 28, `HoVZ`: 29}
 
-var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `PKGCMomX is the particle momentum along X axis`, 17: `PKGCMomY is the particle momentum along Y axis`, 18: `PKGCMomZ is the particle momentum along Z axis`, 19: `PKGCMomSq is the squared total particle momentum across all axes.`, 20: `PKGCMomXP is the SHO position for momentum along positive X axis.`, 21: `PKGCMomXPv is the velocity for SHO position for momentum along positive X axis.`, 22: `PKGCMomXN is the SHO position for momentum along negative X axis.`, 23: `PKGCMomXNv is the velocity for SHO position for momentum along negative X axis.`, 24: `PKGCMomYP is the SHO position for momentum along positive Y axis.`, 25: `PKGCMomYPv is the velocity for SHO position for momentum along positive Y axis.`, 26: `PKGCMomYN is the SHO position for momentum along negative Y axis.`, 27: `PKGCMomYNv is the velocity for SHO position for momentum along negative Y axis.`, 28: `PKGCMomZP is the SHO position for momentum along positive Z axis.`, 29: `PKGCMomZPv is the velocity for SHO position for momentum along positive Z axis.`, 30: `PKGCMomZN is the SHO position for momentum along negative Z axis.`, 31: `PKGCMomZNv is the velocity for SHO position for momentum along negative Z axis.`}
+var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `PKGCPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `PKGCPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `PKGCPvelSq is the squared total particle velocity across all axes: X^2 + Y^2 + Z^2`, 20: `PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-v^2) (v = PvelSq)`, 21: `PKGCPESq is the square of the particle energy.`, 22: `PKGCHoP0 is the central time-like SHO position for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 23: `PKGCHoV0 is the central time-like SHO velocity for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 24: `PKGCHoPX is the SHO position for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 25: `PKGCHoVX is the SHO velocity for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 26: `PKGCHoPY is the SHO position for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 27: `PKGCHoVY is the SHO velocity for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 28: `PKGCHoPZ is the SHO position for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`, 29: `PKGCHoVZ is the SHO velocity for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`}
 
-var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `Particle`, 16: `MomX`, 17: `MomY`, 18: `MomZ`, 19: `MomSq`, 20: `MomXP`, 21: `MomXPv`, 22: `MomXN`, 23: `MomXNv`, 24: `MomYP`, 25: `MomYPv`, 26: `MomYN`, 27: `MomYNv`, 28: `MomZP`, 29: `MomZPv`, 30: `MomZN`, 31: `MomZNv`}
+var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `Particle`, 16: `PvelX`, 17: `PvelY`, 18: `PvelZ`, 19: `PvelSq`, 20: `Lorentz`, 21: `PESq`, 22: `HoP0`, 23: `HoV0`, 24: `HoPX`, 25: `HoVX`, 26: `HoPY`, 27: `HoVY`, 28: `HoPZ`, 29: `HoVZ`}
 
 // String returns the string representation of this ParticleKGCStates value.
 func (i ParticleKGCStates) String() string {

@@ -34,8 +34,8 @@ type Config struct {
 	// e.g., for KG and other matter waves.
 	PacketWidth float32
 
-	// Momentum provides the default particle momentum.
-	Momentum math32.Vector3
+	// Velocity provides the default particle velocity.
+	Velocity math32.Vector3
 
 	// MaxSteps is the maximum number of steps to run.
 	MaxSteps int
@@ -47,7 +47,7 @@ func (cfg *Config) Defaults() {
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 8
-	cfg.Momentum.X = 0.2
+	cfg.Velocity.X = 0.2
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {
