@@ -244,7 +244,7 @@ const GPUVarsN: GPUVars = 6;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 7;
-const ParticleKGCStatesN: ParticleKGCStates = 30;
+const ParticleKGCStatesN: ParticleKGCStates = 31;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -326,14 +326,16 @@ fn KleinGordonKernel(i: u32) { //gosl:kernel
 	var prv = Context_PrevState(ctx);
 	var ppos = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
 	var pvel = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+	var mhsq = Params[0].MOverHSq;
+	var csq = Params[0].CSq;
 	var force: f32;
 	if (Params[0].ThreeD == 1) {
 		force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
 	} else {
 		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
 	}
-	force -= Params[0].MCOverHSq * ppos; // this is the only diff from standard Wave
-	var vel = pvel + Params[0].CSq*force;
+	force -= mhsq * ppos; // this is the only diff from standard Wave
+	var vel = pvel + csq*force;
 	var pos = ppos + vel;
 	if (Params[0].Energy == 1) {
 		var midVel = 0.5 * (pvel + vel);
@@ -392,11 +394,12 @@ struct Parameters {
 	Energy: i32,
 	Move: i32,
 	C: f32,
+	Diff: f32,
 	CSq: f32,
 	Inv2CSq: f32,
 	Hbar: f32,
 	Mass: f32,
-	MCOverHSq: f32,
+	MOverHSq: f32,
 	HSqOver2M: f32,
 	HEOver2MCSq: f32,
 	HOverMC: f32,
@@ -408,6 +411,9 @@ struct Parameters {
 	Eps0: f32,
 	OneoEps0: f32,
 	Edges: Edges,
+	pad: f32,
+	pad1: f32,
+	pad2: f32,
 }
 
 //////// import: "particle-kg.go"
@@ -419,14 +425,15 @@ const  PKGCPvelZ: ParticleKGCStates = 18;
 const  PKGCPvelSq: ParticleKGCStates = 19;
 const  PKGCLorentz: ParticleKGCStates = 20;
 const  PKGCPESq: ParticleKGCStates = 21;
-const  PKGCHoP0: ParticleKGCStates = 22;
-const  PKGCHoV0: ParticleKGCStates = 23;
-const  PKGCHoPX: ParticleKGCStates = 24;
-const  PKGCHoVX: ParticleKGCStates = 25;
-const  PKGCHoPY: ParticleKGCStates = 26;
-const  PKGCHoVY: ParticleKGCStates = 27;
-const  PKGCHoPZ: ParticleKGCStates = 28;
-const  PKGCHoVZ: ParticleKGCStates = 29;
+const  PKGCDriver: ParticleKGCStates = 22;
+const  PKGCHoP0: ParticleKGCStates = 23;
+const  PKGCHoV0: ParticleKGCStates = 24;
+const  PKGCHoPX: ParticleKGCStates = 25;
+const  PKGCHoVX: ParticleKGCStates = 26;
+const  PKGCHoPY: ParticleKGCStates = 27;
+const  PKGCHoVY: ParticleKGCStates = 28;
+const  PKGCHoPZ: ParticleKGCStates = 29;
+const  PKGCHoVZ: ParticleKGCStates = 30;
 
 //////// import: "schrodinger.go"
 

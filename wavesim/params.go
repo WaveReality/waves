@@ -71,6 +71,9 @@ type Parameters struct {
 	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
 
+	// Diff is the particle diffusion factor: proportion decay relative to neighbors.
+	Diff float32
+
 	// CSq = C^2
 	CSq float32 `display:"-"`
 
@@ -83,9 +86,9 @@ type Parameters struct {
 	// Mass is a general mass term, e.g., for the KleinGordon equations.
 	Mass float32
 
-	// MCOverHSq = Mass^2 C^2 / Hbar^2 is the mass drag factor
-	// in KleinGordon and related equations.
-	MCOverHSq float32 `display:"-"`
+	// MOverHSq = Mass^2 / Hbar^2 is the mass drag factor in KleinGordon
+	// and related equations. Note: C^2 factor is added in basic vel += c^2 force
+	MOverHSq float32 `display:"-"`
 
 	// HSqOver2M = Hbar^2 / 2 Mass is the factor for Schrodinger's equation.
 	HSqOver2M float32 `display:"-"`
@@ -123,12 +126,14 @@ type Parameters struct {
 
 	// Edges determines how to handle the edges.
 	Edges Edges
+
+	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {
 	pr.CSq = pr.C * pr.C
 	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
-	pr.MCOverHSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.Hbar * pr.Hbar)
+	pr.MOverHSq = (pr.Mass * pr.Mass) / (pr.Hbar * pr.Hbar)
 	pr.HSqOver2M = (pr.Hbar * pr.Hbar) / (2.0 * pr.Mass)
 	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
 	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
@@ -143,6 +148,7 @@ func (pr *Parameters) Update() {
 
 func (pr *Parameters) Defaults() {
 	pr.C = 0.5
+	pr.Diff = 0.98
 	pr.Hbar = 1.0
 	pr.Mass = 1.0
 	pr.E = 1.0

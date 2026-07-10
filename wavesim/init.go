@@ -209,7 +209,7 @@ func (ss *Sim) ParticleAt(c math32.Vector3i, pvel math32.Vector3, partType float
 	ss.Point(PKGCHoP0, CurOnly, c, 1.0)
 	ss.Point(PKGCHoV0, CurOnly, c, 0.0)
 
-	mch := math32.Sqrt(Params[0].MCOverHSq)
+	mch := math32.Sqrt(Params[0].MOverHSq * Params[0].CSq)
 
 	setN := func(vip, viv enums.Enum, pvel float32) {
 		p := math32.Cos(math32.DegToRad(90 * pvel))

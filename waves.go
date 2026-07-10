@@ -98,7 +98,7 @@ func main() {
 				}
 			case wavesim.ParticleKGC:
 				sim.Params.Edges = wavesim.EdgesDamp
-				sim.Params.Mass = 1
+				sim.Params.Mass = 0.01
 				sim.Params.Move.SetBool(false)
 				if threed {
 					sim.Params.ThreeD.SetBool(true)

@@ -1,0 +1,74 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+// Move26 moves particle probability across cells.
+func Move26(x, y, z, vidx, tidx int32, mx, my, mz, v float32) {
+	ctr := State[z, y, x, vidx, tidx]
+	var mv, nv math32.Vector3
+	mv.Set(mx, my, mz)
+	subtot := float32(0)
+	addtot := float32(0)
+	for j := range 26 {
+		xo := NeighOffs[j, math32.X]
+		yo := NeighOffs[j, math32.Y]
+		zo := NeighOffs[j, math32.Z]
+		nv.Set(float32(xo), float32(yo), float32(zo))
+		lsq := slmath.LengthSquared3(nv)
+		pn := v * slmath.Dot3(mv, nv) / lsq
+		if pn == 0 {
+			continue
+		}
+		cv := State[z+zo, y+yo, x+xo, vidx, tidx]
+		if pn > 0 {
+			addtot += pn
+		} else {
+			cpv := cv * pn
+			subtot += cpv
+		}
+	}
+	fmt.Println("addtot:", addtot, "subtot:", subtot, "ctr:", ctr)
+
+	for j := range 26 {
+		xo := NeighOffs[j, math32.X]
+		yo := NeighOffs[j, math32.Y]
+		zo := NeighOffs[j, math32.Z]
+		nv.Set(float32(xo), float32(yo), float32(zo))
+		lsq := slmath.LengthSquared3(nv)
+		pn := v * slmath.Dot3(mv, nv) / lsq
+		if pn == 0 {
+			continue
+		}
+		cv := State[z+zo, y+yo, x+xo, vidx, tidx]
+		if pn > 0 {
+			pn /= addtot
+			State[z+zo, y+yo, x+xo, vidx, tidx] = cv + pn
+			fmt.Println("Add:", j, xo, yo, zo, lsq, pn, cv, pn, cv+pn)
+		} else {
+			cpv := cv * pn
+			if cpv == 0 {
+				continue
+			}
+			cpv /= subtot
+			State[z+zo, y+yo, x+xo, vidx, tidx] = cv + cpv
+			if cpv != 0 {
+				fmt.Println("Sub:", j, xo, yo, zo, lsq, pn, cv, cpv, cv+cpv)
+			}
+		}
+	}
+	fmt.Println("addtot:", addtot, "subtot:", subtot, "ctr:", ctr)
+}
+
+func (ss *Sim) MoveTest(pos math32.Vector3i) {
+	ss.ParticleAt(pos, math32.Vec3(0,0,0), 1)
+
+	pos = pos.AddScalar(1)
+	vidx := int32(PKGCHoP0)
+	tidx := int32(0)
+	for range 10 {
+		Move26(pos.X, pos.Y, pos.Z, vidx, tidx, 0.2, 0.2, 0, math32.Sqrt(0.2*0.2))
+	}
+}
+

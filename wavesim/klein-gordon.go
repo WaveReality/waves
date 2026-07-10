@@ -82,14 +82,18 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
+
+	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
 		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
-	vel := pvel + Params[0].CSq*force
+	force -= mhsq * ppos // this is the only diff from standard Wave
+	vel := pvel + csq*force
 	pos := ppos + vel
 
 	if Params[0].Energy.IsTrue() {
@@ -127,6 +131,9 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
 
+	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
 		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
@@ -135,12 +142,12 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= Params[0].MCOverHSq * pposA // this is the only diff from standard Wave
-	velA := pvelA + Params[0].CSq*forceA
+	forceA -= mhsq * pposA // this is the only diff from standard Wave
+	velA := pvelA + csq*forceA
 	posA := pposA + velA
 
-	forceB -= Params[0].MCOverHSq * pposB // this is the only diff from standard Wave
-	velB := pvelB + Params[0].CSq*forceB
+	forceB -= mhsq * pposB // this is the only diff from standard Wave
+	velB := pvelB + csq*forceB
 	posB := pposB + velB
 
 	if Params[0].Energy.IsTrue() {
@@ -182,14 +189,18 @@ func KleinGordonDampKernel(i uint32) { //gosl:kernel
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+
+	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
 		force = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	} else {
 		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
-	vel := Params[0].CSq * force        // key damp: no +=
+	force -= mhsq * ppos // this is the only diff from standard Wave
+	vel := csq * force   // key damp: no +=
 	pos := ppos + vel
 
 	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
@@ -213,6 +224,9 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
 	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
 
+	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
 		forceA = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
@@ -221,12 +235,12 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
 		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= Params[0].MCOverHSq * pposA // this is the only diff from standard Wave
-	velA := Params[0].CSq * forceA
+	forceA -= mhsq * pposA // this is the only diff from standard Wave
+	velA := csq * forceA
 	posA := pposA + velA
 
-	forceB -= Params[0].MCOverHSq * pposB // this is the only diff from standard Wave
-	velB := Params[0].CSq * forceB
+	forceB -= mhsq * pposB // this is the only diff from standard Wave
+	velB := csq * forceB
 	posB := pposB + velB
 
 	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))

@@ -186,6 +186,26 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	return avg
 }
 
+// NeighMax26 computes the 3D max magnitude across 26 neighbors,
+// for given x,y,z center coordinates, variable index vidx,
+// and cur / prev time index tidx. ctr is the center value.
+func NeighMax26(x, y, z, vidx, tidx int32, diff float32) float32 {
+	mxabs := float32(0)
+	mx := float32(0)
+	for j := range 26 {
+		xo := NeighOffs.Value(int(j), int(math32.X))
+		yo := NeighOffs.Value(int(j), int(math32.Y))
+		zo := NeighOffs.Value(int(j), int(math32.Z))
+		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+		av := math32.Abs(nv)
+		if av > mxabs {
+			mxabs = av
+			mx = math32.Pow(diff, 1.0/NeighWts.Value(int(AverageWts), int(j))) * nv
+		}
+	}
+	return mx
+}
+
 // Gradient18 computes the 3D gradient across 18 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.

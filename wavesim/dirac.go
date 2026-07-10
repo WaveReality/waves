@@ -71,7 +71,7 @@ func DiracKernel(i uint32) { //gosl:kernel
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
-	force -= Params[0].MCOverHSq * ppos // this is the only diff from standard Wave
+	force -= Params[0].MOverHSq * ppos // this is the only diff from standard Wave
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 

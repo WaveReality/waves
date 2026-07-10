@@ -39,6 +39,9 @@ const (
 	// PKGCPESq is the square of the particle energy.
 	PKGCPESq
 
+	// PKGCDriver is the particle driver field propagating by exponential falloff.
+	PKGCDriver
+
 	// PKGCHoP0 is the central time-like SHO position for particle velocity,
 	// which provides the reference against which the 3 axis phases are computed.
 	PKGCHoP0
@@ -90,6 +93,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
 
 	csq := Params[0].CSq
+	// mhsq := Params[0].MOverHSq
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
@@ -100,14 +104,20 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
 
-	nHoP0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
+	// note: with no weights, favors diagonal; with 1/d or 1/d^2 weights favors
+	// the axes. need to synthesize values?
+	diff := Params[0].Diff
+	drv := NeighMax26(x, y, z, int32(PKGCDriver), prv, diff)
+	odrv := diff * drv
 
 	// todo: drive A and B out of phase based on particle charge!
 	// probably only for neighbor of particle.
-	velA := pvelA + csq*(forceA+nHoP0-pposA)
+	forceA += odrv - pposA
+	velA := pvelA + csq*forceA
 	posA := pposA + velA
 
-	velB := pvelB + csq*(forceB+nHoP0-pposB)
+	forceB += odrv - pposB
+	velB := pvelB + csq*forceB
 	posB := pposB + velB
 
 	// todo: later, based on particle..
@@ -128,6 +138,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+
+	State.Set(odrv, int(z), int(y), int(x), int(PKGCDriver), int(cur))
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX
@@ -248,6 +260,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(lorenz, int(mz), int(my), int(mx), int(PKGCLorentz), int(cur))
 	State.Set(esq, int(mz), int(my), int(mx), int(PKGCPESq), int(cur))
 
+	State.Set(hoP0, int(mz), int(my), int(mx), int(PKGCDriver), int(cur))
 	State.Set(particle, int(mz), int(my), int(mx), int(PKGCParticle), int(cur))
 
 	if moving { // clear old data out
@@ -293,4 +306,4 @@ func (ss *Sim) ParticleKGCStats() {
 }
 
 // ParticleDisplay determines which Parameters fields to display.
-var ParticleDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move"}
+var ParticleDisplay = []string{"Edges", "Energy", "C", "Diff", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move"}
