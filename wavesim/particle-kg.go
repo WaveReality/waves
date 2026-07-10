@@ -171,9 +171,9 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	// but it is still a bit strange.
 	homc := Params[0].C * Params[0].HOverMC
 
-	pvX := homc * (hoPX*hoV0 - hoP0*hoVX)
-	pvY := homc * (hoPY*hoV0 - hoP0*hoVY)
-	pvZ := homc * (hoPZ*hoV0 - hoP0*hoVZ)
+	pvX := homc * (hoP0*hoVX - hoPX*hoV0)
+	pvY := homc * (hoP0*hoVY - hoPY*hoV0)
+	pvZ := homc * (hoP0*hoVZ - hoPZ*hoV0)
 
 	pvSq := pvX*pvX + pvY*pvY + pvZ*pvZ
 	lorenz := 1.0 / math32.Sqrt(1.0-(pvSq/csq))
@@ -231,6 +231,9 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 
 	State.Set(hoP0, int(mz), int(my), int(mx), int(PKGCHoP0), int(cur))
 	State.Set(hoV0, int(mz), int(my), int(mx), int(PKGCHoV0), int(cur))
+
+	State.Set(hoPX, int(mz), int(my), int(mx), int(PKGCHoPX), int(cur))
+	State.Set(hoVX, int(mz), int(my), int(mx), int(PKGCHoVX), int(cur))
 
 	State.Set(hoPY, int(mz), int(my), int(mx), int(PKGCHoPY), int(cur))
 	State.Set(hoVY, int(mz), int(my), int(mx), int(PKGCHoVY), int(cur))

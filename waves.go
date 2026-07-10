@@ -21,8 +21,8 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	threed := false
-	// threed := true
+	// threed := false
+	threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
