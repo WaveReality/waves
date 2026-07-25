@@ -45,6 +45,9 @@ const (
 
 	// ParticleKGC is the Klein-Gordon complex version of stochastic particles.
 	ParticleKGC
+
+	// ParticleMove is just particle motion without any wave field.
+	ParticleMove
 )
 
 // The following are constants used across many equations.

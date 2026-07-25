@@ -78,6 +78,8 @@ type View struct {
 	// current number of panels rendered -- if changes, do full rebuild.
 	curNPanels int
 
+	selCube math32.Vector3i
+
 	sim      *Sim
 	midFrame *core.Frame
 	scene    *Scene
@@ -496,26 +498,28 @@ func (vw *View) PlaneAtNumber(no int) *xyz.Group {
 	return pl.(*xyz.Group)
 }
 
-func (vw *View) ZoomInSize() {
+func (vw *View) ZoomInSize(n int32) {
 	if vw.Size.X <= 4 || vw.Size.Y <= 4 {
 		return
 	}
-	vw.Size.X -= 2
-	vw.Size.Y -= 2
-	vw.Start.X += 1
-	vw.Start.Y += 1
+	n = min(n, vw.Size.X-4)
+	n = min(n, vw.Size.Y-4)
+	vw.Size.X -= 2 * n
+	vw.Size.Y -= 2 * n
+	vw.Start.X += n
+	vw.Start.Y += n
 	vw.UpdateView()
 }
 
-func (vw *View) ZoomOutSize() {
+func (vw *View) ZoomOutSize(n int32) {
 	ctx := GetCtx(0)
 	sz := ctx.Size
 	fs := ctx.SizeFull()
-	vw.Size.X += 2
-	vw.Size.Y += 2
+	vw.Size.X += 2 * n
+	vw.Size.Y += 2 * n
 	if vw.Start.X > 1 && vw.Start.Y > 1 {
-		vw.Start.X -= 1
-		vw.Start.Y -= 1
+		vw.Start.X -= n
+		vw.Start.Y -= n
 	}
 	if vw.Size.X >= sz.X || vw.Size.Y >= sz.Y {
 		vw.Size.X = sz.X

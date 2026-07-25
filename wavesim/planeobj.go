@@ -23,17 +23,28 @@ type PlaneObj struct {
 	view    *View
 }
 
+func (vw *View) planeScale() (sz math32.Vector3i, nsc math32.Vector3) {
+	npanels := vw.Settings.NPanels.N()
+	sz = vw.Size
+	if npanels > 1 {
+		sz.X *= 2
+	}
+	if npanels > 2 {
+		sz.Z *= 2
+	}
+	nsc = math32.Vec3(2/float32(sz.X), 2/float32(sz.Y), 2/float32(sz.Z))
+	if sz.Y == 1 { // for 1D, just make it a silhouette
+		nsc.Y = 0.05
+	}
+	return
+}
+
 // UpdatePlanes updates the planes display with any structural or
 // current data changes. Very fast if no structural changes.
 func (vw *View) UpdatePlanes() {
 	sw := vw.scene
 	se := sw.SceneXYZ()
 
-	// if vw.Net == nil || vw.Net.NumLayers() == 0 {
-	// 	se.DeleteChildren()
-	// 	se.Meshes.Reset()
-	// 	return
-	// }
 	if vw.NeedsRebuild() {
 		se.Background = colors.Scheme.Surface
 	}
@@ -57,18 +68,7 @@ func (vw *View) UpdatePlanes() {
 	gpConfig.Add(types.For[PlaneObj](), "plane")
 	gpConfig.Add(types.For[xyz.Text2D](), "name")
 
-	sz := vw.Size
-	if npanels > 1 {
-		sz.X *= 2
-	}
-	if npanels > 2 {
-		sz.Z *= 2
-	}
-
-	nsc := math32.Vec3(2/float32(sz.X), 2/float32(sz.Y), 2/float32(sz.Z))
-	if sz.Y == 1 { // for 1D, just make it a silhouette
-		nsc.Y = 0.05
-	}
+	_, nsc := vw.planeScale()
 	ht := vw.Settings.Height
 	poff := math32.Vector3Scalar(0.5)
 	poff.Y = -0.5

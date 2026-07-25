@@ -5,10 +5,13 @@
 package wavesim
 
 import (
+	"fmt"
 	"image"
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
+	"cogentcore.org/core/math32"
+	"cogentcore.org/core/xyz"
 	"cogentcore.org/core/xyz/xyzcore"
 )
 
@@ -39,118 +42,86 @@ func (sw *Scene) Init() {
 }
 
 func (sw *Scene) MouseDownEvent(e events.Event) {
-	// pos := e.Pos().Sub(sw.Geom.ContentBBox.Min)
-	// lay, _, _, unIndex := sw.LayerUnitAtPoint(pos)
-	// if lay == nil {
-	// 	return
-	// }
-	// nv := sw.NetView
-	// nv.Data.PathUnIndex = unIndex
-	// nv.Data.PathLay = lay.Label()
-	// nv.UpdateView()
-	// e.SetHandled()
+	pos := e.Pos().Sub(sw.Geom.ContentBBox.Min)
+	panelNo, pt := sw.PlaneUnitAtPoint(pos)
+	if panelNo < 0 {
+		return
+	}
+	vw := sw.View
+	vw.selCube = pt
+	vw.UpdateView()
+	e.SetHandled()
 }
 
 func (sw *Scene) WidgetTooltip(pos image.Point) (string, image.Point) {
-	// if pos == image.Pt(-1, -1) {
-	return "_", image.Point{}
-	// }
-	// nv := sw.NetView
-	// lpos := pos.Sub(sw.Geom.ContentBBox.Min)
+	if pos == image.Pt(-1, -1) {
+		return "_", image.Point{}
+	}
+	vw := sw.View
+	lpos := pos.Sub(sw.Geom.ContentBBox.Min)
 
-	// lay, lx, ly, _ := sw.LayerUnitAtPoint(lpos)
-	// if lay == nil {
-	// 	return "", pos
-	// }
-	// lb := lay.AsEmer()
+	panelNo, pt := sw.PlaneUnitAtPoint(lpos)
+	if panelNo < 0 {
+		return "", pos
+	}
+	cp := vw.Panels[panelNo]
+	ctx := GetCtx(0)
+	val := State.Value(int(pt.Z), int(pt.Y), int(pt.X), int(cp.Var.Int64()), int(ctx.CurState))
 
-	// tt := ""
-	// if lb.Is2D() {
-	// 	idx := []int{ly, lx}
-	// 	val, _, _, hasval := nv.UnitValue(lay, idx)
-	// 	if !hasval {
-	// 		tt = fmt.Sprintf("[%d,%d]=n/a\n", lx, ly)
-	// 	} else {
-	// 		tt = fmt.Sprintf("[%d,%d]=%g\n", lx, ly, val)
-	// 	}
-	// } else if lb.Is4D() {
-	// 	idx, ok := lb.Index4DFrom2D(lx, ly)
-	// 	if !ok {
-	// 		return "", pos
-	// 	}
-	// 	val, _, _, hasval := nv.UnitValue(lay, idx)
-	// 	if !hasval {
-	// 		tt = fmt.Sprintf("[%d,%d][%d,%d]=n/a\n", idx[1], idx[0], idx[3], idx[2])
-	// 	} else {
-	// 		tt = fmt.Sprintf("[%d,%d][%d,%d]=%g\n", idx[1], idx[0], idx[3], idx[2], val)
-	// 	}
-	// } else {
-	// 	return "", pos // not supported
-	// }
-	// return tt, pos
+	tt := fmt.Sprintf("%d: %s %v=%g\n", panelNo, cp.Var, pt, val)
+	return tt, pos
 }
 
-// func (sw *Scene) LayerUnitAtPoint(pos image.Point) (lay emer.Layer, lx, ly, unIndex int) {
-// 	sc := sw.SceneXYZ()
-// 	laysGpi := sc.ChildByName("Layers", 0)
-// 	if laysGpi == nil {
-// 		return
-// 	}
-// 	_, laysGp := xyz.AsNode(laysGpi)
-// 	nv := sw.NetView
-// 	nb := nv.Net.AsEmer()
-// 	nmin, nmax := nb.MinPos, nb.MaxPos
-// 	nsz := nmax.Sub(nmin).Sub(math32.Vec3(1, 1, 0)).Max(math32.Vec3(1, 1, 1))
-// 	nsc := math32.Vec3(1.0/nsz.X, 1.0/nsz.Y, 1.0/nsz.Z)
-// 	szc := math32.Max(nsc.X, nsc.Y)
-// 	poff := math32.Vector3Scalar(0.5)
-// 	poff.Y = -0.5
-// 	for li, lgi := range laysGp.Children {
-// 		lay = nv.Net.EmerLayer(li)
-// 		lb := lay.AsEmer()
-// 		lg := lgi.(*xyz.Group)
-// 		lp := lb.Pos.Pos
-// 		lp.Y = -lp.Y // reverse direction
-// 		lp = lp.Sub(nmin).Mul(nsc).Sub(poff)
-// 		lg.Pose.Pos.Set(lp.X, lp.Z, lp.Y)
-// 		lg.Pose.Scale.Set(nsc.X*lb.Pos.Scale, szc, nsc.Y*lb.Pos.Scale)
-// 		lo := lg.Child(0).(*LayObj)
-// 		ray := lo.RayPick(pos)
-// 		// layer is in XZ plane with norm pointing up in Y axis
-// 		// offset is 0 in local coordinates
-// 		plane := math32.Plane{Norm: math32.Vec3(0, 1, 0), Off: 0}
-// 		pt, ok := ray.IntersectPlane(plane)
-// 		if !ok || pt.Z > 0 { // Z > 0 means clicked "in front" of plane -- where labels are
-// 			continue
-// 		}
-// 		lx = int(pt.X)
-// 		ly = -int(pt.Z)
-// 		// fmt.Printf("selected unit: %v, %v\n", lx, ly)
-// 		if lx < 0 || ly < 0 {
-// 			continue
-// 		}
-// 		lshp := lb.Shape
-// 		if lb.Is2D() {
-// 			idx := []int{ly, lx}
-// 			if !lshp.IndexIsValid(idx...) {
-// 				continue
-// 			}
-// 			unIndex = lshp.IndexTo1D(idx...)
-// 			return
-// 		} else if lb.Is4D() {
-// 			idx, ok := lb.Index4DFrom2D(lx, ly)
-// 			if !ok {
-// 				continue
-// 			}
-// 			unIndex = lshp.IndexTo1D(idx...)
-// 			return
-// 		} else {
-// 			continue // not supported
-// 		}
-// 	}
-// 	lay = nil
-// 	return
-// }
+func (sw *Scene) PlaneUnitAtPoint(pos image.Point) (panelNo int, pt math32.Vector3i) {
+	panelNo = -1
+	sc := sw.SceneXYZ()
+	plGpi := sc.ChildByName("Planes", 0)
+	if plGpi == nil {
+		return
+	}
+	_, plGp := xyz.AsNode(plGpi)
+	vw := sw.View
+	// sz, nsc := vw.planeScale()
+	sz := vw.Size
+	poff := math32.Vector3Scalar(0.5)
+	poff.Y = -0.5
+	for li, plgi := range plGp.Children {
+		plg := plgi.(*xyz.Group)
+		ploff := poff
+		sp := float32(0.02)
+		switch li {
+		case 1:
+			ploff.X = -sp
+		case 2:
+			ploff.Z = -0.5
+		case 3:
+			ploff.X = -sp
+			ploff.Z = -0.5
+		}
+		lp := math32.Vec3(0, 0, 0).Sub(ploff)
+		lp.Y = -lp.Y // reverse direction
+		lo := plg.Child(0).(*PlaneObj)
+		ray := lo.RayPick(pos)
+		// plane is in XZ plane with norm pointing up in Y axis
+		// offset is 0 in local coordinates
+		plane := math32.Plane{Norm: math32.Vec3(0, 1, 0), Off: 0}
+		ipt, ok := ray.IntersectPlane(plane)
+		if !ok || ipt.Z > 0 { // Z > 0 means clicked "in front" of plane -- where labels are
+			continue
+		}
+		pt.Set(int32(ipt.X), int32(-ipt.Z), 0)
+		// fmt.Printf("\tpanel: %d coords: %v\n", li, pt)
+		if pt.X < 0 || pt.Y < 0 || pt.X >= sz.X || pt.Y >= sz.Y {
+			continue
+		}
+		panelNo = li
+		pl := vw.Panels[li]
+		pt = pt.Add(vw.Start).Add(pl.Offset)
+		// fmt.Printf("*** selected panel: %d coords: %v\n", li, pt)
+		break
+	}
+	return
+}
 
 // FormDialog opens a dialog in a new, separate window
 // for viewing / editing the given struct object, in

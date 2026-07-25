@@ -44,7 +44,8 @@ const (
 	FaceOffsVar GPUVars = 2
 	NeighWtsVar GPUVars = 3
 	CtxVar GPUVars = 4
-	StateVar GPUVars = 5
+	ParticlesVar GPUVars = 5
+	StateVar GPUVars = 6
 )
 
 // Tensor stride variables
@@ -89,12 +90,17 @@ func GPUInit() {
 			_ = vr
 			vr = sgp.AddStruct("Ctx", int(unsafe.Sizeof(Context{})), 1, gpu.ComputeShader)
 			vr.ReadOnly = true
+			vr = sgp.Add("Particles", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State0", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State1", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State2", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State3", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State4", gpu.Float32, 1, gpu.ComputeShader)
 			vr = sgp.Add("State5", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State6", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State7", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State8", gpu.Float32, 1, gpu.ComputeShader)
+			vr = sgp.Add("State9", gpu.Float32, 1, gpu.ComputeShader)
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
@@ -110,6 +116,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesWrapKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -119,6 +129,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -131,6 +145,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -143,6 +161,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -155,6 +177,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -167,6 +193,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -179,6 +209,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/MaxwellKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -192,18 +226,27 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ParticleKGCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "Particles")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
 		pl.AddVarUsed(1, "State2")
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -216,6 +259,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -228,6 +275,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -240,6 +291,10 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State3")
 		pl.AddVarUsed(1, "State4")
 		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		sy.Config()
 	}
 }
@@ -803,6 +858,9 @@ func ToGPU(vars ...GPUVars) {
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			gpu.SetValueFrom(v, Ctx)
+		case ParticlesVar:
+			v, _ := syVars.ValueByIndex(1, "Particles", 0)
+			gpu.SetValueFrom(v, Particles.Values)
 		case StateVar:
 			bsz := 536870904
 			n := State.Len()
@@ -834,7 +892,7 @@ func ToGPUTensorStrides() {
 	}
 	sy := GPUSystem
 	syVars := sy.Vars()
-	TensorStrides.SetShapeSizes(40)
+	TensorStrides.SetShapeSizes(50)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[0], 0)
 	TensorStrides.SetInt1D(NeighOffs.Shape().Strides[1], 1)
 	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[0], 10)
@@ -843,11 +901,13 @@ func ToGPUTensorStrides() {
 	TensorStrides.SetInt1D(FaceOffs.Shape().Strides[3], 13)
 	TensorStrides.SetInt1D(NeighWts.Shape().Strides[0], 20)
 	TensorStrides.SetInt1D(NeighWts.Shape().Strides[1], 21)
-	TensorStrides.SetInt1D(State.Shape().Strides[0], 30)
-	TensorStrides.SetInt1D(State.Shape().Strides[1], 31)
-	TensorStrides.SetInt1D(State.Shape().Strides[2], 32)
-	TensorStrides.SetInt1D(State.Shape().Strides[3], 33)
-	TensorStrides.SetInt1D(State.Shape().Strides[4], 34)
+	TensorStrides.SetInt1D(Particles.Shape().Strides[0], 30)
+	TensorStrides.SetInt1D(Particles.Shape().Strides[1], 31)
+	TensorStrides.SetInt1D(State.Shape().Strides[0], 40)
+	TensorStrides.SetInt1D(State.Shape().Strides[1], 41)
+	TensorStrides.SetInt1D(State.Shape().Strides[2], 42)
+	TensorStrides.SetInt1D(State.Shape().Strides[3], 43)
+	TensorStrides.SetInt1D(State.Shape().Strides[4], 44)
 	v, _ := syVars.ValueByIndex(0, "TensorStrides", 0)
 	gpu.SetValueFrom(v, TensorStrides.Values)
 }
@@ -872,6 +932,9 @@ func ReadFromGPU(vars ...GPUVars) {
 			v.GPUToRead(sy.CommandEncoder)
 		case CtxVar:
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
+			v.GPUToRead(sy.CommandEncoder)
+		case ParticlesVar:
+			v, _ := syVars.ValueByIndex(1, "Particles", 0)
 			v.GPUToRead(sy.CommandEncoder)
 		case StateVar:
 			bsz := 536870904
@@ -911,6 +974,10 @@ func SyncFromGPU(vars ...GPUVars) {
 			v, _ := syVars.ValueByIndex(1, "Ctx", 0)
 			v.ReadSync()
 			gpu.ReadToBytes(v, Ctx)
+		case ParticlesVar:
+			v, _ := syVars.ValueByIndex(1, "Particles", 0)
+			v.ReadSync()
+			gpu.ReadToBytes(v, Particles.Values)
 		case StateVar:
 			bsz := 536870904
 			n := State.Len()

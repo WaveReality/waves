@@ -15,18 +15,26 @@ var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
-@group(1) @binding(1)
-var<storage, read_write> State0: array<f32>;
 @group(1) @binding(2)
-var<storage, read_write> State1: array<f32>;
+var<storage, read_write> State0: array<f32>;
 @group(1) @binding(3)
-var<storage, read_write> State2: array<f32>;
+var<storage, read_write> State1: array<f32>;
 @group(1) @binding(4)
-var<storage, read_write> State3: array<f32>;
+var<storage, read_write> State2: array<f32>;
 @group(1) @binding(5)
-var<storage, read_write> State4: array<f32>;
+var<storage, read_write> State3: array<f32>;
 @group(1) @binding(6)
+var<storage, read_write> State4: array<f32>;
+@group(1) @binding(7)
 var<storage, read_write> State5: array<f32>;
+@group(1) @binding(8)
+var<storage, read_write> State6: array<f32>;
+@group(1) @binding(9)
+var<storage, read_write> State7: array<f32>;
+@group(1) @binding(10)
+var<storage, read_write> State8: array<f32>;
+@group(1) @binding(11)
+var<storage, read_write> State9: array<f32>;
 
 alias GPUVars = i32;
 
@@ -62,8 +70,20 @@ fn StateGet(ix: u32) -> f32 {
 	case u32(4): {
 		return State4[ix - 2147483616];
 	}
-	default: {
+	case u32(5): {
 		return State5[ix - 2684354520];
+	}
+	case u32(6): {
+		return State6[ix - 3221225424];
+	}
+	case u32(7): {
+		return State7[ix - 3758096328];
+	}
+	case u32(8): {
+		return State8[ix - 4294967232];
+	}
+	default: {
+		return State9[ix - 536870840];
 	}
 	}
 }
@@ -86,8 +106,20 @@ fn StateSet(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] = vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] = vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] = vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] = vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] = vl;
+	}
+	default: {
+		State9[ix - 536870840] = vl;
 	}
 	}
 }
@@ -110,8 +142,20 @@ fn StateSetAdd(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] += vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] += vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] += vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] += vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] += vl;
+	}
+	default: {
+		State9[ix - 536870840] += vl;
 	}
 	}
 }
@@ -134,8 +178,20 @@ fn StateSetSub(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] -= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] -= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] -= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] -= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] -= vl;
+	}
+	default: {
+		State9[ix - 536870840] -= vl;
 	}
 	}
 }
@@ -158,8 +214,20 @@ fn StateSetMul(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] *= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] *= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] *= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] *= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] *= vl;
+	}
+	default: {
+		State9[ix - 536870840] *= vl;
 	}
 	}
 }
@@ -182,8 +250,20 @@ fn StateSetDiv(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] /= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] /= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] /= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] /= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] /= vl;
+	}
+	default: {
+		State9[ix - 536870840] /= vl;
 	}
 	}
 }
@@ -246,11 +326,12 @@ const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
-const GPUVarsN: GPUVars = 6;
+const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 7;
+const EquationsN: Equations = 8;
 const ParticleKGCStatesN: ParticleKGCStates = 32;
+const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -268,8 +349,8 @@ const  Grad18Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
 fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
-	var p1 = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34],
+	var m1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
+	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
 	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
 return (m1 + p1) - 2*ctr;
 }
@@ -279,7 +360,7 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
+		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
@@ -289,11 +370,11 @@ fn NeighAverage27(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> f32 {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
+		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(j))] * nv;
 	}
-	avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(26))] * StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33],
-	TensorStrides[34], u32(z), u32(y), u32(x), u32(vidx), u32(tidx)));
+	avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(AverageWts), u32(26))] * StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43],
+	TensorStrides[44], u32(z), u32(y), u32(x), u32(vidx), u32(tidx)));
 return avg;
 }
 fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, dx: ptr<function,f32>,dy: ptr<function,f32>,dz: ptr<function,f32>) {
@@ -306,7 +387,7 @@ fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, dx: ptr<function,f32>,dy
 			var ym = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(1))];
 			var zp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(2))];
 			var zm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(2))];
-			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
+			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
 			sum += grad;
 		}
 		switch (xyz) {
@@ -353,12 +434,12 @@ fn Curl18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, cx: ptr<function,f32>,cy: pt
 		var ymZ = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(2), u32(Minus1), u32(j), u32(1))];
 		var zpZ = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(2), u32(Plus1), u32(j), u32(2))];
 		var zmZ = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(2), u32(Minus1), u32(j), u32(2))];
-		dzdy += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpY), u32(y + ypY), u32(x + xpY), u32(dimZ), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmY), u32(y + ymY), u32(x + xmY), u32(dimZ), u32(tidx))));
-		dydz += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpZ), u32(y + ypZ), u32(x + xpZ), u32(dimY), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmZ), u32(y + ymZ), u32(x + xmZ), u32(dimY), u32(tidx))));
-		dxdz += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpZ), u32(y + ypZ), u32(x + xpZ), u32(dimX), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmZ), u32(y + ymZ), u32(x + xmZ), u32(dimX), u32(tidx))));
-		dzdx += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpX), u32(y + ypX), u32(x + xpX), u32(dimZ), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmX), u32(y + ymX), u32(x + xmX), u32(dimZ), u32(tidx))));
-		dydx += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpX), u32(y + ypX), u32(x + xpX), u32(dimY), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmX), u32(y + ymX), u32(x + xmX), u32(dimY), u32(tidx))));
-		dxdy += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zpY), u32(y + ypY), u32(x + xpY), u32(dimX), u32(tidx))) - StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zmY), u32(y + ymY), u32(x + xmY), u32(dimX), u32(tidx))));
+		dzdy += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpY), u32(y + ypY), u32(x + xpY), u32(dimZ), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmY), u32(y + ymY), u32(x + xmY), u32(dimZ), u32(tidx))));
+		dydz += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpZ), u32(y + ypZ), u32(x + xpZ), u32(dimY), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmZ), u32(y + ymZ), u32(x + xmZ), u32(dimY), u32(tidx))));
+		dxdz += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpZ), u32(y + ypZ), u32(x + xpZ), u32(dimX), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmZ), u32(y + ymZ), u32(x + xmZ), u32(dimX), u32(tidx))));
+		dzdx += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpX), u32(y + ypX), u32(x + xpX), u32(dimZ), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmX), u32(y + ymX), u32(x + xmX), u32(dimZ), u32(tidx))));
+		dydx += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpX), u32(y + ypX), u32(x + xpX), u32(dimY), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmX), u32(y + ymX), u32(x + xmX), u32(dimY), u32(tidx))));
+		dxdy += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zpY), u32(y + ypY), u32(x + xpY), u32(dimX), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zmY), u32(y + ymY), u32(x + xmY), u32(dimX), u32(tidx))));
 	}
 	*cx = dzdy - dydz;
 	*cy = dxdz - dzdx;
@@ -414,14 +495,14 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	}
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
-	var a0pp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Pos), u32(prv)));
-	var aXpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXPos), u32(prv)));
-	var aYpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYPos), u32(prv)));
-	var aZpp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZPos), u32(prv)));
-	var a0vp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Vel), u32(prv)));
-	var aXvp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXVel), u32(prv)));
-	var aYvp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYVel), u32(prv)));
-	var aZvp = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZVel), u32(prv)));
+	var a0pp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0Pos), u32(prv)));
+	var aXpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXPos), u32(prv)));
+	var aYpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYPos), u32(prv)));
+	var aZpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZPos), u32(prv)));
+	var a0vp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0Vel), u32(prv)));
+	var aXvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXVel), u32(prv)));
+	var aYvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYVel), u32(prv)));
+	var aZvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZVel), u32(prv)));
 	var f0: f32;
 	var fX: f32;
 	var fY: f32;
@@ -465,21 +546,21 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	var aZpc = aZpp + aZvc;
 	Gradient18(x, y, z, i32(A0Pos), prv, &dX, &dY, &dZ);
 	Curl18(x, y, z, i32(AXPos), prv, &bX, &bY, &bZ);
-	StateSet(-dX - aXvp, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(EX), u32(cur)));
-	StateSet(-dY - aYvp, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(EY), u32(cur)));
-	StateSet(-dZ - aZvp, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(EZ), u32(cur)));
-	StateSet(bX, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(BX), u32(cur)));
-	StateSet(bY, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(BY), u32(cur)));
-	StateSet(bZ, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(BZ), u32(cur)));
-	StateSet(a0vc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Vel), u32(cur)));
-	StateSet(a0pc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(A0Pos), u32(cur)));
-	StateSet(aXvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXVel), u32(cur)));
-	StateSet(aXpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AXPos), u32(cur)));
-	StateSet(aYvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYVel), u32(cur)));
-	StateSet(aYpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AYPos), u32(cur)));
-	StateSet(aZvc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZVel), u32(cur)));
-	StateSet(aZpc, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32],
-	TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(AZPos), u32(cur)));
+	StateSet(-dX - aXvp, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EX), u32(cur)));
+	StateSet(-dY - aYvp, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EY), u32(cur)));
+	StateSet(-dZ - aZvp, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EZ), u32(cur)));
+	StateSet(bX, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(BX), u32(cur)));
+	StateSet(bY, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(BY), u32(cur)));
+	StateSet(bZ, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(BZ), u32(cur)));
+	StateSet(a0vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0Vel), u32(cur)));
+	StateSet(a0pc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0Pos), u32(cur)));
+	StateSet(aXvc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXVel), u32(cur)));
+	StateSet(aXpc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXPos), u32(cur)));
+	StateSet(aYvc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYVel), u32(cur)));
+	StateSet(aYpc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYPos), u32(cur)));
+	StateSet(aZvc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZVel), u32(cur)));
+	StateSet(aZpc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZPos), u32(cur)));
 }
 
 //////// import: "params.go"
@@ -491,6 +572,7 @@ const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
 const  ParticleKGC: Equations = 6;
+const  ParticleMove: Equations = 7;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -540,6 +622,20 @@ const  PKGCHoPY: ParticleKGCStates = 28;
 const  PKGCHoVY: ParticleKGCStates = 29;
 const  PKGCHoPZ: ParticleKGCStates = 30;
 const  PKGCHoVZ: ParticleKGCStates = 31;
+
+//////// import: "particle.go"
+const NParticles = 4;
+alias ParticleVars = i32; //enums:enum -trim-prefix=Particle
+const  ParticleType: ParticleVars = 0;
+const  ParticleMass: ParticleVars = 1;
+const  ParticlePosX: ParticleVars = 2;
+const  ParticlePosY: ParticleVars = 3;
+const  ParticlePosZ: ParticleVars = 4;
+const  ParticleVelX: ParticleVars = 5;
+const  ParticleVelY: ParticleVars = 6;
+const  ParticleVelZ: ParticleVars = 7;
+const  ParticleLorentz: ParticleVars = 8;
+const  ParticleESq: ParticleVars = 9;
 
 //////// import: "schrodinger.go"
 

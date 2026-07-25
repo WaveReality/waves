@@ -44,6 +44,8 @@ var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.Pa
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.ParticleKGCStates", IDName: "particle-kgc-states", Doc: "ParticleKGCStates are the state variables for particles in context\nof KGC complex wave equations on a wave state with two complex values (1, 2),\nwhere A = real and B = complex components."})
 
+var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.ParticleVars", IDName: "particle-vars", Doc: "ParticleVars are the particle variables to record."})
+
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.PlaneMesh", IDName: "plane-mesh", Doc: "PlaneMesh is a xyz.Mesh that represents an X-Y plane through the state,\nas either a Heightfield or bars.\nIt is dynamically updated using the Set method.\nThe geometry is literal in the size:\n0,0,0 lower-left corner and increasing X,Z in display for the X,Y plane.\nDisplay applies an overall scaling to make it fit within the larger view.", Embeds: []types.Field{{Name: "MeshBase"}}, Fields: []types.Field{{Name: "view"}, {Name: "panelNo", Doc: "our panel number"}}})
 
 var _ = types.AddType(&types.Type{Name: "github.com/WaveReality/waves/wavesim.PlaneObj", IDName: "plane-obj", Doc: "PlaneObj is the Plane 3D object within the View", Embeds: []types.Field{{Name: "Solid"}}, Fields: []types.Field{{Name: "panelNo"}, {Name: "view"}}})
@@ -252,6 +254,12 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ge
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewGUIBody", Doc: "NewGUIBody returns a new GUI, with an initialized Body by calling [gui.MakeBody].", Args: []string{"b", "sim", "fsroot", "appname", "title", "about"}, Returns: []string{"GUI"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Center", Doc: "Center returns the given 3d coords with any negative\nnumbers replaced with the value plus center+1 (of non-edge space)\nsuch that -1 = center, -2 = 1 before center, etc.", Args: []string{"c"}, Returns: []string{"Vector3i"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.CoordToFloat", Args: []string{"c"}, Returns: []string{"Vector3"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.CenterFull", Doc: "CenterFull returns the given 3d coords with any negative\nnumbers replaced with the value plus center+1 (of full space)\nsuch that -1 = center, -2 = 1 before center, etc.", Args: []string{"c"}, Returns: []string{"Vector3i"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WavePacket", Doc: "WavePacket returns value for a gaussian * cosine wave packet for given\nlinear dimension value x and 3D distance d.", Args: []string{"x", "d", "wavelength", "width", "phase", "amp"}, Returns: []string{"float32"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.KleinGordonKernel", Doc: "KleinGordonKernel is the kernel for computing the KleinGordon equations,\non scalar state values (WaveStates).", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
@@ -269,6 +277,8 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Ma
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ParticleKGCKernel", Doc: "ParticleKGCKernel is the kernel for computing the stochastic particle\nwith simple harmonic oscillator velocity and rest-mass factors along positive\nand negative directions for each axis, based on KG on complex wave state.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.ParticleKGCViewAll", Doc: "ParticleKGCViewAll configures the View to display ParticleKGC values", Args: []string{"view"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.SetParticleAt", Doc: "SetParticleAt sets particle dynamic data at given index.", Args: []string{"idx", "lorentz", "esq", "pos", "vel"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.NewPlaneMesh", Doc: "NewPlaneMesh adds PlaneMesh mesh to given scene for given layer", Args: []string{"sc", "view", "panel"}, Returns: []string{"PlaneMesh"}})
 

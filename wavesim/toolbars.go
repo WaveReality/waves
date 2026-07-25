@@ -47,7 +47,7 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 	})
 	tree.Add(p, func(w *core.Separator) {})
 
-	pltp := "which panel is active for selecting the variable and other view changes"
+	pltp := "panel active for selecting the variable and other view changes"
 	tree.Add(p, func(w *core.Text) {
 		w.SetText("Panel:").SetTooltip(pltp)
 	})
@@ -65,6 +65,7 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			}
 			w.SetValue(float32(vw.curPanel))
 			vw.varsFrame.Update()
+			vw.toolbar.Update()
 			vw.UpdateView()
 		})
 	})
@@ -76,27 +77,21 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 		vp = &VarSettings{}
 		vp.Defaults()
 	}
-	var minSpin, maxSpin *core.Spinner
-	var minSwitch, maxSwitch *core.Switch
 
-	tree.Add(p, func(w *core.Separator) {})
-	tree.AddAt(p, "minSwitch", func(w *core.Switch) {
-		minSwitch = w
-		w.SetText("Min").SetType(core.SwitchCheckbox).SetChecked(vp.Range.FixMin).
-			SetTooltip("NOTE: not functional yet!  Fix the minimum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
-			OnChange(func(e events.Event) {
-				// vp := vw.GetVarSettingsPanel(vw.curPanel)
-				// vp.Range.FixMin = w.IsChecked()
-				minSpin.UpdateWidget().NeedsRender()
-				vw.UpdateView()
-			})
+	tree.Add(p, func(w *core.Chooser) {
+		w.SetEnum(ViewModesN).SetTooltip("mode of rendering the values: smooth Plane or discrete Bars")
+		w.OnChange(func(e events.Event) {
+			vw.Panels[vw.curPanel].Mode = w.CurrentItem.Value.(ViewModes)
+			vw.RebuildView()
+		})
 		w.Updater(func() {
-			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
-			if vp != nil {
-				w.SetChecked(vp.Range.FixMin)
-			}
+			w.SetCurrentValue(vw.Panels[vw.curPanel].Mode)
 		})
 	})
+
+	var minSpin, maxSpin *core.Spinner
+
+	tree.Add(p, func(w *core.Separator) {})
 	tree.AddAt(p, "minSpin", func(w *core.Spinner) {
 		minSpin = w
 		w.Styler(func(s *styles.Style) {
@@ -111,7 +106,6 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 				}
 				vp.Range.SetMin(w.Value)
 				vp.Range.FixMin = true
-				minSwitch.UpdateWidget().NeedsRender()
 				if vp.ZeroCtr && vp.Range.Min < 0 && vp.Range.FixMax {
 					vp.Range.SetMax(-vp.Range.Min)
 				}
@@ -145,24 +139,6 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 		})
 	})
 
-	tree.AddAt(p, "maxSwitch", func(w *core.Switch) {
-		maxSwitch = w
-		w.SetText("Max").SetType(core.SwitchCheckbox).SetChecked(vp.Range.FixMax).
-			SetTooltip("Note: not functional yet! Fix the maximum end of the displayed value range to value shown in next box.  Having both min and max fixed is recommended where possible for speed and consistent interpretability of the colors.").
-			OnChange(func(e events.Event) {
-				// vp := vw.GetVarSettingsPanel(vw.curPanel)
-				// vp.Range.FixMax = w.IsChecked()
-				maxSpin.UpdateWidget().NeedsRender()
-				vw.UpdateView()
-			})
-		w.Updater(func() {
-			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
-			if vp != nil {
-				w.SetChecked(vp.Range.FixMax)
-			}
-		})
-	})
-
 	tree.AddAt(p, "maxSpin", func(w *core.Spinner) {
 		maxSpin = w
 		w.Styler(func(s *styles.Style) {
@@ -176,7 +152,6 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			}
 			vp.Range.SetMax(w.Value)
 			vp.Range.FixMax = true
-			maxSwitch.UpdateWidget().NeedsRender()
 			if vp.ZeroCtr && vp.Range.Max > 0 && vp.Range.FixMin {
 				vp.Range.SetMin(-vp.Range.Max)
 			}
@@ -222,12 +197,18 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 	})
 
 	tree.Add(p, func(w *core.Button) {
-		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in size of region displayed")
+		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in size of region displayed. Shift goes in increments of 4, and Alt in 8")
 		w.Styler(func(s *styles.Style) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
 		w.OnClick(func(e events.Event) {
-			vw.ZoomInSize()
+			n := int32(1)
+			if e.HasAnyModifier(key.Shift) {
+				n = 4
+			} else if e.HasAnyModifier(key.Alt) {
+				n = 8
+			}
+			vw.ZoomInSize(n)
 		})
 	})
 	tree.Add(p, func(w *core.Button) {
@@ -236,7 +217,13 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
 		w.OnClick(func(e events.Event) {
-			vw.ZoomOutSize()
+			n := int32(1)
+			if e.HasAnyModifier(key.Shift) {
+				n = 4
+			} else if e.HasAnyModifier(key.Alt) {
+				n = 8
+			}
+			vw.ZoomOutSize(n)
 		})
 	})
 	tree.Add(p, func(w *core.Separator) {})

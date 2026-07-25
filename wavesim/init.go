@@ -34,6 +34,48 @@ func (ss *Sim) CopyCurToPrev() {
 	}
 }
 
+// Center returns the given 3d coords with any negative
+// numbers replaced with the value plus center+1 (of non-edge space)
+// such that -1 = center, -2 = 1 before center, etc.
+func Center(c math32.Vector3i) math32.Vector3i {
+	ctx := GetCtx(0)
+	ctr := ctx.Size.V().DivScalar(2).AddScalar(1)
+	if c.X < 0 {
+		c.X += ctr.X
+	}
+	if c.Y < 0 {
+		c.Y += ctr.Y
+	}
+	if c.Z < 0 {
+		c.Z += ctr.Z
+	}
+	return c
+}
+
+func CoordToFloat(c math32.Vector3i) math32.Vector3 {
+	var f math32.Vector3
+	f.SetFromVector3i(c)
+	return f
+}
+
+// CenterFull returns the given 3d coords with any negative
+// numbers replaced with the value plus center+1 (of full space)
+// such that -1 = center, -2 = 1 before center, etc.
+func CenterFull(c math32.Vector3i) math32.Vector3i {
+	ctx := GetCtx(0)
+	ctr := ctx.Size.V().DivScalar(2).AddScalar(2)
+	if c.X < 0 {
+		c.X += ctr.X
+	}
+	if c.Y < 0 {
+		c.Y += ctr.Y
+	}
+	if c.Z < 0 {
+		c.Z += ctr.Z
+	}
+	return c
+}
+
 // WavePacket returns value for a gaussian * cosine wave packet for given
 // linear dimension value x and 3D distance d.
 func WavePacket(x, d, wavelength, width, phase, amp float32) float32 {
@@ -49,7 +91,7 @@ func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val 
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	f := c.AddScalar(1)
+	f := CenterFull(c)
 	if curPrev == CurOnly || curPrev == Both {
 		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 	}
@@ -85,7 +127,7 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
+	ctrf := CoordToFloat(Center(ctr))
 	var diroff math32.Vector3
 	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
@@ -94,7 +136,7 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
+				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf)
 				cv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
@@ -134,7 +176,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 		vamp = amp * 0.0746 // 0.0746
 		veloff = 1 + 2*math32.Sqrt(wavelength)
 	}
-	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
+	ctrf := CoordToFloat(Center(ctr))
 	var diroff math32.Vector3
 	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
@@ -143,7 +185,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
+				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf)
 				cp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cp, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
@@ -179,14 +221,15 @@ func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
-	ctrf := math32.Vec3(float32(ctr.X), float32(ctr.Y), float32(ctr.Z))
+	ctr = Center(ctr)
+	ctrf := CoordToFloat(ctr)
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := math32.Vec3(float32(c.X), float32(c.Y), float32(c.Z))
+				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf).Length()
 				if c == ctr {
 					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))

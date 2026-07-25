@@ -13,18 +13,26 @@ var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
 @group(1) @binding(0)
 var<storage, read> Ctx: array<Context>;
-@group(1) @binding(1)
-var<storage, read_write> State0: array<f32>;
 @group(1) @binding(2)
-var<storage, read_write> State1: array<f32>;
+var<storage, read_write> State0: array<f32>;
 @group(1) @binding(3)
-var<storage, read_write> State2: array<f32>;
+var<storage, read_write> State1: array<f32>;
 @group(1) @binding(4)
-var<storage, read_write> State3: array<f32>;
+var<storage, read_write> State2: array<f32>;
 @group(1) @binding(5)
-var<storage, read_write> State4: array<f32>;
+var<storage, read_write> State3: array<f32>;
 @group(1) @binding(6)
+var<storage, read_write> State4: array<f32>;
+@group(1) @binding(7)
 var<storage, read_write> State5: array<f32>;
+@group(1) @binding(8)
+var<storage, read_write> State6: array<f32>;
+@group(1) @binding(9)
+var<storage, read_write> State7: array<f32>;
+@group(1) @binding(10)
+var<storage, read_write> State8: array<f32>;
+@group(1) @binding(11)
+var<storage, read_write> State9: array<f32>;
 
 alias GPUVars = i32;
 
@@ -56,8 +64,20 @@ fn StateGet(ix: u32) -> f32 {
 	case u32(4): {
 		return State4[ix - 2147483616];
 	}
-	default: {
+	case u32(5): {
 		return State5[ix - 2684354520];
+	}
+	case u32(6): {
+		return State6[ix - 3221225424];
+	}
+	case u32(7): {
+		return State7[ix - 3758096328];
+	}
+	case u32(8): {
+		return State8[ix - 4294967232];
+	}
+	default: {
+		return State9[ix - 536870840];
 	}
 	}
 }
@@ -80,8 +100,20 @@ fn StateSet(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] = vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] = vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] = vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] = vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] = vl;
+	}
+	default: {
+		State9[ix - 536870840] = vl;
 	}
 	}
 }
@@ -104,8 +136,20 @@ fn StateSetAdd(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] += vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] += vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] += vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] += vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] += vl;
+	}
+	default: {
+		State9[ix - 536870840] += vl;
 	}
 	}
 }
@@ -128,8 +172,20 @@ fn StateSetSub(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] -= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] -= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] -= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] -= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] -= vl;
+	}
+	default: {
+		State9[ix - 536870840] -= vl;
 	}
 	}
 }
@@ -152,8 +208,20 @@ fn StateSetMul(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] *= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] *= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] *= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] *= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] *= vl;
+	}
+	default: {
+		State9[ix - 536870840] *= vl;
 	}
 	}
 }
@@ -176,8 +244,20 @@ fn StateSetDiv(vl: f32, ix: u32) {
 	case u32(4): {
 		State4[ix - 2147483616] /= vl;
 	}
-	default: {
+	case u32(5): {
 		State5[ix - 2684354520] /= vl;
+	}
+	case u32(6): {
+		State6[ix - 3221225424] /= vl;
+	}
+	case u32(7): {
+		State7[ix - 3758096328] /= vl;
+	}
+	case u32(8): {
+		State8[ix - 4294967232] /= vl;
+	}
+	default: {
+		State9[ix - 536870840] /= vl;
 	}
 	}
 }
@@ -301,11 +381,12 @@ const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
-const GPUVarsN: GPUVars = 6;
+const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 7;
+const EquationsN: Equations = 8;
 const ParticleKGCStatesN: ParticleKGCStates = 32;
+const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
@@ -328,11 +409,11 @@ fn EdgeInBounds1(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32) -> bool {
 fn LaplacianEdge1D(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var sum = f32(0);
 	if (EdgeInBounds1(x-1, y, z, sx, sy, sz)) {
-		sum += StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))) - ctr;
+		sum += StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))) - ctr;
 	}
 	if (EdgeInBounds1(x+1, y, z, sx, sy, sz)) {
-		sum += StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33],
-		TensorStrides[34], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - ctr;
+		sum += StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43],
+		TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - ctr;
 	}return sum;
 }
 fn LaplacianEdge26(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
@@ -342,7 +423,7 @@ fn LaplacianEdge26(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: 
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
 		if (EdgeInBounds1(x+xo, y+yo, z+zo, sx, sy, sz)) {
-			var nv = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
+			var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 			avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 		}
 	}return avg;
@@ -377,8 +458,8 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 	var sz = Context_SizePlus1(ctx); // exclude updating on edges
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
-	var pposA = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv)));
-	var pposB = StateGet(Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv)));
+	var pposA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv)));
+	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv)));
 	var mhsq = Params[0].MOverHSq;
 	var csq = Params[0].CSq;
 	var forceA: f32;
@@ -396,12 +477,12 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 	forceB -= mhsq * pposB; // this is the only diff from standard Wave
 	var velB = csq * forceB;
 	var posB = pposB + velB;
-	StateSet(forceA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));
-	StateSet(velA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));
-	StateSet(posA, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));
-	StateSet(forceB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));
-	StateSet(velB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));
-	StateSet(posB, Index5D(TensorStrides[30], TensorStrides[31], TensorStrides[32], TensorStrides[33], TensorStrides[34], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));
+	StateSet(forceA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));
+	StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));
+	StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));
+	StateSet(forceB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));
+	StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));
+	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));
 }
 
 //////// import: "maxwell.go"
@@ -434,6 +515,7 @@ const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
 const  ParticleKGC: Equations = 6;
+const  ParticleMove: Equations = 7;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -483,6 +565,20 @@ const  PKGCHoPY: ParticleKGCStates = 28;
 const  PKGCHoVY: ParticleKGCStates = 29;
 const  PKGCHoPZ: ParticleKGCStates = 30;
 const  PKGCHoVZ: ParticleKGCStates = 31;
+
+//////// import: "particle.go"
+const NParticles = 4;
+alias ParticleVars = i32; //enums:enum -trim-prefix=Particle
+const  ParticleType: ParticleVars = 0;
+const  ParticleMass: ParticleVars = 1;
+const  ParticlePosX: ParticleVars = 2;
+const  ParticlePosY: ParticleVars = 3;
+const  ParticlePosZ: ParticleVars = 4;
+const  ParticleVelX: ParticleVars = 5;
+const  ParticleVelY: ParticleVars = 6;
+const  ParticleVelZ: ParticleVars = 7;
+const  ParticleLorentz: ParticleVars = 8;
+const  ParticleESq: ParticleVars = 9;
 
 //////// import: "schrodinger.go"
 

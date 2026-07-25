@@ -39,11 +39,16 @@ var (
 	//gosl:read-only
 	Ctx []Context
 
+	// Particles records tracking data on different particles.
+	// [ParticlesN][VarsN]
+	//gosl:dims 2
+	Particles *tensor.Float32
+
 	// State is the overall wave state, with inner-most index being the current
 	// and previous states. [Z][Y][X][VarsN][2]
 	// The display shows X-Y planes stacked in the Z dimension.
 	//gosl:dims 5
-	//gosl:nbuffs 6
+	//gosl:nbuffs 10
 	State *tensor.Float32
 )
 

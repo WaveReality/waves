@@ -17,6 +17,8 @@ import (
 	"cogentcore.org/lab/base/randx"
 	"cogentcore.org/lab/tensor"
 	"cogentcore.org/lab/tensorfs"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 //go:generate core generate -add-types -add-funcs -gosl
@@ -169,10 +171,19 @@ func (ss *Sim) ConfigState() {
 	ctx.NVars = int32(nvar)
 	if State == nil {
 		State = tensor.NewFloat32()
+		Particles = tensor.NewFloat32()
 	}
 	fs := ctx.SizeFull()
 	// fmt.Println(fs)
+	bufcap := 10 * (1 << 31)
+	totsz := int(fs.X) * int(fs.Y) * int(fs.Z) * nvar * 2
+	p := message.NewPrinter(language.English)
+	p.Println("Total memory size in floats:", totsz, "GB:", totsz*4, "num vars:", nvar, "buf cap:", bufcap)
+	if totsz*4 > bufcap {
+		panic("memory exceeds buffer capacity")
+	}
 	State.SetShapeSizes(int(fs.Z), int(fs.Y), int(fs.X), nvar, 2)
+	Particles.SetShapeSizes(int(NParticles), int(ParticleVarsN))
 }
 
 func (ss *Sim) InitRandSeed(run int) {
@@ -201,7 +212,7 @@ func (ss *Sim) Init() {
 		ss.InitFunc(ss)
 	}
 	ToGPUTensorStrides()
-	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, StateVar)
+	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, ParticlesVar, StateVar)
 	ss.RunStats(true)
 }
 
@@ -281,7 +292,7 @@ func (ss *Sim) StepRun() {
 	if int(ctx.Step)%ss.Config.ViewInterval != 0 {
 		RunDone()
 	} else {
-		RunDone(StateVar)
+		RunDone(ParticlesVar, StateVar)
 		ss.RunStats(false)
 		ss.UpdateView()
 	}

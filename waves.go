@@ -24,11 +24,19 @@ func main() {
 	// threed := false
 	threed := true
 	// eqs := wavesim.Wave
-	// eqs := wavesim.KleinGordonC
+	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
 	eqs := wavesim.ParticleKGC
+
+	ctrPos := math32.Vec3i(-1, -1, -1)
+
+	// note: max 3d size is slightly above 400^3 for KGParticles
+	// Total memory size in floats: 4,157,747,712 GB: 16,630,990,848 num vars: 32 buf cap: 21,474,836,480
+	// nbufs = 10, total vars = 16 -- could squeeze neigh vars to get 12
+	// and actually just push nvars higher given prior experience.
+	// actually runs in reasonable time on the macbook at that size!
 
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
@@ -103,6 +111,7 @@ func main() {
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
+					// sim.Config.Size.Set(400, 400, 400)
 				} else {
 					sim.Config.Size.Set(50, 1, 1)
 				}
@@ -114,54 +123,38 @@ func main() {
 			switch eqs {
 			case wavesim.Wave:
 				if threed {
-					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 50), -1, 8, 8, 0, 1.5)
+					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, ctrPos, -1, 8, 8, 0, 1.5)
 				} else {
 					// sim.PosWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1)
-					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)
+					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, ctrPos, -1, 80, 80, 0, 1)
 					// 				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)
 				}
 			case wavesim.KleinGordon:
-				if threed {
-					sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1.5)
-
-				} else {
-					sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
-				}
+				sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.KleinGordonC:
-				if threed {
-					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
-				} else {
-					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
-				}
+				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Schrodinger:
-				if threed {
-					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
-				} else {
-					sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, math32.Vec3i(250, 0, 0), -1, 0, 1)
-				}
+				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(50, 50, 50), 1)
-					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
 				}
 			case wavesim.Dirac:
+
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(50, 50, 50), 1)
-					sim.InvR(wavesim.A0Pos, math32.Vec3i(50, 50, 50), sim.Params.Mu0)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
 					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, math32.Vec3i(250, 0, 0), 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
 				}
 			case wavesim.ParticleKGC:
-				pos := math32.Vec3i(25, 0, 0)
-				if threed {
-					pos = math32.Vec3i(50, 50, 50)
-				}
-				sim.ParticleAtConfig(pos, 1)
-				sim.InvR(wavesim.CabPosA, pos, .2)
-				sim.InvR(wavesim.CabPosB, pos, .2)
+				sim.ParticleAtConfig(ctrPos, 1)
+				sim.InvR(wavesim.CabPosA, ctrPos, .2)
+				sim.InvR(wavesim.CabPosB, ctrPos, .2)
 			}
 		})
 }

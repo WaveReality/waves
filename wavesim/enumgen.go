@@ -198,20 +198,20 @@ func (i *NeighWeights) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "NeighWeights")
 }
 
-var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4, 5}
+var _GPUVarsValues = []GPUVars{0, 1, 2, 3, 4, 5, 6}
 
 // GPUVarsN is the highest valid value for type GPUVars, plus one.
 //
 //gosl:start
-const GPUVarsN GPUVars = 6
+const GPUVarsN GPUVars = 7
 
 //gosl:end
 
-var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `FaceOffsVar`: 2, `NeighWtsVar`: 3, `CtxVar`: 4, `StateVar`: 5}
+var _GPUVarsValueMap = map[string]GPUVars{`ParamsVar`: 0, `NeighOffsVar`: 1, `FaceOffsVar`: 2, `NeighWtsVar`: 3, `CtxVar`: 4, `ParticlesVar`: 5, `StateVar`: 6}
 
-var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``, 5: ``}
+var _GPUVarsDescMap = map[GPUVars]string{0: ``, 1: ``, 2: ``, 3: ``, 4: ``, 5: ``, 6: ``}
 
-var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `FaceOffsVar`, 3: `NeighWtsVar`, 4: `CtxVar`, 5: `StateVar`}
+var _GPUVarsMap = map[GPUVars]string{0: `ParamsVar`, 1: `NeighOffsVar`, 2: `FaceOffsVar`, 3: `NeighWtsVar`, 4: `CtxVar`, 5: `ParticlesVar`, 6: `StateVar`}
 
 // String returns the string representation of this GPUVars value.
 func (i GPUVars) String() string { return enums.String(i, _GPUVarsMap) }
@@ -335,20 +335,20 @@ func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 7
+const EquationsN Equations = 8
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `ParticleKGC`: 6}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `ParticleKGC`: 6, `ParticleMove`: 7}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `ParticleKGC is the Klein-Gordon complex version of stochastic particles.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `ParticleKGC is the Klein-Gordon complex version of stochastic particles.`, 7: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `ParticleKGC`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `ParticleKGC`, 7: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -393,7 +393,7 @@ const ParticleKGCStatesN ParticleKGCStates = 32
 
 var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`Particle`: 15, `PvelX`: 16, `PvelY`: 17, `PvelZ`: 18, `PvelSq`: 19, `Lorentz`: 20, `PESq`: 21, `Dist`: 22, `Driver`: 23, `HoP0`: 24, `HoV0`: 25, `HoPX`: 26, `HoVX`: 27, `HoPY`: 28, `HoVY`: 29, `HoPZ`: 30, `HoVZ`: 31}
 
-var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `PKGCPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `PKGCPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `PKGCPvelSq is the squared total particle velocity across all axes: X^2 + Y^2 + Z^2`, 20: `PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-v^2) (v = PvelSq)`, 21: `PKGCPESq is the square of the particle energy.`, 22: `PKGCDist is the 1 / distance from particle, propagating from source via diffusion.`, 23: `PKGCDriver is the particle driver field propagating by exponential falloff.`, 24: `PKGCHoP0 is the central time-like SHO position for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 25: `PKGCHoV0 is the central time-like SHO velocity for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 26: `PKGCHoPX is the SHO position for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 27: `PKGCHoVX is the SHO velocity for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 28: `PKGCHoPY is the SHO position for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 29: `PKGCHoVY is the SHO velocity for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 30: `PKGCHoPZ is the SHO position for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`, 31: `PKGCHoVZ is the SHO velocity for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`}
+var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `PKGCPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `PKGCPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `PKGCPvelSq is the squared total particle velocity across all axes: X^2 + Y^2 + Z^2`, 20: `PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-(v^2/c^2)) (v^2 = PvelSq)`, 21: `PKGCPESq is the square of the particle energy.`, 22: `PKGCDist is the 1 / distance from particle, propagating from source via diffusion.`, 23: `PKGCDriver is the particle driver field propagating by exponential falloff.`, 24: `PKGCHoP0 is the central time-like SHO position for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 25: `PKGCHoV0 is the central time-like SHO velocity for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 26: `PKGCHoPX is the SHO position for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 27: `PKGCHoVX is the SHO velocity for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 28: `PKGCHoPY is the SHO position for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 29: `PKGCHoVY is the SHO velocity for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 30: `PKGCHoPZ is the SHO position for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`, 31: `PKGCHoVZ is the SHO velocity for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`}
 
 var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `Particle`, 16: `PvelX`, 17: `PvelY`, 18: `PvelZ`, 19: `PvelSq`, 20: `Lorentz`, 21: `PESq`, 22: `Dist`, 23: `Driver`, 24: `HoP0`, 25: `HoV0`, 26: `HoPX`, 27: `HoVX`, 28: `HoPY`, 29: `HoVY`, 30: `HoPZ`, 31: `HoVZ`}
 
@@ -435,6 +435,53 @@ func (i ParticleKGCStates) MarshalText() ([]byte, error) { return []byte(i.Strin
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *ParticleKGCStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "ParticleKGCStates")
+}
+
+var _ParticleVarsValues = []ParticleVars{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+// ParticleVarsN is the highest valid value for type ParticleVars, plus one.
+//
+//gosl:start
+const ParticleVarsN ParticleVars = 10
+
+//gosl:end
+
+var _ParticleVarsValueMap = map[string]ParticleVars{`Type`: 0, `Mass`: 1, `PosX`: 2, `PosY`: 3, `PosZ`: 4, `VelX`: 5, `VelY`: 6, `VelZ`: 7, `Lorentz`: 8, `ESq`: 9}
+
+var _ParticleVarsDescMap = map[ParticleVars]string{0: `ParticleType is the type or ID of the particle`, 1: `ParticleMass is the rest mass of the particle.`, 2: `Position`, 3: ``, 4: ``, 5: `Velocity`, 6: ``, 7: ``, 8: `ParticleLorentz is the Lorentz factor.`, 9: `ParticleESq is the squared energy of the particle.`}
+
+var _ParticleVarsMap = map[ParticleVars]string{0: `Type`, 1: `Mass`, 2: `PosX`, 3: `PosY`, 4: `PosZ`, 5: `VelX`, 6: `VelY`, 7: `VelZ`, 8: `Lorentz`, 9: `ESq`}
+
+// String returns the string representation of this ParticleVars value.
+func (i ParticleVars) String() string { return enums.String(i, _ParticleVarsMap) }
+
+// SetString sets the ParticleVars value from its string representation,
+// and returns an error if the string is invalid.
+func (i *ParticleVars) SetString(s string) error {
+	return enums.SetString(i, s, _ParticleVarsValueMap, "ParticleVars")
+}
+
+// Int64 returns the ParticleVars value as an int64.
+func (i ParticleVars) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the ParticleVars value from an int64.
+func (i *ParticleVars) SetInt64(in int64) { *i = ParticleVars(in) }
+
+// Desc returns the description of the ParticleVars value.
+func (i ParticleVars) Desc() string { return enums.Desc(i, _ParticleVarsDescMap) }
+
+// ParticleVarsValues returns all possible values for the type ParticleVars.
+func ParticleVarsValues() []ParticleVars { return _ParticleVarsValues }
+
+// Values returns all possible values for the type ParticleVars.
+func (i ParticleVars) Values() []enums.Enum { return enums.Values(_ParticleVarsValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i ParticleVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *ParticleVars) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "ParticleVars")
 }
 
 var _ViewModesValues = []ViewModes{0, 1}

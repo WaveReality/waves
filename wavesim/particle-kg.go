@@ -6,7 +6,9 @@
 
 package wavesim
 
-import "cogentcore.org/core/math32"
+import (
+	"cogentcore.org/core/math32"
+)
 
 //gosl:start
 
@@ -33,7 +35,7 @@ const (
 	// X^2 + Y^2 + Z^2
 	PKGCPvelSq
 
-	// PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-v^2) (v = PvelSq)
+	// PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-(v^2/c^2)) (v^2 = PvelSq)
 	PKGCLorentz
 
 	// PKGCPESq is the square of the particle energy.
@@ -98,6 +100,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	csq := Params[0].CSq
 	// mhsq := Params[0].MOverHSq
 
+	particle := State.Value(int(z), int(y), int(x), int(PKGCParticle), int(prv))
+
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
 		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
@@ -117,7 +121,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	var dist, drv float32
 	if nh0 != 0 {
 		drv = nh0
-		dist = 1
+		dist = 1.5
 	} else {
 		dist = State.Value(int(z), int(y), int(x), int(PKGCDist), int(prv))
 		distF := Laplacian26(x, y, z, int32(PKGCDist), prv, dist)
@@ -166,7 +170,6 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	// State[z, y, x, CabCurrentY, cur] = curY
 	// State[z, y, x, CabCurrentZ, cur] = curZ
 
-	particle := State.Value(int(z), int(y), int(x), int(PKGCParticle), int(prv))
 	if particle == 0 {
 		return
 	}
@@ -208,7 +211,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvZ := homc * (hoP0*hoVZ - hoPZ*hoV0)
 
 	pvSq := pvX*pvX + pvY*pvY + pvZ*pvZ
-	lorenz := 1.0 / math32.Sqrt(1.0-(pvSq/csq))
+	lorentz := 1.0 / math32.Sqrt(1.0-(pvSq/csq))
 	esq = Params[0].C6M2 / (csq - pvSq)
 
 	// todo: is this e factor across all dimensions or only within each individual dimension?
@@ -277,11 +280,13 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(pvY, int(mz), int(my), int(mx), int(PKGCPvelY), int(cur))
 	State.Set(pvZ, int(mz), int(my), int(mx), int(PKGCPvelZ), int(cur))
 	State.Set(pvSq, int(mz), int(my), int(mx), int(PKGCPvelSq), int(cur))
-	State.Set(lorenz, int(mz), int(my), int(mx), int(PKGCLorentz), int(cur))
+	State.Set(lorentz, int(mz), int(my), int(mx), int(PKGCLorentz), int(cur))
 	State.Set(esq, int(mz), int(my), int(mx), int(PKGCPESq), int(cur))
 
 	State.Set(hoP0, int(mz), int(my), int(mx), int(PKGCDriver), int(cur))
 	State.Set(particle, int(mz), int(my), int(mx), int(PKGCParticle), int(cur))
+
+	SetParticleAt(0, lorentz, esq, math32.Vec3i(mx, my, mz), math32.Vec3(pvX, pvY, pvZ))
 
 	if moving { // clear old data out
 		for vi := int32(PKGCParticle); vi < int32(ParticleKGCStatesN); vi++ {
@@ -323,6 +328,7 @@ func (ss *Sim) ParticleKGCStats() {
 	ss.AddStat(ss.StatSum(PKGCPvelZ))
 	ss.AddStat(ss.StatSum(PKGCPvelSq))
 	ss.AddStat(ss.StatSum(PKGCPESq))
+	ss.AddStat(ss.StatParticle(0))
 }
 
 // ParticleDisplay determines which Parameters fields to display.

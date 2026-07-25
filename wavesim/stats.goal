@@ -5,6 +5,8 @@
 package wavesim
 
 import (
+	"strconv"
+
 	"cogentcore.org/core/base/metadata"
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/math32"
@@ -90,5 +92,28 @@ func (ss *Sim) StatSum(vr enums.Enum) func(init bool) {
 		}
 		ctx := GetCtx(0)
 		tsr.AppendRowFloat(StateSum(ss.Config.Size, vr, ctx.CurState))
+	}
+}
+
+// StatParticle is a stats function that records particle state
+// for given particle index.
+func (ss *Sim) StatParticle(idx int) func(init bool) {
+	return func(init bool) {
+		for pv := range ParticleVarsN {
+			name := pv.String()
+			tsr := ss.Stats.Float64(name)
+			if init {
+				tsr.SetNumRows(0)
+				plot.SetFirstStyler(tsr, func(s *plot.Style) {
+					s.Range.SetMin(0)
+					s.On = true
+				})
+				metadata.SetDoc(tsr, "Particle "+strconv.Itoa(idx)+": "+name)
+				continue
+			}
+			vri := int(pv.Int64())
+			stat := float64(Particles[idx, vri])
+			tsr.AppendRowFloat(stat)
+		}
 	}
 }

@@ -1,0 +1,55 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import "cogentcore.org/core/math32"
+
+//gosl:start
+
+// NParticles is the total number of particles that can be tracked.
+const NParticles = 4
+
+// ParticleVars are the particle variables to record.
+type ParticleVars int32 //enums:enum -trim-prefix=Particle
+
+const (
+	// ParticleType is the type or ID of the particle
+	ParticleType ParticleVars = iota
+
+	// ParticleMass is the rest mass of the particle.
+	ParticleMass
+
+	// Position
+	ParticlePosX
+	ParticlePosY
+	ParticlePosZ
+
+	// Velocity
+	ParticleVelX
+	ParticleVelY
+	ParticleVelZ
+
+	// ParticleLorentz is the Lorentz factor.
+	ParticleLorentz
+
+	// ParticleESq is the squared energy of the particle.
+	ParticleESq
+)
+
+// SetParticleAt sets particle dynamic data at given index.
+func SetParticleAt(idx int32, lorentz, esq float32, pos math32.Vector3i, vel math32.Vector3) {
+	Particles[idx, ParticleLorentz] = lorentz
+	Particles[idx, ParticleESq] = esq
+	Particles[idx, ParticlePosX] = float32(pos.X)
+	Particles[idx, ParticlePosY] = float32(pos.Y)
+	Particles[idx, ParticlePosZ] = float32(pos.Z)
+}
+
+func (ss *Sim) ParticleStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatParticle(0))
+}
+
+//gosl:end
