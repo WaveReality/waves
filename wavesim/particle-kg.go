@@ -129,7 +129,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	// driver update: driver is slowly updating
 
 	drv := State.Value(int(z), int(y), int(x), int(PKGCDrive), int(prv))
-	drvV := State.Value(int(z), int(y), int(x), int(PKGCDriveVel), int(prv))
+	// drvV := State[z, y, x, PKGCDriveVel, prv]
 	drvF := Laplacian26(x, y, z, int32(PKGCDrive), prv, drv)
 
 	nh0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
@@ -137,7 +137,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 		drvF += (nh0 - drv)
 	}
 
-	drvV += hcsq * drvF // slow!
+	drvV := hcsq * drvF // not +=
 	drv += drvV
 
 	// todo: later, based on particle..

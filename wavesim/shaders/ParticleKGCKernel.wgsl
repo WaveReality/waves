@@ -509,14 +509,14 @@ var cabDrvF: f32;; if (Params[0].ThreeD == 1) {
 ; var velB = pvelB + csq*forceB;
 ; var posB = pposB + velB;
 ;
-var drv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(PKGCDrive), u32(prv)));
-; var drvV = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(PKGCDriveVel), u32(prv)));
+var drv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(PKGCDrive), u32(prv)));
 ; var drvF = Laplacian26(x, y, z, i32(PKGCDrive), prv, drv);
 ; var nh0 = NeighAverage27(x, y, z, i32(PKGCHoP0), prv);
 ; if (nh0 != 0) {
 	drvF += (nh0 - drv);
-}; drvV += hcsq * drvF;
-; // slow!
+}; var drvV = hcsq * drvF;
+; // not +=
 drv += drvV;
 ;
 StateSet(forceA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));; StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));; StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));; StateSet(forceB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceB), u32(cur)));; StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabVelB), u32(cur)));; StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosB), u32(cur)));; StateSet(drv, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(PKGCDrive), u32(cur)));; StateSet(drvV, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
