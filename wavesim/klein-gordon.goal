@@ -222,7 +222,7 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	pposA := State[z, y, x, CabPosA, prv]
 	pposB := State[z, y, x, CabPosB, prv]
 
-	mhsq := Params[0].MOverHSq
+	// mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
 
 	var forceA, forceB float32
@@ -233,11 +233,11 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
 		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= mhsq * pposA // this is the only diff from standard Wave
+	// forceA -= mhsq * pposA // this is the only diff from standard Wave
 	velA := csq * forceA
 	posA := pposA + velA
 
-	forceB -= mhsq * pposB // this is the only diff from standard Wave
+	// forceB -= mhsq * pposB // this is the only diff from standard Wave
 	velB := csq * forceB
 	posB := pposB + velB
 

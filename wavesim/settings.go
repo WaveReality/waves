@@ -84,6 +84,9 @@ type Settings struct {
 	// and location in the state.
 	NPanels NPanels
 
+	// TrackParticle is the particle number to track: -1 = not
+	TrackParticle int
+
 	// Mode is how the state values are displayed.
 	Mode ViewModes
 
@@ -110,7 +113,7 @@ type Settings struct {
 
 func (nv *Settings) Defaults() {
 	nv.NPanels = PanelsOne
-	// nv.Mode = Bars
+	nv.TrackParticle = -1
 	nv.Height = 0.2
 	nv.BarSize = 0.9
 	nv.LabelSize = 0.05

@@ -231,6 +231,7 @@ func (ss *Sim) Run() {
 
 // StepN runs given number of steps. Must be called by goroutine.
 func (ss *Sim) StepN(n int) {
+	ToGPU(ParamsVar, CtxVar)
 	for range n {
 		if ss.GUI.StopNow() {
 			break

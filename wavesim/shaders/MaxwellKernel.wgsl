@@ -605,15 +605,15 @@ struct Parameters {
 
 //////// import: "particle-kg.go"
 alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
-const  PKGCParticle: ParticleKGCStates = 15;
-const  PKGCPvelX: ParticleKGCStates = 16;
-const  PKGCPvelY: ParticleKGCStates = 17;
-const  PKGCPvelZ: ParticleKGCStates = 18;
-const  PKGCPvelSq: ParticleKGCStates = 19;
-const  PKGCLorentz: ParticleKGCStates = 20;
-const  PKGCPESq: ParticleKGCStates = 21;
-const  PKGCDist: ParticleKGCStates = 22;
-const  PKGCDriver: ParticleKGCStates = 23;
+const  PKGCDrive: ParticleKGCStates = 15;
+const  PKGCDriveVel: ParticleKGCStates = 16;
+const  PKGCParticle: ParticleKGCStates = 17;
+const  PKGCPvelX: ParticleKGCStates = 18;
+const  PKGCPvelY: ParticleKGCStates = 19;
+const  PKGCPvelZ: ParticleKGCStates = 20;
+const  PKGCPvelSq: ParticleKGCStates = 21;
+const  PKGCLorentz: ParticleKGCStates = 22;
+const  PKGCPESq: ParticleKGCStates = 23;
 const  PKGCHoP0: ParticleKGCStates = 24;
 const  PKGCHoV0: ParticleKGCStates = 25;
 const  PKGCHoPX: ParticleKGCStates = 26;

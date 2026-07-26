@@ -459,8 +459,8 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
 	var pposA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosA), u32(prv)));
-	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv)));
-	var mhsq = Params[0].MOverHSq;
+	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosB), u32(prv)));
 	var csq = Params[0].CSq;
 	var forceA: f32;
 	var forceB: f32;
@@ -471,10 +471,8 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 		forceA = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(CabPosA), prv, pposA);
 		forceB = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(CabPosB), prv, pposB);
 	}
-	forceA -= mhsq * pposA; // this is the only diff from standard Wave
 	var velA = csq * forceA;
 	var posA = pposA + velA;
-	forceB -= mhsq * pposB; // this is the only diff from standard Wave
 	var velB = csq * forceB;
 	var posB = pposB + velB;
 	StateSet(forceA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));
@@ -548,15 +546,15 @@ struct Parameters {
 
 //////// import: "particle-kg.go"
 alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
-const  PKGCParticle: ParticleKGCStates = 15;
-const  PKGCPvelX: ParticleKGCStates = 16;
-const  PKGCPvelY: ParticleKGCStates = 17;
-const  PKGCPvelZ: ParticleKGCStates = 18;
-const  PKGCPvelSq: ParticleKGCStates = 19;
-const  PKGCLorentz: ParticleKGCStates = 20;
-const  PKGCPESq: ParticleKGCStates = 21;
-const  PKGCDist: ParticleKGCStates = 22;
-const  PKGCDriver: ParticleKGCStates = 23;
+const  PKGCDrive: ParticleKGCStates = 15;
+const  PKGCDriveVel: ParticleKGCStates = 16;
+const  PKGCParticle: ParticleKGCStates = 17;
+const  PKGCPvelX: ParticleKGCStates = 18;
+const  PKGCPvelY: ParticleKGCStates = 19;
+const  PKGCPvelZ: ParticleKGCStates = 20;
+const  PKGCPvelSq: ParticleKGCStates = 21;
+const  PKGCLorentz: ParticleKGCStates = 22;
+const  PKGCPESq: ParticleKGCStates = 23;
 const  PKGCHoP0: ParticleKGCStates = 24;
 const  PKGCHoV0: ParticleKGCStates = 25;
 const  PKGCHoPX: ParticleKGCStates = 26;

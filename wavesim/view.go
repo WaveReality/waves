@@ -264,6 +264,14 @@ func (vw *View) RebuildView() {
 // UpdateImpl does the guts of updating -- backend for Update or GoUpdate
 func (vw *View) UpdateImpl() {
 	vw.Lock()
+	if vw.Settings.TrackParticle >= 0 {
+		_, _, pos, _ := GetParticleAt(int32(vw.Settings.TrackParticle))
+		if pos != (math32.Vector3i{}) {
+			szh := vw.Size.DivScalar(2)
+			vw.Start = pos.Sub(szh)
+			vw.Start.Z = pos.Z
+		}
+	}
 	for i := range 4 {
 		if vw.Panels[i].Var == nil {
 			fmt.Println("nil var", i)

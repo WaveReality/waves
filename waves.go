@@ -30,7 +30,8 @@ func main() {
 	// eqs := wavesim.Dirac
 	eqs := wavesim.ParticleKGC
 
-	ctrPos := math32.Vec3i(-1, -1, -1)
+	ctrPos := math32.Vec3(-1, -1, -1)
+	ctrInt := math32.Vec3i(-1, -1, -1)
 
 	// note: max 3d size is slightly above 400^3 for KGParticles
 	// Total memory size in floats: 4,157,747,712 GB: 16,630,990,848 num vars: 32 buf cap: 21,474,836,480
@@ -106,12 +107,14 @@ func main() {
 				}
 			case wavesim.ParticleKGC:
 				sim.Params.Edges = wavesim.EdgesDamp
-				sim.Params.Mass = 0.01
+				sim.Params.Mass = 0.1
+				sim.Params.Hbar = 0.1
 				sim.Params.Move.SetBool(false)
+				sim.Config.Velocity.X = 0
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
-					// sim.Config.Size.Set(400, 400, 400)
+					// sim.Config.Size.Set(200, 200, 200)
 				} else {
 					sim.Config.Size.Set(50, 1, 1)
 				}
@@ -137,24 +140,23 @@ func main() {
 				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
 			case wavesim.Dirac:
 
 				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
-					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, math32.Vec3i(50, 50, 50), -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, ctrPos, -1, 0, 1)
 				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrPos, 1)
+					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
 			case wavesim.ParticleKGC:
-				sim.ParticleAtConfig(ctrPos, 1)
-				sim.InvR(wavesim.CabPosA, ctrPos, .2)
-				sim.InvR(wavesim.CabPosB, ctrPos, .2)
+				sim.ParticleAtConfig(ctrInt, 1)
+				sim.ParticleField(ctrInt, 8)
 			}
 		})
 }

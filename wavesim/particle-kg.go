@@ -18,9 +18,15 @@ import (
 type ParticleKGCStates CabStates //enums:enum -trim-prefix=PKGC
 
 const (
+	// PKGCDrive is the particle field driver position
+	PKGCDrive ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
+
+	// PKGCDriveVel is the velocity of the driver
+	PKGCDriveVel
+
 	// PKGCParticle indicates the type of particle present at this cell.
 	// zero indicates no particle.
-	PKGCParticle ParticleKGCStates = ParticleKGCStates(CabStatesN) + iota
+	PKGCParticle
 
 	// PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis
 	PKGCPvelX
@@ -40,12 +46,6 @@ const (
 
 	// PKGCPESq is the square of the particle energy.
 	PKGCPESq
-
-	// PKGCDist is the 1 / distance from particle, propagating from source via diffusion.
-	PKGCDist
-
-	// PKGCDriver is the particle driver field propagating by exponential falloff.
-	PKGCDriver
 
 	// PKGCHoP0 is the central time-like SHO position for particle velocity,
 	// which provides the reference against which the 3 axis phases are computed.
@@ -90,6 +90,7 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	if !ok {
 		return
 	}
+	sz := ctx.Size.V()
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
@@ -98,50 +99,46 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
 
 	csq := Params[0].CSq
+	hbar := Params[0].Hbar
+	hcsq := csq * hbar * hbar
 	// mhsq := Params[0].MOverHSq
+	// diff := Params[0].Diff
 
 	particle := State.Value(int(z), int(y), int(x), int(PKGCParticle), int(prv))
 
-	var forceA, forceB float32
+	var forceA, forceB, cabDrvF float32
 	if Params[0].ThreeD.IsTrue() {
 		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian26(x, y, z, int32(CabPosB), prv, pposB)
+		// todo: drive A and B out of phase based on particle charge!
+		// probably only for neighbor of particle.
+		cabDrvF = OneoAverage27Sum * NeighAverage27(x, y, z, int32(PKGCDrive), prv)
+		forceA += cabDrvF - pposA
+		forceB += cabDrvF - pposB
 	} else {
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
 
-	// note: with no weights, favors diagonal; with 1/d or 1/d^2 weights favors
-	// the axes. need to synthesize values?
-	// diff := Params[0].Diff
-	// drv := NeighMax26(x, y, z, int32(PKGCDriver), prv, diff)
-	// odrv := diff * drv
-
-	nh0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
-	var dist, drv float32
-	if nh0 != 0 {
-		drv = nh0
-		dist = 1.5
-	} else {
-		dist = State.Value(int(z), int(y), int(x), int(PKGCDist), int(prv))
-		distF := Laplacian26(x, y, z, int32(PKGCDist), prv, dist)
-		dist += csq * distF // no velocity
-
-		drv = State.Value(int(z), int(y), int(x), int(PKGCDriver), int(prv))
-		drvF := Laplacian26(x, y, z, int32(PKGCDriver), prv, drv)
-		drv += csq * drvF // no velocity
-	}
-	odrv := drv / max(dist, .0001)
-
-	// todo: drive A and B out of phase based on particle charge!
-	// probably only for neighbor of particle.
-	forceA += odrv - pposA
 	velA := pvelA + csq*forceA
 	posA := pposA + velA
 
-	forceB += odrv - pposB
 	velB := pvelB + csq*forceB
 	posB := pposB + velB
+
+	// driver update: driver is slowly updating
+
+	drv := State.Value(int(z), int(y), int(x), int(PKGCDrive), int(prv))
+	drvV := State.Value(int(z), int(y), int(x), int(PKGCDriveVel), int(prv))
+	drvF := Laplacian26(x, y, z, int32(PKGCDrive), prv, drv)
+
+	nh0 := NeighAverage27(x, y, z, int32(PKGCHoP0), prv)
+	if nh0 != 0 {
+		drvF += (nh0 - drv)
+	}
+
+	drvV += hcsq * drvF // slow!
+	drv += drvV
 
 	// todo: later, based on particle..
 	// var grAX, grAY, grAZ, grBX, grBY, grBZ float32
@@ -162,8 +159,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
 
-	State.Set(dist, int(z), int(y), int(x), int(PKGCDist), int(cur))
-	State.Set(drv, int(z), int(y), int(x), int(PKGCDriver), int(cur))
+	State.Set(drv, int(z), int(y), int(x), int(PKGCDrive), int(cur))
+	State.Set(drvV, int(z), int(y), int(x), int(PKGCDriveVel), int(cur))
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX
@@ -230,21 +227,21 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	rndZ := GetRandomNumber(i, ctx.RandCounter.Counter, 2)
 
 	mvX := int32(0)
-	if rndX < pXp {
+	if rndX < pXp && x < sz.X {
 		mvX = 1
-	} else if rndX < pXp+pXn {
+	} else if rndX < pXp+pXn && x > 1 {
 		mvX = -1
 	}
 	mvY := int32(0)
-	if rndY < pYp {
+	if rndY < pYp && y < sz.Y {
 		mvY = 1
-	} else if rndY < pYp+pYn {
+	} else if rndY < pYp+pYn && y > 1 {
 		mvY = -1
 	}
 	mvZ := int32(0)
-	if rndZ < pZp {
+	if rndZ < pZp && z < sz.Z {
 		mvZ = 1
-	} else if rndZ < pZp+pZn {
+	} else if rndZ < pZp+pZn && z > 1 {
 		mvZ = -1
 	}
 	if Params[0].ThreeD.IsFalse() || Params[0].Move.IsFalse() {
@@ -283,7 +280,8 @@ func ParticleKGCKernel(i uint32) { //gosl:kernel
 	State.Set(lorentz, int(mz), int(my), int(mx), int(PKGCLorentz), int(cur))
 	State.Set(esq, int(mz), int(my), int(mx), int(PKGCPESq), int(cur))
 
-	State.Set(hoP0, int(mz), int(my), int(mx), int(PKGCDriver), int(cur))
+	// State[mz, my, mx, PKGCDriver, cur] = hoP0
+	// State[mz, my, mx, PKGCDist, cur] = 1
 	State.Set(particle, int(mz), int(my), int(mx), int(PKGCParticle), int(cur))
 
 	SetParticleAt(0, lorentz, esq, math32.Vec3i(mx, my, mz), math32.Vec3(pvX, pvY, pvZ))
@@ -312,11 +310,12 @@ func ParticleKGCViewAll(view *View) {
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
 	view.Panels[0].Var = PKGCHoP0
-	view.Panels[1].Var = PKGCHoPX
+	view.Panels[1].Var = PKGCPESq
 	// view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = CabPosA
+	view.Panels[2].Var = PKGCDrive
 	// view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabPosB
+	view.Panels[3].Var = CabPosA
+	view.Settings.TrackParticle = 0
 }
 
 func (ss *Sim) ParticleKGCStats() {

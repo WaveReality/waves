@@ -47,6 +47,16 @@ func SetParticleAt(idx int32, lorentz, esq float32, pos math32.Vector3i, vel mat
 	Particles[idx, ParticlePosZ] = float32(pos.Z)
 }
 
+// GetParticleAt gets particle dynamic data at given index.
+func GetParticleAt(idx int32) (lorentz, esq float32, pos math32.Vector3i, vel math32.Vector3) {
+	lorentz = Particles[idx, ParticleLorentz]
+	esq = Particles[idx, ParticleESq]
+	pos.X = int32(Particles[idx, ParticlePosX])
+	pos.Y = int32(Particles[idx, ParticlePosY])
+	pos.Z = int32(Particles[idx, ParticlePosZ])
+	return
+}
+
 func (ss *Sim) ParticleStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatParticle(0))

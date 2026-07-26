@@ -47,7 +47,6 @@ func (cfg *Config) Defaults() {
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 8
-	cfg.Velocity.X = 0.2
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {

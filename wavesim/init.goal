@@ -32,10 +32,10 @@ func (ss *Sim) CopyCurToPrev() {
 	}
 }
 
-// Center returns the given 3d coords with any negative
+// CenterI returns the given 3D coords with any negative
 // numbers replaced with the value plus center+1 (of non-edge space)
 // such that -1 = center, -2 = 1 before center, etc.
-func Center(c math32.Vector3i) math32.Vector3i {
+func CenterI(c math32.Vector3i) math32.Vector3i {
 	ctx := GetCtx(0)
 	ctr := ctx.Size.V().DivScalar(2).AddScalar(1)
 	if c.X < 0 {
@@ -50,9 +50,33 @@ func Center(c math32.Vector3i) math32.Vector3i {
 	return c
 }
 
+// CenterF returns the given 3D coords with any negative
+// numbers replaced with the value plus center+1 (of non-edge space)
+// such that -1 = center, -2 = 1 before center, etc.
+func CenterF(c math32.Vector3) math32.Vector3 {
+	ctx := GetCtx(0)
+	ctr := ctx.Size.V().DivScalar(2).AddScalar(1)
+	if c.X < 0 {
+		c.X += float32(ctr.X)
+	}
+	if c.Y < 0 {
+		c.Y += float32(ctr.Y)
+	}
+	if c.Z < 0 {
+		c.Z += float32(ctr.Z)
+	}
+	return c
+}
+
 func CoordToFloat(c math32.Vector3i) math32.Vector3 {
 	var f math32.Vector3
 	f.SetFromVector3i(c)
+	return f
+}
+
+func CoordToInt(c math32.Vector3) math32.Vector3i {
+	var f math32.Vector3i
+	f.SetFromVector3(c)
 	return f
 }
 
@@ -117,15 +141,36 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off 
 	}
 }
 
+// Gauss adds gaussian values to given variable.
+func (ss *Sim) Gauss(vr enums.Enum, ctr math32.Vector3, width, amp, off float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	ctr = CenterF(ctr)
+	cur := ctx.CurState
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				ff := CoordToFloat(c)
+				d := ff.Sub(ctr).Length() / width
+				v := off + amp*math32.FastExp(-d*d)
+				State[f.Z, f.Y, f.X, vri, cur] += v
+			}
+		}
+	}
+}
+
 // PosWavePacket adds a gaussian * cosine wave packet along given dimension,
 // with given parameters, to just the current and previous position variables.
 // This will produce two moving wave packets that split off into opposite directions.
-func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, wavelength, width, phase, amp float32) {
+func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ctrf := CoordToFloat(Center(ctr))
+	ctrf := CenterF(ctr)
 	var diroff math32.Vector3
 	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
@@ -150,14 +195,14 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i
 
 // PosWavePacketConfig is a version of [PosWavePacket] that gets parameters from
 // [Config]
-func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
 	ss.PosWavePacket(vr, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
 }
 
 // MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
 // with given parameters, to both the position and velocity variables in current
 // and previous states, which results in a single wave packet moving in given direction.
-func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, wavelength, width, phase, amp float32) {
+func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
 	posI := int(posVar.Int64())
 	velI := int(velVar.Int64())
 	ctx := GetCtx(0)
@@ -174,7 +219,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 		vamp = amp * 0.0746 // 0.0746
 		veloff = 1 + 2*math32.Sqrt(wavelength)
 	}
-	ctrf := CoordToFloat(Center(ctr))
+	ctrf := CenterF(ctr)
 	var diroff math32.Vector3
 	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
@@ -209,18 +254,18 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 
 // MovingWavePacketConfig is a version of [MovingWavePacket] that takes its
 // wavelength and width variables from [Config]
-func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3i, dir, phase, amp float32) {
+func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
 	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
 }
 
 // InvR adds 1/r values radiating from given center point,
 // with peak point as given value.
-func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
+func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3, val float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
-	ctr = Center(ctr)
-	ctrf := CoordToFloat(ctr)
+	ctr = CenterF(ctr)
+	ctri := CoordToInt(ctr)
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
@@ -228,8 +273,8 @@ func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3i, val float32) {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
 				ff := CoordToFloat(c)
-				d := ff.Sub(ctrf).Length()
-				if c == ctr {
+				d := ff.Sub(ctr).Length()
+				if c == ctri {
 					State[f.Z, f.Y, f.X, vri, cur] += val
 				} else {
 					State[f.Z, f.Y, f.X, vri, cur] += val / d
@@ -269,4 +314,12 @@ func (ss *Sim) ParticleAt(c math32.Vector3i, pvel math32.Vector3, partType float
 // ParticleAtConfig is a version of ParticleAt that sets Velocity from [Config]
 func (ss *Sim) ParticleAtConfig(c math32.Vector3i, partType float32) {
 	ss.ParticleAt(c, ss.Config.Velocity, partType)
+}
+
+// ParticleField sets field parameters for particle at given position.
+func (ss *Sim) ParticleField(c math32.Vector3i, width float32) {
+	cf := CoordToFloat(c)
+	ss.InvR(PKGCDrive, cf, 1)
+	ss.InvR(CabPosA, cf, 1)
+	ss.InvR(CabPosB, cf, 1)
 }
