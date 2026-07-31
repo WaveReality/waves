@@ -344,11 +344,11 @@ const EquationsN Equations = 8
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `ParticleKGC`: 6, `ParticleMove`: 7}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Spinfield`: 6, `ParticleMove`: 7}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `ParticleKGC is the Klein-Gordon complex version of stochastic particles.`, 7: `ParticleMove is just particle motion without any wave field.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 7: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `ParticleKGC`, 7: `ParticleMove`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Spinfield`, 7: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -380,61 +380,6 @@ func (i Equations) MarshalText() ([]byte, error) { return []byte(i.String()), ni
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Equations) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "Equations")
-}
-
-var _ParticleKGCStatesValues = []ParticleKGCStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
-
-// ParticleKGCStatesN is the highest valid value for type ParticleKGCStates, plus one.
-//
-//gosl:start
-const ParticleKGCStatesN ParticleKGCStates = 32
-
-//gosl:end
-
-var _ParticleKGCStatesValueMap = map[string]ParticleKGCStates{`Drive`: 15, `DriveVel`: 16, `Particle`: 17, `PvelX`: 18, `PvelY`: 19, `PvelZ`: 20, `PvelSq`: 21, `Lorentz`: 22, `PESq`: 23, `HoP0`: 24, `HoV0`: 25, `HoPX`: 26, `HoVX`: 27, `HoPY`: 28, `HoVY`: 29, `HoPZ`: 30, `HoVZ`: 31}
-
-var _ParticleKGCStatesDescMap = map[ParticleKGCStates]string{15: `PKGCDrive is the particle field driver position`, 16: `PKGCDriveVel is the velocity of the driver`, 17: `PKGCParticle indicates the type of particle present at this cell. zero indicates no particle.`, 18: `PKGCPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 19: `PKGCPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 20: `PKGCPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 21: `PKGCPvelSq is the squared total particle velocity across all axes: X^2 + Y^2 + Z^2`, 22: `PKGCLorentz is the Lorentz factor for particle: 1 / sqrt(1-(v^2/c^2)) (v^2 = PvelSq)`, 23: `PKGCPESq is the square of the particle energy.`, 24: `PKGCHoP0 is the central time-like SHO position for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 25: `PKGCHoV0 is the central time-like SHO velocity for particle velocity, which provides the reference against which the 3 axis phases are computed.`, 26: `PKGCHoPX is the SHO position for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 27: `PKGCHoVX is the SHO velocity for particle velocity along X axis, with phase relative to central HoV0 driving normalized velocity value.`, 28: `PKGCHoPY is the SHO position for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 29: `PKGCHoVY is the SHO velocity for particle velocity along Y axis, with phase relative to central HoV0 driving normalized velocity value.`, 30: `PKGCHoPZ is the SHO position for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`, 31: `PKGCHoVZ is the SHO velocity for particle velocity along Z axis, with phase relative to central HoV0 driving normalized velocity value.`}
-
-var _ParticleKGCStatesMap = map[ParticleKGCStates]string{15: `Drive`, 16: `DriveVel`, 17: `Particle`, 18: `PvelX`, 19: `PvelY`, 20: `PvelZ`, 21: `PvelSq`, 22: `Lorentz`, 23: `PESq`, 24: `HoP0`, 25: `HoV0`, 26: `HoPX`, 27: `HoVX`, 28: `HoPY`, 29: `HoVY`, 30: `HoPZ`, 31: `HoVZ`}
-
-// String returns the string representation of this ParticleKGCStates value.
-func (i ParticleKGCStates) String() string {
-	return enums.StringExtended[ParticleKGCStates, CabStates](i, _ParticleKGCStatesMap)
-}
-
-// SetString sets the ParticleKGCStates value from its string representation,
-// and returns an error if the string is invalid.
-func (i *ParticleKGCStates) SetString(s string) error {
-	return enums.SetStringExtended(i, (*CabStates)(i), s, _ParticleKGCStatesValueMap)
-}
-
-// Int64 returns the ParticleKGCStates value as an int64.
-func (i ParticleKGCStates) Int64() int64 { return int64(i) }
-
-// SetInt64 sets the ParticleKGCStates value from an int64.
-func (i *ParticleKGCStates) SetInt64(in int64) { *i = ParticleKGCStates(in) }
-
-// Desc returns the description of the ParticleKGCStates value.
-func (i ParticleKGCStates) Desc() string {
-	return enums.DescExtended[ParticleKGCStates, CabStates](i, _ParticleKGCStatesDescMap)
-}
-
-// ParticleKGCStatesValues returns all possible values for the type ParticleKGCStates.
-func ParticleKGCStatesValues() []ParticleKGCStates {
-	return enums.ValuesGlobalExtended(_ParticleKGCStatesValues, CabStatesValues())
-}
-
-// Values returns all possible values for the type ParticleKGCStates.
-func (i ParticleKGCStates) Values() []enums.Enum {
-	return enums.ValuesExtended(_ParticleKGCStatesValues, CabStatesValues())
-}
-
-// MarshalText implements the [encoding.TextMarshaler] interface.
-func (i ParticleKGCStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
-
-// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
-func (i *ParticleKGCStates) UnmarshalText(text []byte) error {
-	return enums.UnmarshalText(i, text, "ParticleKGCStates")
 }
 
 var _ParticleVarsValues = []ParticleVars{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
@@ -667,6 +612,61 @@ func (i NPanels) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *NPanels) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "NPanels") }
+
+var _SpinfieldStatesValues = []SpinfieldStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+
+// SpinfieldStatesN is the highest valid value for type SpinfieldStates, plus one.
+//
+//gosl:start
+const SpinfieldStatesN SpinfieldStates = 30
+
+//gosl:end
+
+var _SpinfieldStatesValueMap = map[string]SpinfieldStates{`Particle`: 15, `PvelX`: 16, `PvelY`: 17, `PvelZ`: 18, `PESq`: 19, `Dist`: 20, `Drive`: 21, `0a`: 22, `0b`: 23, `Xa`: 24, `Xb`: 25, `Ya`: 26, `Yb`: 27, `Za`: 28, `Zb`: 29}
+
+var _SpinfieldStatesDescMap = map[SpinfieldStates]string{15: `SpinfieldParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `SpinfieldPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `SpinfieldPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `SpinfieldPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `SpinfieldPESq is the square of the particle energy.`, 20: `SpinfieldDist is the 1/r distance propagated from the source particle.`, 21: `SpinfieldDrive is the coupling strength of particle field to wave fields. Computed from Dist.`, 22: `Spinfield0a is the core spin complex-valued oscillator, a.`, 23: `Spinfield0b is the core spin complex-valued oscillator, b.`, 24: `SpinfieldXa is the complex-valued oscillator for velocity along the X asis, a. Phase relative to 0 determines velocity.`, 25: `SpinfieldXb is the complex-valued oscillator for velocity along the X asis, b. Phase relative to 0 determines velocity.`, 26: `SpinfieldXa is the complex-valued oscillator for velocity along the Y asis, a. Phase relative to 0 determines velocity.`, 27: `SpinfieldXb is the complex-valued oscillator for velocity along the Y asis, b. Phase relative to 0 determines velocity.`, 28: `SpinfieldXa is the complex-valued oscillator for velocity along the Z asis, a. Phase relative to 0 determines velocity.`, 29: `SpinfieldXb is the complex-valued oscillator for velocity along the Z asis, b. Phase relative to 0 determines velocity.`}
+
+var _SpinfieldStatesMap = map[SpinfieldStates]string{15: `Particle`, 16: `PvelX`, 17: `PvelY`, 18: `PvelZ`, 19: `PESq`, 20: `Dist`, 21: `Drive`, 22: `0a`, 23: `0b`, 24: `Xa`, 25: `Xb`, 26: `Ya`, 27: `Yb`, 28: `Za`, 29: `Zb`}
+
+// String returns the string representation of this SpinfieldStates value.
+func (i SpinfieldStates) String() string {
+	return enums.StringExtended[SpinfieldStates, CabStates](i, _SpinfieldStatesMap)
+}
+
+// SetString sets the SpinfieldStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *SpinfieldStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*CabStates)(i), s, _SpinfieldStatesValueMap)
+}
+
+// Int64 returns the SpinfieldStates value as an int64.
+func (i SpinfieldStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the SpinfieldStates value from an int64.
+func (i *SpinfieldStates) SetInt64(in int64) { *i = SpinfieldStates(in) }
+
+// Desc returns the description of the SpinfieldStates value.
+func (i SpinfieldStates) Desc() string {
+	return enums.DescExtended[SpinfieldStates, CabStates](i, _SpinfieldStatesDescMap)
+}
+
+// SpinfieldStatesValues returns all possible values for the type SpinfieldStates.
+func SpinfieldStatesValues() []SpinfieldStates {
+	return enums.ValuesGlobalExtended(_SpinfieldStatesValues, CabStatesValues())
+}
+
+// Values returns all possible values for the type SpinfieldStates.
+func (i SpinfieldStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_SpinfieldStatesValues, CabStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i SpinfieldStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *SpinfieldStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "SpinfieldStates")
+}
 
 var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5}
 

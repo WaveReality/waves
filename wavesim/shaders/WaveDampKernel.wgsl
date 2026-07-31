@@ -385,12 +385,12 @@ const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 8;
-const ParticleKGCStatesN: ParticleKGCStates = 32;
 const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 2;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
+const SpinfieldStatesN: SpinfieldStates = 30;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
@@ -476,7 +476,7 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
-const  ParticleKGC: Equations = 6;
+const  Spinfield: Equations = 6;
 const  ParticleMove: Equations = 7;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
@@ -487,6 +487,7 @@ struct Parameters {
 	Move: i32,
 	C: f32,
 	Diff: f32,
+	Decay: f32,
 	CSq: f32,
 	Inv2CSq: f32,
 	Hbar: f32,
@@ -494,6 +495,7 @@ struct Parameters {
 	MOverHSq: f32,
 	HSqOver2M: f32,
 	HEOver2MCSq: f32,
+	Omega0: f32,
 	HOverMC: f32,
 	MOver2: f32,
 	MCSq: f32,
@@ -504,29 +506,7 @@ struct Parameters {
 	OneoEps0: f32,
 	Edges: Edges,
 	pad: f32,
-	pad1: f32,
-	pad2: f32,
 }
-
-//////// import: "particle-kg.go"
-alias ParticleKGCStates = CabStates; //enums:enum -trim-prefix=PKGC
-const  PKGCDrive: ParticleKGCStates = 15;
-const  PKGCDriveVel: ParticleKGCStates = 16;
-const  PKGCParticle: ParticleKGCStates = 17;
-const  PKGCPvelX: ParticleKGCStates = 18;
-const  PKGCPvelY: ParticleKGCStates = 19;
-const  PKGCPvelZ: ParticleKGCStates = 20;
-const  PKGCPvelSq: ParticleKGCStates = 21;
-const  PKGCLorentz: ParticleKGCStates = 22;
-const  PKGCPESq: ParticleKGCStates = 23;
-const  PKGCHoP0: ParticleKGCStates = 24;
-const  PKGCHoV0: ParticleKGCStates = 25;
-const  PKGCHoPX: ParticleKGCStates = 26;
-const  PKGCHoVX: ParticleKGCStates = 27;
-const  PKGCHoPY: ParticleKGCStates = 28;
-const  PKGCHoVY: ParticleKGCStates = 29;
-const  PKGCHoPZ: ParticleKGCStates = 30;
-const  PKGCHoVZ: ParticleKGCStates = 31;
 
 //////// import: "particle.go"
 const NParticles = 4;
@@ -559,6 +539,24 @@ alias NPanels = i32; //enums:enum -trim-prefix=Panels
 const  PanelsOne: NPanels = 0;
 const  PanelsTwo: NPanels = 1;
 const  PanelsFour: NPanels = 2;
+
+//////// import: "spinfield.go"
+alias SpinfieldStates = CabStates; //enums:enum -trim-prefix=Spinfield
+const  SpinfieldParticle: SpinfieldStates = 15;
+const  SpinfieldPvelX: SpinfieldStates = 16;
+const  SpinfieldPvelY: SpinfieldStates = 17;
+const  SpinfieldPvelZ: SpinfieldStates = 18;
+const  SpinfieldPESq: SpinfieldStates = 19;
+const  SpinfieldDist: SpinfieldStates = 20;
+const  SpinfieldDrive: SpinfieldStates = 21;
+const  Spinfield0a: SpinfieldStates = 22;
+const  Spinfield0b: SpinfieldStates = 23;
+const  SpinfieldXa: SpinfieldStates = 24;
+const  SpinfieldXb: SpinfieldStates = 25;
+const  SpinfieldYa: SpinfieldStates = 26;
+const  SpinfieldYb: SpinfieldStates = 27;
+const  SpinfieldZa: SpinfieldStates = 28;
+const  SpinfieldZb: SpinfieldStates = 29;
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum -trim-prefix=Wave

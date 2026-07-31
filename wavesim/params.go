@@ -43,8 +43,8 @@ const (
 	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
 	Dirac
 
-	// ParticleKGC is the Klein-Gordon complex version of stochastic particles.
-	ParticleKGC
+	// Spinfield is the Klein-Gordon complex version of stochastic particles.
+	Spinfield
 
 	// ParticleMove is just particle motion without any wave field.
 	ParticleMove
@@ -74,8 +74,12 @@ type Parameters struct {
 	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
 
-	// Diff is the particle diffusion factor: proportion decay relative to neighbors.
+	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
 	Diff float32
+
+	// Decay is the particle decay rate: portion of neighbor value to
+	// retain per unit distance.
+	Decay float32
 
 	// CSq = C^2
 	CSq float32 `display:"-"`
@@ -98,6 +102,10 @@ type Parameters struct {
 
 	// HEOver2MCSq = (Hbar*e) / (2 Mass * CSq) for computing charge.
 	HEOver2MCSq float32 `display:"-"`
+
+	// Omega0 is (Mass * Csq) / Hbar -- the angular velocity for
+	// complex-valued oscillator corresponding to the rest mass energy only.
+	Omega0 float32 `display:"-"`
 
 	// HOverMC = (Hbar) / (Mass * C) for computing particle momentum from phase.
 	HOverMC float32 `display:"-"`
@@ -130,7 +138,7 @@ type Parameters struct {
 	// Edges determines how to handle the edges.
 	Edges Edges
 
-	pad, pad1, pad2 float32
+	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -139,6 +147,7 @@ func (pr *Parameters) Update() {
 	pr.MOverHSq = (pr.Mass * pr.Mass) / (pr.Hbar * pr.Hbar)
 	pr.HSqOver2M = (pr.Hbar * pr.Hbar) / (2.0 * pr.Mass)
 	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
+	pr.Omega0 = (pr.Mass * pr.CSq) / pr.Hbar
 	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
 	pr.MOver2 = pr.Mass / 2.0
 	pr.MCSq = pr.Mass * pr.Mass * pr.CSq
@@ -151,7 +160,8 @@ func (pr *Parameters) Update() {
 
 func (pr *Parameters) Defaults() {
 	pr.C = 0.5
-	pr.Diff = 0.98
+	pr.Diff = 0.5
+	pr.Decay = 0.98
 	pr.Hbar = 1.0
 	pr.Mass = 1.0
 	pr.E = 1.0

@@ -6,11 +6,8 @@ package wavesim
 
 import (
 	"fmt"
-	"io"
 
-	"cogentcore.org/core/base/errors"
 	"cogentcore.org/core/base/fsx"
-	"cogentcore.org/core/base/iox/gzipx"
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/tree"
@@ -154,8 +151,8 @@ func (ss *Sim) ConfigSim() {
 		ss.MaxwellConfig()
 	case Dirac:
 		ss.DiracConfig()
-	case ParticleKGC:
-		ss.ParticleKGCConfig()
+	case Spinfield:
+		ss.SpinfieldConfig()
 	}
 	ss.ConfigState()
 	// if ss.Config.GPU {
@@ -261,8 +258,8 @@ func (ss *Sim) StepRun() {
 	case Dirac:
 		RunMaxwellKernel(ns)
 		RunDiracKernel(ns)
-	case ParticleKGC:
-		RunParticleKGCKernel(ns)
+	case Spinfield:
+		RunSpinfieldKernel(ns)
 	}
 	if ss.Params.Edges != EdgesFixed {
 		ne := int(ctx.EdgesN())
@@ -285,7 +282,7 @@ func (ss *Sim) StepRun() {
 			case Dirac:
 				RunMaxwellDampKernel(ne)
 				// RunDiracDampKernel(ne) // todo
-			case ParticleKGC:
+			case Spinfield:
 				RunKleinGordonCDampKernel(ne)
 			}
 		}
@@ -359,19 +356,21 @@ func (ss *Sim) UpdateView() {
 // SaveState saves the state to given file.
 // If filename ends in .gz, it is gzipped.
 func (ss *Sim) SaveState(filename fsx.Filename) error { //types:add
-	err := gzipx.Save(string(filename), func(w io.Writer) error {
-		return tensor.WriteCSV(State, w, tensor.Tab)
-	})
-	return errors.Log(err)
+	// err := gzipx.Save(string(filename), func(w io.Writer) error {
+	// 	return tensor.WriteCSV(State, w, tensor.Tab)
+	// })
+	// return errors.Log(err)
+	return nil
 }
 
 // OpenState opens the state from given file.
 // If filename ends in .gz, it is un-gzipped.
 func (ss *Sim) OpenState(filename fsx.Filename) error { //types:add
-	err := gzipx.Open(string(filename), func(r io.Reader) error {
-		return tensor.ReadCSV(State, r, tensor.Tab)
-	})
-	return errors.Log(err)
+	// err := gzipx.Open(string(filename), func(r io.Reader) error {
+	// 	return tensor.ReadCSV(State, r, tensor.Tab)
+	// })
+	// return errors.Log(err)
+	return nil
 }
 
 func (ss *Sim) RunNoGUI() {

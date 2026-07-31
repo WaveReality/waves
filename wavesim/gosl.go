@@ -230,13 +230,12 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ParticleKGCKernel.wgsl", sy)
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
-		pl.AddVarUsed(1, "Particles")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
 		pl.AddVarUsed(1, "State2")
@@ -247,12 +246,13 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SchrodingerKernel.wgsl", sy)
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/SpinfieldKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "Particles")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
 		pl.AddVarUsed(1, "State2")
@@ -650,48 +650,6 @@ func RunOneMaxwellKernel(n int, syncVars ...GPUVars) {
 		RunMaxwellKernelCPU(n)
 	}
 }
-// RunParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,
-// on either the CPU or GPU depending on the UseGPU variable.
-// Can call multiple Run* kernels in a row, which are then all launched
-// in the same command submission on the GPU, which is by far the most efficient.
-// MUST call RunDone (with optional vars to sync) after all Run calls.
-// Alternatively, a single-shot RunOneParticleKGCKernel call does Run and Done for a
-// single run-and-sync case.
-func RunParticleKGCKernel(n int) {
-	if UseGPU {
-		RunParticleKGCKernelGPU(n)
-	} else {
-		RunParticleKGCKernelCPU(n)
-	}
-}
-
-// RunParticleKGCKernelGPU runs the ParticleKGCKernel kernel on the GPU. See [RunParticleKGCKernel] for more info.
-func RunParticleKGCKernelGPU(n int) {
-	sy := GPUSystem
-	pl := sy.ComputePipelines["ParticleKGCKernel"]
-	ce, _ := sy.BeginComputePass()
-	pl.Dispatch1D(ce, n, 64)
-}
-
-// RunParticleKGCKernelCPU runs the ParticleKGCKernel kernel on the CPU.
-func RunParticleKGCKernelCPU(n int) {
-	gpu.VectorizeFunc(0, n, ParticleKGCKernel)
-}
-
-// RunOneParticleKGCKernel runs the ParticleKGCKernel kernel with given number of elements,
-// on either the CPU or GPU depending on the UseGPU variable.
-// This version then calls RunDone with the given variables to sync
-// after the Run, for a single-shot Run-and-Done call. If multiple kernels
-// can be run in sequence, it is much more efficient to do multiple Run*
-// calls followed by a RunDone call.
-func RunOneParticleKGCKernel(n int, syncVars ...GPUVars) {
-	if UseGPU {
-		RunParticleKGCKernelGPU(n)
-		RunDone(syncVars...)
-	} else {
-		RunParticleKGCKernelCPU(n)
-	}
-}
 // RunSchrodingerKernel runs the SchrodingerKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
@@ -732,6 +690,48 @@ func RunOneSchrodingerKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunSchrodingerKernelCPU(n)
+	}
+}
+// RunSpinfieldKernel runs the SpinfieldKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneSpinfieldKernel call does Run and Done for a
+// single run-and-sync case.
+func RunSpinfieldKernel(n int) {
+	if UseGPU {
+		RunSpinfieldKernelGPU(n)
+	} else {
+		RunSpinfieldKernelCPU(n)
+	}
+}
+
+// RunSpinfieldKernelGPU runs the SpinfieldKernel kernel on the GPU. See [RunSpinfieldKernel] for more info.
+func RunSpinfieldKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["SpinfieldKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunSpinfieldKernelCPU runs the SpinfieldKernel kernel on the CPU.
+func RunSpinfieldKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, SpinfieldKernel)
+}
+
+// RunOneSpinfieldKernel runs the SpinfieldKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneSpinfieldKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunSpinfieldKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunSpinfieldKernelCPU(n)
 	}
 }
 // RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,

@@ -21,14 +21,14 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	// threed := false
-	threed := true
+	threed := false
+	// threed := true
 	// eqs := wavesim.Wave
-	// eqs := wavesim.KleinGordon
+	eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	eqs := wavesim.ParticleKGC
+	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
 	ctrInt := math32.Vec3i(-1, -1, -1)
@@ -105,7 +105,7 @@ func main() {
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
-			case wavesim.ParticleKGC:
+			case wavesim.Spinfield:
 				sim.Params.Edges = wavesim.EdgesDamp
 				sim.Params.Mass = 0.1
 				sim.Params.Hbar = 0.1
@@ -113,13 +113,13 @@ func main() {
 				sim.Config.Velocity.X = 0
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 100)
-					// sim.Config.Size.Set(200, 200, 200)
+					// sim.Config.Size.Set(100, 100, 100)
+					sim.Config.Size.Set(200, 200, 200)
 				} else {
 					sim.Config.Size.Set(50, 1, 1)
 				}
-				sim.ViewInit(wavesim.ParticleKGCViewAll)
-				sim.ParticleKGCStats()
+				sim.ViewInit(wavesim.SpinfieldViewAll)
+				sim.SpinfieldStats()
 			}
 		},
 		func(sim *wavesim.Sim) {
@@ -146,7 +146,6 @@ func main() {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
 			case wavesim.Dirac:
-
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
@@ -154,7 +153,7 @@ func main() {
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
-			case wavesim.ParticleKGC:
+			case wavesim.Spinfield:
 				sim.ParticleAtConfig(ctrInt, 1)
 				sim.ParticleField(ctrInt, 8)
 			}
