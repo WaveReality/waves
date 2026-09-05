@@ -37,6 +37,18 @@ const (
 	// Computed from Dist.
 	SpinfieldDrive
 
+	// SpinfieldHiggs0a is the Higgs spin complex-valued oscillator, 0a.
+	SpinfieldHiggs0a
+
+	// SpinfieldHiggs0b is the Higgs spin complex-valued oscillator, 0b.
+	SpinfieldHiggs0b
+
+	// SpinfieldHiggs1a is the Higgs spin complex-valued oscillator, 1a.
+	SpinfieldHiggs1a
+
+	// SpinfieldHiggs1b is the Higgs spin complex-valued oscillator, 1b.
+	SpinfieldHiggs1b
+
 	// Spinfield0a is the core spin complex-valued oscillator, a.
 	Spinfield0a
 

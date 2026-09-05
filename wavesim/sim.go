@@ -151,6 +151,8 @@ func (ss *Sim) ConfigSim() {
 		ss.MaxwellConfig()
 	case Dirac:
 		ss.DiracConfig()
+	case Higgs:
+		ss.HiggsConfig()
 	case Spinfield:
 		ss.SpinfieldConfig()
 	}
@@ -258,6 +260,9 @@ func (ss *Sim) StepRun() {
 	case Dirac:
 		RunMaxwellKernel(ns)
 		RunDiracKernel(ns)
+	case Higgs:
+		RunMaxwellKernel(ns)
+		RunHiggsKernel(ns)
 	case Spinfield:
 		RunSpinfieldKernel(ns)
 	}
@@ -282,6 +287,8 @@ func (ss *Sim) StepRun() {
 			case Dirac:
 				RunMaxwellDampKernel(ne)
 				// RunDiracDampKernel(ne) // todo
+			case Higgs:
+				RunMaxwellDampKernel(ne)
 			case Spinfield:
 				RunKleinGordonCDampKernel(ne)
 			}

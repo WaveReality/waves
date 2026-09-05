@@ -457,17 +457,19 @@ func (vw *View) ViewDefaults(se *xyz.Scene) {
 
 var NilColor = color.RGBA{0x20, 0x20, 0x20, 0x40}
 
-// ValColor returns the raw value, scaled value, and color representation
-// for given raw value
-func (vw *View) ValColor(raw float32, panelNo int) (scaled float32, clr color.RGBA) {
+// ValColor returns the scaled value, max value, and color representation
+// for given raw value.
+func (vw *View) ValColor(raw float32, panelNo int) (scaled, maxval float32, clr color.RGBA) {
 	vp, err := vw.GetVarSettings(vw.Panels[panelNo].Var)
 	var clp, norm, op float32
 	if err != nil {
-		clp = math32.Clamp(raw, -1, 1)
+		maxval = 1
+		clp = math32.Clamp(raw, -maxval, maxval)
 		norm = 0.5 * (clp + 1)
 		scaled = float32(2*norm - 1)
 		op = (vw.Settings.ZeroAlpha + (1-vw.Settings.ZeroAlpha)*math32.Abs(scaled))
 	} else {
+		maxval = max(math32.Abs(vp.Range.Max), math32.Abs(vp.Range.Min))
 		clp = vp.Range.ClampValue(raw)
 		norm = vp.Range.NormValue(clp)
 		if vp.ZeroCtr {

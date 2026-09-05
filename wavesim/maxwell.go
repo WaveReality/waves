@@ -12,37 +12,37 @@ package wavesim
 type EMStates int32 //enums:enum
 
 const (
-	// A0Pos is the position (height) wave state variable
+	// A0s is the position (height) wave state variable
 	// for the EM A0 electrical (scalar) potential field.
-	A0Pos EMStates = iota
+	A0s EMStates = iota
 
-	// AXPos is the position (height) wave state variable
+	// AXs is the position (height) wave state variable
 	// for the EM AX magnetic (vector) potential field, X component.
-	AXPos
+	AXs
 
-	// AYPos is the position (height) wave state variable
+	// AYs is the position (height) wave state variable
 	// for the EM AY magnetic (vector) potential field, Y component.
-	AYPos
+	AYs
 
-	// AZPos is the position (height) wave state variable
+	// AZs is the position (height) wave state variable
 	// for the EM AZ magnetic (vector) potential field, Z component.
-	AZPos
+	AZs
 
-	// A0Vel is the velocity of wave state variable
+	// A0v is the velocity of wave state variable
 	// for the EM A0 electrical (scalar) potential field.
-	A0Vel
+	A0v
 
-	// AXVel is the velocity of wave state variable
+	// AXv is the velocity of wave state variable
 	// for the EM AX magnetic (vector) potential field, X component.
-	AXVel
+	AXv
 
-	// AYVel is the velocity of wave state variable
+	// AYv is the velocity of wave state variable
 	// for the EM AY magnetic (vector) potential field, Y component.
-	AYVel
+	AYv
 
-	// AZVel is the velocity of wave state variable
+	// AZv is the velocity of wave state variable
 	// for the EM AZ magnetic (vector) potential field, Z component.
-	AZVel
+	AZv
 
 	// EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt
 	EX
@@ -86,74 +86,78 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	a0pp := State.Value(int(z), int(y), int(x), int(A0Pos), int(prv))
-	aXpp := State.Value(int(z), int(y), int(x), int(AXPos), int(prv))
-	aYpp := State.Value(int(z), int(y), int(x), int(AYPos), int(prv))
-	aZpp := State.Value(int(z), int(y), int(x), int(AZPos), int(prv))
 
-	a0vp := State.Value(int(z), int(y), int(x), int(A0Vel), int(prv))
-	aXvp := State.Value(int(z), int(y), int(x), int(AXVel), int(prv))
-	aYvp := State.Value(int(z), int(y), int(x), int(AYVel), int(prv))
-	aZvp := State.Value(int(z), int(y), int(x), int(AZVel), int(prv))
+	csq := Params[0].CSq
 
-	var f0, fX, fY, fZ, c0, cX, cY, cZ, dX, dY, dZ, bX, bY, bZ float32
+	a0pp := State.Value(int(z), int(y), int(x), int(A0s), int(prv))
+	aXpp := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
+	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
+	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+
+	// a0vp := State[z, y, x, A0v, prv]
+	aXvp := State.Value(int(z), int(y), int(x), int(AXv), int(prv))
+	aYvp := State.Value(int(z), int(y), int(x), int(AYv), int(prv))
+	aZvp := State.Value(int(z), int(y), int(x), int(AZv), int(prv))
+
+	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
-		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
-		fY = Laplacian26(x, y, z, int32(AYPos), prv, aYpp)
-		fZ = Laplacian26(x, y, z, int32(AZPos), prv, aZpp)
+		f0 = Laplacian26(x, y, z, int32(A0s), prv, a0pp)
+		fX = Laplacian26(x, y, z, int32(AXs), prv, aXpp)
+		fY = Laplacian26(x, y, z, int32(AYs), prv, aYpp)
+		fZ = Laplacian26(x, y, z, int32(AZs), prv, aZpp)
 
 		c0 = NeighAverage27(x, y, z, int32(Charge), prv)
 		cX = NeighAverage27(x, y, z, int32(CurrentX), prv)
 		cY = NeighAverage27(x, y, z, int32(CurrentY), prv)
 		cZ = NeighAverage27(x, y, z, int32(CurrentZ), prv)
 	} else {
-		f0 = Laplacian1D(x, y, z, int32(A0Pos), prv, a0pp)
-		fX = Laplacian1D(x, y, z, int32(AXPos), prv, aXpp)
-		fY = Laplacian1D(x, y, z, int32(AYPos), prv, aYpp)
-		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
+		f0 = Laplacian1D(x, y, z, int32(A0s), prv, a0pp)
+		fX = Laplacian1D(x, y, z, int32(AXs), prv, aXpp)
+		fY = Laplacian1D(x, y, z, int32(AYs), prv, aYpp)
+		fZ = Laplacian1D(x, y, z, int32(AZs), prv, aZpp)
 	}
-	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0
-	a0vc := a0vp + f0
+	f0 = csq*f0 + Params[0].OneoEps0*c0
+	// a0vc := a0vp + f0
+	a0vc := f0 // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
 	a0pc := a0pp + a0vc
 
-	fX = Params[0].CSq*fX + Params[0].Mu0*cX
+	fX = csq*fX + Params[0].Mu0*cX
 	aXvc := aXvp + fX
 	aXpc := aXpp + aXvc
 
-	fY = Params[0].CSq*fY + Params[0].Mu0*cY
+	fY = csq*fY + Params[0].Mu0*cY
 	aYvc := aYvp + fY
 	aYpc := aYpp + aYvc
 
-	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ
+	fZ = csq*fZ + Params[0].Mu0*cZ
 	aZvc := aZvp + fZ
 	aZpc := aZpp + aZvc
 
 	// note: these were done on cur, not prv, in emewave
 	// could do as a second pass here -- check if affects stability.
-	Gradient18(x, y, z, int32(A0Pos), prv, &dX, &dY, &dZ)
-	Curl18(x, y, z, int32(AXPos), prv, &bX, &bY, &bZ)
+	g := Gradient18(x, y, z, int32(A0s), prv)
+	b := Curl18(x, y, z, int32(AXs), prv)
 
 	// E = -grad A0 - dA/dt
-	State.Set(-dX-aXvp, int(z), int(y), int(x), int(EX), int(cur))
-	State.Set(-dY-aYvp, int(z), int(y), int(x), int(EY), int(cur))
-	State.Set(-dZ-aZvp, int(z), int(y), int(x), int(EZ), int(cur))
+	State.Set(-g.X-aXvp, int(z), int(y), int(x), int(EX), int(cur))
+	State.Set(-g.Y-aYvp, int(z), int(y), int(x), int(EY), int(cur))
+	State.Set(-g.Z-aZvp, int(z), int(y), int(x), int(EZ), int(cur))
 
-	State.Set(bX, int(z), int(y), int(x), int(BX), int(cur))
-	State.Set(bY, int(z), int(y), int(x), int(BY), int(cur))
-	State.Set(bZ, int(z), int(y), int(x), int(BZ), int(cur))
+	State.Set(b.X, int(z), int(y), int(x), int(BX), int(cur))
+	State.Set(b.Y, int(z), int(y), int(x), int(BY), int(cur))
+	State.Set(b.Z, int(z), int(y), int(x), int(BZ), int(cur))
 
-	State.Set(a0vc, int(z), int(y), int(x), int(A0Vel), int(cur))
-	State.Set(a0pc, int(z), int(y), int(x), int(A0Pos), int(cur))
+	State.Set(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
+	State.Set(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
 
-	State.Set(aXvc, int(z), int(y), int(x), int(AXVel), int(cur))
-	State.Set(aXpc, int(z), int(y), int(x), int(AXPos), int(cur))
+	State.Set(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
+	State.Set(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
 
-	State.Set(aYvc, int(z), int(y), int(x), int(AYVel), int(cur))
-	State.Set(aYpc, int(z), int(y), int(x), int(AYPos), int(cur))
+	State.Set(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
+	State.Set(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
 
-	State.Set(aZvc, int(z), int(y), int(x), int(AZVel), int(cur))
-	State.Set(aZpc, int(z), int(y), int(x), int(AZPos), int(cur))
+	State.Set(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
+	State.Set(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
 }
 
 // MaxwellDampKernel is the kernel for computing the Maxwell EM equations,
@@ -169,49 +173,52 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 	sz := ctx.SizePlus1() // exclude updating on edges
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	a0pp := State.Value(int(z), int(y), int(x), int(A0Pos), int(prv))
-	aXpp := State.Value(int(z), int(y), int(x), int(AXPos), int(prv))
-	aYpp := State.Value(int(z), int(y), int(x), int(AYPos), int(prv))
-	aZpp := State.Value(int(z), int(y), int(x), int(AZPos), int(prv))
+
+	csq := Params[0].CSq
+
+	a0pp := State.Value(int(z), int(y), int(x), int(A0s), int(prv))
+	aXpp := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
+	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
+	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
 	var f0, fX, fY, fZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
-		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
-		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
-		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
 	} else {
-		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
-		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
-		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
-		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
 	}
-	f0 = Params[0].CSq * f0
+	f0 = csq * f0
 	a0vc := f0
 	a0pc := a0pp + a0vc
 
-	fX = Params[0].CSq * fX
+	fX = csq * fX
 	aXvc := fX
 	aXpc := aXpp + aXvc
 
-	fY = Params[0].CSq * fY
+	fY = csq * fY
 	aYvc := fY
 	aYpc := aYpp + aYvc
 
-	fZ = Params[0].CSq * fZ
+	fZ = csq * fZ
 	aZvc := fZ
 	aZpc := aZpp + aZvc
 
-	State.Set(a0vc, int(z), int(y), int(x), int(A0Vel), int(cur))
-	State.Set(a0pc, int(z), int(y), int(x), int(A0Pos), int(cur))
+	State.Set(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
+	State.Set(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
 
-	State.Set(aXvc, int(z), int(y), int(x), int(AXVel), int(cur))
-	State.Set(aXpc, int(z), int(y), int(x), int(AXPos), int(cur))
+	State.Set(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
+	State.Set(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
 
-	State.Set(aYvc, int(z), int(y), int(x), int(AYVel), int(cur))
-	State.Set(aYpc, int(z), int(y), int(x), int(AYPos), int(cur))
+	State.Set(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
+	State.Set(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
 
-	State.Set(aZvc, int(z), int(y), int(x), int(AZVel), int(cur))
-	State.Set(aZpc, int(z), int(y), int(x), int(AZPos), int(cur))
+	State.Set(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
+	State.Set(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
 }
 
 //gosl:end
@@ -220,8 +227,26 @@ func (ss *Sim) MaxwellConfig() {
 	ParamsShouldDisplay = MaxwellShouldDisplay
 	ss.StateVars = EMStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(A0Pos, -1)
+		view.SetVar(A0s, -1)
+		MaxwellViewAll(view)
 	})
+}
+
+// MaxwellViewAll configures the View to display all Maxwell values
+func MaxwellViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = A0s
+	view.Panels[1].Var = AXs
+	view.Panels[1].Mode = Vectors
+	// view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = EX
+	view.Panels[2].Mode = Vectors
+	// view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = BX
+	view.Panels[3].Mode = Vectors
+	// view.Settings.TrackParticle = 0
 }
 
 // MaxwellShouldDisplay determines which Parameters fields to display.

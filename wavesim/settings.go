@@ -22,6 +22,9 @@ const (
 
 	// Bars displays discrete bars at each point -- best for more discontinuous states.
 	Bars
+
+	// Vectors displays arrow vectors using value and subsequent 2 values as X,Y,Z.
+	Vectors
 )
 
 // CurPrev for Current vs Previous state access.
@@ -100,6 +103,9 @@ type Settings struct {
 	// size of a single bar element, where 1 = full width and no space.. .9 default
 	BarSize float32 `min:"0.1" max:"1" step:"0.1" default:"0.9"`
 
+	// VectorSize is how wide the vector arrows are, in proportion of one cell (1 = full cell).
+	VectorSize float32 `min:"0.01" max:"1" step:"0.05" default:"0.2"`
+
 	// name of color map to use
 	ColorMap core.ColorMapName `display:"-"`
 
@@ -116,6 +122,7 @@ func (nv *Settings) Defaults() {
 	nv.TrackParticle = -1
 	nv.Height = 0.2
 	nv.BarSize = 0.9
+	nv.VectorSize = 0.2
 	nv.LabelSize = 0.05
 	nv.ZeroAlpha = 0.5
 	nv.ColorMap = core.ColorMapName("ColdHot")

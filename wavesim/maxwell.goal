@@ -10,37 +10,37 @@ package wavesim
 type EMStates int32 //enums:enum
 
 const (
-	// A0Pos is the position (height) wave state variable
+	// A0s is the position (height) wave state variable
 	// for the EM A0 electrical (scalar) potential field.
-	A0Pos EMStates = iota
+	A0s EMStates = iota
 
-	// AXPos is the position (height) wave state variable
+	// AXs is the position (height) wave state variable
 	// for the EM AX magnetic (vector) potential field, X component.
-	AXPos
+	AXs
 
-	// AYPos is the position (height) wave state variable
+	// AYs is the position (height) wave state variable
 	// for the EM AY magnetic (vector) potential field, Y component.
-	AYPos
+	AYs
 
-	// AZPos is the position (height) wave state variable
+	// AZs is the position (height) wave state variable
 	// for the EM AZ magnetic (vector) potential field, Z component.
-	AZPos
+	AZs
 
-	// A0Vel is the velocity of wave state variable
+	// A0v is the velocity of wave state variable
 	// for the EM A0 electrical (scalar) potential field.
-	A0Vel
+	A0v
 
-	// AXVel is the velocity of wave state variable
+	// AXv is the velocity of wave state variable
 	// for the EM AX magnetic (vector) potential field, X component.
-	AXVel
+	AXv
 
-	// AYVel is the velocity of wave state variable
+	// AYv is the velocity of wave state variable
 	// for the EM AY magnetic (vector) potential field, Y component.
-	AYVel
+	AYv
 
-	// AZVel is the velocity of wave state variable
+	// AZv is the velocity of wave state variable
 	// for the EM AZ magnetic (vector) potential field, Z component.
-	AZVel
+	AZv
 
 	// EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt
 	EX
@@ -84,74 +84,78 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	a0pp := State[z, y, x, A0Pos, prv]
-	aXpp := State[z, y, x, AXPos, prv]
-	aYpp := State[z, y, x, AYPos, prv]
-	aZpp := State[z, y, x, AZPos, prv]
 
-	a0vp := State[z, y, x, A0Vel, prv]
-	aXvp := State[z, y, x, AXVel, prv]
-	aYvp := State[z, y, x, AYVel, prv]
-	aZvp := State[z, y, x, AZVel, prv]
+	csq := Params[0].CSq
 
-	var f0, fX, fY, fZ, c0, cX, cY, cZ, dX, dY, dZ, bX, bY, bZ float32
+	a0pp := State[z, y, x, A0s, prv]
+	aXpp := State[z, y, x, AXs, prv]
+	aYpp := State[z, y, x, AYs, prv]
+	aZpp := State[z, y, x, AZs, prv]
+
+	// a0vp := State[z, y, x, A0v, prv]
+	aXvp := State[z, y, x, AXv, prv]
+	aYvp := State[z, y, x, AYv, prv]
+	aZvp := State[z, y, x, AZv, prv]
+
+	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = Laplacian26(x, y, z, int32(A0Pos), prv, a0pp)
-		fX = Laplacian26(x, y, z, int32(AXPos), prv, aXpp)
-		fY = Laplacian26(x, y, z, int32(AYPos), prv, aYpp)
-		fZ = Laplacian26(x, y, z, int32(AZPos), prv, aZpp)
+		f0 = Laplacian26(x, y, z, int32(A0s), prv, a0pp)
+		fX = Laplacian26(x, y, z, int32(AXs), prv, aXpp)
+		fY = Laplacian26(x, y, z, int32(AYs), prv, aYpp)
+		fZ = Laplacian26(x, y, z, int32(AZs), prv, aZpp)
 
 		c0 = NeighAverage27(x, y, z, int32(Charge), prv)
 		cX = NeighAverage27(x, y, z, int32(CurrentX), prv)
 		cY = NeighAverage27(x, y, z, int32(CurrentY), prv)
 		cZ = NeighAverage27(x, y, z, int32(CurrentZ), prv)
 	} else {
-		f0 = Laplacian1D(x, y, z, int32(A0Pos), prv, a0pp)
-		fX = Laplacian1D(x, y, z, int32(AXPos), prv, aXpp)
-		fY = Laplacian1D(x, y, z, int32(AYPos), prv, aYpp)
-		fZ = Laplacian1D(x, y, z, int32(AZPos), prv, aZpp)
+		f0 = Laplacian1D(x, y, z, int32(A0s), prv, a0pp)
+		fX = Laplacian1D(x, y, z, int32(AXs), prv, aXpp)
+		fY = Laplacian1D(x, y, z, int32(AYs), prv, aYpp)
+		fZ = Laplacian1D(x, y, z, int32(AZs), prv, aZpp)
 	}
-	f0 = Params[0].CSq*f0 + Params[0].OneoEps0*c0
-	a0vc := a0vp + f0
+	f0 = csq*f0 + Params[0].OneoEps0*c0
+	// a0vc := a0vp + f0
+	a0vc := f0 // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
 	a0pc := a0pp + a0vc
 
-	fX = Params[0].CSq*fX + Params[0].Mu0*cX
+	fX = csq*fX + Params[0].Mu0*cX
 	aXvc := aXvp + fX
 	aXpc := aXpp + aXvc
 
-	fY = Params[0].CSq*fY + Params[0].Mu0*cY
+	fY = csq*fY + Params[0].Mu0*cY
 	aYvc := aYvp + fY
 	aYpc := aYpp + aYvc
 
-	fZ = Params[0].CSq*fZ + Params[0].Mu0*cZ
+	fZ = csq*fZ + Params[0].Mu0*cZ
 	aZvc := aZvp + fZ
 	aZpc := aZpp + aZvc
 
 	// note: these were done on cur, not prv, in emewave
 	// could do as a second pass here -- check if affects stability.
-	Gradient18(x, y, z, int32(A0Pos), prv, &dX, &dY, &dZ)
-	Curl18(x, y, z, int32(AXPos), prv, &bX, &bY, &bZ)
+	g := Gradient18(x, y, z, int32(A0s), prv)
+	b := Curl18(x, y, z, int32(AXs), prv)
 
 	// E = -grad A0 - dA/dt
-	State[z, y, x, EX, cur] = -dX - aXvp
-	State[z, y, x, EY, cur] = -dY - aYvp
-	State[z, y, x, EZ, cur] = -dZ - aZvp
+	State[z, y, x, EX, cur] = -g.X - aXvp
+	State[z, y, x, EY, cur] = -g.Y - aYvp
+	State[z, y, x, EZ, cur] = -g.Z - aZvp
 
-	State[z, y, x, BX, cur] = bX
-	State[z, y, x, BY, cur] = bY
-	State[z, y, x, BZ, cur] = bZ
+	State[z, y, x, BX, cur] = b.X
+	State[z, y, x, BY, cur] = b.Y
+	State[z, y, x, BZ, cur] = b.Z
 
-	State[z, y, x, A0Vel, cur] = a0vc
-	State[z, y, x, A0Pos, cur] = a0pc
+	State[z, y, x, A0v, cur] = a0vc
+	State[z, y, x, A0s, cur] = a0pc
 
-	State[z, y, x, AXVel, cur] = aXvc
-	State[z, y, x, AXPos, cur] = aXpc
+	State[z, y, x, AXv, cur] = aXvc
+	State[z, y, x, AXs, cur] = aXpc
 
-	State[z, y, x, AYVel, cur] = aYvc
-	State[z, y, x, AYPos, cur] = aYpc
+	State[z, y, x, AYv, cur] = aYvc
+	State[z, y, x, AYs, cur] = aYpc
 
-	State[z, y, x, AZVel, cur] = aZvc
-	State[z, y, x, AZPos, cur] = aZpc
+	State[z, y, x, AZv, cur] = aZvc
+	State[z, y, x, AZs, cur] = aZpc
 }
 
 // MaxwellDampKernel is the kernel for computing the Maxwell EM equations,
@@ -167,49 +171,52 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 	sz := ctx.SizePlus1() // exclude updating on edges
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	a0pp := State[z, y, x, A0Pos, prv]
-	aXpp := State[z, y, x, AXPos, prv]
-	aYpp := State[z, y, x, AYPos, prv]
-	aZpp := State[z, y, x, AZPos, prv]
+
+	csq := Params[0].CSq
+
+	a0pp := State[z, y, x, A0s, prv]
+	aXpp := State[z, y, x, AXs, prv]
+	aYpp := State[z, y, x, AYs, prv]
+	aZpp := State[z, y, x, AZs, prv]
 	var f0, fX, fY, fZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
-		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
-		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
-		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
 	} else {
-		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0Pos), prv, a0pp)
-		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXPos), prv, aXpp)
-		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYPos), prv, aYpp)
-		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZPos), prv, aZpp)
+		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
 	}
-	f0 = Params[0].CSq * f0
+	f0 = csq * f0
 	a0vc := f0
 	a0pc := a0pp + a0vc
 
-	fX = Params[0].CSq * fX
+	fX = csq * fX
 	aXvc := fX
 	aXpc := aXpp + aXvc
 
-	fY = Params[0].CSq * fY
+	fY = csq * fY
 	aYvc := fY
 	aYpc := aYpp + aYvc
 
-	fZ = Params[0].CSq * fZ
+	fZ = csq * fZ
 	aZvc := fZ
 	aZpc := aZpp + aZvc
 
-	State[z, y, x, A0Vel, cur] = a0vc
-	State[z, y, x, A0Pos, cur] = a0pc
+	State[z, y, x, A0v, cur] = a0vc
+	State[z, y, x, A0s, cur] = a0pc
 
-	State[z, y, x, AXVel, cur] = aXvc
-	State[z, y, x, AXPos, cur] = aXpc
+	State[z, y, x, AXv, cur] = aXvc
+	State[z, y, x, AXs, cur] = aXpc
 
-	State[z, y, x, AYVel, cur] = aYvc
-	State[z, y, x, AYPos, cur] = aYpc
+	State[z, y, x, AYv, cur] = aYvc
+	State[z, y, x, AYs, cur] = aYpc
 
-	State[z, y, x, AZVel, cur] = aZvc
-	State[z, y, x, AZPos, cur] = aZpc
+	State[z, y, x, AZv, cur] = aZvc
+	State[z, y, x, AZs, cur] = aZpc
 }
 
 //gosl:end
@@ -218,8 +225,26 @@ func (ss *Sim) MaxwellConfig() {
 	ParamsShouldDisplay = MaxwellShouldDisplay
 	ss.StateVars = EMStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(A0Pos, -1)
+		view.SetVar(A0s, -1)
+		MaxwellViewAll(view)
 	})
+}
+
+// MaxwellViewAll configures the View to display all Maxwell values
+func MaxwellViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = A0s
+	view.Panels[1].Var = AXs
+	view.Panels[1].Mode = Vectors
+	// view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = EX
+	view.Panels[2].Mode = Vectors
+	// view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = BX
+	view.Panels[3].Mode = Vectors
+	// view.Settings.TrackParticle = 0
 }
 
 // MaxwellShouldDisplay determines which Parameters fields to display.

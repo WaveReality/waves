@@ -43,6 +43,9 @@ const (
 	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
 	Dirac
 
+	// Higgs is a focused simulation of the Higgs mechanism.
+	Higgs
+
 	// Spinfield is the Klein-Gordon complex version of stochastic particles.
 	Spinfield
 
@@ -71,8 +74,17 @@ type Parameters struct {
 	// Move determines if particles actually move according to their momentums.
 	Move slbool.Bool
 
+	// EM determines if EM field coupling is activated.
+	EM slbool.Bool
+
 	// C is the speed of light factor. Generally should not exceed 1!
 	C float32
+
+	// HiggsMu is the Higgs potential positive multiplier mu_H
+	HiggsMu float32
+
+	// HiggsLambda is the Higgs potential negative multiplier
+	HiggsLambda float32
 
 	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
 	Diff float32
@@ -91,6 +103,7 @@ type Parameters struct {
 	Hbar float32
 
 	// Mass is a general mass term, e.g., for the KleinGordon equations.
+	// If negative, then M^2 is negative!
 	Mass float32
 
 	// MOverHSq = Mass^2 / Hbar^2 is the mass drag factor in KleinGordon
@@ -135,17 +148,25 @@ type Parameters struct {
 	// OneoEps0 = 1 / Eps0
 	OneoEps0 float32 `display:"-"`
 
+	// E2OverH = (2 * E) / Hbar
+	E2OverH float32 `display:"-"`
+
+	// EOverHSq = E^2 / Hbar^2
+	EOverHSq float32 `display:"-"`
+
 	// Edges determines how to handle the edges.
 	Edges Edges
-
-	pad float32
 }
 
 func (pr *Parameters) Update() {
 	pr.CSq = pr.C * pr.C
 	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
 	pr.MOverHSq = (pr.Mass * pr.Mass) / (pr.Hbar * pr.Hbar)
-	pr.HSqOver2M = (pr.Hbar * pr.Hbar) / (2.0 * pr.Mass)
+	if pr.Mass < 0 {
+		pr.MOverHSq = -pr.MOverHSq
+	}
+	hsq := (pr.Hbar * pr.Hbar)
+	pr.HSqOver2M = hsq / (2.0 * pr.Mass)
 	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
 	pr.Omega0 = (pr.Mass * pr.CSq) / pr.Hbar
 	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
@@ -154,6 +175,8 @@ func (pr *Parameters) Update() {
 	pr.C6M2 = pr.CSq * pr.CSq * pr.MCSq
 	pr.Eps0 = 1.0 / (pr.Mu0 * pr.C * pr.C)
 	pr.OneoEps0 = 1.0 / pr.Eps0
+	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
+	pr.EOverHSq = (pr.E * pr.E) / hsq
 }
 
 //gosl:end
@@ -166,6 +189,8 @@ func (pr *Parameters) Defaults() {
 	pr.Mass = 1.0
 	pr.E = 1.0
 	pr.Mu0 = 1.0
+	pr.HiggsMu = 0.5
+	pr.HiggsLambda = 2.0
 	pr.Energy.SetBool(true)
 	pr.Move.SetBool(true)
 	pr.Update()

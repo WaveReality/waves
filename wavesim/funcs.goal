@@ -218,7 +218,8 @@ func NeighValue(nidx, x, y, z, vidx, tidx int32) float32 {
 // Gradient18 computes the 3D gradient across 18 neighbors,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
-func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
+func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
+	var g math32.Vector3
 	for xyz := range 3 {
 		sum := float32(0)
 		for j := range 9 {
@@ -233,14 +234,15 @@ func Gradient18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) {
 		}
 		switch xyz {
 		case 0:
-			*dx = sum
+			g.X = sum
 		case 1:
-			*dy = sum
+			g.Y = sum
 		case 2:
-			*dz = sum
+			g.Z = sum
 		default:
 		}
 	}
+	return g
 }
 
 // Divergence18 computes the 3D divergence across 18 neighbors,
@@ -266,7 +268,7 @@ func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 // Curl18 computes the 3D curl across 18 neighbors on a field vector,
 // for given x,y,z center coordinates, variable index vidx (to X component),
 // and cur / prev time index tidx.
-func Curl18(x, y, z, vidx, tidx int32, cx, cy, cz *float32) {
+func Curl18(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var dzdy, dydz, dxdz, dzdx, dydx, dxdy float32
 	dimX := vidx + int32(math32.X)
 	dimY := vidx + int32(math32.Y)
@@ -302,9 +304,11 @@ func Curl18(x, y, z, vidx, tidx int32, cx, cy, cz *float32) {
 		dydx += NeighWts[Grad18Wts, j] * (State[z+zpX, y+ypX, x+xpX, dimY, tidx] - State[z+zmX, y+ymX, x+xmX, dimY, tidx])
 		dxdy += NeighWts[Grad18Wts, j] * (State[z+zpY, y+ypY, x+xpY, dimX, tidx] - State[z+zmY, y+ymY, x+xmY, dimX, tidx])
 	}
-	*cx = dzdy - dydz
-	*cy = dxdz - dzdx
-	*cz = dydx - dxdy
+	var c math32.Vector3
+	c.X = dzdy - dydz
+	c.Y = dxdz - dzdx
+	c.Z = dydx - dxdy
+	return c
 }
 
 //////// Edges

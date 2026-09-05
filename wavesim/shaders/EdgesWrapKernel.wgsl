@@ -462,15 +462,17 @@ const EdgesN: Edges = 3;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
+const HiggsStatesN: HiggsStates = 31;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 8;
+const EquationsN: Equations = 9;
 const ParticleVarsN: ParticleVars = 10;
-const ViewModesN: ViewModes = 2;
+const ViewModesN: ViewModes = 3;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
-const SpinfieldStatesN: SpinfieldStates = 30;
+const SpinfieldStatesN: SpinfieldStates = 34;
+const StdStatesN: StdStates = 37;
 const WaveStatesN: WaveStates = 6;
 
 //////// import: "funcs.go"
@@ -483,6 +485,22 @@ const  AverageWts: NeighWeights = 1;
 const  Grad18Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
+
+//////// import: "higgs.go"
+alias HiggsStates = EMStates; //enums:enum -trim-prefix=Higgs
+const  HiggsHs0a: HiggsStates = 18;
+const  HiggsHs0b: HiggsStates = 19;
+const  HiggsHs1a: HiggsStates = 20;
+const  HiggsHs1b: HiggsStates = 21;
+const  HiggsHv0a: HiggsStates = 22;
+const  HiggsHv0b: HiggsStates = 23;
+const  HiggsHv1a: HiggsStates = 24;
+const  HiggsHv1b: HiggsStates = 25;
+const  HiggsCC: HiggsStates = 26;
+const  HiggsV: HiggsStates = 27;
+const  HiggsWp: HiggsStates = 28;
+const  HiggsWn: HiggsStates = 29;
+const  HiggsZ0: HiggsStates = 30;
 
 //////// import: "klein-gordon.go"
 alias CabStates = i32; //enums:enum -trim-prefix=Cab
@@ -504,14 +522,14 @@ const  CabEnergy: CabStates = 14;
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
-const  A0Pos: EMStates = 0;
-const  AXPos: EMStates = 1;
-const  AYPos: EMStates = 2;
-const  AZPos: EMStates = 3;
-const  A0Vel: EMStates = 4;
-const  AXVel: EMStates = 5;
-const  AYVel: EMStates = 6;
-const  AZVel: EMStates = 7;
+const  A0s: EMStates = 0;
+const  AXs: EMStates = 1;
+const  AYs: EMStates = 2;
+const  AZs: EMStates = 3;
+const  A0v: EMStates = 4;
+const  AXv: EMStates = 5;
+const  AYv: EMStates = 6;
+const  AZv: EMStates = 7;
 const  EX: EMStates = 8;
 const  EY: EMStates = 9;
 const  EZ: EMStates = 10;
@@ -531,8 +549,9 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
-const  Spinfield: Equations = 6;
-const  ParticleMove: Equations = 7;
+const  Higgs: Equations = 6;
+const  Spinfield: Equations = 7;
+const  ParticleMove: Equations = 8;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -540,7 +559,10 @@ struct Parameters {
 	ThreeD: i32,
 	Energy: i32,
 	Move: i32,
+	EM: i32,
 	C: f32,
+	HiggsMu: f32,
+	HiggsLambda: f32,
 	Diff: f32,
 	Decay: f32,
 	CSq: f32,
@@ -559,8 +581,9 @@ struct Parameters {
 	Mu0: f32,
 	Eps0: f32,
 	OneoEps0: f32,
+	E2OverH: f32,
+	EOverHSq: f32,
 	Edges: Edges,
-	pad: f32,
 }
 
 //////// import: "particle.go"
@@ -583,6 +606,7 @@ const  ParticleESq: ParticleVars = 9;
 alias ViewModes = i32; //enums:enum
 const  Plane: ViewModes = 0;
 const  Bars: ViewModes = 1;
+const  Vectors: ViewModes = 2;
 alias CurPrev = i32; //enums:enum
 const  Current: CurPrev = 0;
 const  Previous: CurPrev = 1;
@@ -595,6 +619,17 @@ const  PanelsOne: NPanels = 0;
 const  PanelsTwo: NPanels = 1;
 const  PanelsFour: NPanels = 2;
 
+//////// import: "slmath-math.go"
+const SLPi = 3.141592653589793;
+
+//////// import: "slmath-matrix3.go"
+
+//////// import: "slmath-quaternion.go"
+
+//////// import: "slmath-vector2.go"
+
+//////// import: "slmath-vector3.go"
+
 //////// import: "spinfield.go"
 alias SpinfieldStates = CabStates; //enums:enum -trim-prefix=Spinfield
 const  SpinfieldParticle: SpinfieldStates = 15;
@@ -604,14 +639,40 @@ const  SpinfieldPvelZ: SpinfieldStates = 18;
 const  SpinfieldPESq: SpinfieldStates = 19;
 const  SpinfieldDist: SpinfieldStates = 20;
 const  SpinfieldDrive: SpinfieldStates = 21;
-const  Spinfield0a: SpinfieldStates = 22;
-const  Spinfield0b: SpinfieldStates = 23;
-const  SpinfieldXa: SpinfieldStates = 24;
-const  SpinfieldXb: SpinfieldStates = 25;
-const  SpinfieldYa: SpinfieldStates = 26;
-const  SpinfieldYb: SpinfieldStates = 27;
-const  SpinfieldZa: SpinfieldStates = 28;
-const  SpinfieldZb: SpinfieldStates = 29;
+const  SpinfieldHiggs0a: SpinfieldStates = 22;
+const  SpinfieldHiggs0b: SpinfieldStates = 23;
+const  SpinfieldHiggs1a: SpinfieldStates = 24;
+const  SpinfieldHiggs1b: SpinfieldStates = 25;
+const  Spinfield0a: SpinfieldStates = 26;
+const  Spinfield0b: SpinfieldStates = 27;
+const  SpinfieldXa: SpinfieldStates = 28;
+const  SpinfieldXb: SpinfieldStates = 29;
+const  SpinfieldYa: SpinfieldStates = 30;
+const  SpinfieldYb: SpinfieldStates = 31;
+const  SpinfieldZa: SpinfieldStates = 32;
+const  SpinfieldZb: SpinfieldStates = 33;
+
+//////// import: "standard.go"
+alias StdStates = EMStates; //enums:enum -trim-prefix=Std
+const  StdCs0a: StdStates = 18;
+const  StdCs0b: StdStates = 19;
+const  StdCs1a: StdStates = 20;
+const  StdCs1b: StdStates = 21;
+const  StdCv0a: StdStates = 22;
+const  StdCv0b: StdStates = 23;
+const  StdCv1a: StdStates = 24;
+const  StdCv1b: StdStates = 25;
+const  StdHs0a: StdStates = 26;
+const  StdHs0b: StdStates = 27;
+const  StdHs1a: StdStates = 28;
+const  StdH1b: StdStates = 29;
+const  StdHv0a: StdStates = 30;
+const  StdHv0b: StdStates = 31;
+const  StdHv1a: StdStates = 32;
+const  StdHv1b: StdStates = 33;
+const  StdWp: StdStates = 34;
+const  StdWn: StdStates = 35;
+const  StdZ0: StdStates = 36;
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum -trim-prefix=Wave

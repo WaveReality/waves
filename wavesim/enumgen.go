@@ -243,6 +243,61 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
+var _HiggsStatesValues = []HiggsStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
+
+// HiggsStatesN is the highest valid value for type HiggsStates, plus one.
+//
+//gosl:start
+const HiggsStatesN HiggsStates = 31
+
+//gosl:end
+
+var _HiggsStatesValueMap = map[string]HiggsStates{`Hs0a`: 18, `Hs0b`: 19, `Hs1a`: 20, `Hs1b`: 21, `Hv0a`: 22, `Hv0b`: 23, `Hv1a`: 24, `Hv1b`: 25, `CC`: 26, `V`: 27, `Wp`: 28, `Wn`: 29, `Z0`: 30}
+
+var _HiggsStatesDescMap = map[HiggsStates]string{18: `HiggsHs0a is the Higgs state 0a`, 19: `HiggsHs0b is the Higgs state 0b`, 20: `HiggsHs1a is the Higgs state 1a`, 21: `HiggsHs1b is the Higgs state 1b`, 22: `HiggsHs0a is the Higgs vel 0a`, 23: `HiggsHv0b is the Higgs vel 0b`, 24: `HiggsHv1a is the Higgs vel 1a`, 25: `HiggsHv1b is the Higgs vel 1b`, 26: `HiggsCC is the Higgs complex conjugate`, 27: `HiggsV is the Higgs potential as a function of CC`, 28: `HiggsWp is the W+ weak boson field.`, 29: `HiggsWn is the W- weak boson field.`, 30: `HiggsZ0 is the Z0 weak neutral boson field.`}
+
+var _HiggsStatesMap = map[HiggsStates]string{18: `Hs0a`, 19: `Hs0b`, 20: `Hs1a`, 21: `Hs1b`, 22: `Hv0a`, 23: `Hv0b`, 24: `Hv1a`, 25: `Hv1b`, 26: `CC`, 27: `V`, 28: `Wp`, 29: `Wn`, 30: `Z0`}
+
+// String returns the string representation of this HiggsStates value.
+func (i HiggsStates) String() string {
+	return enums.StringExtended[HiggsStates, EMStates](i, _HiggsStatesMap)
+}
+
+// SetString sets the HiggsStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *HiggsStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*EMStates)(i), s, _HiggsStatesValueMap)
+}
+
+// Int64 returns the HiggsStates value as an int64.
+func (i HiggsStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the HiggsStates value from an int64.
+func (i *HiggsStates) SetInt64(in int64) { *i = HiggsStates(in) }
+
+// Desc returns the description of the HiggsStates value.
+func (i HiggsStates) Desc() string {
+	return enums.DescExtended[HiggsStates, EMStates](i, _HiggsStatesDescMap)
+}
+
+// HiggsStatesValues returns all possible values for the type HiggsStates.
+func HiggsStatesValues() []HiggsStates {
+	return enums.ValuesGlobalExtended(_HiggsStatesValues, EMStatesValues())
+}
+
+// Values returns all possible values for the type HiggsStates.
+func (i HiggsStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_HiggsStatesValues, EMStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i HiggsStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *HiggsStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "HiggsStates")
+}
+
 var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
 
 // CabStatesN is the highest valid value for type CabStates, plus one.
@@ -299,11 +354,11 @@ const EMStatesN EMStates = 18
 
 //gosl:end
 
-var _EMStatesValueMap = map[string]EMStates{`A0Pos`: 0, `AXPos`: 1, `AYPos`: 2, `AZPos`: 3, `A0Vel`: 4, `AXVel`: 5, `AYVel`: 6, `AZVel`: 7, `EX`: 8, `EY`: 9, `EZ`: 10, `BX`: 11, `BY`: 12, `BZ`: 13, `Charge`: 14, `CurrentX`: 15, `CurrentY`: 16, `CurrentZ`: 17}
+var _EMStatesValueMap = map[string]EMStates{`A0s`: 0, `AXs`: 1, `AYs`: 2, `AZs`: 3, `A0v`: 4, `AXv`: 5, `AYv`: 6, `AZv`: 7, `EX`: 8, `EY`: 9, `EZ`: 10, `BX`: 11, `BY`: 12, `BZ`: 13, `Charge`: 14, `CurrentX`: 15, `CurrentY`: 16, `CurrentZ`: 17}
 
-var _EMStatesDescMap = map[EMStates]string{0: `A0Pos is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXPos is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYPos is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZPos is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0Vel is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXVel is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYVel is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZVel is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt`, 9: `EY is the electrical vector field, Y component: -grad A_0 - d \vec{A}/dt`, 10: `EZ is the electrical vector field, Z component: -grad A_0 - d \vec{A}/dt`, 11: `BX is the magnetic vector field, X component: curl \vec{A}`, 12: `BY is the magnetic vector field, Y component: curl \vec{A}`, 13: `BZ is the magnetic vector field, Z component: curl \vec{A}`, 14: `Charge is the density of charge, drives A0.`, 15: `CurrentX is the density of current, X component, drives AX.`, 16: `CurrentY is the density of current, Y component, drives AY.`, 17: `CurrentZ is the density of current, Z component, drives AZ.`}
+var _EMStatesDescMap = map[EMStates]string{0: `A0s is the position (height) wave state variable for the EM A0 electrical (scalar) potential field.`, 1: `AXs is the position (height) wave state variable for the EM AX magnetic (vector) potential field, X component.`, 2: `AYs is the position (height) wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 3: `AZs is the position (height) wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 4: `A0v is the velocity of wave state variable for the EM A0 electrical (scalar) potential field.`, 5: `AXv is the velocity of wave state variable for the EM AX magnetic (vector) potential field, X component.`, 6: `AYv is the velocity of wave state variable for the EM AY magnetic (vector) potential field, Y component.`, 7: `AZv is the velocity of wave state variable for the EM AZ magnetic (vector) potential field, Z component.`, 8: `EX is the electrical vector field, X component: -grad A_0 - d \vec{A}/dt`, 9: `EY is the electrical vector field, Y component: -grad A_0 - d \vec{A}/dt`, 10: `EZ is the electrical vector field, Z component: -grad A_0 - d \vec{A}/dt`, 11: `BX is the magnetic vector field, X component: curl \vec{A}`, 12: `BY is the magnetic vector field, Y component: curl \vec{A}`, 13: `BZ is the magnetic vector field, Z component: curl \vec{A}`, 14: `Charge is the density of charge, drives A0.`, 15: `CurrentX is the density of current, X component, drives AX.`, 16: `CurrentY is the density of current, Y component, drives AY.`, 17: `CurrentZ is the density of current, Z component, drives AZ.`}
 
-var _EMStatesMap = map[EMStates]string{0: `A0Pos`, 1: `AXPos`, 2: `AYPos`, 3: `AZPos`, 4: `A0Vel`, 5: `AXVel`, 6: `AYVel`, 7: `AZVel`, 8: `EX`, 9: `EY`, 10: `EZ`, 11: `BX`, 12: `BY`, 13: `BZ`, 14: `Charge`, 15: `CurrentX`, 16: `CurrentY`, 17: `CurrentZ`}
+var _EMStatesMap = map[EMStates]string{0: `A0s`, 1: `AXs`, 2: `AYs`, 3: `AZs`, 4: `A0v`, 5: `AXv`, 6: `AYv`, 7: `AZv`, 8: `EX`, 9: `EY`, 10: `EZ`, 11: `BX`, 12: `BY`, 13: `BZ`, 14: `Charge`, 15: `CurrentX`, 16: `CurrentY`, 17: `CurrentZ`}
 
 // String returns the string representation of this EMStates value.
 func (i EMStates) String() string { return enums.String(i, _EMStatesMap) }
@@ -335,20 +390,20 @@ func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7, 8}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 8
+const EquationsN Equations = 9
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Spinfield`: 6, `ParticleMove`: 7}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Higgs`: 6, `Spinfield`: 7, `ParticleMove`: 8}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 7: `ParticleMove is just particle motion without any wave field.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Higgs is a focused simulation of the Higgs mechanism.`, 7: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 8: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Spinfield`, 7: `ParticleMove`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Higgs`, 7: `Spinfield`, 8: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -429,20 +484,20 @@ func (i *ParticleVars) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "ParticleVars")
 }
 
-var _ViewModesValues = []ViewModes{0, 1}
+var _ViewModesValues = []ViewModes{0, 1, 2}
 
 // ViewModesN is the highest valid value for type ViewModes, plus one.
 //
 //gosl:start
-const ViewModesN ViewModes = 2
+const ViewModesN ViewModes = 3
 
 //gosl:end
 
-var _ViewModesValueMap = map[string]ViewModes{`Plane`: 0, `Bars`: 1}
+var _ViewModesValueMap = map[string]ViewModes{`Plane`: 0, `Bars`: 1, `Vectors`: 2}
 
-var _ViewModesDescMap = map[ViewModes]string{0: `Plane displays a contiguous plane of values -- best for smooth states.`, 1: `Bars displays discrete bars at each point -- best for more discontinuous states.`}
+var _ViewModesDescMap = map[ViewModes]string{0: `Plane displays a contiguous plane of values -- best for smooth states.`, 1: `Bars displays discrete bars at each point -- best for more discontinuous states.`, 2: `Vectors displays arrow vectors using value and subsequent 2 values as X,Y,Z.`}
 
-var _ViewModesMap = map[ViewModes]string{0: `Plane`, 1: `Bars`}
+var _ViewModesMap = map[ViewModes]string{0: `Plane`, 1: `Bars`, 2: `Vectors`}
 
 // String returns the string representation of this ViewModes value.
 func (i ViewModes) String() string { return enums.String(i, _ViewModesMap) }
@@ -613,20 +668,20 @@ func (i NPanels) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *NPanels) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "NPanels") }
 
-var _SpinfieldStatesValues = []SpinfieldStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29}
+var _SpinfieldStatesValues = []SpinfieldStates{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33}
 
 // SpinfieldStatesN is the highest valid value for type SpinfieldStates, plus one.
 //
 //gosl:start
-const SpinfieldStatesN SpinfieldStates = 30
+const SpinfieldStatesN SpinfieldStates = 34
 
 //gosl:end
 
-var _SpinfieldStatesValueMap = map[string]SpinfieldStates{`Particle`: 15, `PvelX`: 16, `PvelY`: 17, `PvelZ`: 18, `PESq`: 19, `Dist`: 20, `Drive`: 21, `0a`: 22, `0b`: 23, `Xa`: 24, `Xb`: 25, `Ya`: 26, `Yb`: 27, `Za`: 28, `Zb`: 29}
+var _SpinfieldStatesValueMap = map[string]SpinfieldStates{`Particle`: 15, `PvelX`: 16, `PvelY`: 17, `PvelZ`: 18, `PESq`: 19, `Dist`: 20, `Drive`: 21, `Higgs0a`: 22, `Higgs0b`: 23, `Higgs1a`: 24, `Higgs1b`: 25, `0a`: 26, `0b`: 27, `Xa`: 28, `Xb`: 29, `Ya`: 30, `Yb`: 31, `Za`: 32, `Zb`: 33}
 
-var _SpinfieldStatesDescMap = map[SpinfieldStates]string{15: `SpinfieldParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `SpinfieldPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `SpinfieldPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `SpinfieldPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `SpinfieldPESq is the square of the particle energy.`, 20: `SpinfieldDist is the 1/r distance propagated from the source particle.`, 21: `SpinfieldDrive is the coupling strength of particle field to wave fields. Computed from Dist.`, 22: `Spinfield0a is the core spin complex-valued oscillator, a.`, 23: `Spinfield0b is the core spin complex-valued oscillator, b.`, 24: `SpinfieldXa is the complex-valued oscillator for velocity along the X asis, a. Phase relative to 0 determines velocity.`, 25: `SpinfieldXb is the complex-valued oscillator for velocity along the X asis, b. Phase relative to 0 determines velocity.`, 26: `SpinfieldXa is the complex-valued oscillator for velocity along the Y asis, a. Phase relative to 0 determines velocity.`, 27: `SpinfieldXb is the complex-valued oscillator for velocity along the Y asis, b. Phase relative to 0 determines velocity.`, 28: `SpinfieldXa is the complex-valued oscillator for velocity along the Z asis, a. Phase relative to 0 determines velocity.`, 29: `SpinfieldXb is the complex-valued oscillator for velocity along the Z asis, b. Phase relative to 0 determines velocity.`}
+var _SpinfieldStatesDescMap = map[SpinfieldStates]string{15: `SpinfieldParticle indicates the type of particle present at this cell. zero indicates no particle.`, 16: `SpinfieldPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 17: `SpinfieldPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 18: `SpinfieldPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 19: `SpinfieldPESq is the square of the particle energy.`, 20: `SpinfieldDist is the 1/r distance propagated from the source particle.`, 21: `SpinfieldDrive is the coupling strength of particle field to wave fields. Computed from Dist.`, 22: `SpinfieldHiggs0a is the Higgs spin complex-valued oscillator, 0a.`, 23: `SpinfieldHiggs0b is the Higgs spin complex-valued oscillator, 0b.`, 24: `SpinfieldHiggs1a is the Higgs spin complex-valued oscillator, 1a.`, 25: `SpinfieldHiggs1b is the Higgs spin complex-valued oscillator, 1b.`, 26: `Spinfield0a is the core spin complex-valued oscillator, a.`, 27: `Spinfield0b is the core spin complex-valued oscillator, b.`, 28: `SpinfieldXa is the complex-valued oscillator for velocity along the X asis, a. Phase relative to 0 determines velocity.`, 29: `SpinfieldXb is the complex-valued oscillator for velocity along the X asis, b. Phase relative to 0 determines velocity.`, 30: `SpinfieldXa is the complex-valued oscillator for velocity along the Y asis, a. Phase relative to 0 determines velocity.`, 31: `SpinfieldXb is the complex-valued oscillator for velocity along the Y asis, b. Phase relative to 0 determines velocity.`, 32: `SpinfieldXa is the complex-valued oscillator for velocity along the Z asis, a. Phase relative to 0 determines velocity.`, 33: `SpinfieldXb is the complex-valued oscillator for velocity along the Z asis, b. Phase relative to 0 determines velocity.`}
 
-var _SpinfieldStatesMap = map[SpinfieldStates]string{15: `Particle`, 16: `PvelX`, 17: `PvelY`, 18: `PvelZ`, 19: `PESq`, 20: `Dist`, 21: `Drive`, 22: `0a`, 23: `0b`, 24: `Xa`, 25: `Xb`, 26: `Ya`, 27: `Yb`, 28: `Za`, 29: `Zb`}
+var _SpinfieldStatesMap = map[SpinfieldStates]string{15: `Particle`, 16: `PvelX`, 17: `PvelY`, 18: `PvelZ`, 19: `PESq`, 20: `Dist`, 21: `Drive`, 22: `Higgs0a`, 23: `Higgs0b`, 24: `Higgs1a`, 25: `Higgs1b`, 26: `0a`, 27: `0b`, 28: `Xa`, 29: `Xb`, 30: `Ya`, 31: `Yb`, 32: `Za`, 33: `Zb`}
 
 // String returns the string representation of this SpinfieldStates value.
 func (i SpinfieldStates) String() string {
@@ -666,6 +721,61 @@ func (i SpinfieldStates) MarshalText() ([]byte, error) { return []byte(i.String(
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *SpinfieldStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "SpinfieldStates")
+}
+
+var _StdStatesValues = []StdStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36}
+
+// StdStatesN is the highest valid value for type StdStates, plus one.
+//
+//gosl:start
+const StdStatesN StdStates = 37
+
+//gosl:end
+
+var _StdStatesValueMap = map[string]StdStates{`Cs0a`: 18, `Cs0b`: 19, `Cs1a`: 20, `Cs1b`: 21, `Cv0a`: 22, `Cv0b`: 23, `Cv1a`: 24, `Cv1b`: 25, `Hs0a`: 26, `Hs0b`: 27, `Hs1a`: 28, `H1b`: 29, `Hv0a`: 30, `Hv0b`: 31, `Hv1a`: 32, `Hv1b`: 33, `Wp`: 34, `Wn`: 35, `Z0`: 36}
+
+var _StdStatesDescMap = map[StdStates]string{18: `StdCs0a is the Dirac charge state 0a`, 19: `StdCs0b is the Dirac charge state 0b`, 20: `StdCs1a is the Dirac charge state 1a`, 21: `StdCs1b is the Dirac charge state 1b`, 22: `StdCs0a is the Dirac charge vel 0a`, 23: `StdCv0b is the Dirac charge vel 0b`, 24: `StdCv1a is the Dirac charge vel 1a`, 25: `StdCv1b is the Dirac charge vel 1b`, 26: `StdHs0a is the Higgs state 0a`, 27: `StdHs0b is the Higgs state 0b`, 28: `StdHs1a is the Higgs state 1a`, 29: `StdH1b is the Higgs state 1b`, 30: `StdHv0a is the Higgs vel 0a`, 31: `StdHv0b is the Higgs vel 0b`, 32: `StdHv1a is the Higgs vel 1a`, 33: `StdH1b is the Higgs vel 1b`, 34: `StdWp is the W+ weak boson field.`, 35: `StdWn is the W- weak boson field.`, 36: `StdZ0 is the Z0 weak neutral boson field.`}
+
+var _StdStatesMap = map[StdStates]string{18: `Cs0a`, 19: `Cs0b`, 20: `Cs1a`, 21: `Cs1b`, 22: `Cv0a`, 23: `Cv0b`, 24: `Cv1a`, 25: `Cv1b`, 26: `Hs0a`, 27: `Hs0b`, 28: `Hs1a`, 29: `H1b`, 30: `Hv0a`, 31: `Hv0b`, 32: `Hv1a`, 33: `Hv1b`, 34: `Wp`, 35: `Wn`, 36: `Z0`}
+
+// String returns the string representation of this StdStates value.
+func (i StdStates) String() string {
+	return enums.StringExtended[StdStates, EMStates](i, _StdStatesMap)
+}
+
+// SetString sets the StdStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *StdStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*EMStates)(i), s, _StdStatesValueMap)
+}
+
+// Int64 returns the StdStates value as an int64.
+func (i StdStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the StdStates value from an int64.
+func (i *StdStates) SetInt64(in int64) { *i = StdStates(in) }
+
+// Desc returns the description of the StdStates value.
+func (i StdStates) Desc() string {
+	return enums.DescExtended[StdStates, EMStates](i, _StdStatesDescMap)
+}
+
+// StdStatesValues returns all possible values for the type StdStates.
+func StdStatesValues() []StdStates {
+	return enums.ValuesGlobalExtended(_StdStatesValues, EMStatesValues())
+}
+
+// Values returns all possible values for the type StdStates.
+func (i StdStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_StdStatesValues, EMStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i StdStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *StdStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "StdStates")
 }
 
 var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5}

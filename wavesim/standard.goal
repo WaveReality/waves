@@ -1,0 +1,171 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+//gosl:start
+
+// StdStates are the state variables for the Standard Model.
+type StdStates EMStates //enums:enum -trim-prefix=Std
+
+const (
+	// StdCs0a is the Dirac charge state 0a
+	StdCs0a StdStates = StdStates(EMStatesN) + iota
+
+	// StdCs0b is the Dirac charge state 0b
+	StdCs0b
+
+	// StdCs1a is the Dirac charge state 1a
+	StdCs1a
+
+	// StdCs1b is the Dirac charge state 1b
+	StdCs1b
+
+	// StdCs0a is the Dirac charge vel 0a
+	StdCv0a
+
+	// StdCv0b is the Dirac charge vel 0b
+	StdCv0b
+
+	// StdCv1a is the Dirac charge vel 1a
+	StdCv1a
+
+	// StdCv1b is the Dirac charge vel 1b
+	StdCv1b
+
+	// StdHs0a is the Higgs state 0a
+	StdHs0a
+
+	// StdHs0b is the Higgs state 0b
+	StdHs0b
+
+	// StdHs1a is the Higgs state 1a
+	StdHs1a
+
+	// StdH1b is the Higgs state 1b
+	StdH1b
+
+	// StdHv0a is the Higgs vel 0a
+	StdHv0a
+
+	// StdHv0b is the Higgs vel 0b
+	StdHv0b
+
+	// StdHv1a is the Higgs vel 1a
+	StdHv1a
+
+	// StdH1b is the Higgs vel 1b
+	StdHv1b
+
+	// StdWp is the W+ weak boson field.
+	StdWp
+
+	// StdWn is the W- weak boson field.
+	StdWn
+
+	// StdZ0 is the Z0 weak neutral boson field.
+	StdZ0
+)
+
+// StandardKernel is the kernel for computing standard model.
+// Only supports 3D.
+func StandardKernel(i uint32) { //gosl:kernel
+	// ctx := GetCtx(0)
+	// var x, y, z int32
+	// ok := ctx.StateCoords(i, &x, &y, &z)
+	// if !ok {
+	// 	return
+	// }
+	// // sz := ctx.Size.V()
+	// cur := ctx.CurState
+	// prv := ctx.PrevState()
+	// csq := Params[0].CSq
+	// mhsq := Params[0].MOverHSq
+	// e2h := Params[0].E2OverH
+	// e := Params[0].E
+	// c := Params[0].C
+	// ehsq := Params[0].EOverHSq
+	// em := Params[0].EM.IsTrue()
+	//
+	// a0 := State[z, y, x, A0s, prv]
+	// aX := State[z, y, x, AXs, prv]
+	// aY := State[z, y, x, AYs, prv]
+	// aZ := State[z, y, x, AZs, prv]
+	//
+	// eX := State[z, y, x, EX, prv]
+	// eY := State[z, y, x, EY, prv]
+	// eZ := State[z, y, x, EZ, prv]
+	//
+	// bX := State[z, y, x, BX, prv]
+	// bY := State[z, y, x, BY, prv]
+	// bZ := State[z, y, x, BZ, prv]
+	//
+	// aV := math32.Vec3(aX, aY, aZ)
+	// a0sq := a0 * a0
+	// aVsq := slmath.LengthSquared3(aV)
+	// aSqD := ehsq * (a0sq - aVsq)
+	//
+	// bxpey := bX + eY
+	// exmby := eX - bY
+	// bxmey := bX - eY
+	// expby := eX + bY
+	//
+	// cs0a := State[z, y, x, StdCs0a, prv]
+	// cs0b := State[z, y, x, StdCs0b, prv]
+	// cs1a := State[z, y, x, StdCs1a, prv]
+	// cs1b := State[z, y, x, StdCs1b, prv]
+	//
+	// cv0a := State[z, y, x, StdCv0a, prv]
+	// cv0b := State[z, y, x, StdCv0b, prv]
+	// cv1a := State[z, y, x, StdCv1a, prv]
+	// cv1b := State[z, y, x, StdCv1b, prv]
+	//
+	// cs0aG := Gradient18(x, y, z, int32(cs0a), prv)
+	// cs0bG := Gradient18(x, y, z, int32(cs0b), prv)
+	//
+	// cs0aF := Laplacian26(x, y, z, int32(StdCs0a), prv, cs0a)
+	// cs0aF -= mhsq * cs0a
+	// cs0aF *= csq
+	// if em {
+	// 	vd := cs0bG.Mul(aV)
+	// 	cs0aF += (e2h*(a0*cv0b+c*(vd.X+vd.Y+vd.Z)) + cs0a*aSqD +
+	// 		e*(cs0a*bZ-cs0b*eZ+cs1a*bxpey-cs1b*exmby))
+	// }
+	// cv0aC := cv0a + cs0aF
+	// cs0aC := cs0a + cv0aC
+}
+
+//gosl:end
+
+func (ss *Sim) StandardConfig() {
+	ParamsShouldDisplay = ParticleDisplay
+	ss.StateVars = StdStatesN
+	ss.ViewInit(func(view *View) {
+		view.SetVar(StdCs0a, -1)
+	})
+}
+
+// StandardViewAll configures the View to display Standard values
+func StandardViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = StdCs0a
+	view.Panels[1].Var = StdCs0b
+	// view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = StdCs0b
+	// view.SetCurPrev(Previous, 3)
+	view.Panels[3].Var = StdCs1a
+	view.Settings.TrackParticle = 0
+}
+
+func (ss *Sim) StandardStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(CabCC))
+	ss.AddStat(ss.StatParticle(0))
+	ss.AddStat(ss.StatParticle(0))
+}
+
+// StandardDisplay determines which Parameters fields to display.
+var StandardDisplay = []string{"Edges", "Energy", "C", "Diff", "Decay", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move"}

@@ -21,13 +21,14 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
-	threed := false
-	// threed := true
+	// threed := false
+	threed := true
 	// eqs := wavesim.Wave
-	eqs := wavesim.KleinGordon
+	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
-	// eqs := wavesim.Maxwell
+	eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
+	// eqs := wavesim.Higgs
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
@@ -89,14 +90,25 @@ func main() {
 				}
 				sim.SchrodingerStats()
 			case wavesim.Maxwell:
+				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
 				if threed {
-					sim.Params.C = 1
 					sim.Params.Edges = wavesim.EdgesDamp
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
+			case wavesim.Higgs:
+				sim.Units.E = 0.55
+				sim.Params.HiggsMu = 0.02
+				sim.Params.HiggsLambda = 0.55
+				// sim.Params.Mass = -0.5
+				sim.Params.Mass = 0
+				sim.Params.Edges = wavesim.EdgesDamp
+				sim.Params.ThreeD.SetBool(true)
+				sim.Config.Size.Set(100, 100, 100)
+				sim.HiggsStats()
+				sim.ViewInit(wavesim.HiggsViewAll)
 			case wavesim.Dirac:
 				if threed {
 					sim.Params.Edges = wavesim.EdgesDamp
@@ -141,18 +153,24 @@ func main() {
 			case wavesim.Maxwell:
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
+					sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
+					sim.MovingWavePacketConfig(wavesim.AYs, wavesim.AYv, math32.X, ctrPos, -1, 0, 1)
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
 			case wavesim.Dirac:
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-					sim.InvR(wavesim.A0Pos, ctrPos, sim.Params.Mu0)
+					sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
 					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, ctrPos, -1, 0, 1)
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
+			case wavesim.Higgs:
+				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
+				sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
+				sim.InvR(wavesim.HiggsHs0a, ctrPos, sim.Params.Mu0)
+				sim.InvR(wavesim.HiggsHv0b, ctrPos, -sim.Params.Mu0)
 			case wavesim.Spinfield:
 				sim.ParticleAtConfig(ctrInt, 1)
 				sim.ParticleField(ctrInt, 8)

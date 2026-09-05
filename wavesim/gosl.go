@@ -133,6 +133,23 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/HiggsKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -263,6 +280,8 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/StandardKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -396,6 +415,48 @@ func RunOneEdgesWrapKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunEdgesWrapKernelCPU(n)
+	}
+}
+// RunHiggsKernel runs the HiggsKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneHiggsKernel call does Run and Done for a
+// single run-and-sync case.
+func RunHiggsKernel(n int) {
+	if UseGPU {
+		RunHiggsKernelGPU(n)
+	} else {
+		RunHiggsKernelCPU(n)
+	}
+}
+
+// RunHiggsKernelGPU runs the HiggsKernel kernel on the GPU. See [RunHiggsKernel] for more info.
+func RunHiggsKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["HiggsKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunHiggsKernelCPU runs the HiggsKernel kernel on the CPU.
+func RunHiggsKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, HiggsKernel)
+}
+
+// RunOneHiggsKernel runs the HiggsKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneHiggsKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunHiggsKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunHiggsKernelCPU(n)
 	}
 }
 // RunKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,
@@ -732,6 +793,48 @@ func RunOneSpinfieldKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunSpinfieldKernelCPU(n)
+	}
+}
+// RunStandardKernel runs the StandardKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneStandardKernel call does Run and Done for a
+// single run-and-sync case.
+func RunStandardKernel(n int) {
+	if UseGPU {
+		RunStandardKernelGPU(n)
+	} else {
+		RunStandardKernelCPU(n)
+	}
+}
+
+// RunStandardKernelGPU runs the StandardKernel kernel on the GPU. See [RunStandardKernel] for more info.
+func RunStandardKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["StandardKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunStandardKernelCPU runs the StandardKernel kernel on the CPU.
+func RunStandardKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, StandardKernel)
+}
+
+// RunOneStandardKernel runs the StandardKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneStandardKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunStandardKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunStandardKernelCPU(n)
 	}
 }
 // RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,
