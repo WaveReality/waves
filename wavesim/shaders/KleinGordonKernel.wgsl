@@ -332,7 +332,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 34;
 const StdStatesN: StdStates = 37;
-const WaveStatesN: WaveStates = 6;
+const WaveStatesN: WaveStates = 7;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -425,6 +425,7 @@ fn KleinGordonKernel(i: u32) { //gosl:kernel
 	var prv = Context_PrevState(ctx);
 	var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
 	var pvel = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveV), u32(prv)));
 	var mhsq = Params[0].MOverHSq;
 	var csq = Params[0].CSq;
 	var force: f32;
@@ -433,7 +434,7 @@ fn KleinGordonKernel(i: u32) { //gosl:kernel
 	} else {
 		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
 	}
-	force -= mhsq * ppos; // this is the only diff from standard Wave
+	force += (vpot - mhsq) * ppos; // this is the only diff from standard Wave
 	var vel = pvel + csq*force;
 	var pos = ppos + vel;
 	if (Params[0].Energy == 1) {
@@ -614,9 +615,10 @@ alias WaveStates = i32; //enums:enum -trim-prefix=Wave
 const  WavePos: WaveStates = 0;
 const  WaveVel: WaveStates = 1;
 const  WaveForce: WaveStates = 2;
-const  WaveKinetic: WaveStates = 3;
-const  WavePotential: WaveStates = 4;
-const  WaveEnergy: WaveStates = 5;
+const  WaveV: WaveStates = 3;
+const  WaveKinetic: WaveStates = 4;
+const  WavePotential: WaveStates = 5;
+const  WaveEnergy: WaveStates = 6;
 
 //////// import: "slrand.wgsl"
 fn Philox2x32round(counter: su64, key: u32) -> su64 {

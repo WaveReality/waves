@@ -393,7 +393,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 34;
 const StdStatesN: StdStates = 37;
-const WaveStatesN: WaveStates = 6;
+const WaveStatesN: WaveStates = 7;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -653,9 +653,10 @@ alias WaveStates = i32; //enums:enum -trim-prefix=Wave
 const  WavePos: WaveStates = 0;
 const  WaveVel: WaveStates = 1;
 const  WaveForce: WaveStates = 2;
-const  WaveKinetic: WaveStates = 3;
-const  WavePotential: WaveStates = 4;
-const  WaveEnergy: WaveStates = 5;
+const  WaveV: WaveStates = 3;
+const  WaveKinetic: WaveStates = 4;
+const  WavePotential: WaveStates = 5;
+const  WaveEnergy: WaveStates = 6;
 
 //////// import: "slrand.wgsl"
 fn Philox2x32round(counter: su64, key: u32) -> su64 {

@@ -82,6 +82,7 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
+	vpot := State.Value(int(z), int(y), int(x), int(WaveV), int(prv))
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
@@ -92,7 +93,7 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
-	force -= mhsq * ppos // this is the only diff from standard Wave
+	force += (vpot - mhsq) * ppos // this is the only diff from standard Wave
 	vel := pvel + csq*force
 	pos := ppos + vel
 
@@ -130,6 +131,7 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
 	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
 	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
@@ -142,11 +144,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
-	forceA -= mhsq * pposA // this is the only diff from standard Wave
+	forceA += (vpot - mhsq) * pposA // this is the only diff from standard Wave
 	velA := pvelA + csq*forceA
 	posA := pposA + velA
 
-	forceB -= mhsq * pposB // this is the only diff from standard Wave
+	forceB += (vpot - mhsq) * pposB // this is the only diff from standard Wave
 	velB := pvelB + csq*forceB
 	posB := pposB + velB
 

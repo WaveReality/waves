@@ -778,20 +778,20 @@ func (i *StdStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "StdStates")
 }
 
-var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5}
+var _WaveStatesValues = []WaveStates{0, 1, 2, 3, 4, 5, 6}
 
 // WaveStatesN is the highest valid value for type WaveStates, plus one.
 //
 //gosl:start
-const WaveStatesN WaveStates = 6
+const WaveStatesN WaveStates = 7
 
 //gosl:end
 
-var _WaveStatesValueMap = map[string]WaveStates{`Pos`: 0, `Vel`: 1, `Force`: 2, `Kinetic`: 3, `Potential`: 4, `Energy`: 5}
+var _WaveStatesValueMap = map[string]WaveStates{`Pos`: 0, `Vel`: 1, `Force`: 2, `V`: 3, `Kinetic`: 4, `Potential`: 5, `Energy`: 6}
 
-var _WaveStatesDescMap = map[WaveStates]string{0: `WavePos is the position (height) wave state variable.`, 1: `WaveVel is the velocity of wave state variable.`, 2: `WaveForce is the net force computed from neighbors.`, 3: `WaveKinetic is the kinetic energy.`, 4: `WavePotential is the potential energy.`, 5: `WaveEnergy is the total kinetic + potential energy.`}
+var _WaveStatesDescMap = map[WaveStates]string{0: `WavePos is the position (height) wave state variable.`, 1: `WaveVel is the velocity of wave state variable.`, 2: `WaveForce is the net force computed from neighbors.`, 3: `WaveV is an external potential energy factor, that can be used to push waves around.`, 4: `WaveKinetic is the kinetic energy.`, 5: `WavePotential is the potential energy.`, 6: `WaveEnergy is the total kinetic + potential energy.`}
 
-var _WaveStatesMap = map[WaveStates]string{0: `Pos`, 1: `Vel`, 2: `Force`, 3: `Kinetic`, 4: `Potential`, 5: `Energy`}
+var _WaveStatesMap = map[WaveStates]string{0: `Pos`, 1: `Vel`, 2: `Force`, 3: `V`, 4: `Kinetic`, 5: `Potential`, 6: `Energy`}
 
 // String returns the string representation of this WaveStates value.
 func (i WaveStates) String() string { return enums.String(i, _WaveStatesMap) }

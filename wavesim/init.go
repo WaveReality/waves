@@ -142,11 +142,12 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off 
 }
 
 // Gauss adds gaussian values to given variable.
-func (ss *Sim) Gauss(vr enums.Enum, ctr math32.Vector3, width, amp, off float32) {
+func (ss *Sim) Gauss(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, width, amp, off float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	ctr = CenterF(ctr)
 	cur := ctx.CurState
+	prv := ctx.PrevState()
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
@@ -156,7 +157,42 @@ func (ss *Sim) Gauss(vr enums.Enum, ctr math32.Vector3, width, amp, off float32)
 				ff := CoordToFloat(c)
 				d := ff.Sub(ctr).Length() / width
 				v := off + amp*math32.FastExp(-d*d)
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				if curPrev == CurOnly || curPrev == Both {
+					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				}
+			}
+		}
+	}
+}
+
+// Step adds a discrete step to given variable, for positive values along given dimension.
+func (ss *Sim) Step(vr enums.Enum, curPrev CurPrevBoth, pos math32.Vector3, dim math32.Dims, amp, off float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	pos = CenterF(pos)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				ff := CoordToFloat(c)
+				d := ff.Sub(pos).Dim(dim)
+				v := off
+				if d >= 0 {
+					v += amp
+				}
+				if curPrev == CurOnly || curPrev == Both {
+					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				}
 			}
 		}
 	}

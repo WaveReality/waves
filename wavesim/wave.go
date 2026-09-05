@@ -21,6 +21,10 @@ const (
 	// WaveForce is the net force computed from neighbors.
 	WaveForce
 
+	// WaveV is an external potential energy factor, that
+	// can be used to push waves around.
+	WaveV
+
 	// WaveKinetic is the kinetic energy.
 	WaveKinetic
 
@@ -43,12 +47,15 @@ func WaveKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
+	vpot := State.Value(int(z), int(y), int(x), int(WaveV), int(prv))
+
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
 		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
+	force += vpot * ppos
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 

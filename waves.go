@@ -21,12 +21,14 @@ var icon string
 func main() {
 	core.AppIcon = icon
 
+	// vpot := float32(2.0)
+	vpot := float32(0)
 	// threed := false
 	threed := true
-	// eqs := wavesim.Wave
-	// eqs := wavesim.KleinGordonC
+	eqs := wavesim.Wave
+	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
-	eqs := wavesim.Maxwell
+	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
 	// eqs := wavesim.Higgs
 	// eqs := wavesim.Spinfield
@@ -142,10 +144,13 @@ func main() {
 				} else {
 					// sim.PosWavePacket(wavesim.WavePos, math32.X, math32.Vec3i(50, 0, 0), -1, 8, 8, 0, 1)
 					sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, ctrPos, -1, 80, 80, 0, 1)
-					// 				sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)
+					// sim.MovingWavePacket(wavesim.WavePos, wavesim.WaveVel, math32.X, math32.Vec3i(500, 0, 0), -1, 80, 80, 0, 1)
 				}
+				sim.Gauss(wavesim.WaveV, wavesim.Both, ctrPos, 42, vpot, -vpot)
 			case wavesim.KleinGordon:
 				sim.MovingWavePacketConfig(wavesim.WavePos, wavesim.WaveVel, math32.X, ctrPos, -1, 0, 1)
+				sim.Gauss(wavesim.WaveV, wavesim.Both, ctrPos, 32, vpot, -vpot)
+				// sim.Step(wavesim.WaveV, wavesim.Both, math32.Vec3(10, 0, 0), math32.X, vpot, -vpot)
 			case wavesim.KleinGordonC:
 				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Schrodinger:
