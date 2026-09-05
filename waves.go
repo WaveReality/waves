@@ -151,13 +151,9 @@ func main() {
 			case wavesim.Schrodinger:
 				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
-				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-					sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
-					sim.MovingWavePacketConfig(wavesim.AYs, wavesim.AYv, math32.X, ctrPos, -1, 0, 1)
-				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-				}
+				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
+				sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
+				sim.MovingWavePacketConfig(wavesim.AYs, wavesim.AYv, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Dirac:
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)

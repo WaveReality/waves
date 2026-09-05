@@ -509,15 +509,16 @@ func (vw *View) PlaneAtNumber(no int) *xyz.Group {
 }
 
 func (vw *View) ZoomInSize(n int32) {
-	if vw.Size.X <= 4 || vw.Size.Y <= 4 {
+	if vw.Size.X <= 4 {
 		return
 	}
 	n = min(n, vw.Size.X-4)
-	n = min(n, vw.Size.Y-4)
 	vw.Size.X -= 2 * n
-	vw.Size.Y -= 2 * n
 	vw.Start.X += n
-	vw.Start.Y += n
+	if vw.Size.Y > 4 {
+		vw.Size.Y -= 2 * n
+		vw.Start.Y += n
+	}
 	vw.UpdateView()
 }
 
@@ -526,20 +527,26 @@ func (vw *View) ZoomOutSize(n int32) {
 	sz := ctx.Size
 	fs := ctx.SizeFull()
 	vw.Size.X += 2 * n
-	vw.Size.Y += 2 * n
-	if vw.Start.X > 1 && vw.Start.Y > 1 {
+	if vw.Start.X > 1 {
 		vw.Start.X -= n
-		vw.Start.Y -= n
 	}
-	if vw.Size.X >= sz.X || vw.Size.Y >= sz.Y {
+	if vw.Size.X >= sz.X {
 		vw.Size.X = sz.X
-		vw.Size.Y = sz.Y
 	}
 	if vw.Start.X+vw.Size.X >= fs.X {
 		vw.Start.X = (fs.X - 1) - vw.Size.X
 	}
-	if vw.Start.Y+vw.Size.Y >= fs.Y {
-		vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+	if sz.Y > 1 {
+		vw.Size.Y += 2 * n
+		if vw.Start.Y > 1 {
+			vw.Start.Y -= n
+		}
+		if vw.Size.Y >= sz.Y {
+			vw.Size.Y = sz.Y
+		}
+		if vw.Start.Y+vw.Size.Y >= fs.Y {
+			vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+		}
 	}
 	vw.UpdateView()
 }
