@@ -329,12 +329,12 @@ func (pm *PlaneMesh) SetVectors(vtxAry, normAry, texAry, clrAry math32.ArrayF32,
 
 			if math32.Abs(ned.X) > .95 { // mostly X
 				bbl.Set(x0, 0, z0)
-				bbr.Set(x0+ed.X, 0, z0)
+				bbr.Set(x0, 0+uy, z0)
 				bfl.Set(x0, 0, z0+uw)
-				bfr.Set(x0+ed.X, 0, z0+uw)
-				tbl.Set(x0, ed.Y+uy, z0+ed.Z)
+				bfr.Set(x0, 0+uy, z0+uw)
+				tbl.Set(x0+ed.X, ed.Y, z0+ed.Z)
 				tbr.Set(x0+ed.X, ed.Y+uy, z0+ed.Z)
-				tfl.Set(x0, ed.Y+uy, z0+uw+ed.Z)
+				tfl.Set(x0+ed.X, ed.Y, z0+uw+ed.Z)
 				tfr.Set(x0+ed.X, ed.Y+uy, z0+uw+ed.Z)
 			} else if math32.Abs(ned.Z) > .95 { // mostly Z
 				bbl.Set(x0, 0, z0)
