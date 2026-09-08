@@ -118,7 +118,7 @@ func (ss *Sim) WaveConfig() {
 }
 
 // WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"Edges", "Energy", "C"}
+var WaveShouldDisplay = []string{"Edges", "Energy", "C", "VPotential"}
 
 // Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
 func Wave1DViewAll(view *View) {

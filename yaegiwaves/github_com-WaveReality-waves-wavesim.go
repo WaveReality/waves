@@ -352,6 +352,7 @@ func init() {
 		"WaveShouldDisplay":            reflect.ValueOf(&wavesim.WaveShouldDisplay).Elem(),
 		"WaveStatesN":                  reflect.ValueOf(wavesim.WaveStatesN),
 		"WaveStatesValues":             reflect.ValueOf(wavesim.WaveStatesValues),
+		"WaveV":                        reflect.ValueOf(wavesim.WaveV),
 		"WaveVel":                      reflect.ValueOf(wavesim.WaveVel),
 
 		// type definitions

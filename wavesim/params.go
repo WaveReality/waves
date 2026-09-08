@@ -68,17 +68,49 @@ type Parameters struct {
 	// ThreeD runs the 3D version of wave equations, else 1D.
 	ThreeD slbool.Bool
 
+	// Edges determines how to handle the edges.
+	Edges Edges
+
 	// Energy determines if energy is computed (when not necessary).
 	Energy slbool.Bool
 
-	// Move determines if particles actually move according to their momentums.
-	Move slbool.Bool
+	// C is the speed of light factor. Generally should not exceed 1!
+	C float32
+
+	// Hbar = h / 2pi = reduced Planck constant.
+	Hbar float32
+
+	// Mass is a general mass term, e.g., for the KleinGordon equations.
+	// If negative, then M^2 is negative!
+	Mass float32
+
+	// VPotential is the strength of an external potential field, which can then
+	// influence wave propagation. This is just the magnitude of the potential,
+	// which is actually negative. In general may need to reduce C below 1 to
+	// ensure stability with larger potential values.
+	VPotential float32
 
 	// EM determines if EM field coupling is activated.
 	EM slbool.Bool
 
-	// C is the speed of light factor. Generally should not exceed 1!
-	C float32
+	// A0NoWave applies the neighborhood force directly as a velocity, instead
+	// of as a force that adds to the velocity, for the scalar potential, A0.
+	// This prevents non-physical longitudinal wave propagation.
+	// It increases the sensitivity, such that C must be less than 1.
+	// This is the same as Sommerfield edge damping.
+	A0NoWave slbool.Bool
+
+	// E is the electric charge constant, which determines the
+	// electric potential units, C = A s
+	// 0.302822 causes Mu0 and Eps0 to both be 1, if C and Hbar are both 1
+	E float32
+
+	// Mu0 is mu_0, or the permeability of free space, which weights
+	// the impact of current on the magnetic vector potential.
+	Mu0 float32
+
+	// Move determines if particles actually move according to their momentums.
+	Move slbool.Bool
 
 	// HiggsMu is the Higgs potential positive multiplier mu_H
 	HiggsMu float32
@@ -98,13 +130,6 @@ type Parameters struct {
 
 	// Inv2CSq = 1 / 2C^2
 	Inv2CSq float32 `display:"-"`
-
-	// Hbar = h / 2pi = reduced Planck constant.
-	Hbar float32
-
-	// Mass is a general mass term, e.g., for the KleinGordon equations.
-	// If negative, then M^2 is negative!
-	Mass float32
 
 	// MOverHSq = Mass^2 / Hbar^2 is the mass drag factor in KleinGordon
 	// and related equations. Note: C^2 factor is added in basic vel += c^2 force
@@ -132,15 +157,6 @@ type Parameters struct {
 	// C6M2= (C^6 * Mass^2) is the numerator for computing total particle energy
 	C6M2 float32 `display:"-"`
 
-	// E is the electric charge constant, which determines the
-	// electric potential units, C = A s
-	// 0.302822 causes Mu0 and Eps0 to both be 1, if C and Hbar are both 1
-	E float32
-
-	// Mu0 is mu_0, or the permeability of free space, which weights
-	// the impact of current on the magnetic vector potential.
-	Mu0 float32
-
 	// Eps0 is epsilon_0, or the permittivity of free space, which weights
 	// the impact of charge on the electrical scalar potential = 1 / (mu0 c^2)
 	Eps0 float32 `edit:"-"`
@@ -154,8 +170,7 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
-	// Edges determines how to handle the edges.
-	Edges Edges
+	pad, pad1 float32
 }
 
 func (pr *Parameters) Update() {
@@ -182,17 +197,18 @@ func (pr *Parameters) Update() {
 //gosl:end
 
 func (pr *Parameters) Defaults() {
+	pr.Energy.SetBool(true)
 	pr.C = 0.5
-	pr.Diff = 0.5
-	pr.Decay = 0.98
 	pr.Hbar = 1.0
 	pr.Mass = 1.0
+	pr.A0NoWave.SetBool(true)
 	pr.E = 1.0
 	pr.Mu0 = 1.0
+	pr.Move.SetBool(true)
 	pr.HiggsMu = 0.5
 	pr.HiggsLambda = 2.0
-	pr.Energy.SetBool(true)
-	pr.Move.SetBool(true)
+	pr.Diff = 0.5
+	pr.Decay = 0.98
 	pr.Update()
 }
 

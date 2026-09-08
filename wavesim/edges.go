@@ -55,7 +55,9 @@ const (
 	// the space around on itself like a torus.
 	EdgesWrap
 
-	// EdgesDamp implements damping of edge values.
+	// EdgesDamp implements damping of edge values, where the force directly
+	// sets the velocity, instead of adding to the velocity as an acceleration.
+	// This is known as Sommerfield damping.
 	EdgesDamp
 )
 

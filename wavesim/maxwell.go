@@ -94,7 +94,7 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
 	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
 
-	// a0vp := State[z, y, x, A0v, prv]
+	a0vp := State.Value(int(z), int(y), int(x), int(A0v), int(prv))
 	aXvp := State.Value(int(z), int(y), int(x), int(AXv), int(prv))
 	aYvp := State.Value(int(z), int(y), int(x), int(AYv), int(prv))
 	aZvp := State.Value(int(z), int(y), int(x), int(AZv), int(prv))
@@ -117,8 +117,12 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 		fZ = Laplacian1D(x, y, z, int32(AZs), prv, aZpp)
 	}
 	f0 = csq*f0 + Params[0].OneoEps0*c0
-	// a0vc := a0vp + f0
-	a0vc := f0 // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
+	var a0vc float32
+	if Params[0].A0NoWave.IsTrue() {
+		a0vc = f0 // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
+	} else {
+		a0vc = a0vp + f0
+	}
 	a0pc := a0pp + a0vc
 
 	fX = csq*fX + Params[0].Mu0*cX
@@ -250,4 +254,4 @@ func MaxwellViewAll(view *View) {
 }
 
 // MaxwellShouldDisplay determines which Parameters fields to display.
-var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0"}
+var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0Velocity"}

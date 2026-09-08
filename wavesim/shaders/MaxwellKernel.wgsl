@@ -520,8 +520,8 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	var a0pp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0s), u32(prv)));
 	var aXpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXs), u32(prv)));
 	var aYpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYs), u32(prv)));
-	var aZpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZs), u32(prv)));
+	var aZpp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZs), u32(prv)));
+	var a0vp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0v), u32(prv)));
 	var aXvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXv), u32(prv)));
 	var aYvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYv), u32(prv)));
 	var aZvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZv), u32(prv)));
@@ -549,7 +549,12 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 		fZ = Laplacian1D(x, y, z, i32(AZs), prv, aZpp);
 	}
 	f0 = csq*f0 + Params[0].OneoEps0*c0;
-	var a0vc = f0; // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
+	var a0vc: f32;
+	if (Params[0].A0NoWave == 1) {
+		a0vc = f0; // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
+	} else {
+		a0vc = a0vp + f0;
+	}
 	var a0pc = a0pp + a0vc;
 	fX = csq*fX + Params[0].Mu0*cX;
 	var aXvc = aXvp + fX;
@@ -595,18 +600,23 @@ const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
 struct Parameters {
 	ThreeD: i32,
+	Edges: Edges,
 	Energy: i32,
-	Move: i32,
-	EM: i32,
 	C: f32,
+	Hbar: f32,
+	Mass: f32,
+	VPotential: f32,
+	EM: i32,
+	A0NoWave: i32,
+	E: f32,
+	Mu0: f32,
+	Move: i32,
 	HiggsMu: f32,
 	HiggsLambda: f32,
 	Diff: f32,
 	Decay: f32,
 	CSq: f32,
 	Inv2CSq: f32,
-	Hbar: f32,
-	Mass: f32,
 	MOverHSq: f32,
 	HSqOver2M: f32,
 	HEOver2MCSq: f32,
@@ -615,13 +625,12 @@ struct Parameters {
 	MOver2: f32,
 	MCSq: f32,
 	C6M2: f32,
-	E: f32,
-	Mu0: f32,
 	Eps0: f32,
 	OneoEps0: f32,
 	E2OverH: f32,
 	EOverHSq: f32,
-	Edges: Edges,
+	pad: f32,
+	pad1: f32,
 }
 
 //////// import: "particle.go"
