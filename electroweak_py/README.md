@@ -1,6 +1,6 @@
 # The Higgs mechanism on a lattice
 
-Note: This is code written entirely by Claude Opus 5, with prompts recorded in prompts.md.
+Note: This is code written entirely by Claude Opus 5, with full session log recorded in the contrails directory, courtesy of the https://github.com/ThreePalmTrees/Contrails app. On a mac, https://github.com/MarkEdit-app provides a good viewer.
 
 Real-time classical lattice field theory for the SU(2)<sub>L</sub> × U(1)<sub>Y</sub>
 Higgs sector. Four numbers go in — `v`, `λ`, `g`, `g'` — and the whole boson spectrum
