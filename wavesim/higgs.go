@@ -77,7 +77,7 @@ func HiggsKernel(i uint32) { //gosl:kernel
 	c := Params[0].C
 	ehsq := Params[0].EOverHSq
 	em := Params[0].EM.IsTrue()
-	mu := Params[0].HiggsMu
+	musq := Params[0].HiggsMuSq
 	lambda := Params[0].HiggsLambda
 
 	if Params[0].Mass < 0 {
@@ -107,13 +107,13 @@ func HiggsKernel(i uint32) { //gosl:kernel
 	hs0aG := Gradient18(x, y, z, int32(hs0a), prv)
 	hs0bG := Gradient18(x, y, z, int32(hs0b), prv)
 
-	cc := hv0a*hv0a + hv0b*hv0b
-	hv := mu*mu*cc - lambda*cc*cc
+	cc := hs0a*hs0a + hs0b*hs0b
+	hv := cc - musq
+	hv = lambda * hv * hv
 
 	hs0aF := Laplacian26(x, y, z, int32(HiggsHs0a), prv, hs0a)
-	hs0aF -= mhsq * hs0a
+	hs0aF -= hv
 	hs0aF *= csq
-	hs0aF += hv
 	if em {
 		vd := hs0bG.Mul(aV)
 		hs0aF += e2h*(a0*hv0b+c*(vd.X+vd.Y+vd.Z)) + hs0a*aSqD
@@ -122,9 +122,8 @@ func HiggsKernel(i uint32) { //gosl:kernel
 	hs0aC := hs0a + hv0aC
 
 	hs0bF := Laplacian26(x, y, z, int32(HiggsHs0b), prv, hs0b)
-	hs0bF -= mhsq * hs0b
+	hs0bF -= hv
 	hs0bF *= csq
-	hs0bF += hv
 	if em {
 		vd := hs0aG.Mul(aV)
 		hs0bF += e2h*(a0*hv0aC+c*(vd.X+vd.Y+vd.Z)) + hs0b*aSqD // note: cur hv0aC
@@ -174,5 +173,13 @@ func (ss *Sim) HiggsStats() {
 	// ss.AddStat(ss.StatParticle(0))
 }
 
+func (ss *Sim) HiggsInit() {
+	ss.Fill(HiggsHs0a, Both, ss.Params.HiggsMu)
+	// ss.Fill(HiggsHv0b, Both, ss.Params.C*ss.Params.HiggsMu)
+	ctx := GetCtx(0)
+	ne := int(ctx.EdgesN())
+	RunEdgesWrapKernel(ne)
+}
+
 // HiggsDisplay determines which Parameters fields to display.
-var HiggsDisplay = []string{"Edges", "Energy", "C", "Diff", "Decay", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move", "Mu0", "HiggsMu", "HiggsLambda"}
+var HiggsDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "EM", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda"}

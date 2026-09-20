@@ -112,10 +112,12 @@ type Parameters struct {
 	// Move determines if particles actually move according to their momentums.
 	Move slbool.Bool
 
-	// HiggsMu is the Higgs potential positive multiplier mu_H
+	// HiggsMu is the Higgs potential target mass (mu_H), which determines the
+	// expected value of the symmetry-broken higgs field squared complex magnitude.
 	HiggsMu float32
 
-	// HiggsLambda is the Higgs potential negative multiplier
+	// HiggsLambda is the Higgs potential weight factor that determines
+	// effectively how strongly the complex magnitude minus mu_H contributes.
 	HiggsLambda float32
 
 	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
@@ -170,7 +172,10 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
-	pad, pad1 float32
+	// HiggsMuSq = HiggsMu*HiggsMu
+	HiggsMuSq float32 `display:"-"`
+
+	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -192,6 +197,7 @@ func (pr *Parameters) Update() {
 	pr.OneoEps0 = 1.0 / pr.Eps0
 	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
 	pr.EOverHSq = (pr.E * pr.E) / hsq
+	pr.HiggsMuSq = pr.HiggsMu * pr.HiggsMu
 }
 
 //gosl:end

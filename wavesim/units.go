@@ -44,6 +44,9 @@ const (
 	// A0 is the Bohr radius in hbar: hbar / (m0 c alpha) = 5.2917720859e-11 m
 	A0 = Hbar / (EMass * C * Alpha)
 
+	// HiggsLambda is the lambda self-coupling constant for the Higgs field.
+	HiggsLambda = 0.129
+
 	//////// Planck scale constants
 
 	// Planck length, m
@@ -57,6 +60,9 @@ const (
 
 	// Planck current, A
 	Ip = 3.47899e25
+
+	// eV/c^2 to kg
+	EVcsqToKg = 1.7826619216279e-36
 )
 
 // Units establishes a consistent set of units for computing

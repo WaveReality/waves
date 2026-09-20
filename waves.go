@@ -23,12 +23,12 @@ func main() {
 
 	// threed := false
 	threed := true
-	eqs := wavesim.Wave
+	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	// eqs := wavesim.Higgs
+	eqs := wavesim.Higgs
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
@@ -100,11 +100,12 @@ func main() {
 				}
 			case wavesim.Higgs:
 				sim.Units.E = 0.55
-				sim.Params.HiggsMu = 0.02
+				sim.Params.E = 0.01
+				sim.Params.HiggsMu = 0.2
 				sim.Params.HiggsLambda = 0.55
 				// sim.Params.Mass = -0.5
 				sim.Params.Mass = 0
-				sim.Params.Edges = wavesim.EdgesDamp
+				sim.Params.Edges = wavesim.EdgesWrap
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(100, 100, 100)
 				sim.HiggsStats()
@@ -167,9 +168,7 @@ func main() {
 				}
 			case wavesim.Higgs:
 				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-				sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
-				sim.InvR(wavesim.HiggsHs0a, ctrPos, sim.Params.Mu0)
-				sim.InvR(wavesim.HiggsHv0b, ctrPos, -sim.Params.Mu0)
+				sim.HiggsInit()
 			case wavesim.Spinfield:
 				sim.ParticleAtConfig(ctrInt, 1)
 				sim.ParticleField(ctrInt, 8)

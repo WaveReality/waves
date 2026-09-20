@@ -122,6 +122,29 @@ func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val 
 	}
 }
 
+// Fill adds given number to all cells.
+func (ss *Sim) Fill(vr enums.Enum, curPrev CurPrevBoth, val float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				if curPrev == CurOnly || curPrev == Both {
+					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				}
+			}
+		}
+	}
+}
+
 // Sine adds sine wave values along given dimension, to given variable.
 func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
 	vri := int(vr.Int64())
