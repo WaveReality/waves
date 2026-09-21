@@ -186,8 +186,8 @@ const (
 	EWWPiZ
 
 	// EWWMag is the charged-W amplitude, sum_mu |W^+_mu|^2, identical for
-	// W^+ and W^-. This is the gauge-basis-independent "how much charged W
-	// field is here" that the two real components above encode.
+	// W^+ and W^-. It is the basis-independent measure of how much charged W
+	// field is present, which the two real components above encode.
 	EWWMag
 )
 
@@ -319,9 +319,12 @@ func EWBorisRot3(v, om math32.Vector3) math32.Vector3 {
 //
 //	m = (g/2) (W^1_0, W^2_0, W^3_0)   and   alpha = g' Y_Phi B_0
 //
-// the exponential is exp(i theta alpha) [cos(theta |m|) I + i sin(theta |m|)
-// mhat.sigma]. The SU(2) part turns the doublet and the U(1) part is an
-// overall phase -- exactly the parallel transport the connection generates.
+// the exponential is
+//
+//	exp(i theta alpha) * (cos(theta |m|) I + i sin(theta |m|) mhat.sigma)
+//
+// The SU(2) part turns the doublet and the U(1) part is an overall phase --
+// exactly the parallel transport the connection generates.
 func EWBorisPhase(w1, w2, w3, b, theta float32, v math32.Vector4) math32.Vector4 {
 	hg := 0.5 * Params[0].GW
 	m := math32.Vec3(hg*w1, hg*w2, hg*w3)
