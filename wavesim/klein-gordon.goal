@@ -87,7 +87,7 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
-		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+		force = Laplacian19(x, y, z, int32(WavePos), prv, ppos)
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
@@ -100,7 +100,7 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		var potential float32
 		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+			potential = PotentialEnergy19(x, y, z, int32(WavePos), prv, ppos)
 		} else {
 			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 		}
@@ -136,8 +136,8 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
-		forceA = Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
-		forceB = Laplacian26(x, y, z, int32(CabPosB), prv, pposB)
+		forceA = Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
+		forceB = Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
 	} else {
 		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
@@ -156,7 +156,7 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		var potential float32
 		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy26(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy26(x, y, z, int32(CabPosB), prv, pposB)
+			potential = PotentialEnergy19(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy19(x, y, z, int32(CabPosB), prv, pposB)
 		} else {
 			potential = PotentialEnergy1D(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy1D(x, y, z, int32(CabPosB), prv, pposB)
 		}
@@ -195,7 +195,7 @@ func KleinGordonDampKernel(i uint32) { //gosl:kernel
 
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
-		force = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+		force = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	} else {
 		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	}
@@ -229,8 +229,8 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
-		forceA = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
-		forceB = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
+		forceA = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
+		forceB = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
 	} else {
 		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
 		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)

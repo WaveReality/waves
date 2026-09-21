@@ -121,7 +121,7 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 		d0b = s0b
 	} else {
 		dist = State.Value(int(z), int(y), int(x), int(SpinfieldDist), int(prv))
-		distF := Laplacian26(x, y, z, int32(SpinfieldDist), prv, dist)
+		distF := Laplacian19(x, y, z, int32(SpinfieldDist), prv, dist)
 		dist += diff * distF // no velocity
 
 		d0a = NeighValue(maxNeigh, x, y, z, int32(Spinfield0a), prv)
@@ -144,8 +144,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	State.Set(s0a, int(z), int(y), int(x), int(Spinfield0a), int(cur))
 	State.Set(s0b, int(z), int(y), int(x), int(Spinfield0b), int(cur))
 
-	forceA := Laplacian26(x, y, z, int32(CabPosA), prv, pposA)
-	forceB := Laplacian26(x, y, z, int32(CabPosB), prv, pposB)
+	forceA := Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
+	forceB := Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
 	forceA += drive * (s0a - pposA)
 	forceB += drive * (s0b - pposB)
 
@@ -157,8 +157,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 
 	// todo: later, based on particle..
 	// var grAX, grAY, grAZ, grBX, grBY, grBZ float32
-	// Gradient18(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
-	// Gradient18(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+	// Gradient10(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
+	// Gradient10(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
 	//
 	// chg := pposB*pvelA - pposA*pvelB
 	//

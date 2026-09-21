@@ -51,7 +51,7 @@ func WaveKernel(i uint32) { //gosl:kernel
 
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
-		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+		force = Laplacian19(x, y, z, int32(WavePos), prv, ppos)
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
@@ -64,7 +64,7 @@ func WaveKernel(i uint32) { //gosl:kernel
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		var potential float32
 		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+			potential = PotentialEnergy19(x, y, z, int32(WavePos), prv, ppos)
 		} else {
 			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 		}
@@ -93,7 +93,7 @@ func WaveDampKernel(i uint32) { //gosl:kernel
 	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
-		force = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
+		force = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	} else {
 		force = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
 	}

@@ -213,9 +213,9 @@ func EWCurrent(psi, d math32.Vector4) math32.Vector4 {
 // EWDiv returns the lattice divergence of a 3-vector gauge potential whose
 // X, Y, Z components are the three consecutive state variables at vX.
 func EWDiv(x, y, z, vX, tidx int32) float32 {
-	gx := Gradient18(x, y, z, vX, tidx)
-	gy := Gradient18(x, y, z, vX+1, tidx)
-	gz := Gradient18(x, y, z, vX+2, tidx)
+	gx := Gradient10(x, y, z, vX, tidx)
+	gy := Gradient10(x, y, z, vX+1, tidx)
+	gz := Gradient10(x, y, z, vX+2, tidx)
 	return gx.X + gy.Y + gz.Z
 }
 
@@ -299,10 +299,10 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	bz := State.Value(int(z), int(y), int(x), int(EWBZs), int(prv))
 
 	// ---- ordinary gradients of the four Higgs components -----------------
-	gCa := Gradient18(x, y, z, int32(EWHsCa), prv)
-	gCb := Gradient18(x, y, z, int32(EWHsCb), prv)
-	g0a := Gradient18(x, y, z, int32(EWHs0a), prv)
-	g0b := Gradient18(x, y, z, int32(EWHs0b), prv)
+	gCa := Gradient10(x, y, z, int32(EWHsCa), prv)
+	gCb := Gradient10(x, y, z, int32(EWHsCb), prv)
+	g0a := Gradient10(x, y, z, int32(EWHs0a), prv)
+	g0b := Gradient10(x, y, z, int32(EWHs0b), prv)
 
 	dxp := math32.Vec4(gCa.X, gCb.X, g0a.X, g0b.X) // d_x Psi
 	dyp := math32.Vec4(gCa.Y, gCb.Y, g0a.Y, g0b.Y)
@@ -334,10 +334,10 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	dvW3 := EWDiv(x, y, z, int32(EWW3Xs), prv)
 	dvB := EWDiv(x, y, z, int32(EWBXs), prv)
 
-	lap := math32.Vec4(Laplacian26(x, y, z, int32(EWHsCa), prv, psi.X),
-		Laplacian26(x, y, z, int32(EWHsCb), prv, psi.Y),
-		Laplacian26(x, y, z, int32(EWHs0a), prv, psi.Z),
-		Laplacian26(x, y, z, int32(EWHs0b), prv, psi.W))
+	lap := math32.Vec4(Laplacian19(x, y, z, int32(EWHsCa), prv, psi.X),
+		Laplacian19(x, y, z, int32(EWHsCb), prv, psi.Y),
+		Laplacian19(x, y, z, int32(EWHs0a), prv, psi.Z),
+		Laplacian19(x, y, z, int32(EWHs0b), prv, psi.W))
 
 	cov := lap.Add(EWGaugeAct(dvW1, dvW2, dvW3, dvB, psi))
 	cov = cov.Add(EWGaugeAct(w1x, w2x, w3x, bx, dxp.Add(dX)))
@@ -437,7 +437,7 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32) {
 		}
 		ps := State.Value(int(z), int(y), int(x), int(vs), int(prv))
 		vp := State.Value(int(z), int(y), int(x), int(vv), int(prv))
-		f := csq * (Laplacian26(x, y, z, vs, prv, ps) + jc)
+		f := csq * (Laplacian19(x, y, z, vs, prv, ps) + jc)
 		vc := vp + f
 		State.Set(vc, int(z), int(y), int(x), int(vv), int(cur))
 		State.Set(ps+vc, int(z), int(y), int(x), int(vs), int(cur))

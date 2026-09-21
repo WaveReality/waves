@@ -65,7 +65,7 @@ func DiracKernel(i uint32) { //gosl:kernel
 	pvel := State[z, y, x, WaveVel, prv]
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
-		force = Laplacian26(x, y, z, int32(WavePos), prv, ppos)
+		force = Laplacian19(x, y, z, int32(WavePos), prv, ppos)
 	} else {
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
@@ -78,7 +78,7 @@ func DiracKernel(i uint32) { //gosl:kernel
 		kinetic := Params[0].Inv2CSq * midVel * midVel
 		var potential float32
 		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy26(x, y, z, int32(WavePos), prv, ppos)
+			potential = PotentialEnergy19(x, y, z, int32(WavePos), prv, ppos)
 		} else {
 			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 		}

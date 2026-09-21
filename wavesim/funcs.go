@@ -120,7 +120,7 @@ func (ss *Sim) ConfigVars() {
 	for j := range 9 {
 		a, b := tra[j][0], tra[j][1]
 		w := grdWt[a*a+b*b]
-		NeighWts.Set(w, int(Grad18Wts), int(j))
+		NeighWts.Set(w, int(Grad10Wts), int(j))
 		sum += w
 		setPair(math32.X, int32(j), -1, a, b)
 		setPair(math32.Y, int32(j), a, -1, b)
@@ -128,7 +128,7 @@ func (ss *Sim) ConfigVars() {
 	}
 	sum *= 2
 	for j := range 9 {
-		NeighWts.SetDiv(sum, int(Grad18Wts), int(j))
+		NeighWts.SetDiv(sum, int(Grad10Wts), int(j))
 	}
 }
 
@@ -169,8 +169,9 @@ const (
 	// AverageWts are 26 + 1 ctr average weights = 1 / d
 	AverageWts
 
-	// Grad18Wts are 18 neighbor gradaients
-	Grad18Wts
+	// Grad10Wts are the gradient pair weights, shared by the gradient,
+	// divergence and curl. Only the first NGradPair = 5 are non-zero.
+	Grad10Wts
 )
 
 const (
@@ -190,10 +191,11 @@ func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	return (m1 + p1) - 2*ctr
 }
 
-// Laplacian26 computes the 3D Laplacian across 26 neighbors,
+// Laplacian19 computes the 3D Laplacian over the 18 face and edge neighbors
+// plus the center (the 19-point stencil),
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
-func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
+func Laplacian19(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
 		xo := NeighOffs.Value(int(j), int(math32.X))
@@ -252,10 +254,10 @@ func NeighValue(nidx, x, y, z, vidx, tidx int32) float32 {
 	return nv
 }
 
-// Gradient18 computes the 3D gradient across 18 neighbors,
+// Gradient10 computes the 3D gradient from 5 antipodal pairs (10 points),
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
-func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
+func Gradient10(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var g math32.Vector3
 	for xyz := range 3 {
 		sum := float32(0)
@@ -266,7 +268,7 @@ func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
 			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
 			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
 			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
-			grad := NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
+			grad := NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
 			sum += grad
 		}
 		switch xyz {
@@ -282,10 +284,11 @@ func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
 	return g
 }
 
-// Divergence18 computes the 3D divergence across 18 neighbors,
+// Divergence10 computes the 3D divergence from 5 antipodal pairs (10 points)
+// per direction,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. Div = sum of gradients.
-func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
+func Divergence10(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 	sum := float32(0)
 	for xyz := range 3 {
 		d := float32(0)
@@ -300,7 +303,7 @@ func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
 			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
 			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
-			d += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vi), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vi), int(tidx)))
+			d += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vi), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vi), int(tidx)))
 		}
 		switch xyz {
 		case 0:
@@ -315,10 +318,11 @@ func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 	return sum
 }
 
-// Curl18 computes the 3D curl across 18 neighbors on a field vector,
+// Curl10 computes the 3D curl from 5 antipodal pairs (10 points) per
+// direction, on a field vector,
 // for given x,y,z center coordinates, variable index vidx (to X component),
 // and cur / prev time index tidx.
-func Curl18(x, y, z, vidx, tidx int32) math32.Vector3 {
+func Curl10(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var dzdy, dydz, dxdz, dzdx, dydx, dxdy float32
 	dimX := vidx + int32(math32.X)
 	dimY := vidx + int32(math32.Y)
@@ -345,14 +349,14 @@ func Curl18(x, y, z, vidx, tidx int32) math32.Vector3 {
 		zpZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.Z))
 		zmZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.Z))
 
-		dzdy += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimZ), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimZ), int(tidx)))
-		dydz += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimY), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimY), int(tidx)))
+		dzdy += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimZ), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimZ), int(tidx)))
+		dydz += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimY), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimY), int(tidx)))
 
-		dxdz += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimX), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimX), int(tidx)))
-		dzdx += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimZ), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimZ), int(tidx)))
+		dxdz += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimX), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimX), int(tidx)))
+		dzdx += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimZ), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimZ), int(tidx)))
 
-		dydx += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimY), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimY), int(tidx)))
-		dxdy += NeighWts.Value(int(Grad18Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimX), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimX), int(tidx)))
+		dydx += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimY), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimY), int(tidx)))
+		dxdy += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimX), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimX), int(tidx)))
 	}
 	var c math32.Vector3
 	c.X = dzdy - dydz
@@ -388,11 +392,11 @@ func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 	return sum
 }
 
-// LaplacianEdge26 computes the 3D Laplacian across 26 neighbors,
+// LaplacianEdge19 computes the 19-point 3D Laplacian,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
 // For computation at the edge, checks against given full size bounds.
-func LaplacianEdge26(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+func LaplacianEdge19(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
 		xo := NeighOffs.Value(int(j), int(math32.X))
@@ -417,10 +421,10 @@ func PotentialEnergy1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	return 0.5 * (pm1d*pm1d + pp1d*pp1d)
 }
 
-// PotentialEnergy26 computes the 3D potential energy across 26 neighbors,
+// PotentialEnergy19 computes the 3D potential energy over the 19-point stencil,
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
-func PotentialEnergy26(x, y, z, vidx, tidx int32, ctr float32) float32 {
+func PotentialEnergy19(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
 		xo := NeighOffs.Value(int(j), int(math32.X))

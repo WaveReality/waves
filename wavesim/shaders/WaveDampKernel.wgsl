@@ -451,7 +451,7 @@ const  NLapNeigh = 18;
 const  NGradPair = 5;
 const  LaplacianWts: NeighWeights = 0;
 const  AverageWts: NeighWeights = 1;
-const  Grad18Wts: NeighWeights = 2;
+const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
 fn EdgeInBounds1(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32) -> bool {
@@ -467,7 +467,7 @@ fn LaplacianEdge1D(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: 
 		TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - ctr;
 	}return sum;
 }
-fn LaplacianEdge26(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn LaplacianEdge19(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
@@ -681,7 +681,7 @@ var cur = ctx.CurState;
 ; var prv = Context_PrevState(ctx);
 ; var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
 ; var force: f32;; if (Params[0].ThreeD == 1) {
-	force = LaplacianEdge26(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
+	force = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
 } else {
 	force = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
 }; var vel = Params[0].CSq * force;

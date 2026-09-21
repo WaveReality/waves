@@ -391,9 +391,9 @@ fn EWCurrent(psi: vec4<f32>,d: vec4<f32>) -> vec4<f32> {
 return j;
 }
 fn EWDiv(x: i32,y: i32,z: i32,vX: i32,tidx: i32) -> f32 {
-	var gx = Gradient18(x, y, z, vX, tidx);
-	var gy = Gradient18(x, y, z, vX+1, tidx);
-	var gz = Gradient18(x, y, z, vX+2, tidx);
+	var gx = Gradient10(x, y, z, vX, tidx);
+	var gy = Gradient10(x, y, z, vX+1, tidx);
+	var gz = Gradient10(x, y, z, vX+2, tidx);
 return gx.x + gy.y + gz.z;
 }
 fn ElectroweakKernel(i: u32) { //gosl:kernel
@@ -433,10 +433,10 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var by = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWBYs), u32(prv)));
 	var bz = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWBZs), u32(prv)));
-	var gCa = Gradient18(x, y, z, i32(EWHsCa), prv);
-	var gCb = Gradient18(x, y, z, i32(EWHsCb), prv);
-	var g0a = Gradient18(x, y, z, i32(EWHs0a), prv);
-	var g0b = Gradient18(x, y, z, i32(EWHs0b), prv);
+	var gCa = Gradient10(x, y, z, i32(EWHsCa), prv);
+	var gCb = Gradient10(x, y, z, i32(EWHsCb), prv);
+	var g0a = Gradient10(x, y, z, i32(EWHs0a), prv);
+	var g0b = Gradient10(x, y, z, i32(EWHs0b), prv);
 	var dxp = vec4<f32>(gCa.x, gCb.x, g0a.x, g0b.x); // d_x Psi
 	var dyp = vec4<f32>(gCa.y, gCb.y, g0a.y, g0b.y);
 	var dzp = vec4<f32>(gCa.z, gCb.z, g0a.z, g0b.z);
@@ -453,10 +453,10 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var dvW2 = EWDiv(x, y, z, i32(EWW2Xs), prv);
 	var dvW3 = EWDiv(x, y, z, i32(EWW3Xs), prv);
 	var dvB = EWDiv(x, y, z, i32(EWBXs), prv);
-	var lap = vec4<f32>(Laplacian26(x, y, z, i32(EWHsCa), prv, psi.x),
-		Laplacian26(x, y, z, i32(EWHsCb), prv, psi.y),
-		Laplacian26(x, y, z, i32(EWHs0a), prv, psi.z),
-		Laplacian26(x, y, z, i32(EWHs0b), prv, psi.w));
+	var lap = vec4<f32>(Laplacian19(x, y, z, i32(EWHsCa), prv, psi.x),
+		Laplacian19(x, y, z, i32(EWHsCb), prv, psi.y),
+		Laplacian19(x, y, z, i32(EWHs0a), prv, psi.z),
+		Laplacian19(x, y, z, i32(EWHs0b), prv, psi.w));
 	var cov = lap+(EWGaugeAct(dvW1, dvW2, dvW3, dvB, psi));
 	cov = cov+(EWGaugeAct(w1x, w2x, w3x, bx, dxp+(dX)));
 	cov = cov+(EWGaugeAct(w1y, w2y, w3y, by, dyp+(dY)));
@@ -520,7 +520,7 @@ fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,
 		}
 		var ps = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(prv)));
 		var vp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(prv)));
-		var f = csq * (Laplacian26(x, y, z, vs, prv, ps) + jc);
+		var f = csq * (Laplacian19(x, y, z, vs, prv, ps) + jc);
 		var vc = vp + f;
 		StateSet(vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(cur)));
 		StateSet(ps + vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
@@ -556,10 +556,10 @@ const  NLapNeigh = 18;
 const  NGradPair = 5;
 const  LaplacianWts: NeighWeights = 0;
 const  AverageWts: NeighWeights = 1;
-const  Grad18Wts: NeighWeights = 2;
+const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
-fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
@@ -569,7 +569,7 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
-fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
+fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	var g: vec3<f32>;
 	for (var xyz=0; xyz<3; xyz++) {
 		var sum = f32(0);
@@ -580,7 +580,7 @@ fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 			var ym = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(1))];
 			var zp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(2))];
 			var zm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(2))];
-			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
+			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad10Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
 			sum += grad;
 		}
 		switch (xyz) {

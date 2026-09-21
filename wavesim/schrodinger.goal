@@ -27,7 +27,7 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	var forceA, velA, posA, forceB, velB, posB float32
 	if cur == 0 {
 		if Params[0].ThreeD.IsTrue() {
-			forceA = Laplacian26(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+			forceA = Laplacian19(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
 		} else {
 			forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
 		}
@@ -41,7 +41,7 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 		posB = pposB
 	} else {
 		if Params[0].ThreeD.IsTrue() {
-			forceB = Laplacian26(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+			forceB = Laplacian19(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
 		} else {
 			forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
 		}

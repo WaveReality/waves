@@ -392,10 +392,10 @@ const  NLapNeigh = 18;
 const  NGradPair = 5;
 const  LaplacianWts: NeighWeights = 0;
 const  AverageWts: NeighWeights = 1;
-const  Grad18Wts: NeighWeights = 2;
+const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
-fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
@@ -627,7 +627,7 @@ var d0b: f32;; if (particle != 0) {
 	d0b = s0b;
 } else {
 	dist = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDist), u32(prv)));
-	var distF = Laplacian26(x, y, z, i32(SpinfieldDist), prv, dist);
+	var distF = Laplacian19(x, y, z, i32(SpinfieldDist), prv, dist);
 	dist += diff * distF; // no velocity
 	d0a = NeighValue(maxNeigh, x, y, z, i32(Spinfield0a), prv);
 	d0b = NeighValue(maxNeigh, x, y, z, i32(Spinfield0b), prv);
@@ -641,8 +641,8 @@ var d0b: f32;; if (particle != 0) {
 ; s0a -= omega0 * s0b;
 ; // everybody update to present tense
 s0b += omega0 * s0a;
-; StateSet(s0a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(cur)));; StateSet(s0b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(cur)));; var forceA = Laplacian26(x, y, z, i32(CabPosA), prv, pposA);
-; var forceB = Laplacian26(x, y, z, i32(CabPosB), prv, pposB);
+; StateSet(s0a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(cur)));; StateSet(s0b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(cur)));; var forceA = Laplacian19(x, y, z, i32(CabPosA), prv, pposA);
+; var forceB = Laplacian19(x, y, z, i32(CabPosB), prv, pposB);
 ; forceA += drive * (s0a - pposA);
 ; forceB += drive * (s0b - pposB);
 ; var velA = pvelA + csq*forceA;

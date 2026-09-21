@@ -35,7 +35,7 @@ func ewSim(sz int32) *Sim {
 
 // ewWrap re-wraps the edge ring. Fill and friends only touch interior cells,
 // so any perturbation must be followed by this -- otherwise the edges keep the
-// old value and Laplacian26 sees a step at the boundary.
+// old value and Laplacian19 sees a step at the boundary.
 func ewWrap() {
 	ctx := GetCtx(0)
 	RunEdgesWrapKernel(int(ctx.EdgesN()))

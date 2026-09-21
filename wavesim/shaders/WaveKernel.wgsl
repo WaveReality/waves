@@ -390,7 +390,7 @@ const  NLapNeigh = 18;
 const  NGradPair = 5;
 const  LaplacianWts: NeighWeights = 0;
 const  AverageWts: NeighWeights = 1;
-const  Grad18Wts: NeighWeights = 2;
+const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
 fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
@@ -399,7 +399,7 @@ fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
 return (m1 + p1) - 2*ctr;
 }
-fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
@@ -416,7 +416,7 @@ fn PotentialEnergy1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 
 	var pp1d = p1 - ctr;
 return 0.5 * (pm1d*pm1d + pp1d*pp1d);
 }
-fn PotentialEnergy26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
+fn PotentialEnergy19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
@@ -629,7 +629,7 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var pvel = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
 ; var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveV), u32(prv)));
 ; var force: f32;; if (Params[0].ThreeD == 1) {
-	force = Laplacian26(x, y, z, i32(WavePos), prv, ppos);
+	force = Laplacian19(x, y, z, i32(WavePos), prv, ppos);
 } else {
 	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
 }; force += vpot * ppos;
@@ -640,7 +640,7 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 	var kinetic = Params[0].Inv2CSq * midVel * midVel;
 	var potential: f32;
 	if (Params[0].ThreeD == 1) {
-		potential = PotentialEnergy26(x, y, z, i32(WavePos), prv, ppos);
+		potential = PotentialEnergy19(x, y, z, i32(WavePos), prv, ppos);
 	} else {
 		potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
 	}

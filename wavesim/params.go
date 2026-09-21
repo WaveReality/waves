@@ -75,7 +75,7 @@ type Parameters struct {
 	Energy slbool.Bool
 
 	// C is the speed of light factor, in cubes per time step. The stability
-	// limit is set by the spectral radius of Laplacian26, which for the
+	// limit is set by the spectral radius of Laplacian19, which for the
 	// isotropic weights is 16/3 (attained at k = (pi,pi,0)), giving
 	//	C < 2/sqrt(16/3) = sqrt(3)/2 = 0.8660
 	// Note this is TIGHTER than the 1.0 that the older, anisotropic 1/d^2

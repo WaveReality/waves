@@ -209,11 +209,11 @@ const NeighWeightsN NeighWeights = 3
 
 //gosl:end
 
-var _NeighWeightsValueMap = map[string]NeighWeights{`LaplacianWts`: 0, `AverageWts`: 1, `Grad18Wts`: 2}
+var _NeighWeightsValueMap = map[string]NeighWeights{`LaplacianWts`: 0, `AverageWts`: 1, `Grad10Wts`: 2}
 
-var _NeighWeightsDescMap = map[NeighWeights]string{0: `LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)`, 1: `AverageWts are 26 + 1 ctr average weights = 1 / d`, 2: `Grad18Wts are 18 neighbor gradaients`}
+var _NeighWeightsDescMap = map[NeighWeights]string{0: `LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)`, 1: `AverageWts are 26 + 1 ctr average weights = 1 / d`, 2: `Grad10Wts are the gradient pair weights, shared by the gradient, divergence and curl. Only the first NGradPair = 5 are non-zero.`}
 
-var _NeighWeightsMap = map[NeighWeights]string{0: `LaplacianWts`, 1: `AverageWts`, 2: `Grad18Wts`}
+var _NeighWeightsMap = map[NeighWeights]string{0: `LaplacianWts`, 1: `AverageWts`, 2: `Grad10Wts`}
 
 // String returns the string representation of this NeighWeights value.
 func (i NeighWeights) String() string { return enums.String(i, _NeighWeightsMap) }

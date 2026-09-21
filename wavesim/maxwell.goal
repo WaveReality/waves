@@ -99,10 +99,10 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 
 	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = Laplacian26(x, y, z, int32(A0s), prv, a0pp)
-		fX = Laplacian26(x, y, z, int32(AXs), prv, aXpp)
-		fY = Laplacian26(x, y, z, int32(AYs), prv, aYpp)
-		fZ = Laplacian26(x, y, z, int32(AZs), prv, aZpp)
+		f0 = Laplacian19(x, y, z, int32(A0s), prv, a0pp)
+		fX = Laplacian19(x, y, z, int32(AXs), prv, aXpp)
+		fY = Laplacian19(x, y, z, int32(AYs), prv, aYpp)
+		fZ = Laplacian19(x, y, z, int32(AZs), prv, aZpp)
 
 		c0 = NeighAverage27(x, y, z, int32(Charge), prv)
 		cX = NeighAverage27(x, y, z, int32(CurrentX), prv)
@@ -137,8 +137,8 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 
 	// note: these were done on cur, not prv, in emewave
 	// could do as a second pass here -- check if affects stability.
-	g := Gradient18(x, y, z, int32(A0s), prv)
-	b := Curl18(x, y, z, int32(AXs), prv)
+	g := Gradient10(x, y, z, int32(A0s), prv)
+	b := Curl10(x, y, z, int32(AXs), prv)
 
 	// E = -grad A0 - dA/dt
 	State[z, y, x, EX, cur] = -g.X - aXvp
@@ -184,10 +184,10 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 	aZpp := State[z, y, x, AZs, prv]
 	var f0, fX, fY, fZ float32
 	if Params[0].ThreeD.IsTrue() {
-		f0 = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
-		fX = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
-		fY = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
-		fZ = LaplacianEdge26(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
+		f0 = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+		fX = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+		fY = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+		fZ = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
 	} else {
 		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
 		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)

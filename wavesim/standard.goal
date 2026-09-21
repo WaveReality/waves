@@ -121,10 +121,10 @@ func StandardKernel(i uint32) { //gosl:kernel
 	// cv1a := State[z, y, x, StdCv1a, prv]
 	// cv1b := State[z, y, x, StdCv1b, prv]
 	//
-	// cs0aG := Gradient18(x, y, z, int32(cs0a), prv)
-	// cs0bG := Gradient18(x, y, z, int32(cs0b), prv)
+	// cs0aG := Gradient10(x, y, z, int32(cs0a), prv)
+	// cs0bG := Gradient10(x, y, z, int32(cs0b), prv)
 	//
-	// cs0aF := Laplacian26(x, y, z, int32(StdCs0a), prv, cs0a)
+	// cs0aF := Laplacian19(x, y, z, int32(StdCs0a), prv, cs0a)
 	// cs0aF -= mhsq * cs0a
 	// cs0aF *= csq
 	// if em {
