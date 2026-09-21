@@ -371,36 +371,49 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
 	var csq = Params[0].CSq;
-	var mhsq = Params[0].MOverHSq;
 	var musq = Params[0].HiggsMuSq;
 	var lambda = Params[0].HiggsLambda;
-	if (Params[0].Mass < 0) {
-		mhsq = -mhsq;
-	}
 	var hsCa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(prv)));
-	var hsCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(prv)));
+	var hsCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(prv)));
+	var hs0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(prv)));
+	var hs0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(prv)));
 	var hvCa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCa), u32(prv)));
-	var hvCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(prv)));
-	var mag = hsCa*hsCa + hsCb*hsCb;      // + hs0a*hs0a + hs0b*hs0b
-	var hv = -musq*hsCa + lambda*mag*mag; // todo: what is actual form here?
+	var hvCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(prv)));
+	var hv0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0a), u32(prv)));
+	var hv0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0b), u32(prv)));
+	var mag = hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b;
+	var vfac = musq - lambda*mag;
 	var hfCa = Laplacian26(x, y, z, i32(EWHsCa), prv, hsCa); // force
-	hfCa += hv;
+	hfCa += vfac * hsCa;
 	hfCa *= csq;
 	var hvCaN = hvCa + hfCa;
 	var hsCaN = hsCa + hvCaN;
 	var hfCb = Laplacian26(x, y, z, i32(EWHsCb), prv, hsCb);
-	hfCb += hv;
+	hfCb += vfac * hsCb;
 	hfCb *= csq;
 	var hvCbN = hvCb + hfCb;
 	var hsCbN = hsCb + hvCbN;
+	var hf0a = Laplacian26(x, y, z, i32(EWHs0a), prv, hs0a);
+	hf0a += vfac * hs0a;
+	hf0a *= csq;
+	var hv0aN = hv0a + hf0a;
+	var hs0aN = hs0a + hv0aN;
+	var hf0b = Laplacian26(x, y, z, i32(EWHs0b), prv, hs0b);
+	hf0b += vfac * hs0b;
+	hf0b *= csq;
+	var hv0bN = hv0b + hf0b;
+	var hs0bN = hs0b + hv0bN;
 	StateSet(hsCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(cur)));
 	StateSet(hsCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(cur)));
+	StateSet(hs0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(cur)));
+	StateSet(hs0bN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(cur)));
 	StateSet(hvCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCa), u32(cur)));
 	StateSet(hvCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(cur)));
+	StateSet(hv0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0a), u32(cur)));
+	StateSet(hv0bN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0b), u32(cur)));
 	StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHmag), u32(cur)));
-	StateSet(hv, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
+	StateSet(-0.5*musq*mag + 0.25*lambda*mag*mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
 }
 
 //////// import: "enumgen.go"
@@ -528,7 +541,7 @@ struct Parameters {
 	E2OverH: f32,
 	EOverHSq: f32,
 	HiggsMuSq: f32,
-	pad: f32,
+	HiggsV: f32,
 }
 
 //////// import: "particle.go"

@@ -5,6 +5,8 @@
 package wavesim
 
 import (
+	"math"
+
 	"cogentcore.org/core/math32"
 )
 
@@ -50,11 +52,25 @@ const (
 	// A0 is the Bohr radius in hbar: hbar / (m0 c alpha) = 5.2917720859e-11 m
 	A0 = Hbar / (EMass * C * Alpha)
 
-	// HiggsLambda is the lambda factor in the Higgs potential, in natural units (/hbar c) = m_h^2 / (2v^2)
+	// HiggsLambda is the quartic coupling of the Higgs potential,
+	// m_h^2 / (2 v^2) = 0.1291. In 4 spacetime dimensions lambda is
+	// DIMENSIONLESS, so it carries into cube units completely unchanged --
+	// provided the Higgs field itself is measured in inverse-length (1/cube)
+	// units, the same units as the masses. See [Units.Update].
 	HiggsLambda = 0.1291
 
-	// HiggsMu is the mu factor in the Higgs potential, in GeV/c^2 = m_h / \sqrt(2)
-	HiggsMu = 88.47
+	// HiggsMuGeV is the mu parameter of the Higgs potential, m_h / sqrt(2),
+	// in GeV/c^2. Retained for reference only: it CANNOT be expressed in the
+	// electron-anchored cube units, because the Higgs and electron Compton
+	// wavelengths differ by a factor of 2.4e5 -- at ComptonE = 16 the Higgs
+	// Compton wavelength is 1e-4 of a single cube. The electroweak sector
+	// therefore sets its own length scale, via Units.HiggsCompton.
+	HiggsMuGeV = 88.47
+
+	// HiggsMhOverV = m_h / v = sqrt(2 * HiggsLambda) = 0.50813 is the only
+	// dimensionless number the Higgs potential actually contains. Everything
+	// else about it is a choice of units.
+	HiggsMhOverV = 0.50813
 
 	//////// Planck scale constants
 
@@ -78,7 +94,7 @@ type Units struct {
 	// ComptonE is the compton hbar wavelength of an electron in cubic elements,
 	// i.e., how many cubes long is the Compton wavelength of the electron.
 	// This fixes the length dimension of a cube, as the inverse of this times
-	// the numerical value of this quantity (LambdaBarE).
+	// the numerical value of this quantity (LambdaBarE). It also fixes the EMass.
 	ComptonE float64 `default:"16" min:"4"`
 
 	// C is the speed of light in a vacuum in units of cube length / time step.
@@ -106,11 +122,32 @@ type Units struct {
 	// F/m = (s^4 A^2) / (m^3 kg)
 	Eps0 float64 `edit:"-"`
 
-	// HiggsLambda is the lambda factor in the Higgs potential = m_h^2 / (2v^2) in cube units.
+	// HiggsCompton is the reduced Compton wavelength of the Higgs boson,
+	// in cubic elements: how many cubes long is hbar / (m_h c). This is the
+	// single free scale knob for the electroweak sector, playing the same role
+	// there that ComptonE plays for the electron. It is independent of ComptonE
+	// because the two scales are 2.4e5 apart and cannot share a lattice.
+	// Values of 16 or more keep m_h, m_W and m_Z all well resolved.
+	HiggsCompton float64 `default:"16" min:"4"`
+
+	// HiggsMh is the Higgs mass in inverse cube units (1/cube),
+	// = 1 / HiggsCompton.
+	HiggsMh float64 `edit:"-"`
+
+	// HiggsLambda is the quartic coupling of the Higgs potential. It is
+	// dimensionless, so this is just the Standard Model value, unconverted.
 	HiggsLambda float64 `edit:"-"`
 
-	// HiggsMu is the mu factor in the Higgs potential, in GeV = m_h / \sqrt(2) in cube units.
+	// HiggsMu is the mu parameter of the Higgs potential, m_h / sqrt(2),
+	// in INVERSE cube units (1/cube) -- an inverse Compton wavelength, not a
+	// mass. Its square fills the same slot in the update as (m c / hbar)^2
+	// does in Klein-Gordon.
 	HiggsMu float64 `edit:"-"`
+
+	// HiggsV is the Higgs vacuum expectation value, mu / sqrt(lambda), in
+	// inverse cube units (1/cube). This is the radius of the minimum of the
+	// potential, i.e. the value the neutral component settles at.
+	HiggsV float64 `edit:"-"`
 
 	// CuM is the computed length of a cubic element, in meters.
 	CuM float64 `edit:"-"`
@@ -181,10 +218,11 @@ type Units struct {
 
 func (un *Units) Defaults() {
 	un.ComptonE = 16
+	un.HiggsCompton = 16
 	un.C = 0.5
 	un.Hbar = 1
 	un.E = 1.0
-	un.EMass = 1
+	un.EMass = 0.125 // for ComptonE = 16
 	un.Csi = C
 	un.HbarSi = Hbar
 	un.Esi = E
@@ -204,7 +242,7 @@ func (un *Units) Update() {
 	un.CuKg = ((un.CuS / (un.CuM * un.CuM)) * Hbar) / un.Hbar
 	un.CuN = (un.CuKg * un.CuM) / (un.CuS * un.CuS)
 	un.CuJ = un.CuN * un.CuM
-	un.CuW = un.CuJ * un.CuM
+	un.CuW = un.CuJ / un.CuS
 
 	un.CuA = E / (un.E * un.CuS) // un.E = Esi / (un.A * un.S); A * E = Esi / S; A = Esi / (E * S)
 	un.CuC = un.CuA * un.CuS
@@ -215,6 +253,21 @@ func (un *Units) Update() {
 	un.Mu0 = Mu0 * ((un.CuS * un.CuS * un.CuA * un.CuA) / (un.CuM * un.CuKg))
 	un.Eps0 = 1.0 / (un.Mu0 * un.C * un.C)
 
-	un.HiggsLambda = HiggsLambda / (un.C * un.Hbar)
-	un.HiggsMu = HiggsMu * GEVcsqToKg
+	// The electroweak sector sets its own length scale. Anchoring it to the
+	// electron is impossible: m_h / m_e = 2.4e5, so at ComptonE = 16 the Higgs
+	// Compton wavelength would be 1e-4 of one cube -- unresolvable by 4 orders
+	// of magnitude. HiggsCompton anchors it directly instead.
+	//
+	// Measuring the Higgs field in inverse-length (1/cube) units, the same units
+	// as the masses, makes lambda dimensionless and g, g' dimensionless too, so
+	// every Standard Model coupling passes through with NO conversion at all.
+	// Only the one length scale needs setting:
+	//
+	//	m_h = 1 / HiggsCompton   [1/cube]
+	//	mu  = m_h / sqrt(2)      [1/cube]   -- mu^2 goes in the mass slot
+	//	v   = mu / sqrt(lambda)  [1/cube]   -- check: m_h / v = sqrt(2 lambda)
+	un.HiggsMh = 1.0 / un.HiggsCompton
+	un.HiggsLambda = HiggsLambda
+	un.HiggsMu = un.HiggsMh / math.Sqrt2
+	un.HiggsV = un.HiggsMu / math.Sqrt(un.HiggsLambda)
 }

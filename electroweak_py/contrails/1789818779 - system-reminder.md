@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-21 11:10:00
+- **Last Message:** 2026-09-21 12:08:28
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -8391,47 +8391,657 @@ $$\hat\mu = \frac{\mu c}{\hbar}\,\Delta x$$
 
 Given that, the usual move is to convert to natural units at the boundary and run the kernel with ħ = c = 1 internally. It removes a whole class of unit bugs from the inner loop, and you only need the conversion table above at I/O. If your existing solver is already committed to carrying ħ and c explicitly that's fine too — just make sure the mass parameter you hand it is $\mu c/\hbar$ and not 88.47.
 
-Yes — μ is a mass-dimension-1 quantity, so **GeV/c²** is right. (Worth noting it isn't itself any particle's mass; $m_h = \sqrt2\,\mu$. But it carries mass units.)
+## 🧑 User - 2026-09-21 12:01:12
 
-The thing to watch is that GeV/c² is probably *not* the number you actually feed the solver.
+ok, so I've started on my electroweak sim. the code is in the .goal and .go files in waves/wavesim. this is using the GoSL and Goal frameworks from https://github.com/cogentcore/lab, which use Go (golang) code to generate WGSL kernels that run on the GPU, both locally and on the web. The code can run in native Go too, and that is all you need to worry about. The Goal framework is used here minimally, to support multi-dimensional indexing of the form: `hsCa := State[z, y, x, EWHsCa, prv]` where State is a tensor, using cogentcore/lab/tensor. Goal just does a transpiling of .goal files into corresponding .go files, which are then what is built. The State is one huge blob of floats is sent to the GPU which then operates on it via the Kernel that is generated, e.g., from the ElectroweakKernel which is the object of interest right now. at this point, I would like you to check how Params.HiggsMu and HiggsLambda are computed from the corresponding constants, using "cubic" units that are the local units for my sim, which are set by defining a few key Param values. The Laplacian26 function is a key piece of my own invention (https://ccnlab.org/papers/OReillyBeck06.pdf) which does a great job of computing isotropic laplacian in 3D. So for now, I just want you to check also the units for that ElectroweakKernel function, and I'm pretty confused how to actually compute the higgs potential as you can see.
 
-## What the wave equation wants
+## 🤖 Assistant - 2026-09-21 12:01:15
 
-With ħ and c restored, the KG equation is one of these depending on how you arrange it:
+*Model: claude-opus-5*
 
-$$\frac{1}{c^2}\partial_t^2\psi = \nabla^2\psi - \left(\frac{mc}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{length}^{-2}$$
+Scope's open now — let me find the electroweak files.
 
-$$\partial_t^2\psi = c^2\nabla^2\psi - \left(\frac{mc^2}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{time}^{-2}$$
+<details>
+<summary>Tool Calls (7)</summary>
 
-So what multiplies $\psi$ is an inverse **Compton wavelength** squared, or an inverse time squared — never a mass. For μ:
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && ls -la && echo "=== electroweak-ish ===" && ls -la | grep -i -E "electro|ew|higgs"``
+  ```
+  total 936
+  drwxr-xr-x  47 oreilly  staff   1504 Sep 21 13:45 ./
+  drwxr-xr-x  19 oreilly  staff    608 Sep 21 13:46 ../
+  -rw-r--r--@  1 oreilly  staff   6148 Jul 28 21:02 .DS_Store
+  drwxr-xr-x   3 oreilly  staff     96 Jul 10 15:48 _old/
+  -rw-r--r--   1 oreilly  staff   1508 Jul 26 05:05 config.go
+  -rw-r--r--   1 oreilly  staff   2458 Jul 25 06:28 context.go
+  -rw-r--r--   1 oreilly  staff   3442 Sep 21 13:45 dirac.go
+  -rw-r--r--   1 oreilly  staff   3146 Jul 10 13:19 dirac.goal
+  -rw-r--r--   1 oreilly  staff   5879 Sep 21 13:45 edges.go
+  -rw-r--r--   1 oreilly  staff   5693 Sep  8 22:00 edges.goal
+  -rw-r--r--   1 oreilly  staff   7120 Sep 21 13:45 electroweak.go
+  -rw-r--r--   1 oreilly  staff   6754 Sep 21 13:45 electroweak.goal
+  -rw-r--r--   1 oreilly  staff  45512 Sep 21 13:45 enumgen.go
+  -rw-r--r--   1 oreilly  staff   3431 Jul 25 23:49 events.go
+  -rw-r--r--   1 oreilly  staff  15148 Sep 21 13:45 funcs.go
+  -rw-r--r--   1 oreilly  staff  12409 Aug 12 00:06 funcs.goal
+  -rw-r--r--   1 oreilly  staff  38555 Sep 21 13:46 gosl.go
+  -rw-r--r--   1 oreilly  staff   7457 Jul  4 12:50 gui.go
+  -rw-r--r--   1 oreilly  staff  12522 Sep 21 13:45 init.go
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && echo "============ electroweak.goal ============" && cat electroweak.goal && echo && echo "============ units.go ============" && cat units.go``
+  ```
+  ============ electroweak.goal ============
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  //gosl:start
+  //gosl:import "cogentcore.org/lab/gosl/slmath"
+  
+  // EWStates are the state variables for the Electroweak Model.
+  type EWStates EMStates //enums:enum -trim-prefix=EW
+  
+  const (
+  	// EWHsCa is the Higgs doublet charged state Ca (real)
+  	EWHsCa EWStates = EWStates(EMStatesN) + iota
+  
+  	// EWHsCb is the Higgs doublet charged state Cb (imaginary)
+  	EWHsCb
+  
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat params.go``
+  ```
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  import (
+  	"slices"
+  
+  	"cogentcore.org/core/math32"
+  	"cogentcore.org/lab/gosl/slbool"
+  )
+  
+  // ParamsShouldDisplay should be set to an equation-specific list of
+  // Parameters field names to display. To simplify the
+  // GPU configuration, it is important to only have one struct
+  // with everything in it, so this simplifies things.
+  var ParamsShouldDisplay []string
+  
+  //gosl:start
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && echo "=== Laplacian26 / Gradient18 ===" && sed -n '/func Laplacian26/,/^}/p' funcs.goal && echo "=== KG mass usage ===" && grep -n "MOverHSq\|mhsq\|csq" klein-gordon.goal | head -40``
+  ```
+  === Laplacian26 / Gradient18 ===
+  func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
+  	avg := float32(0)
+  	for j := range 26 {
+  		xo := NeighOffs[j, math32.X]
+  		yo := NeighOffs[j, math32.Y]
+  		zo := NeighOffs[j, math32.Z]
+  		nv := State[z+zo, y+yo, x+xo, vidx, tidx]
+  		avg += NeighWts[LaplacianWts, j] * (nv - ctr)
+  	}
+  	return avg
+  }
+  === KG mass usage ===
+  85:	mhsq := Params[0].MOverHSq
+  86:	csq := Params[0].CSq
+  94:	force += (vpot - mhsq) * ppos // this is the only diff from standard Wave
+  95:	vel := pvel + csq*force
+  134:	mhsq := Params[0].MOverHSq
+  135:	csq := Params[0].CSq
+  145:	forceA += (vpot - mhsq) * pposA // this is the only diff from standard Wave
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && echo "=== Units -> Params wiring ===" && grep -rn "Units\|un\.Higgs\|HiggsMu\|HiggsLambda" --include=*.go --include=*.goal . | grep -v "^./units.go" | grep -v enumgen | grep -v typegen | grep -v gosl.go && echo && echo "=== LaplacianWts ===" && grep -n "LaplacianWts" -B4 -A25 init.goal | head -70``
+  ```
+  === Units -> Params wiring ===
+  sim.go:31:	// Units convert between real-world SI units and per-cube computational units.
+  sim.go:32:	Units Units `new-window:"+" display:"no-inline"`
+  sim.go:192:// UpdateUnits updates Units from Params and vice-versa.
+  sim.go:193:func (ss *Sim) UpdateUnits() {
+  sim.go:194:	ss.Units.C = float64(ss.Params.C)
+  sim.go:195:	ss.Units.Hbar = float64(ss.Params.Hbar)
+  sim.go:196:	ss.Units.EMass = float64(ss.Params.Mass)
+  sim.go:197:	ss.Units.Update()
+  sim.go:198:	ss.Params.Mu0 = float32(ss.Units.Mu0)
+  sim.go:199:	ss.Params.Eps0 = float32(ss.Units.Eps0)
+  sim.go:200:	ss.Params.HiggsMu = float32(ss.Units.HiggsMu)
+  sim.go:201:	ss.Params.HiggsLambda = float32(ss.Units.HiggsLambda)
+  sim.go:208:	ss.UpdateUnits()
+  electroweak.goal:160:	musq := Params[0].HiggsMuSq
+  electroweak.goal:161:	lambda := Params[0].HiggsLambda
+  electroweak.goal:256:	ss.Fill(EWHsCa, Both, ss.Params.HiggsMu)
+  electroweak.goal:257:	// ss.Fill(HiggsHvCb, Both, ss.Params.C*ss.Params.HiggsMu)
+  electroweak.goal:264:var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "EM", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda"}
+  units.go:53:	// HiggsLambda is the lambda factor in the Higgs potential, in natural units (/hbar c) = m_h^2 / (2v^2)
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -rn "LaplacianWts" --include=*.go --include=*.goal . | grep -v enumgen | grep -v typegen | head && echo "=== weights setup ===" && grep -rn "NeighWts" --include=*.goal . | head -20``
+  ```
+  funcs.go:46:				NeighWts.Set(wt, int(LaplacianWts), int(idx))
+  funcs.go:131:	// LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)
+  funcs.go:132:	LaplacianWts NeighWeights = iota
+  funcs.go:168:		avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
+  funcs.go:355:			avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
+  funcs.go:383:		avg += NeighWts.Value(int(LaplacianWts), int(j)) * dv * dv
+  funcs.goal:44:				NeighWts[LaplacianWts, idx] = wt
+  funcs.goal:129:	// LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)
+  funcs.goal:130:	LaplacianWts NeighWeights = iota
+  funcs.goal:166:		avg += NeighWts[LaplacianWts, j] * (nv - ctr)
+  === weights setup ===
+  funcs.goal:25:	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
+  funcs.goal:44:				NeighWts[LaplacianWts, idx] = wt
+  funcs.goal:49:				NeighWts[AverageWts, idx] = invD
+  funcs.goal:55:	NeighWts[AverageWts, idx] = 1.0
+  funcs.goal:76:			NeighWts[Grad18Wts, idx] = wt
+  funcs.goal:111:		NeighWts[Grad18Wts, j] /= sum
+  funcs.goal:166:		avg += NeighWts[LaplacianWts, j] * (nv - ctr)
+  funcs.goal:181:		avg += NeighWts[AverageWts, j] * nv
+  funcs.goal:183:	avg += NeighWts[AverageWts, 26] * State[z, y, x, vidx, tidx]
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n '20,60p' funcs.goal && echo "=== EWHsCa/EWHs0a init & Fill ===" && grep -rn "func (ss \*Sim) Fill" -A 20 funcs.goal init.goal 2>/dev/null | head -30``
+  ```
+  	Params[0].Defaults()
+  	ss.Params = &Params[0]
+  	ss.Units.Defaults()
+  	Ctx = make([]Context, 1)
+  	Ctx[0].Init()
+  	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
+  	NeighOffs = tensor.NewInt32(26,3)
+  	lnorm := float32(3.0 / 13.0)
+  	// sum := float32(0)
+  	idx := 0
+  	for z := -1; z <= 1; z++ {
+  		for y := -1; y <= 1; y++ {
+  			for x := -1; x <= 1; x++ {
+  				if x == 0 && y == 0 && z == 0 {
+  					continue
+  				}
+  				NeighOffs[idx, math32.X] = int32(x)
+  				NeighOffs[idx, math32.Y] = int32(y)
+  				NeighOffs[idx, math32.Z] = int32(z)
+  				
+  ...
+  ```
 
-| form | value |
-|---|---|
-| $\mu$ | 88.467 GeV/c² |
-| $\mu c^2$ | 88.467 GeV |
-| $\mu c/\hbar$ | 448.33 fm⁻¹ = 4.4833×10¹⁷ m⁻¹ |
-| $\hbar/\mu c$ | 2.2305×10⁻³ fm |
-| $\mu c^2/\hbar$ | 1.3441×10²⁶ s⁻¹ |
+</details>
 
-(using $\hbar c = 197.327$ MeV·fm). The conversion rule is just: a mass $M$ becomes $Mc^2$ for an energy, $Mc/\hbar$ for an inverse length, $Mc^2/\hbar$ for an inverse frequency — pick whichever slot it occupies in your equation.
+Now I have the full picture. Let me verify the Laplacian normalization and work the unit numbers.
 
-## The part that usually bites
+<details>
+<summary>Tool Calls (3)</summary>
 
-**λ is dimensionless only if φ is measured in mass units.** If your code normalizes the field so the kinetic term is $\tfrac12(\nabla\phi)^2$ with no ħ or c, then $[\phi] = \sqrt{\text{energy}/\text{length}}$, and
+- **Bash**: `Ran `cd /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad && cat > units_check.py <<'PY'
+import numpy as np
+import itertools
 
-$$\left[\lambda\right] = \frac{1}{\text{energy}\cdot\text{length}} = \frac{1}{\hbar c} \quad\Longrightarrow\quad \lambda_{\rm code} = \frac{0.1291}{\hbar c} = 0.654\ \text{GeV}^{-1}\text{fm}^{-1}$$
+# ---- 1. Laplacian26 normalization ----------------------------------------
+offs = [np.array(o) for o in itertools.product((-1,0,1), repeat=3) if any(o)]
+lnorm = 3.0/13.0
+wts = [lnorm/ (o@o) for o in offs]
+def lap26(f, at=np.zeros(3)):
+    return sum(w*(f(at+o) - f(at)) for w,o in zip(wts, offs))
+print("Laplacian26 check (exact answer in parentheses):")
+for name, f, exact in [("x^2",        lambda p: p[0]**2,                  2.0),
+                       ("x^2+y^2+z^2",lambda p: p@p,                      6.0),
+                       ("xy",         lambda p: p[0]*p[1],                0.0),
+                       ("x",          lambda p: p[0],                     0.0),
+                       ("2x^2-y^2-z^2",lambda p: 2*p[0]**2-p[1]**2-p[2]**2, 0.0)]:
+    print(f"   {name:14s} -> {lap26(f):9.6f}   ({exact})")
+print(f"   sum of weights = {sum(wts):.6f}   (26 neighbors, 3/13/d^2)\n")
 
-Which is exactly the statement that λ is dimensionless *in units where ħc = 1*. Same question applies to $v = 246.22$ GeV — mass dimension 1, so it converts like μ does, and $\phi_{\min}$ in your field variable is $v$ times whatever normalization factor you chose.
+# ---- 2. the cube unit system ---------------------------------------------
+C_SI, HBAR, EMASS = 299792458.0, 1.054571628e-34, 9.10938215e-31
+LAMBDABAR_E = HBAR/(EMASS*C_SI)
+GEV_KG = 1.7826619216279e-27
+HBARC_GEVFM = 0.1973269804
 
-So before wiring this up, pin down one thing: **what are the units of φ itself in your code?** Everything else follows mechanically. If φ is in mass units, λ is a pure number and μ is a mass. If φ carries √(energy/length), λ picks up $1/\hbar c$.
+ComptonE, c, hbar = 16.0, 0.5, 1.0
+CuM = LAMBDABAR_E/ComptonE
+CuS = CuM*c/C_SI
+CuKg = (CuS/CuM**2)*HBAR/hbar
+print(f"cube length CuM  = {CuM:.6e} m")
+print(f"cube time   CuS  = {CuS:.6e} s")
+print(f"cube mass   CuKg = {CuKg:.6e} kg")
+me_cube = EMASS/CuKg
+print(f"\nelectron mass in cube units = {me_cube:.6f}   (code Defaults set Params.Mass = 1.0)")
+print(f"   -> (m c / hbar)      = {me_cube*c/hbar:.6f}  per cube")
+print(f"   -> reduced Compton   = {hbar/(me_cube*c):.4f} cubes   (target ComptonE = {ComptonE})")
+print(f"   with Mass=1: (m c/hbar) = {1*c/hbar:.4f} -> Compton = {1/(1*c/hbar):.4f} cubes")
+print(f"   code's MOverHSq = Mass^2/Hbar^2 = {1.0:.4f};  (m c/hbar)^2 = {(1*c/hbar)**2:.4f}  [ratio c^2 = {c*c}]")
 
-## Practical suggestion
+# ---- 3. what units.go currently produces for the Higgs -------------------
+print("\n--- units.go Update() as written ---")
+uHiggsMu = 88.47*GEV_KG
+uHiggsLam = 0.1291/(c*hbar)
+print(f"un.HiggsMu     = 88.47 * GEVcsqToKg = {uHiggsMu:.6e}   <- SI kilograms")
+print(f"un.HiggsLambda = 0.1291/(C*Hbar)    = {uHiggsLam:.6f}")
 
-The thing that actually controls your simulation is the dimensionless product
+print("\n--- what it would be if converted to cube units ---")
+mu_cube_mass = uHiggsMu/CuKg
+print(f"mu in cube MASS units          = {mu_cube_mass:.4e}")
+print(f"mu c/hbar (inverse length)      = {mu_cube_mass*c/hbar:.4e} per cube")
+print(f"reduced Compton of mu           = {hbar/(mu_cube_mass*c):.4e} cubes")
+mh_fm = HBARC_GEVFM/125.11
+print(f"m_h reduced Compton             = {mh_fm:.6e} fm = {mh_fm*1e-15/CuM:.4e} cubes")
+print(f"scale ratio m_h / m_e           = {125.11e9/0.51099891e6:.4e}")
 
-$$\hat\mu = \frac{\mu c}{\hbar}\,\Delta x$$
+# ---- 4. a self-consistent electroweak unit choice ------------------------
+print("\n--- anchoring the lattice to the HIGGS instead of the electron ---")
+LH = 16.0                      # want the Higgs Compton wavelength to be 16 cubes
+mh = 1.0/LH                    # [1/cube]
+lam = 0.1291
+v  = mh/np.sqrt(2*lam)
+mu = mh/np.sqrt(2.0)
+g, gp = 0.6533, 0.3500
+mW, mZ = g*v/2, v*np.hypot(g,gp)/2
+print(f"  m_h  = {mh:.6f} /cube   Compton = {1/mh:6.2f} cubes")
+print(f"  mu   = {mu:.6f} /cube   (= m_h/sqrt2)")
+print(f"  v    = {v:.6f} /cube   (= mu/sqrt(lambda))   check m_h/v = {mh/v:.5f} vs sqrt(2 lam) = {np.sqrt(2*lam):.5f}")
+print(f"  lam  = {lam}  (dimensionless, UNCHANGED)")
+print(f"  m_W  = {mW:.6f} /cube   Compton = {1/mW:6.2f} cubes")
+print(f"  m_Z  = {mZ:.6f} /cube   Compton = {1/mZ:6.2f} cubes")
+CuM_h = mh_fm*1e-15/LH
+print(f"  => cube size = {CuM_h:.4e} m ;  electron Compton = {LAMBDABAR_E/CuM_h:.3e} cubes")
 
-— mass times lattice spacing. That's what tells you whether the mode is resolved, and it's the same number in any unit system. In [higgs_gauge.py](higgs_gauge.py) that's `p.m_h * p.a` with `a` in GeV⁻¹; in a ħ/c code it's the same quantity with `a` in fm.
+# ---- 5. current defaults ---------------------------------------------------
+print("\n--- Params.Defaults(): HiggsMu=0.5, HiggsLambda=2.0 ---")
+mu0, lam0 = 0.5, 2.0
+v0 = mu0/np.sqrt(lam0); mh0 = np.sqrt(2)*mu0
+print(f"  v    = mu/sqrt(lam) = {v0:.4f}")
+print(f"  m_h  = sqrt2 mu     = {mh0:.4f} /cube -> Compton = {1/mh0:.3f} cubes  <-- UNRESOLVED")
+print(f"  m_h/v = {mh0/v0:.4f}   vs Standard Model {np.sqrt(2*0.1291):.4f}")
+PY
+python3 units_check.py``
+- **Bash**: `Ran `cd /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad && /Users/oreilly/wavereality/waves/electroweak_py/.venv/bin/python units_check.py``
+  ```
+  Laplacian26 check (exact answer in parentheses):
+     x^2            ->  2.000000   (2.0)
+     x^2+y^2+z^2    ->  6.000000   (6.0)
+     xy             ->  0.000000   (0.0)
+     x              -> -0.000000   (0.0)
+     2x^2-y^2-z^2   ->  0.000000   (0.0)
+     sum of weights = 3.384615   (26 neighbors, 3/13/d^2)
+  
+  cube length CuM  = 2.413495e-14 m
+  cube time   CuS  = 4.025277e-23 s
+  cube mass   CuKg = 7.287506e-30 kg
+  
+  electron mass in cube units = 0.125000   (code Defaults set Params.Mass = 1.0)
+     -> (m c / hbar)      = 0.062500  per cube
+     -> reduced Compton   = 16.0000 cubes   (target ComptonE = 16.0)
+     with Mass=1: (m c/hbar) = 0.5000 -> Compton = 2.0000 cubes
+     code's MOverHSq = Mass^2/Hbar^2 = 1.0000;  (m c/hbar)^2 = 0.2500  [ratio c^2 = 0.25]
+  
+  --- units.go Update() as written ---
+  un.HiggsMu     = 88.47 * GEVcsqToKg = 1.577121e-25   <- SI kilograms
+  ...
+  ```
+- **Bash**: `Ran `cd /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad && cat > stab.py <<'PY'
+import numpy as np, itertools
+offs=[np.array(o) for o in itertools.product((-1,0,1),repeat=3) if any(o)]
+w=[(3.0/13.0)/(o@o) for o in offs]
+ks=np.linspace(0,np.pi,181)
+worst=0.0
+for kx in ks:
+    for ky in ks:
+        for kz in ks:
+            k=np.array([kx,ky,kz])
+            s=sum(wi*(np.cos(k@o)-1.0) for wi,o in zip(w,offs))
+            worst=min(worst,s)
+print(f"Laplacian26 most negative eigenvalue = {worst:.4f}  (7-pt stencil gives -12.0)")
+print(f"leapfrog stable while c^2*|lam_max| < 4  ->  c < {2/np.sqrt(-worst):.4f}")
+for mh in (0.0625,):
+    print(f"with m_h = {mh}: c < {2/np.sqrt(-worst+mh*mh):.4f}")
+PY
+/Users/oreilly/wavereality/waves/electroweak_py/.venv/bin/python stab.py``
+  ```
+  Laplacian26 most negative eigenvalue = -4.0000  (7-pt stencil gives -12.0)
+  leapfrog stable while c^2*|lam_max| < 4  ->  c < 1.0000
+  with m_h = 0.0625: c < 0.9995
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
 
-Given that, the usual move is to convert to natural units at the boundary and run the kernel with ħ = c = 1 internally. It removes a whole class of unit bugs from the inner loop, and you only need the conversion table above at I/O. If your existing solver is already committed to carrying ħ and c explicitly that's fine too — just make sure the mass parameter you hand it is $\mu c/\hbar$ and not 88.47.
+</details>
+
+Checked all three. The Laplacian is fine; the potential and the unit conversion both need work.
+
+## 1. Laplacian26 checks out exactly
+
+Weights $\tfrac{3}{13}/d^2$ over 26 neighbors reproduce $\nabla^2$ with **no scale factor** — it's the Laplacian in units of 1/cube², with $\Delta x = 1$:
+
+```
+x^2            ->  2.000000   (2.0)
+x^2+y^2+z^2    ->  6.000000   (6.0)
+xy             ->  0.000000   (0.0)
+2x^2-y^2-z^2   ->  0.000000   (0.0)   <- the anisotropic quadrupole, correctly killed
+```
+
+A bonus worth knowing: its most negative eigenvalue is **exactly −4.0**, against −12.0 for the 7-point stencil. So the leapfrog stability bound is
+
+$$c^2\left|\lambda_{\max}\right| < 4 \quad\Longrightarrow\quad c < 1.0000$$
+
+exactly. Your "C generally should not exceed 1" comment in [params.go](../wavesim/params.go) is not a rule of thumb — it's the precise CFL limit for this stencil, and the 26-neighbor form buys you a factor of √3 in timestep over the 7-point one on top of the isotropy.
+
+## 2. What the mass slot actually holds
+
+Your update is `force = Laplacian26(...) + X*psi; vel += csq*force`, i.e.
+
+$$\partial_t^2\psi = c^2\left[\nabla^2\psi + X\psi\right]$$
+
+and Klein–Gordon with full ħ, c is
+
+$$\partial_t^2\psi = c^2\left[\nabla^2\psi - \left(\frac{mc}{\hbar}\right)^2\psi\right]$$
+
+So **X must be an inverse reduced Compton wavelength squared, in 1/cube²** — never a mass, never a mass over ħ. That's the slot `HiggsMuSq` has to fill.
+
+### A discrepancy this exposes
+
+`MOverHSq = Mass²/Hbar²` is missing a factor of $c^2$. With your defaults:
+
+```
+electron mass in cube units = 0.125000   (Defaults set Params.Mass = 1.0)
+   -> reduced Compton   = 16.0000 cubes   (target ComptonE = 16)
+   with Mass=1: Compton = 2.0000 cubes
+   MOverHSq = Mass^2/Hbar^2 = 1.0000;  (m c/hbar)^2 = 0.2500  [ratio c^2 = 0.25]
+```
+
+Two separate things: `MOverHSq` should be `Mass*Mass*CSq/(Hbar*Hbar)`, and `Params.Mass` should be **0.125**, not 1.0 — that's the value that makes the electron's Compton wavelength come out at your stated `ComptonE = 16`. `UpdateUnits()` computes exactly that into `Units.EMass` and then never copies it back to `Params.Mass`, unlike `Mu0`/`Eps0`/`HiggsMu`/`HiggsLambda`. Worth checking against whatever KG dispersion tests you have before changing it, in case the two errors were cancelling.
+
+## 3. The Higgs potential — this is your `todo`
+
+Your line:
+
+```go
+mag := hsCa*hsCa + hsCb*hsCb
+hv := -musq*hsCa + lambda*mag*mag  // todo: what is actual form here?
+```
+
+Four things wrong, and one of them is the conceptual one.
+
+**Signs are inverted.** With $V = -\tfrac12\mu^2\varphi^2 + \tfrac14\lambda\varphi^4$, the force is $-\partial V/\partial\varphi = +\mu^2\varphi - \lambda\varphi^3$. You have $-\mu^2$ and $+\lambda$.
+
+**Wrong power.** `lambda*mag*mag` is $\lambda\varphi^4$. The *force* needs $\lambda\varphi^3 = \lambda\cdot\text{mag}\cdot\varphi$.
+
+**The conceptual one: the same `hv` is added to both components.** It was computed from `hsCa` and then applied to `hfCb` as well. The potential force is not a constant added to each component — it is **a common radial scalar multiplying each component separately**:
+
+$$\frac{\partial V}{\partial\varphi_i} = \left(\lambda\,|\varphi|^2 - \mu^2\right)\varphi_i \quad\Longrightarrow\quad F_i = \underbrace{\left(\mu^2 - \lambda\,|\varphi|^2\right)}_{\text{one scalar}}\cdot\,\varphi_i$$
+
+That structure is exactly what makes it the Mexican hat: the force depends only on the radius $|\varphi|$ and points along the field vector, so it's blind to the phase. Get this wrong and you break the O(4) symmetry, which means no flat directions, no Goldstones, no mechanism.
+
+**`EWHV` stores the force, not the potential**, despite its doc comment.
+
+Corrected:
+
+```go
+hsCa := State[z, y, x, EWHsCa, prv]
+hsCb := State[z, y, x, EWHsCb, prv]
+hs0a := State[z, y, x, EWHs0a, prv]
+hs0b := State[z, y, x, EWHs0b, prv]
+
+// mag = sum of squares of all four real components = 2 * Phi^dag Phi
+mag := hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b
+
+// V = -1/2 musq*mag + 1/4 lambda*mag^2
+// force_i = -dV/dphi_i = (musq - lambda*mag) * phi_i  -- ONE factor, EACH component
+vfac := musq - lambda*mag
+
+hfCa := Laplacian26(x, y, z, int32(EWHsCa), prv, hsCa) + vfac*hsCa
+hfCa *= csq
+hfCb := Laplacian26(x, y, z, int32(EWHsCb), prv, hsCb) + vfac*hsCb
+hfCb *= csq
+// ... same for hs0a, hs0b
+
+State[z, y, x, EWHmag, cur] = mag
+State[z, y, x, EWHV,   cur] = -0.5*musq*mag + 0.25*lambda*mag*mag
+```
+
+The doublet mapping, which you'll need the moment you add $W$ and $B$:
+
+$$\Phi = \frac{1}{\sqrt2}\begin{pmatrix}\text{hsCa} + i\,\text{hsCb}\\ \text{hs0a} + i\,\text{hs0b}\end{pmatrix}, \qquad \text{mag} = 2\,\Phi^\dagger\Phi$$
+
+So the VEV lives in **hs0a** with value $v$ (giving $\Phi_{\rm lower} = v/\sqrt2$, the standard convention). Your `ElectroweakInit` currently fills **EWHsCa** — the *charged* component — with the value `HiggsMu`. Both parts need fixing: wrong component (putting the VEV in the charged slot means $Q$ no longer annihilates the vacuum, and you lose the massless photon), and wrong magnitude ($v = \mu/\sqrt\lambda$, not $\mu$).
+
+## 4. HiggsMu and HiggsLambda in units.go
+
+```go
+un.HiggsLambda = HiggsLambda / (un.C * un.Hbar)
+un.HiggsMu = HiggsMu * GEVcsqToKg
+```
+
+`HiggsMu` comes out as $1.577\times10^{-25}$ — **SI kilograms**. It never gets divided by `CuKg`, so it isn't in cube units at all, and even in cube units a mass is the wrong kind of thing for that slot (see §2).
+
+But the deeper problem is that the conversion can't work in principle:
+
+```
+mu in cube MASS units       = 2.1641e+04
+mu c/hbar                   = 1.0821e+04 per cube
+reduced Compton of mu       = 9.2415e-05 cubes
+scale ratio m_h / m_e       = 2.4483e+05
+```
+
+With the lattice anchored to the electron at `ComptonE = 16`, the Higgs Compton wavelength is **1/10,000 of a single cube**. There is no lattice on which the electron and the Higgs are both resolved — they're 2.4×10⁵ apart. (Same wall I hit in `electron_demo.py`, where I had to use a 100 GeV lepton.)
+
+### The fix, and it's a nice one
+
+**Measure the Higgs field in units of 1/cube — the same units as the masses — and every dimensionless SM parameter passes through untouched.**
+
+$$[\varphi] = \text{cube}^{-1} \;\Longrightarrow\; [\lambda] = \frac{1}{\text{length}^2\,[\varphi]^2} = 1 \;\text{(dimensionless)}$$
+
+So $\lambda = 0.1291$ **exactly as is**, no $\hbar c$, no $C$, no conversion. Same for $g$ and $g'$. Then pick the Higgs Compton wavelength in cubes as your one free scale knob:
+
+```
+m_h  = 0.062500 /cube   Compton =  16.00 cubes
+mu   = 0.044194 /cube   (= m_h/sqrt2)
+v    = 0.122999 /cube   (= mu/sqrt(lambda))   m_h/v = 0.50813 = sqrt(2 lam)
+lam  = 0.1291  (dimensionless, UNCHANGED)
+m_W  = 0.040178 /cube   Compton =  24.89 cubes
+m_Z  = 0.045580 /cube   Compton =  21.94 cubes
+```
+
+Everything lands in the 16–25 cubes-per-wavelength range, comfortably resolved, and all four SM relations hold exactly. The implied cube size is $9.86\times10^{-20}$ m, on which the electron's Compton wavelength is $3.9\times10^6$ cubes — i.e. the electron is a uniform background, which is the physically honest statement.
+
+Concretely:
+
+```go
+// HiggsCompton is the Higgs reduced Compton wavelength in cubes -- the single
+// free scale knob for the electroweak sector. The electroweak scale cannot
+// share a lattice with the electron scale (ratio 2.4e5), so this sector sets
+// its own length unit rather than inheriting ComptonE.
+un.HiggsCompton = 16.0
+
+mh := 1.0 / un.HiggsCompton          // [1/cube]
+un.HiggsMu     = mh / math.Sqrt2     // [1/cube]  -> HiggsMuSq is 1/cube^2, the right slot
+un.HiggsLambda = HiggsLambda         // 0.1291, dimensionless, no conversion
+un.HiggsV      = un.HiggsMu / math.Sqrt(HiggsLambda)
+```
+
+and `ElectroweakInit` fills `EWHs0a` with `HiggsV`.
+
+Your current `Params.Defaults()` (`HiggsMu = 0.5`, `HiggsLambda = 2.0`) gives $m_h = 0.707$/cube, a Compton wavelength of **1.41 cubes** — badly under-resolved — and $m_h/v = 2.0$ against the SM's 0.508.
+
+## 5. Two smaller things
+
+`un.CuW = un.CuJ * un.CuM` — power is J/s, so this should be `un.CuJ / un.CuS`. The doc comment right above it says so. It propagates into `CuV` and `CuF`, so it'll bite on the EM side rather than here.
+
+`mag` currently omits `hs0a`/`hs0b`, which is consistent while only two components are live, but must include all four the moment you uncomment them — otherwise the radial factor is computed on the wrong radius and the hat is no longer a hat.
+
+---
+
+Want me to make these edits to [electroweak.goal](../wavesim/electroweak.goal) and [units.go](../wavesim/units.go)? I'd hold off on the `MOverHSq`/`Params.Mass` change until you've checked it against your existing KG results, since that one touches working code.
+
+Checked all three. The Laplacian is fine; the potential and the unit conversion both need work.
+
+## 1. Laplacian26 checks out exactly
+
+Weights $\tfrac{3}{13}/d^2$ over 26 neighbors reproduce $\nabla^2$ with **no scale factor** — it's the Laplacian in units of 1/cube², with $\Delta x = 1$:
+
+```
+x^2            ->  2.000000   (2.0)
+x^2+y^2+z^2    ->  6.000000   (6.0)
+xy             ->  0.000000   (0.0)
+2x^2-y^2-z^2   ->  0.000000   (0.0)   <- the anisotropic quadrupole, correctly killed
+```
+
+A bonus worth knowing: its most negative eigenvalue is **exactly −4.0**, against −12.0 for the 7-point stencil. So the leapfrog stability bound is
+
+$$c^2\left|\lambda_{\max}\right| < 4 \quad\Longrightarrow\quad c < 1.0000$$
+
+exactly. Your "C generally should not exceed 1" comment in [params.go](../wavesim/params.go) is not a rule of thumb — it's the precise CFL limit for this stencil, and the 26-neighbor form buys you a factor of √3 in timestep over the 7-point one on top of the isotropy.
+
+## 2. What the mass slot actually holds
+
+Your update is `force = Laplacian26(...) + X*psi; vel += csq*force`, i.e.
+
+$$\partial_t^2\psi = c^2\left[\nabla^2\psi + X\psi\right]$$
+
+and Klein–Gordon with full ħ, c is
+
+$$\partial_t^2\psi = c^2\left[\nabla^2\psi - \left(\frac{mc}{\hbar}\right)^2\psi\right]$$
+
+So **X must be an inverse reduced Compton wavelength squared, in 1/cube²** — never a mass, never a mass over ħ. That's the slot `HiggsMuSq` has to fill.
+
+### A discrepancy this exposes
+
+`MOverHSq = Mass²/Hbar²` is missing a factor of $c^2$. With your defaults:
+
+```
+electron mass in cube units = 0.125000   (Defaults set Params.Mass = 1.0)
+   -> reduced Compton   = 16.0000 cubes   (target ComptonE = 16)
+   with Mass=1: Compton = 2.0000 cubes
+   MOverHSq = Mass^2/Hbar^2 = 1.0000;  (m c/hbar)^2 = 0.2500  [ratio c^2 = 0.25]
+```
+
+Two separate things: `MOverHSq` should be `Mass*Mass*CSq/(Hbar*Hbar)`, and `Params.Mass` should be **0.125**, not 1.0 — that's the value that makes the electron's Compton wavelength come out at your stated `ComptonE = 16`. `UpdateUnits()` computes exactly that into `Units.EMass` and then never copies it back to `Params.Mass`, unlike `Mu0`/`Eps0`/`HiggsMu`/`HiggsLambda`. Worth checking against whatever KG dispersion tests you have before changing it, in case the two errors were cancelling.
+
+## 3. The Higgs potential — this is your `todo`
+
+Your line:
+
+```go
+mag := hsCa*hsCa + hsCb*hsCb
+hv := -musq*hsCa + lambda*mag*mag  // todo: what is actual form here?
+```
+
+Four things wrong, and one of them is the conceptual one.
+
+**Signs are inverted.** With $V = -\tfrac12\mu^2\varphi^2 + \tfrac14\lambda\varphi^4$, the force is $-\partial V/\partial\varphi = +\mu^2\varphi - \lambda\varphi^3$. You have $-\mu^2$ and $+\lambda$.
+
+**Wrong power.** `lambda*mag*mag` is $\lambda\varphi^4$. The *force* needs $\lambda\varphi^3 = \lambda\cdot\text{mag}\cdot\varphi$.
+
+**The conceptual one: the same `hv` is added to both components.** It was computed from `hsCa` and then applied to `hfCb` as well. The potential force is not a constant added to each component — it is **a common radial scalar multiplying each component separately**:
+
+$$\frac{\partial V}{\partial\varphi_i} = \left(\lambda\,|\varphi|^2 - \mu^2\right)\varphi_i \quad\Longrightarrow\quad F_i = \underbrace{\left(\mu^2 - \lambda\,|\varphi|^2\right)}_{\text{one scalar}}\cdot\,\varphi_i$$
+
+That structure is exactly what makes it the Mexican hat: the force depends only on the radius $|\varphi|$ and points along the field vector, so it's blind to the phase. Get this wrong and you break the O(4) symmetry, which means no flat directions, no Goldstones, no mechanism.
+
+**`EWHV` stores the force, not the potential**, despite its doc comment.
+
+Corrected:
+
+```go
+hsCa := State[z, y, x, EWHsCa, prv]
+hsCb := State[z, y, x, EWHsCb, prv]
+hs0a := State[z, y, x, EWHs0a, prv]
+hs0b := State[z, y, x, EWHs0b, prv]
+
+// mag = sum of squares of all four real components = 2 * Phi^dag Phi
+mag := hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b
+
+// V = -1/2 musq*mag + 1/4 lambda*mag^2
+// force_i = -dV/dphi_i = (musq - lambda*mag) * phi_i  -- ONE factor, EACH component
+vfac := musq - lambda*mag
+
+hfCa := Laplacian26(x, y, z, int32(EWHsCa), prv, hsCa) + vfac*hsCa
+hfCa *= csq
+hfCb := Laplacian26(x, y, z, int32(EWHsCb), prv, hsCb) + vfac*hsCb
+hfCb *= csq
+// ... same for hs0a, hs0b
+
+State[z, y, x, EWHmag, cur] = mag
+State[z, y, x, EWHV,   cur] = -0.5*musq*mag + 0.25*lambda*mag*mag
+```
+
+The doublet mapping, which you'll need the moment you add $W$ and $B$:
+
+$$\Phi = \frac{1}{\sqrt2}\begin{pmatrix}\text{hsCa} + i\,\text{hsCb}\\ \text{hs0a} + i\,\text{hs0b}\end{pmatrix}, \qquad \text{mag} = 2\,\Phi^\dagger\Phi$$
+
+So the VEV lives in **hs0a** with value $v$ (giving $\Phi_{\rm lower} = v/\sqrt2$, the standard convention). Your `ElectroweakInit` currently fills **EWHsCa** — the *charged* component — with the value `HiggsMu`. Both parts need fixing: wrong component (putting the VEV in the charged slot means $Q$ no longer annihilates the vacuum, and you lose the massless photon), and wrong magnitude ($v = \mu/\sqrt\lambda$, not $\mu$).
+
+## 4. HiggsMu and HiggsLambda in units.go
+
+```go
+un.HiggsLambda = HiggsLambda / (un.C * un.Hbar)
+un.HiggsMu = HiggsMu * GEVcsqToKg
+```
+
+`HiggsMu` comes out as $1.577\times10^{-25}$ — **SI kilograms**. It never gets divided by `CuKg`, so it isn't in cube units at all, and even in cube units a mass is the wrong kind of thing for that slot (see §2).
+
+But the deeper problem is that the conversion can't work in principle:
+
+```
+mu in cube MASS units       = 2.1641e+04
+mu c/hbar                   = 1.0821e+04 per cube
+reduced Compton of mu       = 9.2415e-05 cubes
+scale ratio m_h / m_e       = 2.4483e+05
+```
+
+With the lattice anchored to the electron at `ComptonE = 16`, the Higgs Compton wavelength is **1/10,000 of a single cube**. There is no lattice on which the electron and the Higgs are both resolved — they're 2.4×10⁵ apart. (Same wall I hit in `electron_demo.py`, where I had to use a 100 GeV lepton.)
+
+### The fix, and it's a nice one
+
+**Measure the Higgs field in units of 1/cube — the same units as the masses — and every dimensionless SM parameter passes through untouched.**
+
+$$[\varphi] = \text{cube}^{-1} \;\Longrightarrow\; [\lambda] = \frac{1}{\text{length}^2\,[\varphi]^2} = 1 \;\text{(dimensionless)}$$
+
+So $\lambda = 0.1291$ **exactly as is**, no $\hbar c$, no $C$, no conversion. Same for $g$ and $g'$. Then pick the Higgs Compton wavelength in cubes as your one free scale knob:
+
+```
+m_h  = 0.062500 /cube   Compton =  16.00 cubes
+mu   = 0.044194 /cube   (= m_h/sqrt2)
+v    = 0.122999 /cube   (= mu/sqrt(lambda))   m_h/v = 0.50813 = sqrt(2 lam)
+lam  = 0.1291  (dimensionless, UNCHANGED)
+m_W  = 0.040178 /cube   Compton =  24.89 cubes
+m_Z  = 0.045580 /cube   Compton =  21.94 cubes
+```
+
+Everything lands in the 16–25 cubes-per-wavelength range, comfortably resolved, and all four SM relations hold exactly. The implied cube size is $9.86\times10^{-20}$ m, on which the electron's Compton wavelength is $3.9\times10^6$ cubes — i.e. the electron is a uniform background, which is the physically honest statement.
+
+Concretely:
+
+```go
+// HiggsCompton is the Higgs reduced Compton wavelength in cubes -- the single
+// free scale knob for the electroweak sector. The electroweak scale cannot
+// share a lattice with the electron scale (ratio 2.4e5), so this sector sets
+// its own length unit rather than inheriting ComptonE.
+un.HiggsCompton = 16.0
+
+mh := 1.0 / un.HiggsCompton          // [1/cube]
+un.HiggsMu     = mh / math.Sqrt2     // [1/cube]  -> HiggsMuSq is 1/cube^2, the right slot
+un.HiggsLambda = HiggsLambda         // 0.1291, dimensionless, no conversion
+un.HiggsV      = un.HiggsMu / math.Sqrt(HiggsLambda)
+```
+
+and `ElectroweakInit` fills `EWHs0a` with `HiggsV`.
+
+Your current `Params.Defaults()` (`HiggsMu = 0.5`, `HiggsLambda = 2.0`) gives $m_h = 0.707$/cube, a Compton wavelength of **1.41 cubes** — badly under-resolved — and $m_h/v = 2.0$ against the SM's 0.508.
+
+## 5. Two smaller things
+
+`un.CuW = un.CuJ * un.CuM` — power is J/s, so this should be `un.CuJ / un.CuS`. The doc comment right above it says so. It propagates into `CuV` and `CuF`, so it'll bite on the EM side rather than here.
+
+`mag` currently omits `hs0a`/`hs0b`, which is consistent while only two components are live, but must include all four the moment you uncomment them — otherwise the radial factor is computed on the wrong radius and the hat is no longer a hat.
+
+---
+
+Want me to make these edits to [electroweak.goal](../wavesim/electroweak.goal) and [units.go](../wavesim/units.go)? I'd hold off on the `MOverHSq`/`Params.Mass` change until you've checked it against your existing KG results, since that one touches working code.
 

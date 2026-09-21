@@ -142,6 +142,20 @@ const (
 
 // ElectroweakKernel is the kernel for computing Electroweak model.
 // Only supports 3D.
+//
+// The Higgs doublet is carried as four real fields:
+//
+//	Phi = (1/sqrt2) * ( hsCa + i hsCb , hs0a + i hs0b )^T
+//
+// so that mag = hsCa^2 + hsCb^2 + hs0a^2 + hs0b^2 = 2 Phi^dag Phi, and the
+// vacuum <Phi> = (0, v/sqrt2)^T corresponds to hs0a = v with the other three
+// zero. The VEV must sit in the NEUTRAL (lower) component: that is what makes
+// the unbroken generator Q = T^3 + Y annihilate the vacuum, and hence what
+// leaves the photon massless.
+//
+// All quantities are in inverse cube units (1/cube), which is what makes
+// lambda (and later g, g') dimensionless Standard Model values needing no
+// conversion. See Units.Update.
 func ElectroweakKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -153,7 +167,6 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	csq := Params[0].CSq
-	mhsq := Params[0].MOverHSq
 	// e2h := Params[0].E2OverH
 	// e := Params[0].E
 	// c := Params[0].C
@@ -161,10 +174,6 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	// em := Params[0].EM.IsTrue()
 	musq := Params[0].HiggsMuSq
 	lambda := Params[0].HiggsLambda
-
-	if Params[0].Mass < 0 {
-		mhsq = -mhsq
-	}
 
 	// a0 := State[z, y, x, A0s, prv]
 	// aX := State[z, y, x, AXs, prv]
@@ -178,22 +187,35 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 
 	hsCa := State.Value(int(z), int(y), int(x), int(EWHsCa), int(prv))
 	hsCb := State.Value(int(z), int(y), int(x), int(EWHsCb), int(prv))
-	// hs0a := State[z, y, x, EWHs0a, prv]
-	// hs0b := State[z, y, x, EWHs0b, prv]
+	hs0a := State.Value(int(z), int(y), int(x), int(EWHs0a), int(prv))
+	hs0b := State.Value(int(z), int(y), int(x), int(EWHs0b), int(prv))
 
 	hvCa := State.Value(int(z), int(y), int(x), int(EWHvCa), int(prv))
 	hvCb := State.Value(int(z), int(y), int(x), int(EWHvCb), int(prv))
-	// hv0a := State[z, y, x, EWHv0a, prv]
-	// hv0b := State[z, y, x, EWHv0b, prv]
+	hv0a := State.Value(int(z), int(y), int(x), int(EWHv0a), int(prv))
+	hv0b := State.Value(int(z), int(y), int(x), int(EWHv0b), int(prv))
 
 	// hsCaG := Gradient18(x, y, z, int32(hsCa), prv)
 	// hsCbG := Gradient18(x, y, z, int32(hsCb), prv)
 
-	mag := hsCa*hsCa + hsCb*hsCb      // + hs0a*hs0a + hs0b*hs0b
-	hv := -musq*hsCa + lambda*mag*mag // todo: what is actual form here?
+	// mag = 2 Phi^dag Phi: the SQUARED RADIUS in the 4D field space. The
+	// potential depends on this and nothing else, which is exactly why it is
+	// a Mexican hat rather than four independent wells.
+	mag := hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b
+
+	// V = -(1/2) mu^2 mag + (1/4) lambda mag^2
+	// force_i = -dV/dphi_i = (mu^2 - lambda*mag) * phi_i
+	//
+	// The SAME radial factor multiplies EACH component. That is what makes the
+	// force point along the field vector and depend only on |Phi|, leaving the
+	// phase directions exactly flat -- the Goldstone modes. Applying a single
+	// shared additive term instead would break the symmetry and destroy the
+	// mechanism. At the VEV, mag = mu^2/lambda so vfac = 0 and the vacuum is
+	// exactly stationary.
+	vfac := musq - lambda*mag
 
 	hfCa := Laplacian26(x, y, z, int32(EWHsCa), prv, hsCa) // force
-	hfCa += hv
+	hfCa += vfac * hsCa
 	hfCa *= csq
 	//	if em {
 	//		vd := hsCbG.Mul(aV)
@@ -203,7 +225,7 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	hsCaN := hsCa + hvCaN
 
 	hfCb := Laplacian26(x, y, z, int32(EWHsCb), prv, hsCb)
-	hfCb += hv
+	hfCb += vfac * hsCb
 	hfCb *= csq
 	//	if em {
 	//		vd := hsCaG.Mul(aV)
@@ -212,14 +234,30 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	hvCbN := hvCb + hfCb
 	hsCbN := hsCb + hvCbN
 
+	hf0a := Laplacian26(x, y, z, int32(EWHs0a), prv, hs0a)
+	hf0a += vfac * hs0a
+	hf0a *= csq
+	hv0aN := hv0a + hf0a
+	hs0aN := hs0a + hv0aN
+
+	hf0b := Laplacian26(x, y, z, int32(EWHs0b), prv, hs0b)
+	hf0b += vfac * hs0b
+	hf0b *= csq
+	hv0bN := hv0b + hf0b
+	hs0bN := hs0b + hv0bN
+
 	State.Set(hsCaN, int(z), int(y), int(x), int(EWHsCa), int(cur))
 	State.Set(hsCbN, int(z), int(y), int(x), int(EWHsCb), int(cur))
+	State.Set(hs0aN, int(z), int(y), int(x), int(EWHs0a), int(cur))
+	State.Set(hs0bN, int(z), int(y), int(x), int(EWHs0b), int(cur))
 
 	State.Set(hvCaN, int(z), int(y), int(x), int(EWHvCa), int(cur))
 	State.Set(hvCbN, int(z), int(y), int(x), int(EWHvCb), int(cur))
+	State.Set(hv0aN, int(z), int(y), int(x), int(EWHv0a), int(cur))
+	State.Set(hv0bN, int(z), int(y), int(x), int(EWHv0b), int(cur))
 
 	State.Set(mag, int(z), int(y), int(x), int(EWHmag), int(cur))
-	State.Set(hv, int(z), int(y), int(x), int(EWHV), int(cur))
+	State.Set(-0.5*musq*mag+0.25*lambda*mag*mag, int(z), int(y), int(x), int(EWHV), int(cur))
 }
 
 //gosl:end
@@ -228,7 +266,7 @@ func (ss *Sim) ElectroweakConfig() {
 	ParamsShouldDisplay = ElectroweakDisplay
 	ss.StateVars = EWStatesN
 	ss.ViewInit(func(view *View) {
-		view.SetVar(EWHsCa, -1)
+		view.SetVar(EWHs0a, -1)
 	})
 }
 
@@ -237,7 +275,7 @@ func ElectroweakViewAll(view *View) {
 	view.Settings.NPanels = PanelsFour
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
-	view.Panels[0].Var = EWHsCa
+	view.Panels[0].Var = EWHs0a
 	view.Panels[1].Var = A0s
 	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = EWHmag
@@ -255,8 +293,11 @@ func (ss *Sim) ElectroweakStats() {
 }
 
 func (ss *Sim) ElectroweakInit() {
-	ss.Fill(EWHsCa, Both, ss.Params.HiggsMu)
-	// ss.Fill(HiggsHvCb, Both, ss.Params.C*ss.Params.HiggsMu)
+	// The vacuum is <Phi> = (0, v/sqrt2)^T, i.e. the NEUTRAL (lower) component
+	// holds the VEV, with magnitude v = mu/sqrt(lambda) -- not mu. Putting it
+	// in the charged component instead would leave Q = T^3 + Y broken and give
+	// the photon a mass.
+	ss.Fill(EWHs0a, Both, ss.Params.HiggsV)
 	ctx := GetCtx(0)
 	ne := int(ctx.EdgesN())
 	RunEdgesWrapKernel(ne)

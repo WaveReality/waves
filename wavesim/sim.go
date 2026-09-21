@@ -193,12 +193,12 @@ func (ss *Sim) InitRandSeed(run int) {
 func (ss *Sim) UpdateUnits() {
 	ss.Units.C = float64(ss.Params.C)
 	ss.Units.Hbar = float64(ss.Params.Hbar)
-	ss.Units.EMass = float64(ss.Params.Mass)
 	ss.Units.Update()
 	ss.Params.Mu0 = float32(ss.Units.Mu0)
 	ss.Params.Eps0 = float32(ss.Units.Eps0)
 	ss.Params.HiggsMu = float32(ss.Units.HiggsMu)
 	ss.Params.HiggsLambda = float32(ss.Units.HiggsLambda)
+	ss.Params.HiggsV = float32(ss.Units.HiggsV)
 	ss.Params.Update()
 }
 

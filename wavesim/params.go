@@ -81,6 +81,8 @@ type Parameters struct {
 	Hbar float32
 
 	// Mass is a general mass term, e.g., for the KleinGordon equations.
+	// In general, this should be set to Hbar / (Compton * C) for the
+	// target Compton (bar) wavelength, e.g. .125 for C = 0.5 and Compton = 16.
 	// If negative, then M^2 is negative!
 	Mass float32
 
@@ -133,8 +135,15 @@ type Parameters struct {
 	// Inv2CSq = 1 / 2C^2
 	Inv2CSq float32 `display:"-"`
 
-	// MOverHSq = Mass^2 / Hbar^2 is the mass drag factor in KleinGordon
-	// and related equations. Note: C^2 factor is added in basic vel += c^2 force
+	// MOverHSq = (Mass * C / Hbar)^2 is the mass drag factor in KleinGordon
+	// and related equations: the INVERSE REDUCED COMPTON WAVELENGTH squared,
+	// in units of 1/cube^2. The update applies it as
+	//	vel += CSq * (Laplacian + ... - MOverHSq*psi)
+	// which matches Klein-Gordon written as
+	//	d2psi/dt2 = c^2 [ Laplacian(psi) - (m c / hbar)^2 psi ]
+	// so the C^2 inside MOverHSq is required and is NOT the same as the outer
+	// CSq factor -- one converts mass to inverse length, the other converts
+	// the whole bracket to an acceleration.
 	MOverHSq float32 `display:"-"`
 
 	// HSqOver2M = Hbar^2 / 2 Mass is the factor for Schrodinger's equation.
@@ -172,16 +181,20 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
-	// HiggsMuSq = HiggsMu*HiggsMu
+	// HiggsMuSq = HiggsMu*HiggsMu, in 1/cube^2 -- the Higgs equivalent of
+	// MOverHSq, occupying the same slot in the update.
 	HiggsMuSq float32 `display:"-"`
 
-	pad float32
+	// HiggsV = HiggsMu / sqrt(HiggsLambda) is the Higgs vacuum expectation
+	// value: the radius of the minimum of the potential, in 1/cube. The
+	// neutral (lower) doublet component is initialized to this.
+	HiggsV float32 `display:"-"`
 }
 
 func (pr *Parameters) Update() {
 	pr.CSq = pr.C * pr.C
 	pr.Inv2CSq = 1.0 / (2 * pr.CSq)
-	pr.MOverHSq = (pr.Mass * pr.Mass) / (pr.Hbar * pr.Hbar)
+	pr.MOverHSq = (pr.Mass * pr.Mass * pr.CSq) / (pr.Hbar * pr.Hbar)
 	if pr.Mass < 0 {
 		pr.MOverHSq = -pr.MOverHSq
 	}
@@ -198,6 +211,9 @@ func (pr *Parameters) Update() {
 	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
 	pr.EOverHSq = (pr.E * pr.E) / hsq
 	pr.HiggsMuSq = pr.HiggsMu * pr.HiggsMu
+	if pr.HiggsLambda > 0 {
+		pr.HiggsV = pr.HiggsMu / math32.Sqrt(pr.HiggsLambda)
+	}
 }
 
 //gosl:end
@@ -206,13 +222,16 @@ func (pr *Parameters) Defaults() {
 	pr.Energy.SetBool(true)
 	pr.C = 0.5
 	pr.Hbar = 1.0
-	pr.Mass = 1.0
+	pr.Mass = 0.125
 	pr.A0NoWave.SetBool(true)
 	pr.E = 1.0
 	pr.Mu0 = 1.0
 	pr.Move.SetBool(true)
-	pr.HiggsMu = 0.5
-	pr.HiggsLambda = 2.0
+	// Standard Model values at HiggsCompton = 16 cubes (see Units.Update):
+	// m_h = 1/16 = 0.0625 /cube, mu = m_h/sqrt2, lambda the SM value unchanged.
+	// Gives v = 0.1230, m_W Compton 24.9 cubes, m_Z Compton 21.9 cubes.
+	pr.HiggsMu = 0.0441942
+	pr.HiggsLambda = 0.1291
 	pr.Diff = 0.5
 	pr.Decay = 0.98
 	pr.Update()

@@ -167,7 +167,7 @@ func main() {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
 			case wavesim.Electroweak:
-				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
+				// sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				sim.ElectroweakInit()
 			case wavesim.Spinfield:
 				sim.ParticleAtConfig(ctrInt, 1)

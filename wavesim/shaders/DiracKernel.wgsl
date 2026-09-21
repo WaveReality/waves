@@ -540,7 +540,7 @@ struct Parameters {
 	E2OverH: f32,
 	EOverHSq: f32,
 	HiggsMuSq: f32,
-	pad: f32,
+	HiggsV: f32,
 }
 
 //////// import: "particle.go"
