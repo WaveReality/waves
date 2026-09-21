@@ -139,6 +139,15 @@ type Parameters struct {
 	// self-interaction. Costs 12 extra Gradient10 evaluations per site.
 	YangMills slbool.Bool
 
+	// Boris enables the Boris-style push for the velocity-dependent
+	// (gauge-connection) part of the force. Those terms generate a rotation of
+	// the velocity, and an explicit integrator drives such a system
+	// exponentially -- the radius of a pure-gauge rotation doubles about once
+	// per period. The Boris step applies that rotation EXACTLY instead, so it
+	// is norm-preserving by construction. Second-order accurate, and costs one
+	// extra force split (no extra neighbor reads).
+	Boris slbool.Bool
+
 	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
 	// the B field to the Higgs doublet. Dimensionless. Standard Model value
 	// 0.3500. Together with g it sets the weak mixing angle and m_Z.
@@ -221,10 +230,9 @@ type Parameters struct {
 	// likewise for reference only. The photon mass is zero.
 	MZ float32 `display:"-"`
 
-	// The GPU struct must be a multiple of 16 bytes; sz_test.go checks it.
+	// The GPU struct must be a multiple of 16 bytes.
 	pad0 float32
 	pad1 float32
-	pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -273,6 +281,7 @@ func (pr *Parameters) Defaults() {
 	pr.GW = 0.6533
 	pr.GpW = 0.3500
 	pr.YangMills.SetBool(true)
+	pr.Boris.SetBool(true)
 	pr.Diff = 0.5
 	pr.Decay = 0.98
 	pr.Update()

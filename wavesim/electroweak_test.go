@@ -589,3 +589,64 @@ func TestYangMillsSpectrumUnchanged(t *testing.T) {
 		t.Errorf("Yang-Mills terms shifted the W mass by %g; they must vanish at linear order", rel)
 	}
 }
+
+// TestBorisStability measures what the Boris push buys on the configuration
+// that previously destroyed the integrator: a uniform W^3_0 large enough that
+// the pure-gauge rotation has a 96-step period.
+//
+// The velocity-dependent (Coriolis) part of the force is a rotation, and Boris
+// applies it exactly instead of integrating it explicitly. That is the
+// difference between exponential blow-up and a bounded solution.
+//
+// It does NOT conserve, and cannot. Writing z = W^1 + i W^2, the pure-gauge
+// sector obeys
+//
+//	d2z/dt2 = -2 i w dz/dt + w^2 z   ->   lambda^2 + 2 i w lambda - w^2 = 0
+//
+// whose discriminant vanishes: lambda = -i w is a DOUBLE root, so the continuum
+// general solution is (A + B t) exp(-i w t). The secular branch is there in the
+// exact equations, not put there by the discretization -- it is the gauge
+// direction, a gauge transformation whose parameter grows linearly in time.
+// No integrator removes it; only fixing the gauge does.
+//
+// (The Higgs sector looks perfectly conserved under the same test, but that is
+// partly the Mexican-hat potential supplying a restoring force toward |Phi| = v
+// which the pure gauge sector has nothing equivalent to.)
+func TestBorisStability(t *testing.T) {
+	const nst = 1200 // ~12 rotation periods
+	b, r := float32(0.2), float32(0.05)
+	var res [2]float64
+	for i, bo := range []bool{false, true} {
+		ss := ymSim(4)
+		ss.Params.Boris.SetBool(bo)
+		ss.Params.Update()
+		p := ss.Params
+		om := float64(p.C) * float64(p.GW) * float64(b)
+		ss.Fill(EWW30s, Both, b)
+		ss.Fill(EWW1Xs, Both, r)
+		ss.Fill(EWW2Xv, Both, float32(om)*r)
+		ewWrap()
+		r0 := float64(r) * float64(r)
+		worst := 1.0
+		for range nst {
+			ewStep(ss)
+			w1, w2 := float64(ewGet(EWW1Xs)), float64(ewGet(EWW2Xs))
+			rr := (w1*w1 + w2*w2) / r0
+			if math.IsNaN(rr) {
+				worst = math.Inf(1)
+				break
+			}
+			worst = math.Max(worst, rr)
+		}
+		res[i] = worst
+		t.Logf("Boris=%-5v  peak radius^2 / initial over %d steps (~%d periods): %.4g",
+			bo, nst, int(float64(nst)*om/(2*math.Pi)), worst)
+	}
+	if !math.IsInf(res[0], 1) && res[0] < 100 {
+		t.Errorf("control did not blow up (peak %.3g); the test is not exercising the instability", res[0])
+	}
+	if res[1] > 4.0 {
+		t.Errorf("Boris peak radius^2 grew to %.3g; expected bounded", res[1])
+	}
+	t.Logf("improvement: unbounded -> bounded at %.3g", res[1])
+}

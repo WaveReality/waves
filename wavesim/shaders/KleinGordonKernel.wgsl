@@ -541,6 +541,7 @@ struct Parameters {
 	HiggsLambda: f32,
 	GW: f32,
 	YangMills: i32,
+	Boris: i32,
 	GpW: f32,
 	Diff: f32,
 	Decay: f32,
@@ -564,7 +565,6 @@ struct Parameters {
 	MZ: f32,
 	pad0: f32,
 	pad1: f32,
-	pad2: f32,
 }
 
 //////// import: "particle.go"

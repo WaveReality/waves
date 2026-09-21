@@ -242,6 +242,64 @@ func EWCrossLor(a0, ax, ay, az, b0, bx, by, bz math32.Vector3) math32.Vector3 {
 	return r
 }
 
+// EWBorisRot3 is the Boris rotation for an adjoint 3-vector velocity: the
+// EXACT, norm-preserving update for dv/dt = v x Omega over one unit step.
+//
+//	t = Omega/2 ;  v' = v + v x t ;  v+ = v + v' x (2t / (1 + |t|^2))
+//
+// The two half-turns compose into a true rotation, which is the whole point:
+// the velocity-dependent gauge force does not change |v|, and an explicit
+// update gets that wrong at O(Omega^2) EVERY step, which is what makes the
+// rotating-frame system blow up.
+func EWBorisRot3(v, om math32.Vector3) math32.Vector3 {
+	t := om.MulScalar(0.5)
+	vp := v.Add(slmath.Cross3(v, t))
+	s := t.MulScalar(2.0 / (1.0 + slmath.LengthSquared3(t)))
+	return v.Add(slmath.Cross3(vp, s))
+}
+
+// EWBorisPhase rotates the Higgs velocity by exp(i theta G_0), the exact
+// solution of the velocity-dependent part of the Higgs equation,
+//
+//	dv/dt = -2c (-i G_0) v = 2ic G_0 v   ->   v(1) = exp(2ic G_0) v(0)
+//
+// so theta = 2c. For the 2x2 Hermitian gauge matrix this has a closed form:
+// splitting G_0 = alpha I + m.sigma, with
+//
+//	m = (g/2) (W^1_0, W^2_0, W^3_0)   and   alpha = g' Y_Phi B_0
+//
+// the exponential is exp(i theta alpha) [cos(theta |m|) I + i sin(theta |m|)
+// mhat.sigma]. The SU(2) part turns the doublet and the U(1) part is an
+// overall phase -- exactly the parallel transport the connection generates.
+func EWBorisPhase(w1, w2, w3, b, theta float32, v math32.Vector4) math32.Vector4 {
+	hg := 0.5 * Params[0].GW
+	m := math32.Vec3(hg*w1, hg*w2, hg*w3)
+	al := Params[0].GpW * YPhi * b
+	mag := slmath.Length3(m)
+	var nx, ny, nz, sn float32
+	if mag > 1.0e-12 {
+		nx = m.X / mag
+		ny = m.Y / mag
+		nz = m.Z / mag
+		sn = math32.Sin(theta * mag)
+	}
+	cs := math32.Cos(theta * mag)
+	// P = (mhat.sigma) Psi, in real components
+	p1r := nz*v.X + nx*v.Z + ny*v.W
+	p1i := nz*v.Y + nx*v.W - ny*v.Z
+	p2r := nx*v.X - ny*v.Y - nz*v.Z
+	p2i := nx*v.Y + ny*v.X - nz*v.W
+	// Q = cos Psi + i sin P
+	q1r := cs*v.X - sn*p1i
+	q1i := cs*v.Y + sn*p1r
+	q2r := cs*v.Z - sn*p2i
+	q2i := cs*v.W + sn*p2r
+	// overall U(1) phase exp(i theta alpha)
+	ca := math32.Cos(theta * al)
+	sa := math32.Sin(theta * al)
+	return math32.Vec4(ca*q1r-sa*q1i, ca*q1i+sa*q1r, ca*q2r-sa*q2i, ca*q2i+sa*q2r)
+}
+
 // ElectroweakKernel is the kernel for the SU(2)_L x U(1)_Y electroweak model:
 // the Higgs doublet coupled to the three W^a gauge fields and the B field.
 // Only supports 3D.
@@ -307,6 +365,7 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	csq := Params[0].CSq
 	oc := 1.0 / Params[0].C
+	boris := Params[0].Boris.IsTrue()
 	musq := Params[0].HiggsMuSq
 	lambda := Params[0].HiggsLambda
 
@@ -419,11 +478,17 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	w30v := State[z, y, x, EWW30v, prv]
 	b0v := State[z, y, x, EWB0v, prv]
 
+	// Of the three, only the two built on dtp depend on the Higgs VELOCITY.
+	// Together they are -2 G_0 (dPsi/dt)/c, i.e. exactly the connection acting
+	// on the velocity -- a rotation. With Boris on they are left out here and
+	// applied exactly below; otherwise they go in explicitly as before.
 	q0 := EWGaugeAct(oc*w10v, oc*w20v, oc*w30v, oc*b0v, psi)
-	q1 := EWGaugeAct(w10, w20, w30, b0, dtp)
-	q2 := EWGaugeAct(w10, w20, w30, b0, d0)
-	cov = math32.Vec4(cov.X-q0.X-q1.X-q2.X, cov.Y-q0.Y-q1.Y-q2.Y,
-		cov.Z-q0.Z-q1.Z-q2.Z, cov.W-q0.W-q1.W-q2.W)
+	qa := EWGaugeAct(w10, w20, w30, b0, a0)
+	cov = cov.Sub(q0).Sub(qa)
+	if !boris {
+		qv := EWGaugeAct(w10, w20, w30, b0, dtp)
+		cov = cov.Sub(qv).Sub(qv)
+	}
 
 	// ---- the potential ----------------------------------------------------
 	// V = -(1/2) mu^2 mag + (1/4) lambda mag^2
@@ -452,6 +517,13 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	if Params[0].YangMills.IsTrue() {
 		gw := Params[0].GW
 		w0 := math32.Vec3(w10, w20, w30)
+		// wb is w0 for the explicit path; with Boris it is zeroed so the
+		// mu = 0 transport term (the velocity-dependent one) is handled by the
+		// exact rotation instead of being integrated explicitly.
+		wb := w0
+		if boris {
+			wb = math32.Vec3(0, 0, 0)
+		}
 		wx := math32.Vec3(w1x, w2x, w3x)
 		wy := math32.Vec3(w1y, w2y, w3y)
 		wz := math32.Vec3(w1z, w2z, w3z)
@@ -485,28 +557,28 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 		//             d^nu = +d_0 for nu=0 but -d_j for nu=j)
 		// [quartic]   -g^2 sum_mu (W_mu x (W^mu x W^nu))
 		// [divergence] -g (dv x W^nu)
-		ym0 = EWCrossUp(w0, wx, wy, wz, t0, x0, y0, z0).MulScalar(2 * gw)
+		ym0 = EWCrossUp(wb, wx, wy, wz, t0, x0, y0, z0).MulScalar(2 * gw)
 		ym0 = ym0.Sub(EWCrossLor(w0, wx, wy, wz, t0, tx, ty, tz).MulScalar(gw))
 		ym0 = ym0.Sub(EWCrossLor(w0, wx, wy, wz,
 			slmath.Cross3(w0, w0), slmath.Cross3(wx, w0),
 			slmath.Cross3(wy, w0), slmath.Cross3(wz, w0)).MulScalar(gw * gw))
 		ym0 = ym0.Add(slmath.Cross3(dv, w0).MulScalar(gw))
 
-		ymx = EWCrossUp(w0, wx, wy, wz, tx, xx, yx, zx).MulScalar(2 * gw)
+		ymx = EWCrossUp(wb, wx, wy, wz, tx, xx, yx, zx).MulScalar(2 * gw)
 		ymx = ymx.Add(EWCrossLor(w0, wx, wy, wz, x0, xx, xy, xz).MulScalar(gw))
 		ymx = ymx.Sub(EWCrossLor(w0, wx, wy, wz,
 			slmath.Cross3(w0, wx), slmath.Cross3(wx, wx),
 			slmath.Cross3(wy, wx), slmath.Cross3(wz, wx)).MulScalar(gw * gw))
 		ymx = ymx.Add(slmath.Cross3(dv, wx).MulScalar(gw))
 
-		ymy = EWCrossUp(w0, wx, wy, wz, ty, xy, yy, zy).MulScalar(2 * gw)
+		ymy = EWCrossUp(wb, wx, wy, wz, ty, xy, yy, zy).MulScalar(2 * gw)
 		ymy = ymy.Add(EWCrossLor(w0, wx, wy, wz, y0, yx, yy, yz).MulScalar(gw))
 		ymy = ymy.Sub(EWCrossLor(w0, wx, wy, wz,
 			slmath.Cross3(w0, wy), slmath.Cross3(wx, wy),
 			slmath.Cross3(wy, wy), slmath.Cross3(wz, wy)).MulScalar(gw * gw))
 		ymy = ymy.Add(slmath.Cross3(dv, wy).MulScalar(gw))
 
-		ymz = EWCrossUp(w0, wx, wy, wz, tz, xz, yz, zz).MulScalar(2 * gw)
+		ymz = EWCrossUp(wb, wx, wy, wz, tz, xz, yz, zz).MulScalar(2 * gw)
 		ymz = ymz.Add(EWCrossLor(w0, wx, wy, wz, z0, zx, zy, zz).MulScalar(gw))
 		ymz = ymz.Sub(EWCrossLor(w0, wx, wy, wz,
 			slmath.Cross3(w0, wz), slmath.Cross3(wx, wz),
@@ -515,19 +587,27 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	}
 
 	// ---- gauge field updates: box W = j, box B = j^Y ----------------------
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW10s), csq,
-		j0.X+ym0.X, jx.X+ymx.X, jy.X+ymy.X, jz.X+ymz.X)
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW20s), csq,
-		j0.Y+ym0.Y, jx.Y+ymx.Y, jy.Y+ymy.Y, jz.Y+ymz.Y)
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW30s), csq,
-		j0.Z+ym0.Z, jx.Z+ymx.Z, jy.Z+ymy.Z, jz.Z+ymz.Z)
+	// Omega for the Boris rotation of the W velocities: the transport term is
+	// dv/dt = v x Omega with Omega = -2 g c W_0.
+	omW := math32.Vec3(w10, w20, w30).MulScalar(-2 * Params[0].GW * Params[0].C)
+	EWWStep(x, y, z, cur, prv, 0, csq, omW, math32.Vec3(j0.X+ym0.X, j0.Y+ym0.Y, j0.Z+ym0.Z), boris)
+	EWWStep(x, y, z, cur, prv, 1, csq, omW, math32.Vec3(jx.X+ymx.X, jx.Y+ymx.Y, jx.Z+ymx.Z), boris)
+	EWWStep(x, y, z, cur, prv, 2, csq, omW, math32.Vec3(jy.X+ymy.X, jy.Y+ymy.Y, jy.Z+ymy.Z), boris)
+	EWWStep(x, y, z, cur, prv, 3, csq, omW, math32.Vec3(jz.X+ymz.X, jz.Y+ymz.Y, jz.Z+ymz.Z), boris)
 	EWGaugeStep(x, y, z, cur, prv, int32(EWB0s), csq, j0.W, jx.W, jy.W, jz.W)
 
 	// ---- Higgs update ------------------------------------------------------
-	hvCaN := psv.X + hf.X
-	hvCbN := psv.Y + hf.Y
-	hv0aN := psv.Z + hf.Z
-	hv0bN := psv.W + hf.W
+	var hvN math32.Vector4
+	if boris {
+		hh := hf.MulScalar(0.5)
+		hvN = EWBorisPhase(w10, w20, w30, b0, 2*Params[0].C, psv.Add(hh)).Add(hh)
+	} else {
+		hvN = psv.Add(hf)
+	}
+	hvCaN := hvN.X
+	hvCbN := hvN.Y
+	hv0aN := hvN.Z
+	hv0bN := hvN.W
 
 	State[z, y, x, EWHsCa, cur] = psi.X + hvCaN
 	State[z, y, x, EWHsCb, cur] = psi.Y + hvCbN
@@ -541,6 +621,42 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 
 	State[z, y, x, EWHmag, cur] = mag
 	State[z, y, x, EWHV, cur] = -0.5*musq*mag + 0.25*lambda*mag*mag
+}
+
+// EWWStep advances the twelve SU(2) potentials. src carries the
+// velocity-INDEPENDENT source (current + the explicit Yang-Mills terms) for one
+// spacetime index, as an adjoint 3-vector; the Laplacian is added here.
+//
+// With Boris on, the velocity-dependent transport term -- which is exactly
+// dv/dt = v x Omega with Omega = -2 g c W_0 -- is applied as a true rotation
+// between two half kicks, instead of being lumped into the explicit force.
+func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, boris bool) {
+	vs := int32(EWW10s) + nu
+	vv := int32(EWW10v) + nu
+	p1 := State[z, y, x, vs, prv]
+	p2 := State[z, y, x, vs+8, prv]
+	p3 := State[z, y, x, vs+16, prv]
+	l1 := Laplacian19(x, y, z, vs, prv, p1)
+	l2 := Laplacian19(x, y, z, vs+8, prv, p2)
+	l3 := Laplacian19(x, y, z, vs+16, prv, p3)
+	f := math32.Vec3(csq*(l1+src.X), csq*(l2+src.Y), csq*(l3+src.Z))
+	q1 := State[z, y, x, vv, prv]
+	q2 := State[z, y, x, vv+8, prv]
+	q3 := State[z, y, x, vv+16, prv]
+	v := math32.Vec3(q1, q2, q3)
+	var vn math32.Vector3
+	if boris {
+		h := f.MulScalar(0.5)
+		vn = EWBorisRot3(v.Add(h), om).Add(h)
+	} else {
+		vn = v.Add(f)
+	}
+	State[z, y, x, vv, cur] = vn.X
+	State[z, y, x, vv+8, cur] = vn.Y
+	State[z, y, x, vv+16, cur] = vn.Z
+	State[z, y, x, vs, cur] = p1 + vn.X
+	State[z, y, x, vs+8, cur] = p2 + vn.Y
+	State[z, y, x, vs+16, cur] = p3 + vn.Z
 }
 
 // EWGaugeStep advances one four-potential (the 0,X,Y,Z state variables

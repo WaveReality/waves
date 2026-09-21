@@ -410,6 +410,40 @@ fn EWCrossLor(a0: vec3<f32>,ax: vec3<f32>,ay: vec3<f32>,az: vec3<f32>,b0: vec3<f
 	r = r-(Cross3(az, bz));
 return r;
 }
+fn EWBorisRot3(v: vec3<f32>,om: vec3<f32>) -> vec3<f32> {
+	var t = om*(0.5);
+	var vp = v+(Cross3(v, t));
+	var s = t*(2.0 / (1.0 + LengthSquared3(t)));
+return v+(Cross3(vp, s));
+}
+fn EWBorisPhase(w1: f32,w2: f32,w3: f32,b: f32,theta: f32, v: vec4<f32>) -> vec4<f32> {
+	var hg = 0.5 * Params[0].GW;
+	var m = vec3<f32>(hg*w1, hg*w2, hg*w3);
+	var al = Params[0].GpW * YPhi * b;
+	var mag = Length3(m);
+	var nx: f32;
+	var ny: f32;
+	var nz: f32;
+	var sn: f32;
+	if (mag > 1.0e-12) {
+		nx = m.x / mag;
+		ny = m.y / mag;
+		nz = m.z / mag;
+		sn = sin(theta * mag);
+	}
+	var cs = cos(theta * mag);
+	var p1r = nz*v.x + nx*v.z + ny*v.w;
+	var p1i = nz*v.y + nx*v.w - ny*v.z;
+	var p2r = nx*v.x - ny*v.y - nz*v.z;
+	var p2i = nx*v.y + ny*v.x - nz*v.w;
+	var q1r = cs*v.x - sn*p1i;
+	var q1i = cs*v.y + sn*p1r;
+	var q2r = cs*v.z - sn*p2i;
+	var q2i = cs*v.w + sn*p2r;
+	var ca = cos(theta * al);
+	var sa = sin(theta * al);
+return vec4<f32>(ca*q1r-sa*q1i, ca*q1i+sa*q1r, ca*q2r-sa*q2i, ca*q2i+sa*q2r);
+}
 fn ElectroweakKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -423,6 +457,7 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var prv = Context_PrevState(ctx);
 	var csq = Params[0].CSq;
 	var oc = 1.0 / Params[0].C;
+	var boris = Params[0].Boris == 1;
 	var musq = Params[0].HiggsMuSq;
 	var lambda = Params[0].HiggsLambda;
 	var psi = vec4<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(prv))),
@@ -499,12 +534,15 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var w10v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW10v), u32(prv)));
 	var w20v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW20v), u32(prv)));
 	var w30v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW30v), u32(prv)));
-	var b0v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWB0v), u32(prv)));
+	var b0v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWB0v), u32(prv)));
 	var q0 = EWGaugeAct(oc*w10v, oc*w20v, oc*w30v, oc*b0v, psi);
-	var q1 = EWGaugeAct(w10, w20, w30, b0, dtp);
-	var q2 = EWGaugeAct(w10, w20, w30, b0, d0);
-	cov = vec4<f32>(cov.x-q0.x-q1.x-q2.x, cov.y-q0.y-q1.y-q2.y,
-		cov.z-q0.z-q1.z-q2.z, cov.w-q0.w-q1.w-q2.w);
+	var qa = EWGaugeAct(w10, w20, w30, b0, a0);
+	cov = cov-(q0)-(qa);
+	if (!boris) {
+		var qv = EWGaugeAct(w10, w20, w30, b0, dtp);
+		cov = cov-(qv)-(qv);
+	}
 	var mag = psi.x*psi.x + psi.y*psi.y + psi.z*psi.z + psi.w*psi.w;
 	var vfac = musq - lambda*mag;
 	var hf = vec4<f32>(csq*(cov.x+vfac*psi.x), csq*(cov.y+vfac*psi.y),
@@ -520,6 +558,10 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	if (Params[0].YangMills == 1) {
 		var gw = Params[0].GW;
 		var w0 = vec3<f32>(w10, w20, w30);
+		var wb = w0;
+		if (boris) {
+			wb = vec3<f32>(0, 0, 0);
+		}
 		var wx = vec3<f32>(w1x, w2x, w3x);
 		var wy = vec3<f32>(w1y, w2y, w3y);
 		var wz = vec3<f32>(w1z, w2z, w3z);
@@ -540,42 +582,48 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 		var yz = vec3<f32>(g1z.y, g2z.y, g3z.y);
 		var zz = vec3<f32>(g1z.z, g2z.z, g3z.z);
 		var dv = t0+(xx)+(yy)+(zz);
-		ym0 = EWCrossUp(w0, wx, wy, wz, t0, x0, y0, z0)*(2 * gw);
+		ym0 = EWCrossUp(wb, wx, wy, wz, t0, x0, y0, z0)*(2 * gw);
 		ym0 = ym0-(EWCrossLor(w0, wx, wy, wz, t0, tx, ty, tz)*(gw));
 		ym0 = ym0-(EWCrossLor(w0, wx, wy, wz,
 			Cross3(w0, w0), Cross3(wx, w0),
 			Cross3(wy, w0), Cross3(wz, w0))*(gw * gw));
 		ym0 = ym0+(Cross3(dv, w0)*(gw));
-		ymx = EWCrossUp(w0, wx, wy, wz, tx, xx, yx, zx)*(2 * gw);
+		ymx = EWCrossUp(wb, wx, wy, wz, tx, xx, yx, zx)*(2 * gw);
 		ymx = ymx+(EWCrossLor(w0, wx, wy, wz, x0, xx, xy, xz)*(gw));
 		ymx = ymx-(EWCrossLor(w0, wx, wy, wz,
 			Cross3(w0, wx), Cross3(wx, wx),
 			Cross3(wy, wx), Cross3(wz, wx))*(gw * gw));
 		ymx = ymx+(Cross3(dv, wx)*(gw));
-		ymy = EWCrossUp(w0, wx, wy, wz, ty, xy, yy, zy)*(2 * gw);
+		ymy = EWCrossUp(wb, wx, wy, wz, ty, xy, yy, zy)*(2 * gw);
 		ymy = ymy+(EWCrossLor(w0, wx, wy, wz, y0, yx, yy, yz)*(gw));
 		ymy = ymy-(EWCrossLor(w0, wx, wy, wz,
 			Cross3(w0, wy), Cross3(wx, wy),
 			Cross3(wy, wy), Cross3(wz, wy))*(gw * gw));
 		ymy = ymy+(Cross3(dv, wy)*(gw));
-		ymz = EWCrossUp(w0, wx, wy, wz, tz, xz, yz, zz)*(2 * gw);
+		ymz = EWCrossUp(wb, wx, wy, wz, tz, xz, yz, zz)*(2 * gw);
 		ymz = ymz+(EWCrossLor(w0, wx, wy, wz, z0, zx, zy, zz)*(gw));
 		ymz = ymz-(EWCrossLor(w0, wx, wy, wz,
 			Cross3(w0, wz), Cross3(wx, wz),
 			Cross3(wy, wz), Cross3(wz, wz))*(gw * gw));
 		ymz = ymz+(Cross3(dv, wz)*(gw));
 	}
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW10s), csq,
-		j0.x+ym0.x, jx.x+ymx.x, jy.x+ymy.x, jz.x+ymz.x);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW20s), csq,
-		j0.y+ym0.y, jx.y+ymx.y, jy.y+ymy.y, jz.y+ymz.y);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW30s), csq,
-		j0.z+ym0.z, jx.z+ymx.z, jy.z+ymy.z, jz.z+ymz.z);
+	var omW = vec3<f32>(w10, w20, w30)*(-2 * Params[0].GW * Params[0].C);
+	EWWStep(x, y, z, cur, prv, i32(i32(0)), csq, omW, vec3<f32>(j0.x+ym0.x, j0.y+ym0.y, j0.z+ym0.z), boris);
+	EWWStep(x, y, z, cur, prv, i32(i32(1)), csq, omW, vec3<f32>(jx.x+ymx.x, jx.y+ymx.y, jx.z+ymx.z), boris);
+	EWWStep(x, y, z, cur, prv, i32(i32(2)), csq, omW, vec3<f32>(jy.x+ymy.x, jy.y+ymy.y, jy.z+ymy.z), boris);
+	EWWStep(x, y, z, cur, prv, i32(i32(3)), csq, omW, vec3<f32>(jz.x+ymz.x, jz.y+ymz.y, jz.z+ymz.z), boris);
 	EWGaugeStep(x, y, z, cur, prv, i32(EWB0s), csq, j0.w, jx.w, jy.w, jz.w);
-	var hvCaN = psv.x + hf.x;
-	var hvCbN = psv.y + hf.y;
-	var hv0aN = psv.z + hf.z;
-	var hv0bN = psv.w + hf.w;
+	var hvN: vec4<f32>;
+	if (boris) {
+		var hh = hf*(0.5);
+		hvN = EWBorisPhase(w10, w20, w30, b0, 2*Params[0].C, psv+(hh))+(hh);
+	} else {
+		hvN = psv+(hf);
+	}
+	var hvCaN = hvN.x;
+	var hvCbN = hvN.y;
+	var hv0aN = hvN.z;
+	var hv0bN = hvN.w;
 	StateSet(psi.x + hvCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(cur)));
 	StateSet(psi.y + hvCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(cur)));
 	StateSet(psi.z + hv0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(cur)));
@@ -587,6 +635,35 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHmag), u32(cur)));
 	StateSet(-0.5*musq*mag + 0.25*lambda*mag*mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
+}
+fn EWWStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,nu: i32, csq: f32, om: vec3<f32>,src: vec3<f32>, boris: bool) {
+	var vs = i32(EWW10s) + nu;
+	var vv = i32(EWW10v) + nu;
+	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(prv)));
+	var p2 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs + 8), u32(prv)));
+	var p3 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs + 16), u32(prv)));
+	var l1 = Laplacian19(x, y, z, vs, prv, p1);
+	var l2 = Laplacian19(x, y, z, vs+8, prv, p2);
+	var l3 = Laplacian19(x, y, z, vs+16, prv, p3);
+	var f = vec3<f32>(csq*(l1+src.x), csq*(l2+src.y), csq*(l3+src.z));
+	var q1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(prv)));
+	var q2 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv + 8), u32(prv)));
+	var q3 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv + 16), u32(prv)));
+	var v = vec3<f32>(q1, q2, q3);
+	var vn: vec3<f32>;
+	if (boris) {
+		var h = f*(0.5);
+		vn = EWBorisRot3(v+(h), om)+(h);
+	} else {
+		vn = v+(f);
+	}
+	StateSet(vn.x, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(cur)));
+	StateSet(vn.y, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv + 8), u32(cur)));
+	StateSet(vn.z, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv + 16), u32(cur)));
+	StateSet(p1 + vn.x, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
+	StateSet(p2 + vn.y, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs + 8), u32(cur)));
+	StateSet(p3 + vn.z, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs + 16), u32(cur)));
 }
 fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,jx: f32,jy: f32,jz: f32) {
 	for (var ki=0; ki<4; ki++) {
@@ -759,6 +836,7 @@ struct Parameters {
 	HiggsLambda: f32,
 	GW: f32,
 	YangMills: i32,
+	Boris: i32,
 	GpW: f32,
 	Diff: f32,
 	Decay: f32,
@@ -782,7 +860,6 @@ struct Parameters {
 	MZ: f32,
 	pad0: f32,
 	pad1: f32,
-	pad2: f32,
 }
 
 //////// import: "particle.go"
@@ -828,6 +905,12 @@ const SLPi = 3.141592653589793;
 //////// import: "slmath-vector2.go"
 
 //////// import: "slmath-vector3.go"
+fn Length3(v: vec3<f32>) -> f32 {
+	return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+}
+fn LengthSquared3(v: vec3<f32>) -> f32 {
+	return v.x*v.x + v.y*v.y + v.z*v.z;
+}
 fn Cross3(v: vec3<f32>,o: vec3<f32>) -> vec3<f32> {
 	return vec3<f32>(v.y*o.z-v.z*o.y, v.z*o.x-v.x*o.z, v.x*o.y-v.y*o.x);
 }
