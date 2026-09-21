@@ -1,6 +1,6 @@
-- **Session ID:** `f24264ea-7cdc-4d0d-8725-ded757cc6ebc`
+- **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-20 10:11:32
+- **Last Message:** 2026-09-21 06:20:45
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -172,7 +172,7 @@ I'll search, and I have a new theory from your results.
 <details>
 <summary>Tool Calls (3)</summary>
 
-- **ToolSearch**: `max_results, query`
+- **ToolSearch**: `query, max_results`
 - **WebSearch**: `Search `Claude desktop app inline LaTeX math not rendering raw dollar signs``
 - **WebSearch**: `Search `Claude Code markdown KaTeX inline math rendering bug github issue``
   ```
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4406,4 +4406,3687 @@ Switching the curl to backward differences dropped the residual from $10^3$ to $
 A second, physical point that falls out: a *conserved static* current has no monopole moment, so the field is a screened dipole rather than a monopole. The far field still decays as $e^{-m_W r}/r$, but there's a subleading $1/r^2$ piece, which is why a naive fit reads 84.7 GeV and the log-slope extrapolated to $1/r \to 0$ reads 81.9.
 
 `verify.py` still passes all five checks with the source hook added.
+
+## 🧑 User - 2026-09-20 10:41:17
+
+can you find other code in github that does roughly the same thing you've done in this simulation?
+
+## 🤖 Assistant - 2026-09-20 10:41:40
+
+*Model: claude-opus-5*
+
+Let me search for comparable codebases.
+
+<details>
+<summary>Tool Calls (10)</summary>
+
+- **WebSearch**: `Search `github real-time classical lattice simulation SU(2) Higgs electroweak gauge fields code``
+- **WebSearch**: `Search `CosmoLattice github lattice simulation gauge fields SU(2) U(1) Higgs classical``
+  ```
+  Web search results for query: "github real-time classical lattice simulation SU(2) Higgs electroweak gauge fields code"
+  
+  Links: [{"title":"GitHub - akio-tomiya/LatticeQCD.jl: A native Julia code for lattice QCD with dynamical fermions in 4 dimension. · GitHub","url":"https://github.com/akio-tomiya/LatticeQCD.jl"},{"title":"GitHub - GennaroCalandriello/LatticeGaugeTheories · GitHub","url":"https://github.com/GennaroCalandriello/LatticeGaugeTheories"},{"title":"A modern code for lattice simulations of scalar and gauge ...","url":"https://arxiv.org/pdf/2102.01031"},{"title":"GitHub - ABouttefeux/lattice-qcd-rs: Classical lattice QCD simulation in Rust","url":"https://github.com/ABouttefeux/lattice-qcd-rs"},{"title":"Lattice Field Theories — Lattice Field Theories documentation","url":"https://rantahar.github.io/Lattice-Field-Theory/"},{"title":"GitHub - julian-urban/lattice-phi4: Pedagogical example of a simple lattice field theory simulation. · GitHub","url":"https://github.com/julian-urban/lattice-phi4"},{"title":"GitHub - pretidav/pyLattice: Lattice Gauge Theory simulation library · GitHub","url":"https://github.com/pretidav/pyLattice"},{"title":"GitHub - LatticeQCD/SIMULATeQCD: SIMULATeQCD is a multi-GPU Lattice QCD framework that makes it easy for physicists to implement lattice QCD formulas while still providing competitive performance. · GitHub","url":"https://github.com/LatticeQCD/SIMULATeQCD"},{"title":"lattice-gauge-theory · GitHub Topics · GitHub","url":"https://github.com/topics/lattice-gauge-theory?l=c&o=asc&s=updated"},{"title":"lattice-field-theory · GitHub Topics · GitHub","url":"https://github.com/topics/lattice-field-theory"}]
+  
+  I found several GitHub repositories related to lattice gauge theory simulations. Here are the most relevant results for your search:
+  
+  **Classical Lattice Gauge Field Simulations:**
+  
+  1. **lattice-qcd-rs** - A Rust library providing tools to simulate a pure gauge SU(3) theory on a lattice, though it focuses on SU(3) rather than the specific SU(2) Higgs system you're looking for.
+  
+  2. **LatticeGaugeTheories** - This repository simulates the behavior of pure SU2 and SU3 lattice gauge theories using Metropolis, Heat Bath and Over Relaxation updating algorithms.
+  
+  3. **LatticeQCD.jl** - A Julia package that includes Gaugefields.jl for lattice SU(N) gauge fields, treating gauge fields (links) and gauge actions.
+  
+  4. **pyLattice** - A lattice (gauge) theory simulation library in python.
+  
+  5. **SIMULATeQCD** - A multi-GPU Lattice QCD framework.
+  
+  Additionally, there's an academic paper discussing "A modern code for lattice simulations of scalar and gauge field dynamics" that covers electroweak gauge bosons and Higgs field interactions, which may contain relevant implementation details for real-time classical simulations.
+  
+  ...
+  ```
+  ```
+  Web search results for query: "CosmoLattice github lattice simulation gauge fields SU(2) U(1) Higgs classical"
+  
+  Links: [{"title":"CosmoLattice | Request PDF","url":"https://www.researchgate.net/publication/348958774_CosmoLattice"},{"title":"CosmoLattice: A modern code for lattice simulations of scalar and gauge field dynamics in an expanding universe - ScienceDirect","url":"https://www.sciencedirect.com/science/article/pii/S0010465522003058"},{"title":"GitHub - cosmolattice/cosmolatticeweb: A code for lattice simulations of scalar and gauge field dynamics in an expanding universe","url":"https://github.com/cosmolattice/cosmolatticeweb"},{"title":"GitHub - cosmolattice/cosmolattice: A modern code for lattice simulations of scalar and gauge field dynamics in an expanding universe. · GitHub","url":"https://github.com/cosmolattice/cosmolattice"},{"title":"CosmoLattice: A modern code for lattice simulations of scalar and gauge field dynamics in an expanding universe","url":"https://infoscience.epfl.ch/entities/publication/63a127ea-874b-4239-91b0-c3d5fcaf8768"},{"title":"ASCL.net - CosmoLattice: Lattice simulator of scalar and gauge field dynamics in an expanding universe","url":"https://ascl.net/2311.012"},{"title":"[2006.15122] The art of simulating the early Universe – Part I","url":"https://ar5iv.labs.arxiv.org/html/2006.15122"},{"title":"<math altimg=\"si1.svg\"><mi mathvariant=\"script\">C</mi></math>osmo<math altimg=\"si2.svg\"><mi mathvariant=\"script\">L</mi></math>attice: A modern code for lattice simulations of scalar and gauge field dynamics in an expanding universe - INSPIRE","url":"https://inspirehep.net/literature/1844216"},{"title":"CosmoLattice","url":"https://cosmolattice.net/"}]
+  
+  Based on the search results, here's information about CosmoLattice:
+  
+  CosmoLattice is a modern package for lattice simulations of field dynamics in an expanding universe. It can simulate the dynamics of interacting scalar field theories, Abelian U(1) gauge theories, and non-Abelian SU(2) gauge theories, either in flat spacetime or an expanding FLRW background, including the case of self-consistent expansion sourced by the fields themselves.
+  
+  The code is written in C++ fully exploiting the object oriented programming paradigm, with a modular structure and a clear separation between the physics and the technical details, it is MPI-based and uses a discrete Fourier transform parallelized in multiple spatial dimensions, and it introduces its own symbolic language, defining field variables and operations over them.
+  
+  The algorithms for gauge theories (Abelian or non-Abelian) respect the Gauss constraint to machine precision.
+  
+  The official GitHub repository can be found at https://github.com/cosmolattice/cosmolattice, and the project website is at https://www.cosmolattice.net/
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+- **WebSearch**: `Search `github code real-time simulation electroweak baryogenesis sphaleron SU(2) Higgs classical lattice Tranberg Smit``
+- **WebSearch**: `Search `github Higgs mechanism simulation educational python spontaneous symmetry breaking gauge boson mass visualization``
+  ```
+  Web search results for query: "github code real-time simulation electroweak baryogenesis sphaleron SU(2) Higgs classical lattice Tranberg Smit"
+  
+  Links: [{"title":"Real-time fermions for baryogenesis simulations | Journal of High Energy Physics | Springer Nature Link","url":"https://link.springer.com/article/10.1007/JHEP07(2011)066"},{"title":"Simulations of Cold Electroweak Baryogenesis","url":"https://arxiv.org/pdf/hep-lat/0510114"},{"title":"Classical issues in electroweak baryogenesis","url":"https://arxiv.org/pdf/hep-lat/0309082"},{"title":"Real-time simulations and the electroweak phase transition","url":"https://arxiv.org/html/hep-lat/9710026"},{"title":"Simulations of Cold Electroweak Baryogenesis: Finite time quenches","url":"https://arxiv.org/pdf/hep-ph/0610096"},{"title":"Dynamical simulations of electroweak baryogenesis with fermions","url":"https://arxiv.org/html/1111.7136"},{"title":"Simulations of Cold Electroweak Baryogenesis: Dependence on Higgs mass and strength of CP-violation","url":"https://arxiv.org/html/hep-ph/0604263"},{"title":"Particle distributions in electroweak tachyonic preheating","url":"https://arxiv.org/html/hep-lat/0309046"},{"title":"Real-time Fermions for Baryogenesis Simulations","url":"https://arxiv.org/html/1105.5546"}]
+  
+  Based on the search results, I found several academic papers related to real-time simulations of electroweak baryogenesis in SU(2)-Higgs models by Tranberg and Smit, but I did not find any GitHub repositories with code implementations.
+  
+  The search results include several peer-reviewed papers and arXiv preprints by Anders Tranberg and Jan Smit on cold electroweak baryogenesis simulations. The relevant processes take place out of thermal equilibrium and are non-perturbative, and so must be studied using full, real-time lattice simulations.
+  
+  Key related works include:
+  - Full real-time lattice simulations to compute the dependence of the asymmetry on Higgs mass and CP violation parameters
+  - Classical real-time lattice simulations in the SU(2)–Higgs model in three dimensions
+  - Numerical real-time simulations of electroweak baryogenesis that have neglected dynamical fermions, with purely bosonic systems evolved and baryon number assumed to follow the gauge field Chern-Simons number
+  
+  However, the search results do not contain references to publicly available GitHub repositories or code implementations for these simulations. The papers describe the theoretical framework and results, but do not appear to include links to source code repositories.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+  ```
+  Web search results for query: "github Higgs mechanism simulation educational python spontaneous symmetry breaking gauge boson mass visualization"
+  
+  Links: [{"title":"Chapter 0Spontaneous Symmetry Breaking and the Higgs Mechanism","url":"https://arxiv.org/html/2512.04741v1"},{"title":"Spontaneous Symmetry Breaking and the Higgs Mechanism Gustavo Burdman,a","url":"https://arxiv.org/pdf/2512.04741"},{"title":"[2512.04741] Spontaneous Symmetry Breaking and the Higgs Mechanism","url":"https://arxiv.org/abs/2512.04741"},{"title":"higgs · GitHub Topics · GitHub","url":"https://github.com/topics/higgs"},{"title":"GitHub - zeineb12/higgs_boson: Higgs Boson Machine Learning Challenge, use the ATLAS experiment to identify the Higgs boson","url":"https://github.com/zeineb12/higgs_boson"},{"title":"GitHub - jongminyoon/HiggsBoson: Julia source code repository for various numerical computations in Gauge-Higgs Unification models.","url":"https://github.com/jongminyoon/HiggsBoson"},{"title":"higgs-bosons-decay · GitHub Topics · GitHub","url":"https://github.com/topics/higgs-bosons-decay"},{"title":"III. Spontaneous Symmetry Breaking and the Higgs ...","url":"https://www2.ph.ed.ac.uk/~paboyle/Teaching/SM_tutorials/StMod11.pdf"},{"title":"INTERACTIVE 3D PYTHON MODELING OF THE HIGGS BOSON AND GAUGE BOSONS IN PHYSICS EDUCATION | International journal of artificial intelligence","url":"https://www.academicpublishers.org/journals/index.php/ijai/article/view/6595"}]
+  
+  Based on the search results, I found several relevant resources related to Higgs mechanism simulations and educational materials:
+  
+  ## Educational Python Visualization Projects
+  
+  A notable educational project uses Python as the primary tool to develop a series of 3D models that simulate the behavior and properties of fundamental particles and fields. The models include electromagnetic waves representing photons, color flux tubes depicting gluon confinement, Yukawa-type short-range potentials characterizing the W and Z bosons, and the Mexican-hat potential illustrating the Higgs field and the essence of spontaneous symmetry breaking. These simulations were built with widely used Python libraries such as NumPy, Matplotlib, and Plotly.
+  
+  ## GitHub Resources
+  
+  Several GitHub repositories exist related to Higgs physics:
+  
+  1. **Gauge-Higgs Unification Models**: A Julia source code repository focusing on SO(5)xU(1) models of Gauge-Higgs Unification, including computations for the minimum of the Higgs potential.
+  
+  2. **Higgs Boson Visualization**: Higgs Insights is an interactive visualization platform exploring CERN's particle physics data, designed for researchers, students, and science enthusiasts.
+  
+  3. **Machine Learning Applications**: Educational projects using Python with machine learning techniques to predict whether collision events represent a Higgs boson signal or background.
+  
+  ...
+  ```
+- **WebFetch**: `Fetch `https://github.com/cosmolattice/cosmolattice``
+- **WebSearch**: `Search `github repository "SU(2)" Higgs real-time lattice simulation python code W boson mass measurement dispersion``
+  ```
+  # CosmoLattice: Key Technical Details
+  
+  ## Core Purpose
+  The code performs "lattice simulations of scalar and gauge field dynamics in an expanding universe." It's designed for real-time classical lattice evolution in cosmological settings.
+  
+  ## Language & License
+  - **Language**: C++20
+  - **License**: MIT
+  - **Requirements**: CMake 3.16+, compilers supporting C++20
+  
+  ## Architecture & Structure
+  The project uses **TempLat** as its computational backend—a C++ template library providing high-level lattice and field operations. The codebase includes:
+  - CMake build configuration
+  - Multiple physics models (e.g., `lphi4`)
+  - Parameter files for different scenarios
+  - Test suite and profiling tools
+  
+  ## Parallelization Options
+  CosmoLattice supports multiple backends via Kokkos:
+  - **GPU**: CUDA (NVIDIA), HIP (AMD)
+  ...
+  ```
+  ```
+  Web search results for query: "github repository "SU(2)" Higgs real-time lattice simulation python code W boson mass measurement dispersion"
+  
+  Links: [{"title":"Multi-boson spectrum of the SU(2)-Higgs model","url":"https://arxiv.org/html/1310.1121"},{"title":"higgs · GitHub Topics · GitHub","url":"https://github.com/topics/higgs"},{"title":"higgs-boson · GitHub Topics · GitHub","url":"https://github.com/topics/higgs-boson"},{"title":"GitHub - pretidav/pyLattice: Lattice Gauge Theory simulation library · GitHub","url":"https://github.com/pretidav/pyLattice"},{"title":"su2 · GitHub Topics","url":"https://github.com/topics/su2?o=asc&s=updated"},{"title":"boson-higgs - Overview","url":"https://github.com/boson-higgs"},{"title":"LatticeQCD · GitHub","url":"https://github.com/LatticeQCD"},{"title":"GitHub - p2nath/SU2: SU2: An Open-Source Suite for Multiphysics Simulation and Design · GitHub","url":"https://github.com/p2nath/SU2"},{"title":"Multi-boson spectrum of the SU(2)-Higgs model","url":"https://ar5iv.arxiv.org/html/1310.1121"}]
+  
+  Based on the search results, I found some relevant information about SU(2)-Higgs model lattice simulations:
+  
+  There is a lattice gauge theory simulation library in Python called pyLattice, available at https://github.com/pretidav/pyLattice.
+  
+  Additionally, lattice simulations are used to compute the spectrum of energy levels in the SU(2)-Higgs model with parameters chosen to match experimental data from the Higgs-W boson sector of the standard model. The research paper describing such work can be found at https://arxiv.org/html/1310.1121.
+  
+  SIMULATeQCD is a multi-GPU Lattice QCD framework that makes it easy for physicists to implement lattice QCD formulas while still providing competitive performance, available through the LatticeQCD GitHub organization.
+  
+  However, I should note that the search results do not specifically identify a repository that combines all the elements you mentioned (real-time simulation, W boson mass measurement, and dispersion relations) in a single Python package. The results show general lattice simulation tools and research papers on SU(2)-Higgs spectroscopy, but not a dedicated repository matching all your specific criteria.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+- **WebFetch**: `Fetch `https://cosmolattice.net/``
+- **WebSearch**: `Search `"cosmolattice" SU(2)xU(1) electroweak Higgs doublet model support gauge constraint machine precision``
+  ```
+  # CosmoLattice Field Content and Capabilities
+  
+  ## Supported Field Content and Gauge Groups
+  
+  CosmoLattice supports:
+  
+  - **Scalar fields**: "interacting singlet scalar fields with arbitrary potentials"
+  - **Abelian gauge fields (U(1))**: "U(1)-charged scalar fields coupled to Abelian gauge fields"
+  - **Non-Abelian gauge fields (SU(2))**: "SU(2) scalar doublets coupled to non-Abelian gauge fields, alone or combined with a U(1) sector"
+  - **Axion-like particles**: coupled to U(1) through topological terms
+  
+  ## Simultaneous SU(2)×U(1) Support
+  
+  Yes, the documentation explicitly states CosmoLattice can handle "SU(2) scalar doublets coupled to non-Abelian gauge fields, alone or combined with a U(1) sector," indicating electroweak-like configurations are supported simultaneously.
+  
+  ## Real-Time Classical Evolution
+  
+  Yes. CosmoLattice performs "lattice simulations of the non-linear dynamics of interactive fields in an expanding Universe" with fields evolving either in flat spacetime or expanding backgrounds using the FLRW metric.
+  
+  ## Gauss Constraint Handling
+  ...
+  ```
+  ```
+  Web search results for query: ""cosmolattice" SU(2)xU(1) electroweak Higgs doublet model support gauge constraint machine precision"
+  
+  Links: [{"title":"Electroweak Constraints on Effective Theories with U(2)xU(1) Flavor Symmetry","url":"https://arxiv.org/pdf/hep-ph/0510125"},{"title":"The Higgs Boson and Electroweak Symmetry Breaking 2. Models of EWSB","url":"https://www.slac.stanford.edu/econf/C040802/lec_notes/Peskin2/Peskin2_web.pdf"},{"title":"Electroweak symmetry breaking of standard model in SU(2) doublet extension","url":"https://people.iith.ac.in/bpriyo/shilpa_msc_dissertation.pdf"},{"title":"UWThPh-2007-28 A precision constraint on multi-Higgs-doublet models","url":"https://arxiv.org/html/arXiv:0711.4022"},{"title":"Study of SU(2) gauge theories with multiple Higgs fields in different representations","url":"https://arxiv.org/pdf/2210.09855"},{"title":"Supersymmetric Electroweak Cosmic Strings","url":"https://arxiv.org/html/hep-th/9605066"},{"title":"2. The Electroweak Standard Model","url":"https://www.ictp-saifr.org/wp-content/uploads/2023/11/Lecture_1_2.pdf"},{"title":"Collider bounds on 2-Higgs doublet models with U(1)X gauge symmetries - ScienceDirect","url":"https://www.sciencedirect.com/science/article/pii/S0370269319302813"},{"title":"Kien Nguyen Juli 2009 1 The Higgs Mechanism","url":"https://www.theorie.physik.uni-muenchen.de/lsfrey/teaching/archiv/sose_09/rng/higgs_mechanism.pdf"}]
+  
+  The search results do not contain specific information about "cosmolattice" or its support for SU(2)×U(1) electroweak models with gauge constraints and machine precision. The results discuss various aspects of electroweak symmetry breaking, Higgs doublet models, and SU(2)×U(1) gauge theories in general, but do not mention cosmolattice or provide details about its implementation, capabilities, or precision features related to gauge constraints.
+  
+  To get more targeted information, you may want to:
+  1. Search directly for "cosmolattice" as a software tool or simulation framework
+  2. Look for recent publications or documentation about cosmolattice's features and supported models
+  3. Check if cosmolattice is a specific computational physics package or simulation code
+  
+  Would you like me to perform additional searches with different keywords to find information about cosmolattice specifically?
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+- **WebSearch**: `Search `github abelian Higgs model real-time lattice simulation python vortices gauge field code pedagogical``
+- **WebSearch**: `Search `lattice codes preheating gauge fields LATTICEEASY GABE PyCOOL HLattice CosmoLattice comparison scalar only``
+  ```
+  Web search results for query: "github abelian Higgs model real-time lattice simulation python vortices gauge field code pedagogical"
+  
+  Links: [{"title":"Percolation of Vortices in the 3D Abelian Lattice Higgs Model | Request PDF","url":"https://www.researchgate.net/publication/222566151_Percolation_of_Vortices_in_the_3D_Abelian_Lattice_Higgs_Model"},{"title":"[1702.05492] Quantum Simulation of the Abelian-Higgs Lattice Gauge Theory with Ultracold Atoms","url":"https://arxiv.org/abs/1702.05492"},{"title":"[0708.0903] Percolation of Vortices in the 3D Abelian Lattice Higgs Model","url":"https://arxiv.org/abs/0708.0903"},{"title":"Lattice vortices in the two-dimensional Abelian Higgs model | Zeitschrift für Physik C Particles and Fields","url":"https://link.springer.com/article/10.1007/BF01548269"},{"title":"GitHub - gkanwar/lattlib: A loosely related collection of lattice field theory code.","url":"https://github.com/gkanwar/lattlib"},{"title":"GitHub - pretidav/pyLattice: Lattice Gauge Theory simulation library · GitHub","url":"https://github.com/pretidav/pyLattice"},{"title":"A modern code for lattice simulations of scalar and gauge ...","url":"https://arxiv.org/pdf/2102.01031"},{"title":"GitHub - statphysandml/LatticeModelSimulationLib: Software project that contains implementations for the most common physical models and update formalisms on a lattice and on a site.","url":"https://github.com/statphysandml/LatticeModelSimulationLib"},{"title":"lattice-gauge-theory · GitHub Topics · GitHub","url":"https://github.com/topics/lattice-gauge-theory?l=c&o=asc&s=updated"}]
+  
+  Based on the search results, I found several relevant resources related to lattice simulations and gauge theory code:
+  
+  ## Key Findings:
+  
+  **Python-based Lattice Code Resources:**
+  
+  1. A repository (lattlib) contains libraries with useful functions for MCMC sampling and observable measurements in particular theories (gauge_theory/, scalar_field/, ...) and a set of executable Python scripts that expose simulation and measurement functions for various theories. This is available at https://github.com/gkanwar/lattlib.
+  
+  2. There is a Lattice Gauge Theory simulation library (pyLattice) available at https://github.com/pretidav/pyLattice.
+  
+  **Other Relevant Tools:**
+  
+  3. CosmoLattice is written in C++ with a modular structure and can simulate fields under U(1) and/or SU(2) gauge groups, and the corresponding associated Abelian and/or non-Abelian gauge fields.
+  
+  4. LatticeModelSimulationLib is a C++ library that implements different well-known Monte Carlo algorithms and interesting models in statistical physics, available at https://github.com/statphysandml/LatticeModelSimulationLib.
+  
+  ...
+  ```
+  ```
+  Web search results for query: "lattice codes preheating gauge fields LATTICEEASY GABE PyCOOL HLattice CosmoLattice comparison scalar only"
+  
+  Links: [{"title":"LATTICEEASY: A program for lattice simulations of scalar fields in an expanding universe | Request PDF","url":"https://www.researchgate.net/publication/1997587_LATTICEEASY_A_program_for_lattice_simulations_of_scalar_fields_in_an_expanding_universe"},{"title":"PSpectCosmo: A Pseudo-Spectral Code for Cosmological Dynamics Spanning Inflation and Reheating","url":"https://arxiv.org/html/2411.17658"},{"title":"CUDAEASY - a GPU accelerated cosmological lattice program","url":"https://www.researchgate.net/publication/45887293_CUDAEASY_-_a_GPU_accelerated_cosmological_lattice_program"},{"title":"(PDF) PSpectRe: A Pseudo-Spectral Code for (P)reheating","url":"https://www.researchgate.net/publication/45917041_PSpectRe_A_Pseudo-Spectral_Code_for_Preheating"},{"title":"Lattice simulations of Abelian gauge fields coupled to axions during Inflation","url":"https://arxiv.org/pdf/2110.10695"},{"title":"PyCOOL — A Cosmological Object-Oriented Lattice code written in Python","url":"https://www.researchgate.net/publication/221659538_PyCOOL_-_A_Cosmological_Object-Oriented_Lattice_code_written_in_Python"},{"title":"Present and future of CosmoLattice","url":"https://arxiv.org/pdf/2312.15056"},{"title":"InflationEasy: A C++ Lattice Code for Inflation","url":"https://arxiv.org/pdf/2506.11797"},{"title":"A modern code for lattice simulations of scalar and gauge ...","url":"https://arxiv.org/pdf/2102.01031"}]
+  
+  The search results provide relevant information about lattice codes for preheating and gauge fields. Here's what I found:
+  
+  ## Lattice Codes for Preheating and Gauge Field Simulations
+  
+  Several open-source lattice codes have been developed to model the reheating process, including LATTICEEASY, CLUSTEREASY, DEFROST, CUDAEASY, HLATTICE, PyCOOL, GABE, CosmoLattice, and the pseudo-spectral code PSpectRe.
+  
+  ### Code Capabilities and Approaches
+  
+  A number of public packages for lattice simulations have appeared over the years, mostly dedicated to the simulation of interacting scalar fields, like LatticeEasy, ClusterEasy, Defrost, CUDAEasy, HLattice, PyCOOL and GABE, which use finite difference techniques and a FLRW background metric.
+  
+  Not all of these lattice codes include metric perturbations and only a few include the backreaction of the metric perturbations.
+  
+  ### Modern Developments
+  
+  CosmoLattice is a modern code for lattice simulations of scalar and gauge field dynamics in an expanding universe. This represents an important development, as these tools have predominantly focused on studying reheating, as the inflationary period has traditionally been modeled using linear perturbation theory.
+  
+  ...
+  ```
+
+</details>
+
+Searched. Here's the landscape.
+
+## The one genuinely close match: CosmoLattice
+
+[github.com/cosmolattice/cosmolattice](https://github.com/cosmolattice/cosmolattice) — C++20, MIT licensed, actively developed. It does real-time classical lattice evolution and explicitly supports *"SU(2) scalar doublets coupled to non-Abelian gauge fields, alone or combined with a U(1) sector"* — which is precisely the field content we built. Paper: [arXiv:2102.01031](https://arxiv.org/pdf/2102.01031), methods companion ["The art of simulating the early Universe"](https://ar5iv.labs.arxiv.org/html/2006.15122), project site at [cosmolattice.net](https://cosmolattice.net/).
+
+Where it differs from what we have:
+
+| | ours | CosmoLattice |
+|---|---|---|
+| gauge fields | non-compact, $O(a^2)$ invariance | compact links, **Gauss law to machine precision** |
+| background | flat spacetime | FLRW, incl. self-consistent expansion |
+| scale | ~500 readable lines, NumPy | MPI + CUDA/HIP via Kokkos, production framework |
+| purpose | spectroscopy: measure $m_W$, $m_Z$, $m_\gamma$, $m_h$ | cosmology: preheating, defects, gravitational waves |
+
+That first row is the one that matters for you. Their algorithms respect the Gauss constraint exactly regardless of integrator — which is exactly the property I flagged as missing from our non-compact formulation and as the thing you'd want before attempting sphalerons or Chern–Simons number. If the WGSL kernel is headed anywhere topological, their compact-link update scheme is the reference implementation to read.
+
+## The research lineage — published, but no public code
+
+Real-time classical SU(2)–Higgs simulation is a mature research area going back to the 1990s, and it's the direct ancestor of what we wrote. But the codes were essentially never released:
+
+- Tranberg & Smit, [Simulations of Cold Electroweak Baryogenesis](https://arxiv.org/pdf/hep-lat/0510114) and [Higgs mass and CP-violation dependence](https://arxiv.org/html/hep-ph/0604263)
+- [Real-time simulations and the electroweak phase transition](https://arxiv.org/html/hep-lat/9710026)
+- [Real-time fermions for baryogenesis simulations](https://arxiv.org/html/1105.5546) — adds dynamical fermions, which is where your electron/neutrino question would lead
+
+These papers describe the same temporal-gauge leapfrog structure we implemented. Worth reading for method even without source.
+
+## Adjacent but doing something different
+
+The large lattice-gauge ecosystem is almost entirely **Euclidean Monte Carlo for QCD**, not real-time with a Higgs: [pyLattice](https://github.com/pretidav/pyLattice), [LatticeQCD.jl](https://github.com/akio-tomiya/LatticeQCD.jl), [SIMULATeQCD](https://github.com/LatticeQCD/SIMULATeQCD), [lattice-qcd-rs](https://github.com/ABouttefeux/lattice-qcd-rs), [lattlib](https://github.com/gkanwar/lattlib), [LatticeGaugeTheories](https://github.com/GennaroCalandriello/LatticeGaugeTheories). Different algorithm, different observables — they sample a path integral, we integrate equations of motion.
+
+Closest in *observable*: [Multi-boson spectrum of the SU(2)-Higgs model](https://arxiv.org/html/1310.1121) computes the W and Higgs spectrum with SM-matched parameters — same quantities as our `demo.py`, but via Euclidean Monte Carlo rather than reading off oscillation frequencies.
+
+The older cosmology codes — LATTICEEASY, CLUSTEREASY, DEFROST, CUDAEasy, HLattice, PyCOOL, GABE — are **scalar-only**. No gauge fields. CosmoLattice was written specifically to fill that gap.
+
+## What I didn't find
+
+Nothing that does the validation approach in `verify.py` and `demo.py`: measuring $m_W$, $m_Z$ and $m_\gamma = 0$ from real-time oscillation frequencies and checking them against $gv/2$, as a correctness test. Production codes validate against Gauss-law conservation and energy budgets instead. The k=0 spectroscopy trick — exact because uniform fields have zero discretization error — seems not to be a standard published diagnostic, though it's simple enough that people have surely used it privately.
+
+Also nothing matching the driven-source cutoff demo. The evanescent/radiating threshold is textbook physics, but I found no code that demonstrates it for $m_W$ specifically.
+
+One caveat on the search: GitHub's own code search isn't reachable this way, so I was working from web results. Small repos with poor discoverability could easily have been missed.
+
+## Practical suggestion
+
+Our code stays useful as the readable reference and the validation harness for the Go/WGSL port — it's small enough to hold in your head and every number in it is checked. CosmoLattice is worth reading for two specific things: the compact-link update that preserves Gauss exactly, and how they structure the SU(2)×U(1) sector together. Both are directly relevant if `HiggsKernel.wgsl` is going to grow gauge fields.
+
+Sources: [cosmolattice](https://github.com/cosmolattice/cosmolattice) · [arXiv:2102.01031](https://arxiv.org/pdf/2102.01031) · [arXiv:2006.15122](https://ar5iv.labs.arxiv.org/html/2006.15122) · [cosmolattice.net](https://cosmolattice.net/) · [hep-lat/0510114](https://arxiv.org/pdf/hep-lat/0510114) · [hep-ph/0604263](https://arxiv.org/html/hep-ph/0604263) · [hep-lat/9710026](https://arxiv.org/html/hep-lat/9710026) · [1105.5546](https://arxiv.org/html/1105.5546) · [1310.1121](https://arxiv.org/html/1310.1121) · [pyLattice](https://github.com/pretidav/pyLattice) · [LatticeQCD.jl](https://github.com/akio-tomiya/LatticeQCD.jl) · [SIMULATeQCD](https://github.com/LatticeQCD/SIMULATeQCD) · [lattice-qcd-rs](https://github.com/ABouttefeux/lattice-qcd-rs) · [lattlib](https://github.com/gkanwar/lattlib) · [LatticeGaugeTheories](https://github.com/GennaroCalandriello/LatticeGaugeTheories)
+
+## 🧑 User - 2026-09-20 10:48:34
+
+add a single free electron in motion, with associated em field, so I can see what that looks like
+
+## 🤖 Assistant - 2026-09-20 10:51:51
+
+*Model: claude-opus-5*
+
+This one has a scale problem worth naming up front, so let me check it before building.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, higgs_gauge as hg
+p = hg.Params()
+hbarc = 0.1973  # GeV fm
+me = 0.511e-3
+print("scale check for a REAL electron:")
+print(f"  electron Compton wavelength 1/m_e = {hbarc/me:8.1f} fm")
+print(f"  Z range 1/m_Z                     = {hbarc/p.m_Z:8.5f} fm")
+print(f"  ratio                             = {(1/me)/(1/p.m_Z):8.3e}")
+print("  -> no single lattice can hold both. Need a heavy lepton for a joint picture.")
+print()
+sw2 = np.sin(p.theta_W)**2
+gV = -0.5 + 2*sw2          # electron vector coupling to Z
+gA = -0.5
+print(f"  sin^2(theta_W) = {sw2:.4f}")
+print(f"  electron Z vector coupling g_V = -1/2 + 2 sin^2 = {gV:+.4f}   (accidentally tiny)")
+print(f"  electron Z axial  coupling g_A = {gA:+.4f}")
+print(f"  EM charge Q = -1  -> static Z source is {abs(gV):.4f} of the EM one")
+EOF``
+  ```
+  scale check for a REAL electron:
+    electron Compton wavelength 1/m_e =    386.1 fm
+    Z range 1/m_Z                     =  0.00216 fm
+    ratio                             = 1.786e+05
+    -> no single lattice can hold both. Need a heavy lepton for a joint picture.
+  
+    sin^2(theta_W) = 0.2230
+    electron Z vector coupling g_V = -1/2 + 2 sin^2 = -0.0540   (accidentally tiny)
+    electron Z axial  coupling g_A = -0.5000
+    EM charge Q = -1  -> static Z source is 0.0540 of the EM one
+  ```
+
+</details>
+
+Confirmed — 1.8×10⁵ scale ratio, so a joint picture needs a heavy lepton. Let me build the Dirac packet first and verify it:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, time
+
+# Dirac representation
+s1=np.array([[0,1],[1,0]],complex); s2=np.array([[0,-1j],[1j,0]]); s3=np.array([[1,0],[0,-1]],complex)
+I2=np.eye(2,dtype=complex); Z2=np.zeros((2,2),complex)
+ALPHA=np.array([np.block([[Z2,s],[s,Z2]]) for s in (s1,s2,s3)])
+BETA=np.block([[I2,Z2],[Z2,-I2]])
+print("alpha,beta Hermitian:", all(np.allclose(A,A.conj().T) for A in ALPHA), np.allclose(BETA,BETA.conj().T))
+# {alpha_i, alpha_j} = 2 delta, alpha^2 = 1
+print("alpha_i^2 = 1:", all(np.allclose(A@A, np.eye(4)) for A in ALPHA))
+print("{a_i,b}=0:", all(np.allclose(A@BETA+BETA@A, 0) for A in ALPHA))
+
+N, a, mass, pz, sigma = 64, 0.004, 100.0, 200.0, 0.015
+k1 = 2*np.pi*np.fft.fftfreq(N, a)
+KX,KY,KZ = np.meshgrid(k1,k1,k1, indexing='ij')
+E = np.sqrt(KX**2+KY**2+KZ**2+mass**2)
+print(f"\nN={N} a={a}  L={N*a:.3f}  k_max={np.abs(k1).max():.0f} GeV  m={mass} p={pz}")
+print(f"  E(p) = {np.sqrt(mass**2+pz**2):.2f}  v=p/E = {pz/np.sqrt(mass**2+pz**2):.4f}  gamma = {np.sqrt(mass**2+pz**2)/mass:.4f}")
+
+# H(k) = alpha.k + beta m  ; positive-energy projector P+ = (E + H)/(2E)
+def apply_H(psi_hat):
+    out = np.einsum('ij,j...->i...', BETA, psi_hat)*mass
+    for A,K in zip(ALPHA,(KX,KY,KZ)):
+        out = out + np.einsum('ij,j...->i...', A, psi_hat)*K
+    return out
+
+g = np.exp(-0.5*sigma**2*(KX**2+KY**2+(KZ-pz)**2))
+chi = np.zeros((4,)+KX.shape, complex); chi[0]=g
+psi_hat = 0.5*(chi + apply_H(chi)/E)          # P+ chi
+nrm = np.sqrt((np.abs(psi_hat)**2).sum())
+psi_hat /= nrm
+print(f"  positive-energy check: ||(H-E)psi||/||psi|| = "
+      f"{np.sqrt((np.abs(apply_H(psi_hat)-E*psi_hat)**2).sum()):.3e}")
+
+def psi_at(t):
+    ph = psi_hat*np.exp(-1j*E*t)
+    return np.fft.ifftn(ph, axes=(1,2,3))
+
+x1 = (np.arange(N))*a
+def moments(t):
+    psi = psi_at(t)
+    J0 = np.real(np.einsum('i...,i...->...', psi.conj(), psi))
+    tot = J0.sum()
+    Jz = np.real(np.einsum('i...,ij,j...->...', psi.conj(), ALPHA[2], psi))
+    zc = (J0*np.arange(N)[None,None,:]*a).sum()/tot
+    return tot, Jz.sum()/tot, zc
+
+t0=time.perf_counter()
+print(f"\n{'t':>8}{'norm':>14}{'<v_z>':>10}{'<z>':>10}")
+prev=None
+for t in (0.0, 0.0005, 0.0010, 0.0015):
+    n, vz, zc = moments(t)
+    dz = f"{(zc-prev)/0.0005:8.4f}" if prev is not None else "      --"
+    print(f"{t:>8.4f}{n:>14.8f}{vz:>10.5f}{zc:>10.5f}   d<z>/dt ={dz}")
+    prev = zc
+print(f"({time.perf_counter()-t0:.1f}s)  expected v = {pz/np.sqrt(mass**2+pz**2):.4f}")
+EOF``
+  ```
+  alpha,beta Hermitian: True True
+  alpha_i^2 = 1: True
+  {a_i,b}=0: True
+  
+  N=64 a=0.004  L=0.256  k_max=785 GeV  m=100.0 p=200.0
+    E(p) = 223.61  v=p/E = 0.8944  gamma = 2.2361
+    positive-energy check: ||(H-E)psi||/||psi|| = 3.453e-14
+  
+         t          norm     <v_z>       <z>
+    0.0000    0.00000381   0.84084   0.10882   d<z>/dt =      --
+    0.0005    0.00000381   0.84084   0.10530   d<z>/dt = -7.0470
+    0.0010    0.00000381   0.84084   0.10181   d<z>/dt = -6.9774
+    0.0015    0.00000381   0.84084   0.09836   d<z>/dt = -6.8966
+  (0.1s)  expected v = 0.8944
+  ```
+
+</details>
+
+Algebra and positive-energy projection check out. The packet is straddling the periodic boundary, so the centroid is garbage — let me center it:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np
+s1=np.array([[0,1],[1,0]],complex); s2=np.array([[0,-1j],[1j,0]]); s3=np.array([[1,0],[0,-1]],complex)
+I2=np.eye(2,dtype=complex); Z2=np.zeros((2,2),complex)
+ALPHA=np.array([np.block([[Z2,s],[s,Z2]]) for s in (s1,s2,s3)]); BETA=np.block([[I2,Z2],[Z2,-I2]])
+
+N,a,mass,pz,sigma = 64,0.004,100.0,200.0,0.015
+L=N*a; k1=2*np.pi*np.fft.fftfreq(N,a)
+KX,KY,KZ=np.meshgrid(k1,k1,k1,indexing='ij'); E=np.sqrt(KX**2+KY**2+KZ**2+mass**2)
+def apply_H(p):
+    o=np.einsum('ij,j...->i...',BETA,p)*mass
+    for A,K in zip(ALPHA,(KX,KY,KZ)): o=o+np.einsum('ij,j...->i...',A,p)*K
+    return o
+g=np.exp(-0.5*sigma**2*(KX**2+KY**2+(KZ-pz)**2))
+# centre the packet in the box
+g=g*np.exp(-1j*(KX+KY+KZ)*(L/2))
+chi=np.zeros((4,)+KX.shape,complex); chi[0]=g
+psi_hat=0.5*(chi+apply_H(chi)/E)
+psi_hat/= np.sqrt((np.abs(psi_hat)**2).sum()/N**3/a**3)   # so integral |psi|^2 d3x = 1
+
+x=np.arange(N)*a
+def diag(t):
+    psi=np.fft.ifftn(psi_hat*np.exp(-1j*E*t),axes=(1,2,3))
+    J0=np.real(np.einsum('i...,i...->...',psi.conj(),psi))
+    Jz=np.real(np.einsum('i...,ij,j...->...',psi.conj(),ALPHA[2],psi))
+    Jx=np.real(np.einsum('i...,ij,j...->...',psi.conj(),ALPHA[0],psi))
+    tot=J0.sum()*a**3
+    zc=(J0.sum(axis=(0,1))*x).sum()*a**3/tot
+    width=np.sqrt((J0.sum(axis=(0,1))*(x-zc)**2).sum()*a**3/tot)
+    return tot, Jz.sum()*a**3/tot, Jx.sum()*a**3/tot, zc, width
+
+print(f"m={mass} p={pz}  expected v = {pz/np.sqrt(mass**2+pz**2):.4f}")
+print(f"{'t':>8}{'norm':>10}{'<v_z>':>9}{'<v_x>':>10}{'<z>':>9}{'width':>9}{'d<z>/dt':>10}")
+prev=None; dt=0.0005
+for i in range(5):
+    t=i*dt; n,vz,vx,zc,w=diag(t)
+    d = f"{(zc-prev)/dt:9.4f}" if prev is not None else "       --"
+    print(f"{t:>8.4f}{n:>10.6f}{vz:>9.5f}{vx:>10.2e}{zc:>9.5f}{w:>9.5f}{d}")
+    prev=zc
+EOF``
+  ```
+  m=100.0 p=200.0  expected v = 0.8944
+         t      norm    <v_z>     <v_x>      <z>    width   d<z>/dt
+    0.0000  0.000000  0.84084 -3.79e-18  0.12800  0.01063       --
+    0.0005  0.000000  0.84084 -4.34e-18  0.12842  0.01063   0.8408
+    0.0010  0.000000  0.84084 -4.44e-18  0.12884  0.01063   0.8408
+    0.0015  0.000000  0.84084 -1.21e-18  0.12926  0.01063   0.8408
+    0.0020  0.000000  0.84084 -1.21e-18  0.12968  0.01063   0.8408
+  ```
+
+</details>
+
+Ehrenfest's theorem satisfied exactly — `d⟨z⟩/dt` matches `⟨v_z⟩` to 5 digits. Now the full demo:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Write**: `Created `/Users/oreilly/wavereality/waves/electroweak_py/electron_demo.py``
+  ```
+  File created successfully at: /Users/oreilly/wavereality/waves/electroweak_py/electron_demo.py (file state is current in your context — no need to Read it back)
+  ```
+- **Bash**: `Ran `time .venv/bin/python electron_demo.py 2>&1 | tail -35``
+  ```
+  ============================================================================
+  A SINGLE FREE LEPTON IN MOTION, AND ITS FIELDS
+  ============================================================================
+  
+    m_Z = 91.24 GeV, range 1/m_Z = 0.00216 fm
+    a real electron's Compton wavelength is 386 fm  ->  ratio 1.8e+05
+    so this uses a 100 GeV lepton with the electron's charge and couplings.
+  
+    EM coupling   e*Q = -0.3028
+    Z  coupling  g_Z*g_V = -0.0200   (g_V = -1/2 + 2sin^2 = -0.0540, accidentally small)
+    |Z source| / |EM source| = 0.0661
+  
+    lattice N=96, a=0.003 GeV^-1, box 0.288 = 26/m_Z
+    m = 100.0 GeV, p_z = 200.0 GeV  ->  E = 223.61,  v = 0.8944,  gamma = 2.2361
+  
+    norm  = 1.00000000   (exactly conserved: evolution is a phase)
+    <v>   = (-5.68e-18, +0.00e+00, 0.81190)
+    d<z>/dt = 0.81190   -> Ehrenfest holds to 9.4e-13
+    (<v_z> < p/E = 0.8944 because the packet has a momentum spread)
+  
+  ...
+  ```
+
+</details>
+
+Two things to check: `E_perp/E_par` is below γ³, and the rest-frame B isn't zero. Let me look:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, importlib.util, types
+src = open("electron_demo.py").read().replace('if __name__ == "__main__":\n    main(replot="--replot" in sys.argv)','')
+M = types.ModuleType("ed"); exec(compile(src,"ed","exec"), M.__dict__)
+import higgs_gauge as hg
+P = hg.Params(); e_em = np.sqrt(4*np.pi/137.036)
+
+pk = M.Packet()
+J0, Jv = pk.current(0.0)
+E, B = M.moving_fields(pk, J0, Jv, -e_em, 0.0)
+c = pk.N//2
+print(f"gamma={pk.gamma:.4f}  gamma^3={pk.gamma**3:.3f}   box L/2 = {pk.L/2:.3f}  sigma=0.012")
+print(f"\n{'r':>8}{'r/sigma':>9}{'r/(L/2)':>9}{'E_perp':>12}{'E_par':>12}{'ratio':>9}")
+for d in (6,10,14,18,22,26,30,34,38):
+    r = d*pk.a
+    et = np.sqrt(sum(f[c+d,c,c]**2 for f in E)); el = np.sqrt(sum(f[c,c,c+d]**2 for f in E))
+    print(f"{r:>8.3f}{r/0.012:>9.1f}{r/(pk.L/2):>9.2f}{et:>12.4e}{el:>12.4e}{et/el:>9.3f}")
+
+# rest frame: is B a magnetic dipole from the spin?
+pr = M.Packet(pz=0.0)
+J0r, Jvr = pr.current(0.0)
+Er, Br = M.moving_fields(pr, J0r, Jvr, -e_em, 0.0)
+print(f"\nat rest:  |E|max {np.sqrt(sum(f**2 for f in Er)).max():.3e}   "
+      f"|B|max {np.sqrt(sum(b**2 for b in Br)).max():.3e}")
+print("  spatial current at rest (magnetisation):",
+      f"max|Jx| {np.abs(Jvr[0]).max():.3e}  max|Jz| {np.abs(Jvr[2]).max():.3e}"
+      f"   vs max J0 {J0r.max():.3e}")
+print(f"  net current integral: {[f'{J.sum()*pr.a**3:+.2e}' for J in Jvr]}  (dipole -> 0)")
+print(f"\n  rest-frame |B| falloff (dipole = 1/r^3):")
+rB, fB = M.radial_profile(pr, Br); rE, fE = M.radial_profile(pr, Er)
+sel = (rB>0.02)&(rB<0.10)
+print(f"    fitted power for |B|: {np.polyfit(np.log(rB[sel]), np.log(fB[sel]),1)[0]:+.3f}")
+print(f"    fitted power for |E|: {np.polyfit(np.log(rE[sel]), np.log(fE[sel]),1)[0]:+.3f}")
+EOF``
+  ```
+  gamma=2.2361  gamma^3=11.180   box L/2 = 0.144  sigma=0.012
+  
+         r  r/sigma  r/(L/2)      E_perp       E_par    ratio
+     0.018      1.5     0.12  8.1384e+01  2.7505e+01    2.959
+     0.030      2.5     0.21  4.4804e+01  9.4231e+00    4.755
+     0.042      3.5     0.29  2.5362e+01  4.4787e+00    5.663
+     0.054      4.5     0.37  1.5924e+01  2.7718e+00    5.745
+     0.066      5.5     0.46  1.0673e+01  1.9440e+00    5.490
+     0.078      6.5     0.54  7.4205e+00  1.4467e+00    5.129
+     0.090      7.5     0.62  5.2283e+00  1.0948e+00    4.776
+     0.102      8.5     0.71  3.6375e+00  8.1211e-01    4.479
+     0.114      9.5     0.79  2.4001e+00  5.6395e-01    4.256
+  
+  at rest:  |E|max 5.888e+01   |B|max 5.730e+01
+    spatial current at rest (magnetisation): max|Jx| 1.893e+04  max|Jz| 2.115e-12   vs max J0 7.913e+04
+    net current integral: ['-2.43e-17', '+0.00e+00', '-8.26e-18']  (dipole -> 0)
+  
+    rest-frame |B| falloff (dipole = 1/r^3):
+      fitted power for |B|: -2.827
+      fitted power for |E|: -2.060
+  ```
+
+</details>
+
+The rest-frame B is real physics — it's the spin magnetic moment (net current integrates to zero, falls as 1/r³). Let me isolate whether the E_⊥/E_∥ shortfall is a periodic-box artifact:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np
+# pure rigid Gaussian charge, no Dirac -- isolates the field solver from the packet
+def ratio_test(N, a, sigma, v, ds):
+    L=N*a; g=2*np.pi*np.fft.fftfreq(N,a)
+    KX,KY,KZ=np.meshgrid(g,g,g,indexing='ij')
+    gam=1/np.sqrt(1-v*v)
+    idx=np.arange(N)*a-L/2
+    X,Y,Z=np.meshgrid(idx,idx,idx,indexing='ij')
+    rho=np.exp(-0.5*(X**2+Y**2+Z**2)/sigma**2)
+    rho/= rho.sum()*a**3
+    rho=np.roll(np.roll(np.roll(rho,N//2,0),N//2,1),N//2,2)  # centre at index N//2
+    S0=np.fft.fftn(rho); Sv=[np.zeros_like(S0),np.zeros_like(S0),np.fft.fftn(rho*v)]
+    D=KX**2+KY**2+KZ**2/gam**2; D=D.copy(); D[0,0,0]=np.inf
+    A0=S0/D; Av=[S/D for S in Sv]
+    Eh=[-1j*K*A0+1j*v*KZ*A for K,A in zip((KX,KY,KZ),Av)]
+    E=[np.real(np.fft.ifftn(h)) for h in Eh]
+    c=N//2
+    out=[]
+    for d in ds:
+        et=np.sqrt(sum(f[c+d,c,c]**2 for f in E)); el=np.sqrt(sum(f[c,c,c+d]**2 for f in E))
+        out.append((d*a, d*a/(L/2), et/el))
+    return gam, out
+
+v=0.8944
+for N,a,sigma in ((96,0.003,0.012),(96,0.006,0.012),(128,0.006,0.012),(160,0.006,0.012)):
+    gam,res = ratio_test(N,a,sigma,v,[int(0.036/a),int(0.054/a),int(0.072/a)])
+    L=N*a
+    print(f"N={N:4d} a={a}  L={L:.3f} (={L/sigma:.0f} sigma)   gamma^3={gam**3:.3f}")
+    for r,frac,rat in res:
+        print(f"    r={r:.3f}  r/(L/2)={frac:.2f}   E_perp/E_par = {rat:.3f}")
+EOF``
+  ```
+  N=  96 a=0.003  L=0.288 (=24 sigma)   gamma^3=11.176
+      r=0.033  r/(L/2)=0.23   E_perp/E_par = 0.026
+      r=0.054  r/(L/2)=0.37   E_perp/E_par = 0.023
+      r=0.069  r/(L/2)=0.48   E_perp/E_par = 0.021
+  N=  96 a=0.006  L=0.576 (=48 sigma)   gamma^3=11.176
+      r=0.030  r/(L/2)=0.10   E_perp/E_par = 0.025
+      r=0.054  r/(L/2)=0.19   E_perp/E_par = 0.024
+      r=0.066  r/(L/2)=0.23   E_perp/E_par = 0.023
+  N= 128 a=0.006  L=0.768 (=64 sigma)   gamma^3=11.176
+      r=0.030  r/(L/2)=0.08   E_perp/E_par = 0.024
+      r=0.054  r/(L/2)=0.14   E_perp/E_par = 0.024
+      r=0.066  r/(L/2)=0.17   E_perp/E_par = 0.024
+  N= 160 a=0.006  L=0.960 (=80 sigma)   gamma^3=11.176
+      r=0.030  r/(L/2)=0.06   E_perp/E_par = 0.024
+      r=0.054  r/(L/2)=0.11   E_perp/E_par = 0.024
+      r=0.066  r/(L/2)=0.14   E_perp/E_par = 0.024
+  ```
+
+</details>
+
+My test script mis-centered the charge. Fixing:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np
+def ratio_test(N, a, sigma, v, rs):
+    L=N*a; g=2*np.pi*np.fft.fftfreq(N,a)
+    KX,KY,KZ=np.meshgrid(g,g,g,indexing='ij'); gam=1/np.sqrt(1-v*v)
+    idx=np.arange(N)*a-L/2
+    X,Y,Z=np.meshgrid(idx,idx,idx,indexing='ij')
+    rho=np.exp(-0.5*(X**2+Y**2+Z**2)/sigma**2); rho/=rho.sum()*a**3   # centred at index N//2
+    S0=np.fft.fftn(rho); Sz=np.fft.fftn(rho*v)
+    D=KX**2+KY**2+KZ**2/gam**2; D[0,0,0]=np.inf
+    A0=S0/D; Av=[np.zeros_like(A0),np.zeros_like(A0),Sz/D]
+    E=[np.real(np.fft.ifftn(-1j*K*A0+1j*v*KZ*A)) for K,A in zip((KX,KY,KZ),Av)]
+    c=N//2; out=[]
+    for r in rs:
+        d=int(round(r/a))
+        et=np.sqrt(sum(f[c+d,c,c]**2 for f in E)); el=np.sqrt(sum(f[c,c,c+d]**2 for f in E))
+        out.append((d*a, d*a/(L/2), et, el, et/el))
+    return gam,out
+v=0.8944
+for N,a,sigma in ((96,0.003,0.012),(128,0.006,0.012),(160,0.006,0.012)):
+    gam,res=ratio_test(N,a,sigma,v,[0.030,0.054,0.078,0.102])
+    print(f"N={N:4d} a={a}  L={N*a:.3f}   gamma^3={gam**3:.3f}")
+    for r,frac,et,el,rat in res:
+        print(f"    r={r:.3f}  r/sigma={r/sigma:4.1f}  r/(L/2)={frac:.2f}   E_perp/E_par = {rat:7.3f}")
+EOF``
+  ```
+  N=  96 a=0.003  L=0.288   gamma^3=11.176
+      r=0.030  r/sigma= 2.5  r/(L/2)=0.21   E_perp/E_par =   4.426
+      r=0.054  r/sigma= 4.5  r/(L/2)=0.37   E_perp/E_par =   6.664
+      r=0.078  r/sigma= 6.5  r/(L/2)=0.54   E_perp/E_par =   6.462
+      r=0.102  r/sigma= 8.5  r/(L/2)=0.71   E_perp/E_par =   5.809
+  N= 128 a=0.006  L=0.768   gamma^3=11.176
+      r=0.030  r/sigma= 2.5  r/(L/2)=0.08   E_perp/E_par =   4.567
+      r=0.054  r/sigma= 4.5  r/(L/2)=0.14   E_perp/E_par =   7.808
+      r=0.078  r/sigma= 6.5  r/(L/2)=0.20   E_perp/E_par =   9.025
+      r=0.102  r/sigma= 8.5  r/(L/2)=0.27   E_perp/E_par =   9.272
+  N= 160 a=0.006  L=0.960   gamma^3=11.176
+      r=0.030  r/sigma= 2.5  r/(L/2)=0.06   E_perp/E_par =   4.571
+      r=0.054  r/sigma= 4.5  r/(L/2)=0.11   E_perp/E_par =   7.855
+      r=0.078  r/sigma= 6.5  r/(L/2)=0.16   E_perp/E_par =   9.186
+      r=0.102  r/sigma= 8.5  r/(L/2)=0.21   E_perp/E_par =   9.610
+  ```
+
+</details>
+
+Good — it converges to γ³ in a large box; my original box was too small. Let me check N=128 is affordable:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, time, resource, types
+src = open("electron_demo.py").read().replace('if __name__ == "__main__":\n    main(replot="--replot" in sys.argv)','')
+M = types.ModuleType("ed"); exec(compile(src,"ed","exec"), M.__dict__)
+e_em = np.sqrt(4*np.pi/137.036)
+t0=time.perf_counter()
+pk = M.Packet(N=128, a=0.005, mass=100.0, pz=200.0, sigma=0.016)
+J0,Jv = pk.current(0.0)
+E,B = M.moving_fields(pk, J0, Jv, -e_em, 0.0)
+el=time.perf_counter()-t0
+mem=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1e9
+print(f"N=128 a=0.005: {el:.1f}s, peak RSS {mem:.2f} GB, L={pk.L:.3f}, sigma/a={0.016/0.005:.1f}")
+c=128//2
+print(f"{'r':>7}{'r/sig':>7}{'r/(L/2)':>9}{'ratio':>8}   gamma^3={pk.gamma**3:.2f}")
+for d in (12,16,20,24,28,32):
+    r=d*pk.a
+    et=np.sqrt(sum(f[c+d,c,c]**2 for f in E)); el2=np.sqrt(sum(f[c,c,c+d]**2 for f in E))
+    print(f"{r:>7.3f}{r/0.016:>7.1f}{r/(pk.L/2):>9.2f}{et/el2:>8.3f}")
+bm=np.sqrt(sum(b**2 for b in B)).max(); em=np.sqrt(sum(f**2 for f in E)).max()
+print(f"|B|max/|E|max = {bm/em:.4f}  vs v = {pk.v:.4f}")
+EOF``
+  ```
+  N=128 a=0.005: 1.3s, peak RSS 1.59 GB, L=0.640, sigma/a=3.2
+        r  r/sig  r/(L/2)   ratio   gamma^3=11.18
+    0.060    3.8     0.19   7.039
+    0.080    5.0     0.25   7.483
+    0.100    6.2     0.31   7.448
+    0.120    7.5     0.38   7.171
+    0.140    8.8     0.44   6.784
+    0.160   10.0     0.50   6.367
+  |B|max/|E|max = 0.8694  vs v = 0.8944
+  ```
+
+</details>
+
+N=128 runs in 1.3 s. The residual gap to γ³ is the finite packet size — let me verify the solver converges and finalize:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+
+# --- add a solver-convergence validation using a pure rigid Gaussian ---------
+s = s.replace('''# ---------------------------------------------------------------------------
+
+
+def main(replot=False):''',
+'''def validate_boost(v, sigma=0.012, boxes=((96, 0.004), (128, 0.006), (160, 0.007))):
+    """Pure rigid Gaussian charge: E_perp/E_par -> gamma^3 as the box grows.
+
+    Separates the field solver from the Dirac packet. The asymptotic point-charge
+    ratio needs gamma*sigma << r << L/4; a periodic box always squeezes that window.
+    """
+    gam = 1.0 / np.sqrt(1 - v * v)
+    rows = []
+    for N, a in boxes:
+        L = N * a
+        k1 = 2 * np.pi * np.fft.fftfreq(N, a)
+        KX, KY, KZ = np.meshgrid(k1, k1, k1, indexing="ij")
+        idx = np.arange(N) * a - L / 2
+        X, Y, Z = np.meshgrid(idx, idx, idx, indexing="ij")
+        rho = np.exp(-0.5 * (X**2 + Y**2 + Z**2) / sigma**2)
+        rho /= rho.sum() * a**3
+        D = KX**2 + KY**2 + KZ**2 / gam**2
+        D[0, 0, 0] = np.inf
+        A0 = np.fft.fftn(rho) / D
+        Az = np.fft.fftn(rho * v) / D
+        E = [np.real(np.fft.ifftn(-1j * K * A0 + 1j * v * KZ * A))
+             for K, A in zip((KX, KY, KZ), (0 * Az, 0 * Az, Az))]
+        c, d = N // 2, int(round(0.11 / a))
+        et = np.sqrt(sum(f[c + d, c, c] ** 2 for f in E))
+        el = np.sqrt(sum(f[c, c, c + d] ** 2 for f in E))
+        rows.append((N, a, L, d * a, et / el))
+    return gam**3, rows
+
+
+# ---------------------------------------------------------------------------
+
+
+def main(replot=False):''')
+
+# --- bigger box for the EM panels; separate fine grid for the Z -------------
+s = s.replace("    pk = Packet()\n", "    pk = Packet(N=128, a=0.005, sigma=0.016)\n")
+s = s.replace("    pk_rest = Packet(N=pk.N, a=pk.a, mass=pk.mass, pz=0.0, sigma=0.012)",
+              "    pk_rest = Packet(N=pk.N, a=pk.a, mass=pk.mass, pz=0.0, sigma=0.016)")
+
+# --- honest reporting: rest-frame B is the spin moment, not an error --------
+s = s.replace('''    print(f"  |B|max (at rest)         = {np.sqrt(sum(b**2 for b in B_rest)).max():.2e}"
+          f"   (should be 0)")''',
+'''    Bm_rest = np.sqrt(sum(b**2 for b in B_rest)).max()
+    net = [abs(J.sum()) * pk_rest.a**3 for J in Jvr]
+    print(f"  |B|max (at rest)         = {Bm_rest:.2e}   NOT zero: this is the")
+    print(f"     electron's SPIN magnetic moment. Net current integrates to "
+          f"{max(net):.1e} (pure dipole,")
+    print(f"     no monopole) and |B| falls as 1/r^3 -- it fell out of the Dirac "
+          f"equation, unasked.")''')
+
+s = s.replace('''    d = 28
+    e_tr = np.sqrt(sum(f[c + d, c, c] ** 2 for f in E_mv))
+    e_lo = np.sqrt(sum(f[c, c, c + d] ** 2 for f in E_mv))
+    print(f"  at r = {d * pk.a:.3f}:  E_perp/E_par = {e_tr / e_lo:.3f}"
+          f"   vs point-charge gamma^3 = {pk.gamma**3:.3f}")''',
+'''    d = 20
+    e_tr = np.sqrt(sum(f[c + d, c, c] ** 2 for f in E_mv))
+    e_lo = np.sqrt(sum(f[c, c, c + d] ** 2 for f in E_mv))
+    ratio_meas = e_tr / e_lo
+    print(f"  at r = {d * pk.a:.3f}:  E_perp/E_par = {ratio_meas:.3f}"
+          f"   vs point-charge gamma^3 = {pk.gamma**3:.3f}")
+    g3, rows = validate_boost(pk.v)
+    print(f"\\n  solver check (rigid Gaussian, no Dirac): E_perp/E_par -> gamma^3 "
+          f"= {g3:.2f}")
+    for N_, a_, L_, r_, rat_ in rows:
+        print(f"    N={N_:4d} a={a_:.3f}  L={L_:.2f}  r={r_:.3f}  ratio {rat_:6.3f}")
+    print("    (the packet panels use a smaller box, so they under-read; the window"
+          "\\n     gamma*sigma << r << L/4 is what a periodic box squeezes)")''')
+
+# --- Z panel on its own fine grid -------------------------------------------
+s = s.replace('''    r_em, f_em = radial_profile(pk_rest, E_rest)
+    r_z, f_z = radial_profile(pk_rest, E_Z)''',
+'''    del E_Z
+    fine = Packet(N=96, a=0.003, mass=pk.mass, pz=0.0, sigma=0.012)
+    J0f, Jvf = fine.current(0.0)
+    E_emf, _ = moving_fields(fine, J0f, Jvf, -e_em, 0.0)
+    E_Zf, _ = moving_fields(fine, J0f, Jvf, gZ, P.m_Z)
+    r_em, f_em = radial_profile(fine, E_emf)
+    r_z, f_z = radial_profile(fine, E_Zf)
+    print(f"\\n  Z panel on a finer grid: N={fine.N}, a={fine.a}, "
+          f"a*m_Z = {fine.a * P.m_Z:.3f}, box = {fine.L * P.m_Z:.0f}/m_Z")''')
+s = s.replace("        sigma=0.012,\n", "        sigma=0.016,\n")
+f.write_text(s); print("patched")
+PY
+time .venv/bin/python electron_demo.py 2>&1 | tail -32``
+  ```
+  patched
+    a real electron's Compton wavelength is 386 fm  ->  ratio 1.8e+05
+    so this uses a 100 GeV lepton with the electron's charge and couplings.
+  
+    EM coupling   e*Q = -0.3028
+    Z  coupling  g_Z*g_V = -0.0200   (g_V = -1/2 + 2sin^2 = -0.0540, accidentally small)
+    |Z source| / |EM source| = 0.0661
+  
+    lattice N=128, a=0.005 GeV^-1, box 0.640 = 58/m_Z
+    m = 100.0 GeV, p_z = 200.0 GeV  ->  E = 223.61,  v = 0.8944,  gamma = 2.2361
+  
+    norm  = 1.00000000   (exactly conserved: evolution is a phase)
+    <v>   = (-9.43e-20, -1.46e-17, 0.84722)
+    d<z>/dt = 0.84722   -> Ehrenfest holds to 7.8e-13
+    (<v_z> < p/E = 0.8944 because the packet has a momentum spread)
+  
+    solving fields ...
+    |B|max / |E|max (moving) = 0.8694   (should approach v = 0.8944)
+    |B|max (at rest)         = 2.87e+01   NOT zero: this is the
+       electron's SPIN magnetic moment. Net current integrates to 5.8e-18 (pure dipole,
+  ...
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+Panels (a)/(b) are zoomed too far out — at 75% of the box half-width you're seeing the periodic images, not the charge. Zooming in and fixing the fits:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+
+s = s.replace('    win = 22.0', '''    # stay well inside the box: past ~25% of L/2 a periodic lattice shows its
+    # image charges rather than the isolated-particle field
+    win = 6.0''')
+
+s = s.replace('''        sp = ax.streamplot(g, g, Ez.T, Ex.T, color="#c0392b", density=1.25,
+                           linewidth=1.0, arrowsize=0.9)''',
+'''        sp = ax.streamplot(g, g, Ez.T, Ex.T, color="#c0392b", density=1.5,
+                           linewidth=1.1, arrowsize=1.0)''')
+
+s = s.replace('''    axes[0, 0].text(0.03, 0.04, "grey = charge density\\nred = electric field",
+                    transform=axes[0, 0].transAxes, fontsize=11, color="0.25")''',
+'''    axes[0, 0].text(0.03, 0.04, "grey = charge density\\nred = electric field\\n"
+                    "blue = magnetic field", transform=axes[0, 0].transAxes,
+                    fontsize=11, color="0.25",
+                    bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))''')
+s = s.replace('''    axes[0, 1].annotate("", xy=(16, 0), xytext=(8, 0),
+                        arrowprops=dict(arrowstyle="-|>", color="0.1", lw=2.4))
+    axes[0, 1].text(0.03, 0.04, "blue = magnetic field\\n(zero at rest)",
+                    transform=axes[0, 1].transAxes, fontsize=11, color="#1a5276")''',
+'''    axes[0, 1].annotate("", xy=(4.6, 0), xytext=(2.4, 0),
+                        arrowprops=dict(arrowstyle="-|>", color="0.1", lw=2.6))
+    axes[0, 1].text(0.03, 0.04, "field squeezed toward\\nthe transverse plane",
+                    transform=axes[0, 1].transAxes, fontsize=11, color="0.25",
+                    bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))''')
+# show the spin dipole in the rest panel too
+s = s.replace('''    panel(axes[0, 0], rho_rest, Ex_rest, Ez_rest,
+          r"(a)  at rest — isotropic Coulomb field")''',
+'''    panel(axes[0, 0], rho_rest, Ex_rest, Ez_rest,
+          r"(a)  at rest — isotropic Coulomb + spin dipole", showB=By_rest)''')
+
+# --- panel (c): stay inside the clean window ---------------------------------
+s = s.replace('''    half = slice(N // 2 + 1, N)
+    rr = g[half]''',
+'''    half = slice(N // 2 + 1, N)
+    rr = g[half]
+    ok = rr <= 8.0            # r < ~25% of L/2
+    rr = rr[ok]''')
+s = s.replace('ax.loglog(rr, Etr[half], color="#c0392b", lw=2.4, label=r"moving, transverse")',
+              'ax.loglog(rr, Etr[half][ok], color="#c0392b", lw=2.4, label=r"moving, transverse")')
+s = s.replace('ax.loglog(rr, Elo[half], color="#2471a3", lw=2.4, ls="--", label=r"moving, longitudinal")',
+              'ax.loglog(rr, Elo[half][ok], color="#2471a3", lw=2.4, ls="--", label=r"moving, longitudinal")')
+s = s.replace('ax.loglog(rr, Etr0[half], color="0.35", lw=1.8, ls=":", label="at rest")',
+              'ax.loglog(rr, Etr0[half][ok], color="0.35", lw=1.8, ls=":", label="at rest")')
+s = s.replace('''    ref = Etr[half][12] * (rr / rr[12]) ** -2
+    ax.loglog(rr, ref, color="0.6", lw=1.2, alpha=0.8)
+    ax.text(rr[20] * 1.1, ref[20] * 1.6, r"$1/r^2$", fontsize=13, color="0.45")''',
+'''    j = len(rr) - 6
+    ref = Etr[half][ok][j] * (rr / rr[j]) ** -2
+    ax.loglog(rr, ref, color="0.6", lw=1.2, alpha=0.8)
+    ax.text(rr[j] * 0.85, ref[j] * 2.2, r"$1/r^2$", fontsize=13, color="0.45")''')
+s = s.replace('''    i = np.argmin(np.abs(rr - 9.0))
+    ax.text(0.40, 0.88,
+            rf"$E_\\perp/E_\\parallel = {Etr[half][i] / Elo[half][i]:.1f}$ at "
+            rf"$m_Zr=9$" "\\n" rf"point charge: $\\gamma^3={gamma**3:.1f}$",
+            transform=ax.transAxes, fontsize=11.5, color="0.2")''',
+'''    i = np.argmin(np.abs(rr - 6.0))
+    ax.text(0.03, 0.14,
+            rf"$E_\\perp/E_\\parallel = {Etr[half][ok][i] / Elo[half][ok][i]:.1f}$ at "
+            rf"$m_Zr=6$" "\\n" rf"point charge limit: $\\gamma^3={gamma**3:.1f}$",
+            transform=ax.transAxes, fontsize=11.5, color="0.2",
+            bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))''')
+
+# --- panel (d): fit the Z slope further out, where the 1/r prefactor matters less
+s = s.replace('    m = (r_z * m_Z > 3) & (r_z * m_Z < 11)', '    m = (r_z * m_Z > 6) & (r_z * m_Z < 12)')
+f.write_text(s); print("patched")
+PY
+python3 - <<'PY'
+import pathlib
+f=pathlib.Path("/Users/oreilly/wavereality/waves/electroweak_py/electron_demo.py"); s=f.read_text()
+# By_rest needs to be cached and passed through
+s=s.replace("        By_mv=B_mv[1][:, c, :],","        By_mv=B_mv[1][:, c, :], By_rest=B_rest[1][:, c, :],")
+s=s.replace("Ex_mv, Ez_mv, By_mv, Etr, Elo, Etr0,","Ex_mv, Ez_mv, By_mv, By_rest, Etr, Elo, Etr0,")
+f.write_text(s); print("By_rest threaded")
+PY
+cd /Users/oreilly/wavereality/waves/electroweak_py && .venv/bin/python electron_demo.py 2>&1 | tail -4``
+  ```
+  patched
+  By_rest threaded
+  
+    Z panel on a finer grid: N=96, a=0.003, a*m_Z = 0.274, box = 26/m_Z
+  
+  wrote electron_fields.png  (cached in electron_results.pkl)
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+Found it — I transposed the field components in `streamplot`, which reflects a radial field about the diagonal and fakes a quadrupole. Fixing that plus panel (c) and (d):
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+
+# --- BUG: arrays are indexed [x, z]; the plot's x-axis IS z and y-axis IS x,
+#     so matplotlib already wants shape (n_x, n_z). The .T reflected the field
+#     about the diagonal, turning a monopole into a fake saddle pattern.
+s = s.replace('ax.contourf(g, g, rho.T / rho.max(), levels=[0.05, 0.3, 0.6, 1.0],',
+              'ax.contourf(g, g, rho / rho.max(), levels=[0.05, 0.3, 0.6, 1.0],')
+s = s.replace('sp = ax.streamplot(g, g, Ez.T, Ex.T, color="#c0392b", density=1.5,',
+              'sp = ax.streamplot(g, g, Ez, Ex, color="#c0392b", density=1.5,')
+s = s.replace('''            ax.contour(g, g, showB.T, levels=lev, colors="#2471a3",''',
+              '''            ax.contour(g, g, showB, levels=lev, colors="#2471a3",''')
+
+# --- panel (c): keep the 1/r^2 guide inside the data range, move the annotation
+s = s.replace('''    j = len(rr) - 6
+    ref = Etr[half][ok][j] * (rr / rr[j]) ** -2
+    ax.loglog(rr, ref, color="0.6", lw=1.2, alpha=0.8)
+    ax.text(rr[j] * 0.85, ref[j] * 2.2, r"$1/r^2$", fontsize=13, color="0.45")''',
+'''    j = len(rr) - 6
+    guide = rr >= 2.0
+    ref = Etr[half][ok][j] * (rr / rr[j]) ** -2
+    ax.loglog(rr[guide], ref[guide], color="0.55", lw=1.4, alpha=0.9)
+    ax.text(rr[j] * 0.80, ref[j] * 2.4, r"$1/r^2$", fontsize=13, color="0.4")''')
+s = s.replace('    ax.legend(loc="lower left", framealpha=0.95)\n    ax.grid(alpha=0.2, which="both")\n    i = np.argmin',
+              '    ax.legend(loc="upper right", framealpha=0.95)\n    ax.grid(alpha=0.2, which="both")\n    i = np.argmin')
+
+# --- panel (d): plot r*|A0| instead of |E|. Photon -> flat, Z -> pure e^{-m r}
+s = s.replace('''def radial_profile(pk, F, nb=48):''',
+'''def potential_profile(pk, J0, coupling, mass, nb=48):
+    """Radial profile of r*|A^0| (Lorenz gauge). Photon -> flat, Yukawa -> e^{-m r},
+    with no 1/r prefactor left to bias an exponential fit."""
+    KX, KY, KZ = pk.K
+    D = KX**2 + KY**2 + KZ**2 / pk.gamma**2 + mass**2
+    if mass == 0.0:
+        D = D.copy()
+        D[0, 0, 0] = np.inf
+    A0 = np.real(np.fft.ifftn(np.fft.fftn(coupling * J0) / D))
+    idx = np.arange(pk.N) * pk.a - pk.L / 2
+    X, Y, Z = np.meshgrid(idx, idx, idx, indexing="ij")
+    r = np.sqrt(X**2 + Y**2 + Z**2).ravel()
+    v = np.abs(A0).ravel() * r
+    edges = np.linspace(0, pk.L / 2, nb + 1)
+    w = np.digitize(r, edges) - 1
+    rs, fs = [], []
+    for b in range(nb):
+        sel = w == b
+        if sel.sum() > 16:
+            rs.append(r[sel].mean())
+            fs.append(v[sel].mean())
+    return np.array(rs), np.array(fs)
+
+
+def radial_profile(pk, F, nb=48):''')
+s = s.replace('''    r_em, f_em = radial_profile(fine, E_emf)
+    r_z, f_z = radial_profile(fine, E_Zf)''',
+'''    r_em, f_em = potential_profile(fine, J0f, -e_em, 0.0)
+    r_z, f_z = potential_profile(fine, J0f, gZ, P.m_Z)
+    del E_emf, E_Zf''')
+s = s.replace('ax.semilogy(r_em * m_Z, f_em, color="#c0392b", lw=2.6, label="photon (massless)")',
+              'ax.semilogy(r_em * m_Z, f_em, color="#c0392b", lw=2.6, label="photon: flat = pure $1/r$")')
+s = s.replace('ax.semilogy(r_z * m_Z, f_z, color="#1e8449", lw=2.6, label=r"$Z$ (massive)")',
+              'ax.semilogy(r_z * m_Z, f_z, color="#1e8449", lw=2.6, label=r"$Z$: $e^{-m_Z r}/r$")')
+s = s.replace('ax.set_ylabel("field strength")', 'ax.set_ylabel(r"$r\\,|A^0|$   (Lorenz gauge)")')
+f.write_text(s); print("patched")
+PY
+.venv/bin/python electron_demo.py 2>&1 | tail -3``
+  ```
+  patched
+    Z panel on a finer grid: N=96, a=0.003, a*m_Z = 0.274, box = 26/m_Z
+  
+  wrote electron_fields.png  (cached in electron_results.pkl)
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+Radial now, and panel (d) fits to exactly −1.00. Let me make the pancaking unmistakable with a field-magnitude background:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+s = s.replace('''    def panel(ax, rho, Ex, Ez, title, showB=None):
+        ax.contourf(g, g, rho / rho.max(), levels=[0.05, 0.3, 0.6, 1.0],
+                    cmap="Greys", alpha=0.55)
+        sp = ax.streamplot(g, g, Ez, Ex, color="#c0392b", density=1.5,
+                           linewidth=1.1, arrowsize=1.0)
+        if showB is not None:
+            lev = np.array([-0.7, -0.35, 0.35, 0.7]) * np.abs(showB).max()
+            ax.contour(g, g, showB, levels=lev, colors="#2471a3",
+                       linewidths=1.3, linestyles="-")''',
+'''    from matplotlib.colors import LogNorm
+    Emag_all = [np.sqrt(Ex**2 + Ez**2) for Ex, Ez in
+                ((Ex_rest, Ez_rest), (Ex_mv, Ez_mv))]
+    vhi = max(m.max() for m in Emag_all)
+    vlo = vhi / 3e3
+
+    def panel(ax, rho, Ex, Ez, title, showB=None):
+        # |E| as the background is what makes the pancaking visible: streamlines
+        # of a radial-ish field look radial either way, the anisotropy is in the
+        # magnitude at fixed radius.
+        mesh = ax.pcolormesh(g, g, np.clip(np.sqrt(Ex**2 + Ez**2), vlo, vhi),
+                             norm=LogNorm(vmin=vlo, vmax=vhi), cmap="inferno",
+                             shading="auto", rasterized=True)
+        ax.streamplot(g, g, Ez, Ex, color="w", density=1.1, linewidth=0.8,
+                      arrowsize=0.8)
+        ax.contour(g, g, rho / rho.max(), levels=[0.15, 0.6], colors="w",
+                   linewidths=1.0, linestyles="--", alpha=0.7)
+        if showB is not None:
+            lev = np.array([-0.6, -0.3, 0.3, 0.6]) * np.abs(showB).max()
+            ax.contour(g, g, showB, levels=lev, colors="#4fc3f7",
+                       linewidths=1.4, linestyles="-")
+        return mesh''')
+s = s.replace('''    panel(axes[0, 0], rho_rest, Ex_rest, Ez_rest,
+          r"(a)  at rest — isotropic Coulomb + spin dipole", showB=By_rest)''',
+'''    mesh = panel(axes[0, 0], rho_rest, Ex_rest, Ez_rest,
+                 r"(a)  at rest — isotropic Coulomb + spin dipole", showB=By_rest)''')
+s = s.replace('''    panel(axes[0, 1], rho_mv, Ex_mv, Ez_mv,
+          rf"(b)  moving, $v={v:.3f}c$ ($\\gamma={gamma:.2f}$) — pancaked", showB=By_mv)''',
+'''    panel(axes[0, 1], rho_mv, Ex_mv, Ez_mv,
+          rf"(b)  moving, $v={v:.3f}c$ ($\\gamma={gamma:.2f}$) — pancaked", showB=By_mv)
+    fig.colorbar(mesh, ax=axes[0, :], shrink=0.82, pad=0.015, label=r"$|E|$")''')
+s = s.replace('''                    fontsize=11, color="0.25",
+                    bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))''',
+'''                    fontsize=10.5, color="w",
+                    bbox=dict(fc="0.15", ec="none", alpha=0.6, pad=2.5))''')
+s = s.replace('''    axes[0, 1].text(0.03, 0.04, "field squeezed toward\\nthe transverse plane",
+                    transform=axes[0, 1].transAxes, fontsize=11, color="0.25",
+                    bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))''',
+'''    axes[0, 1].text(0.03, 0.04, "field squeezed toward\\nthe transverse plane",
+                    transform=axes[0, 1].transAxes, fontsize=10.5, color="w",
+                    bbox=dict(fc="0.15", ec="none", alpha=0.6, pad=2.5))''')
+s = s.replace('    ax.legend(loc="upper right", framealpha=0.95)\n    ax.grid(alpha=0.2, which="both")\n    i = np.argmin',
+              '    ax.legend(loc="lower left", framealpha=0.95)\n    ax.grid(alpha=0.2, which="both")\n    i = np.argmin')
+s = s.replace('    ax.text(0.03, 0.14,\n            rf"$E_\\perp/E_\\parallel',
+              '    ax.text(0.30, 0.90,\n            rf"$E_\\perp/E_\\parallel')
+s = s.replace('    ax.set_xlim(0, 15)', '    ax.set_xlim(0, 9.2)   # past ~0.7 L/2 the periodic images take over')
+s = s.replace('    fig.tight_layout(rect=(0, 0, 1, 0.925))', '    fig.tight_layout(rect=(0, 0, 0.995, 0.925))')
+f.write_text(s); print("patched")
+PY
+.venv/bin/python electron_demo.py --replot``
+  ```
+  patched
+  /Users/oreilly/wavereality/waves/electroweak_py/electron_demo.py:434: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+    fig.tight_layout(rect=(0, 0, 0.995, 0.925))
+  redrew electron_fields.png from electron_results.pkl
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+The `return mesh` landed before the axis-limit block, so the formatting was skipped. Let me read and fix that function properly:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `grep -n "def panel" -A 32 electron_demo.py | head -40``
+  ```
+  336:    def panel(ax, rho, Ex, Ez, title, showB=None):
+  337-        # |E| as the background is what makes the pancaking visible: streamlines
+  338-        # of a radial-ish field look radial either way, the anisotropy is in the
+  339-        # magnitude at fixed radius.
+  340-        mesh = ax.pcolormesh(g, g, np.clip(np.sqrt(Ex**2 + Ez**2), vlo, vhi),
+  341-                             norm=LogNorm(vmin=vlo, vmax=vhi), cmap="inferno",
+  342-                             shading="auto", rasterized=True)
+  343-        ax.streamplot(g, g, Ez, Ex, color="w", density=1.1, linewidth=0.8,
+  344-                      arrowsize=0.8)
+  345-        ax.contour(g, g, rho / rho.max(), levels=[0.15, 0.6], colors="w",
+  346-                   linewidths=1.0, linestyles="--", alpha=0.7)
+  347-        if showB is not None:
+  348-            lev = np.array([-0.6, -0.3, 0.3, 0.6]) * np.abs(showB).max()
+  349-            ax.contour(g, g, showB, levels=lev, colors="#4fc3f7",
+  350-                       linewidths=1.4, linestyles="-")
+  351-        return mesh
+  352-        ax.set_xlim(-win, win)
+  353-        ax.set_ylim(-win, win)
+  354-        ax.set_aspect("equal")
+  355-        ax.set_xlabel(r"$m_Z\,z$   (direction of motion)")
+  ...
+  ```
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+s = s.replace('''            ax.contour(g, g, showB, levels=lev, colors="#4fc3f7",
+                       linewidths=1.4, linestyles="-")
+        return mesh
+        ax.set_xlim(-win, win)
+        ax.set_ylim(-win, win)
+        ax.set_aspect("equal")
+        ax.set_xlabel(r"$m_Z\\,z$   (direction of motion)")
+        ax.set_ylabel(r"$m_Z\\,x$")
+        ax.set_title(title)
+        return sp''',
+'''            ax.contour(g, g, showB, levels=lev, colors="#4fc3f7",
+                       linewidths=1.4, linestyles="-")
+        ax.set_xlim(-win, win)
+        ax.set_ylim(-win, win)
+        ax.set_aspect("equal")
+        ax.set_xlabel(r"$m_Z\\,z$   (direction of motion)")
+        ax.set_ylabel(r"$m_Z\\,x$")
+        ax.set_title(title)
+        return mesh''')
+s = s.replace('''    fig.colorbar(mesh, ax=axes[0, :], shrink=0.82, pad=0.015, label=r"$|E|$")''',
+              '''    fig.colorbar(mesh2, ax=axes[0, 1], shrink=0.88, pad=0.02, label=r"$|E|$")''')
+s = s.replace('''    panel(axes[0, 1], rho_mv, Ex_mv, Ez_mv,
+          rf"(b)  moving, $v={v:.3f}c$ ($\\gamma={gamma:.2f}$) — pancaked", showB=By_mv)''',
+'''    mesh2 = panel(axes[0, 1], rho_mv, Ex_mv, Ez_mv,
+                  rf"(b)  moving, $v={v:.3f}c$ ($\\gamma={gamma:.2f}$) — pancaked",
+                  showB=By_mv)''')
+s = s.replace('''    axes[0, 0].text(0.03, 0.04, "grey = charge density\\nred = electric field\\n"
+                    "blue = magnetic field", transform=axes[0, 0].transAxes,''',
+'''    axes[0, 0].text(0.03, 0.03, "colour = $|E|$   white = field lines\\n"
+                    "dashed = charge density   cyan = $B$",
+                    transform=axes[0, 0].transAxes,''')
+s = s.replace('    fig.tight_layout(rect=(0, 0, 0.995, 0.925))', '    fig.tight_layout(rect=(0, 0, 1, 0.925))')
+f.write_text(s); print("ok")
+PY
+.venv/bin/python electron_demo.py --replot``
+  ```
+  ok
+  redrew electron_fields.png from electron_results.pkl
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+Layout's right and the pancaking is clear. Let me tighten the color range to the visible window for contrast, then finish:
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("electron_demo.py"); s=f.read_text()
+s = s.replace('''    Emag_all = [np.sqrt(Ex**2 + Ez**2) for Ex, Ez in
+                ((Ex_rest, Ez_rest), (Ex_mv, Ez_mv))]
+    vhi = max(m.max() for m in Emag_all)
+    vlo = vhi / 3e3''',
+'''    # normalise the colour scale to what is actually inside the plotted window,
+    # otherwise the near-field spike flattens everything else to one shade
+    inwin = np.abs(g) <= 6.0
+    sub = np.ix_(inwin, inwin)
+    vhi = max(np.sqrt(Ex**2 + Ez**2)[sub].max()
+              for Ex, Ez in ((Ex_rest, Ez_rest), (Ex_mv, Ez_mv)))
+    vlo = min(np.sqrt(Ex**2 + Ez**2)[sub].min()
+              for Ex, Ez in ((Ex_rest, Ez_rest), (Ex_mv, Ez_mv)))
+    vlo = max(vlo, vhi / 120.0)''')
+s = s.replace('''    axes[0, 0].text(0.03, 0.03, "colour = $|E|$   white = field lines\\n"
+                    "dashed = charge density   cyan = $B$",''',
+'''    axes[0, 0].text(0.03, 0.03, "colour $=|E|$    white $=$ field lines\\n"
+                    "dashed $=$ charge density    cyan $=B$",''')
+f.write_text(s); print("ok")
+PY
+.venv/bin/python electron_demo.py --replot``
+  ```
+  ok
+  redrew electron_fields.png from electron_results.pkl
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("README.md"); s=f.read_text()
+s = s.replace("| `w_source_demo.py` | driving the W field: Yukawa blob, evanescent vs radiating, cutoff at $m_W$ |",
+              "| `w_source_demo.py` | driving the W field: Yukawa blob, evanescent vs radiating, cutoff at $m_W$ |\n"
+              "| `electron_demo.py` | a free Dirac packet in motion and the fields it carries |")
+s = s.replace("python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)",
+              "python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)\n"
+              "python electron_demo.py   # -> electron_fields.png   (~8 s)")
+s = s.replace("""- **Fermions are absent**, so no Yukawa couplings and no top quark.""",
+"""- **Fermions are absent from `higgs_gauge.py`**, so no Yukawa couplings and no top
+  quark. `electron_demo.py` adds a standalone Dirac packet, but it is a *source* for
+  the gauge fields, not a dynamically coupled field: there is no back-reaction.
+- **`electron_demo.py` uses a 100 GeV lepton, not a real electron.** An electron's
+  Compton wavelength is 386 fm and the Z range is 0.0022 fm — a ratio of 1.8e5, so no
+  single lattice shows both. The electromagnetic structure is scale free and looks
+  the same either way; only the Z panel depends on the mass choice.""")
+f.write_text(s); print("README updated")
+PY
+ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
+  ```
+  README updated
+  -rw-r--r--  1 oreilly  staff    6727 Sep 20 13:03 README.md
+  -rw-r--r--  1 oreilly  staff   15650 Sep 19 18:05 demo.py
+  -rw-r--r--  1 oreilly  staff   19619 Sep 20 13:02 electron_demo.py
+  -rw-r--r--  1 oreilly  staff  419633 Sep 20 13:02 electron_fields.png
+  -rw-r--r--  1 oreilly  staff   20567 Sep 20 11:49 higgs_gauge.py
+  -rw-r--r--@ 1 oreilly  staff  402565 Sep 19 18:07 higgs_mechanism.png
+  -rw-r--r--@ 1 oreilly  staff  483421 Sep 20 10:55 higgs_potential.png
+  -rw-r--r--  1 oreilly  staff    6982 Sep 20 10:55 potential_plot.py
+  -rw-r--r--  1 oreilly  staff    8161 Sep 19 18:05 verify.py
+  -rw-r--r--@ 1 oreilly  staff  409550 Sep 20 12:10 w_source.png
+  -rw-r--r--  1 oreilly  staff   14006 Sep 20 12:10 w_source_demo.py
+  
+  ============================================================================
+  ALL CHECKS PASSED
+  ============================================================================
+  ```
+- **SendUserFile**: `status, caption, display, files`
+  ```
+  1 file delivered to user.
+  ```
+
+</details>
+
+Built — [electron_demo.py](electron_demo.py), runs in about 8 seconds.
+
+## What the fermion actually is
+
+A genuine Dirac wave packet: 4-component spinor, projected onto positive energy, evolved **exactly** in momentum space. After projection the evolution is just a phase, $\hat\psi(k,t) = e^{-iE_k t}\hat\psi(k,0)$, so there are no lattice doublers, no dispersion error, and no integrator to blame. Its conserved current $J^\mu = (\psi^\dagger\psi,\,\psi^\dagger\alpha^i\psi)$ sources the fields.
+
+Checks: norm conserved exactly, and $d\langle z\rangle/dt$ matches $\langle v_z\rangle$ to $8\times10^{-13}$ — Ehrenfest's theorem, satisfied to machine precision. Note $\langle v_z\rangle = 0.847$ rather than $p/E = 0.894$, because the packet has a momentum spread and $\langle p/E\rangle \ne p_c/E_c$.
+
+## The best thing in the figure
+
+**The electron's magnetic moment appeared without being asked for.** Look at the cyan contours in panel (a) — the packet is *at rest*, and there's still a magnetic field. It's a pure dipole: the net spatial current integrates to $6\times10^{-18}$ (no monopole) and $|B|$ falls as $1/r^3$. That's the Gordon decomposition's magnetization term — a spin-$\tfrac12$ field carries a magnetic moment, and it falls straight out of the Dirac equation.
+
+## The rest
+
+**(b)** At $v = 0.894c$ the field is visibly squeezed into the transverse plane, with the forward and backward directions going dark. $|B|_{\max}/|E|_{\max} = 0.869$ against $v = 0.894$ — approaching $B = v\times E$, the small deficit being the magnetization contribution and finite packet size.
+
+**(c)** $E_\perp/E_\parallel = 7.2$ at $m_Z r = 6$, against the point-charge limit $\gamma^3 = 11.2$. The gap is real and explained: the asymptotic result needs $\gamma\sigma \ll r \ll L/4$, and a periodic box squeezes that window. I verified the field solver separately with a rigid Gaussian, where the ratio climbs to 9.8 as the box grows — that check is in the script output.
+
+**(d)** Plotting $r|A^0|$ makes the comparison exact: the photon is flat (pure $1/r$), the Z is a clean exponential with **fitted slope −1.00**. Same charge density sources both; one reaches across the universe, the other stops at 0.0022 fm.
+
+And $W^\pm$ is identically zero, for the reason from earlier — the charged current turns an electron into a neutrino, so a one-lepton state has $\langle J^+\rangle = 0$. Nothing to plot.
+
+## Two honest caveats
+
+**It's a 100 GeV lepton, not an electron.** A real electron's Compton wavelength is 386 fm and the Z range is 0.0022 fm — a ratio of $1.8\times10^5$. No lattice holds both. The couplings and charge are the electron's; the electromagnetic structure is scale-free and identical for a real electron. Only panel (d)'s relative scale depends on the mass choice. Also worth noting the Z source is only 6.6% of the EM one, because $g_V = -\tfrac12 + 2\sin^2\theta_W \approx -0.054$ is accidentally near zero.
+
+**No back-reaction.** The packet sources the fields; the fields don't push back. That avoids the classical self-force problem, and it's why the steady-state solution is exact — uniform motion doesn't radiate.
+
+One bug worth recording since it'll recur in any WGSL port: my arrays are indexed `[x, z]` while the plot's horizontal axis *is* z, so matplotlib already wanted that shape. The `.T` I added reflected the field about the diagonal and turned a monopole into a convincing-looking saddle. It looked like a physics result rather than an indexing error, which is the dangerous kind.
+
+`verify.py` still passes all five checks.
+
+## 🧑 User - 2026-09-20 17:01:44
+
+now add a neutrino alongside for comparison
+
+## 🤖 Assistant - 2026-09-20 17:03:02
+
+*Model: claude-opus-5*
+
+Perfect comparison to make — the neutrino inverts the electron's situation. Let me check the couplings first:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, higgs_gauge as hg
+P = hg.Params(); sw2 = np.sin(P.theta_W)**2
+e_em = np.sqrt(4*np.pi/137.036); pref = P.g/(2*np.cos(P.theta_W))
+print(f"sin^2(theta_W) = {sw2:.4f}   e = {e_em:.4f}   g = {P.g:.4f}   g/(2 cos) = {pref:.4f}\n")
+print(f"{'':<10}{'T3':>7}{'Y':>7}{'Q=T3+Y':>9}{'g_V':>9}{'EM src':>10}{'Z src':>10}")
+for name,T3,Y in (("electron",-0.5,-0.5),("neutrino",+0.5,-0.5)):
+    Q = T3+Y; gV = T3 - 2*Q*sw2
+    print(f"{name:<10}{T3:>+7.1f}{Y:>+7.1f}{Q:>+9.1f}{gV:>+9.4f}{e_em*Q:>+10.4f}{pref*gV:>+10.4f}")
+gVe = -0.5+2*sw2; gVn = 0.5
+print(f"\n  neutrino Z source / electron Z source = {gVn/abs(gVe):.2f}x")
+print(f"  neutrino Z source / electron EM source = {pref*gVn/e_em:.3f}")
+print("  -> at short range the neutrino's Z field rivals the electron's Coulomb field;")
+print("     past ~1/m_Z it is gone and the electron's is not.")
+EOF``
+  ```
+  sin^2(theta_W) = 0.2230   e = 0.3028   g = 0.6533   g/(2 cos) = 0.3706
+  
+                 T3      Y   Q=T3+Y      g_V    EM src     Z src
+  electron     -0.5   -0.5     -1.0  -0.0540   -0.3028   -0.0200
+  neutrino     +0.5   -0.5     +0.0  +0.5000   +0.0000   +0.1853
+  
+    neutrino Z source / electron Z source = 9.26x
+    neutrino Z source / electron EM source = 0.612
+    -> at short range the neutrino's Z field rivals the electron's Coulomb field;
+       past ~1/m_Z it is gone and the electron's is not.
+  ```
+
+</details>
+
+The neutrino's Z source is 61% of the electron's Coulomb source and 9.3× the electron's own Z. Let me build the comparison:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f = pathlib.Path("electron_demo.py"); s = f.read_text()
+
+# ---- docstring -------------------------------------------------------------
+s = s.replace("""A single free lepton in motion, and the fields it carries with it.""",
+"""A free electron and a free neutrino in motion, and the fields they carry.
+
+Same wave packet for both -- identical mass, momentum and width -- so the only
+difference is the charges. Q = T^3 + Y gives the electron Q = -1 and the neutrino
+Q = 0, while the Z vector couplings g_V = T^3 - 2 Q sin^2(theta_W) come out
+-0.054 for the electron (accidentally tiny) and +0.500 for the neutrino. So the
+two particles trade places: the electron carries a long-range electric field and
+almost no Z, the neutrino carries no electric field at all and a Z field nine
+times the electron's.""")
+s = s.replace("""WHY THERE IS NO W FIELD. The charged current is off-diagonal in particle species
+(it turns an electron into a neutrino), so a one-lepton state has <J^+> = 0
+identically. Nothing to plot -- see w_source_demo.py for what does drive it.""",
+"""WHY THERE IS NO W FIELD, for either of them. The charged current is off-diagonal
+in particle species (it turns an electron into a neutrino), so a one-lepton state
+has <J^+> = 0 identically. Nothing to plot -- see w_source_demo.py for what does
+drive it.""")
+
+# ---- main: add the neutrino ------------------------------------------------
+s = s.replace("""    gV = -0.5 + 2 * sw2                       # electron vector coupling to Z
+    gZ = P.g / (2 * np.cos(P.theta_W)) * gV""",
+"""    pref = P.g / (2 * np.cos(P.theta_W))
+    gV = -0.5 + 2 * sw2                       # electron: T3=-1/2, Q=-1
+    gZ = pref * gV
+    gV_nu = +0.5                              # neutrino: T3=+1/2, Q=0
+    gZ_nu = pref * gV_nu""")
+s = s.replace("""    print(f"  |Z source| / |EM source| = {abs(gZ / (e_em)):.4f}")""",
+"""    print(f"  |Z source| / |EM source| = {abs(gZ / e_em):.4f}")
+    print(f"\\n  {'':<10}{'Q':>6}{'T3':>7}{'Y':>7}{'g_V':>9}{'EM src':>10}{'Z src':>10}")
+    for nm, T3, Y in (("electron", -0.5, -0.5), ("neutrino", +0.5, -0.5)):
+        Q = T3 + Y
+        gv = T3 - 2 * Q * sw2
+        print(f"  {nm:<10}{Q:>+6.0f}{T3:>+7.1f}{Y:>+7.1f}{gv:>+9.4f}"
+              f"{e_em * Q:>+10.4f}{pref * gv:>+10.4f}")
+    print(f"  neutrino Z source is {gV_nu / abs(gV):.2f}x the electron's Z source,"
+          f" and {pref * gV_nu / e_em:.2f}x the electron's EM source")""")
+s = s.replace("""    E_Z, _ = moving_fields(pk, J0, Jv, gZ, P.m_Z)""",
+"""    E_Z, _ = moving_fields(pk, J0, Jv, gZ, P.m_Z)
+    E_nu, _ = moving_fields(pk, J0, Jv, gZ_nu, P.m_Z)   # same packet, neutrino charges""")
+s = s.replace("""    r_em, f_em = potential_profile(fine, J0f, -e_em, 0.0)
+    r_z, f_z = potential_profile(fine, J0f, gZ, P.m_Z)""",
+"""    r_em, f_em = potential_profile(fine, J0f, -e_em, 0.0)
+    r_z, f_z = potential_profile(fine, J0f, gZ, P.m_Z)
+    r_nu, f_nu = potential_profile(fine, J0f, gZ_nu, P.m_Z)""")
+s = s.replace("""        Ex_mv=E_mv[0][:, c, :], Ez_mv=E_mv[2][:, c, :],""",
+"""        Ex_mv=E_mv[0][:, c, :], Ez_mv=E_mv[2][:, c, :],
+        Ex_nu=E_nu[0][:, c, :], Ez_nu=E_nu[2][:, c, :],
+        r_nu=r_nu, f_nu=f_nu, sw2=sw2,""")
+s = s.replace("""        r_em=r_em, f_em=f_em, r_z=r_z, f_z=f_z,
+    )""", """        r_em=r_em, f_em=f_em, r_z=r_z, f_z=f_z,
+    )
+    del E_nu""")
+f.write_text(s); print("main patched")
+PY
+grep -n "gZ_nu\|Ex_nu\|r_nu" electron_demo.py | head -12``
+  ```
+  main patched
+  224:    gZ_nu = pref * gV_nu
+  269:    E_nu, _ = moving_fields(pk, J0, Jv, gZ_nu, P.m_Z)   # same packet, neutrino charges
+  310:    r_nu, f_nu = potential_profile(fine, J0f, gZ_nu, P.m_Z)
+  321:        Ex_nu=E_nu[0][:, c, :], Ez_nu=E_nu[2][:, c, :],
+  322:        r_nu=r_nu, f_nu=f_nu, sw2=sw2,
+  ```
+
+</details>
+
+Now the 2×3 figure:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f = pathlib.Path("electron_demo.py"); s = f.read_text()
+i = s.index("def make_figure(")
+j = s.index('if __name__ == "__main__":')
+new = '''def make_figure(**kw):
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LogNorm
+
+    N, a, L, m_Z = kw["N"], kw["a"], kw["L"], kw["m_Z"]
+    v, gamma, mass, pz, sw2 = kw["v"], kw["gamma"], kw["mass"], kw["pz"], kw["sw2"]
+
+    plt.rcParams.update({
+        "font.size": 13, "axes.titlesize": 15, "axes.labelsize": 14,
+        "xtick.labelsize": 12, "ytick.labelsize": 12, "legend.fontsize": 11.5,
+    })
+    fig, axes = plt.subplots(2, 3, figsize=(19.5, 11.2))
+    g = (np.arange(N) * a - L / 2) * m_Z
+    win = 6.0
+
+    trio = ((kw["Ex_rest"], kw["Ez_rest"]), (kw["Ex_mv"], kw["Ez_mv"]),
+            (kw["Ex_nu"], kw["Ez_nu"]))
+    inwin = np.abs(g) <= win
+    sub = np.ix_(inwin, inwin)
+    # one shared colour scale across all three, so the panels are comparable
+    vhi = max(np.sqrt(Ex**2 + Ez**2)[sub].max() for Ex, Ez in trio)
+    vlo = vhi / 120.0
+
+    def panel(ax, rho, Ex, Ez, title, showB=None, lines=True):
+        mesh = ax.pcolormesh(g, g, np.clip(np.sqrt(Ex**2 + Ez**2), vlo, vhi),
+                             norm=LogNorm(vmin=vlo, vmax=vhi), cmap="inferno",
+                             shading="auto", rasterized=True)
+        if lines:
+            ax.streamplot(g, g, Ez, Ex, color="w", density=1.1, linewidth=0.8,
+                          arrowsize=0.8)
+        ax.contour(g, g, rho / rho.max(), levels=[0.15, 0.6], colors="w",
+                   linewidths=1.0, linestyles="--", alpha=0.7)
+        if showB is not None:
+            lev = np.array([-0.6, -0.3, 0.3, 0.6]) * np.abs(showB).max()
+            ax.contour(g, g, showB, levels=lev, colors="#4fc3f7",
+                       linewidths=1.4, linestyles="-")
+        ax.set_xlim(-win, win)
+        ax.set_ylim(-win, win)
+        ax.set_aspect("equal")
+        ax.set_xlabel(r"$m_Z\\,z$   (direction of motion)")
+        ax.set_ylabel(r"$m_Z\\,x$")
+        ax.set_title(title)
+        return mesh
+
+    tag = dict(fc="0.12", ec="none", alpha=0.65, pad=2.5)
+    panel(axes[0, 0], kw["rho_rest"], kw["Ex_rest"], kw["Ez_rest"],
+          r"(a)  electron at rest — Coulomb + spin dipole", showB=kw["By_rest"])
+    axes[0, 0].text(0.03, 0.03, "colour $=|E|$    white $=$ field lines\\n"
+                    "dashed $=$ charge density    cyan $=B$",
+                    transform=axes[0, 0].transAxes, fontsize=10.5, color="w", bbox=tag)
+
+    panel(axes[0, 1], kw["rho_mv"], kw["Ex_mv"], kw["Ez_mv"],
+          rf"(b)  electron, $v={v:.3f}c$ — pancaked", showB=kw["By_mv"])
+    axes[0, 1].annotate("", xy=(4.6, 0), xytext=(2.4, 0),
+                        arrowprops=dict(arrowstyle="-|>", color="w", lw=2.6))
+
+    mesh = panel(axes[0, 2], kw["rho_mv"], kw["Ex_nu"], kw["Ez_nu"],
+                 rf"(c)  neutrino, $v={v:.3f}c$ — $Z$ field only")
+    axes[0, 2].annotate("", xy=(4.6, 0), xytext=(2.4, 0),
+                        arrowprops=dict(arrowstyle="-|>", color="w", lw=2.6))
+    axes[0, 2].text(0.03, 0.03, "identical wave packet.\\n"
+                    "$Q=0$, so no electric field\\nat any distance.",
+                    transform=axes[0, 2].transAxes, fontsize=10.5, color="w", bbox=tag)
+    fig.colorbar(mesh, ax=axes[0, 2], shrink=0.88, pad=0.02,
+                 label=r"field strength (shared scale)")
+
+    # (d) transverse vs longitudinal --------------------------------------
+    ax = axes[1, 0]
+    half = slice(N // 2 + 1, N)
+    rr = g[half]
+    ok = rr <= 8.0
+    rr = rr[ok]
+    ax.loglog(rr, kw["Etr"][half][ok], color="#c0392b", lw=2.4, label="moving, transverse")
+    ax.loglog(rr, kw["Elo"][half][ok], color="#2471a3", lw=2.4, ls="--",
+              label="moving, longitudinal")
+    ax.loglog(rr, kw["Etr0"][half][ok], color="0.35", lw=1.8, ls=":", label="at rest")
+    j = len(rr) - 6
+    guide = rr >= 2.0
+    ref = kw["Etr"][half][ok][j] * (rr / rr[j]) ** -2
+    ax.loglog(rr[guide], ref[guide], color="0.55", lw=1.4, alpha=0.9)
+    ax.text(rr[j] * 0.80, ref[j] * 2.4, r"$1/r^2$", fontsize=13, color="0.4")
+    i = np.argmin(np.abs(rr - 6.0))
+    ax.text(0.30, 0.90,
+            rf"$E_\\perp/E_\\parallel = {kw['Etr'][half][ok][i] / kw['Elo'][half][ok][i]:.1f}$"
+            rf" at $m_Zr=6$" "\\n" rf"point-charge limit: $\\gamma^3={gamma**3:.1f}$",
+            transform=ax.transAxes, fontsize=11.5, color="0.2",
+            bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.5))
+    ax.set_xlabel(r"distance,  $m_Z\\,r$")
+    ax.set_ylabel(r"$|E|$")
+    ax.set_title(r"(d)  electron: boosted $\\perp$, suppressed $\\parallel$")
+    ax.legend(loc="lower left", framealpha=0.95)
+    ax.grid(alpha=0.2, which="both")
+
+    # (e) all three reaches on one plot ------------------------------------
+    ax = axes[1, 1]
+    ax.semilogy(kw["r_em"] * m_Z, kw["f_em"], color="#c0392b", lw=2.8,
+                label=r"electron, photon")
+    ax.semilogy(kw["r_nu"] * m_Z, kw["f_nu"], color="#8e44ad", lw=2.8,
+                label=r"neutrino, $Z$")
+    ax.semilogy(kw["r_z"] * m_Z, kw["f_z"], color="#1e8449", lw=2.4, ls="--",
+                label=r"electron, $Z$")
+    ax.axvline(1.0, color="0.5", lw=1.2, ls=":")
+    ax.text(1.15, 3e-7, r"$r = 1/m_Z$", fontsize=11, color="0.4")
+    ax.set_xlim(0, 9.2)
+    ax.set_xlabel(r"distance,  $m_Z\\,r$")
+    ax.set_ylabel(r"$r\\,|A^0|$   (Lorenz gauge)")
+    ax.set_title("(e)  flat $=$ infinite reach, sloped $=$ screened")
+    ax.legend(loc="upper right", framealpha=0.95)
+    ax.grid(alpha=0.2, which="both")
+    ax.text(0.04, 0.10,
+            "at $r\\\\to 0$ the neutrino's $Z$ is\\n"
+            "61% of the electron's Coulomb field;\\n"
+            r"by $m_Zr=9$ it is down $10^{4}$",
+            transform=ax.transAxes, fontsize=11, color="0.25")
+
+    # (f) the quantum numbers ----------------------------------------------
+    ax = axes[1, 2]
+    ax.axis("off")
+    e_em = np.sqrt(4 * np.pi / 137.036)
+    pref = 0.6533 / (2 * np.cos(np.arcsin(np.sqrt(sw2))))
+    rows = [("", "Q", "T³", "Y", "g_V", "EM", "Z")]
+    for nm, T3, Y in (("electron", -0.5, -0.5), ("neutrino", +0.5, -0.5)):
+        Q = T3 + Y
+        gv = T3 - 2 * Q * sw2
+        rows.append((nm, f"{Q:+.0f}", f"{T3:+.1f}", f"{Y:+.1f}", f"{gv:+.3f}",
+                     f"{e_em * Q:+.3f}", f"{pref * gv:+.3f}"))
+    xs = [0.02, 0.36, 0.47, 0.59, 0.73, 0.87, 1.00]
+    ax.text(0.5, 1.0, r"$Q = T^3 + Y$   and   $g_V = T^3 - 2Q\\sin^2\\theta_W$",
+            ha="center", fontsize=13, transform=ax.transAxes)
+    for ri, row in enumerate(rows):
+        yy = 0.90 - ri * 0.085
+        for xi, (x, cell) in enumerate(zip(xs, row)):
+            ax.text(x, yy, cell, fontsize=12.5, family="monospace",
+                    weight="bold" if ri == 0 else "normal",
+                    ha="left" if xi == 0 else "right", transform=ax.transAxes,
+                    color="0.15" if ri == 0 else "0.25")
+    ax.plot([0.02, 1.0], [0.60, 0.60], color="0.8", lw=1.0,
+            transform=ax.transAxes, clip_on=False)
+    ax.text(0.02, 0.535,
+            "The two swap roles. The electron's own $Z$\\n"
+            r"coupling is accidentally tiny because"
+            "\\n"
+            r"$\\sin^2\\theta_W \\approx 1/4$ nearly cancels $T^3$."
+            "\\n\\n"
+            "And note the couplings themselves:\\n"
+            r"$g = 0.653$ against $e = 0.303$."
+            "\\n"
+            "The weak coupling is twice the\\n"
+            "electromagnetic one. What makes the weak\\n"
+            r"force weak is $m_Z$, not the charge —"
+            "\\n"
+            "panel (e), not this table.",
+            fontsize=11.8, va="top", linespacing=1.45,
+            transform=ax.transAxes, color="0.2")
+
+    fig.suptitle(
+        rf"An electron and a neutrino as identical positive-energy Dirac packets "
+        rf"($m={mass:.0f}$ GeV, $p_z={pz:.0f}$ GeV) — only the charges differ"
+        "\\n"
+        r"Neither carries a $W$ field: the charged current turns one into the other, "
+        r"so a one-lepton state has $\\langle J^+\\rangle = 0$",
+        fontsize=15,
+    )
+    fig.tight_layout(rect=(0, 0, 1, 0.925))
+    fig.savefig("electron_fields.png", dpi=135)
+
+
+'''
+f.write_text(s[:i] + new + s[j:]); print("make_figure replaced")
+PY
+.venv/bin/python electron_demo.py 2>&1 | tail -18``
+  ```
+  make_figure replaced
+  
+    solving fields ...
+    |B|max / |E|max (moving) = 0.8694   (should approach v = 0.8944)
+    |B|max (at rest)         = 2.87e+01   NOT zero: this is the
+       electron's SPIN magnetic moment. Net current integrates to 5.8e-18 (pure dipole,
+       no monopole) and |B| falls as 1/r^3 -- it fell out of the Dirac equation, unasked.
+    at r = 0.100:  E_perp/E_par = 7.448   vs point-charge gamma^3 = 11.180
+  
+    solver check (rigid Gaussian, no Dirac): E_perp/E_par -> gamma^3 = 11.18
+      N=  96 a=0.004  L=0.38  r=0.112  ratio  6.680
+      N= 128 a=0.006  L=0.77  r=0.108  ratio  9.256
+      N= 160 a=0.007  L=1.12  r=0.112  ratio  9.845
+      (the packet panels use a smaller box, so they under-read; the window
+       gamma*sigma << r << L/4 is what a periodic box squeezes)
+  
+    Z panel on a finer grid: N=96, a=0.003, a*m_Z = 0.274, box = 26/m_Z
+  
+  wrote electron_fields.png  (cached in electron_results.pkl)
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+Panel (c) makes the point. Two fixes — the streamlines in (c) imply a field where there is none, and the (e) annotation should use measured numbers:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f = pathlib.Path("electron_demo.py"); s = f.read_text()
+s = s.replace('''    mesh = panel(axes[0, 2], kw["rho_mv"], kw["Ex_nu"], kw["Ez_nu"],
+                 rf"(c)  neutrino, $v={v:.3f}c$ — $Z$ field only")''',
+'''    # no streamlines here: drawing field lines across the black region would
+    # imply a field that is not there
+    mesh = panel(axes[0, 2], kw["rho_mv"], kw["Ex_nu"], kw["Ez_nu"],
+                 rf"(c)  neutrino, $v={v:.3f}c$ — $Z$ field only", lines=False)''')
+s = s.replace('''    ax.text(0.04, 0.10,
+            "at $r\\\\to 0$ the neutrino's $Z$ is\\n"
+            "61% of the electron's Coulomb field;\\n"
+            r"by $m_Zr=9$ it is down $10^{4}$",
+            transform=ax.transAxes, fontsize=11, color="0.25")''',
+'''    rn, fn, re_, fe = kw["r_nu"] * m_Z, kw["f_nu"], kw["r_em"] * m_Z, kw["f_em"]
+    i0 = int(np.argmax(fn))
+    i1 = int(np.argmin(np.abs(rn - 8.0)))
+    ax.text(0.035, 0.17,
+            "neutrino $Z$ vs electron photon:\\n"
+            rf"$\\times{fn[i0] / fe[i0]:.2f}$ at $m_Zr={rn[i0]:.1f}$,   "
+            rf"$\\times{fn[i1] / fe[i1]:.0e}$".replace("e-0", r"10^{-") + r"}$"
+            rf" at $m_Zr={rn[i1]:.0f}$",
+            transform=ax.transAxes, fontsize=11, color="0.25",
+            bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.0))''')
+f.write_text(s); print("ok")
+PY
+.venv/bin/python electron_demo.py --replot 2>&1 | tail -3``
+  ```
+  ok
+  redrew electron_fields.png from electron_results.pkl
+  [This command modified 1 file you've previously read: electron_demo.py. Call Read before editing.]
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+
+</details>
+
+The annotation formatting broke. Clean fix:
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f = pathlib.Path("electron_demo.py"); s = f.read_text()
+old = s[s.index('    rn, fn, re_, fe = kw["r_nu"]'):s.index('    # (f) the quantum numbers')]
+new = '''    rn, fn, fe = kw["r_nu"] * m_Z, kw["f_nu"], kw["f_em"]
+    i0, i1 = int(np.argmax(fn)), int(np.argmin(np.abs(rn - 8.0)))
+
+    def pw(x):
+        ex = int(np.floor(np.log10(x)))
+        return rf"{x / 10**ex:.1f}\\times 10^{{{ex}}}"
+
+    ax.text(0.035, 0.16,
+            "neutrino $Z$ / electron photon:\\n"
+            rf"${fn[i0] / fe[i0]:.2f}$ at $m_Zr={rn[i0]:.1f}$,"
+            rf"   ${pw(fn[i1] / fe[i1])}$ at $m_Zr=8$",
+            transform=ax.transAxes, fontsize=11, color="0.25",
+            bbox=dict(fc="w", ec="none", alpha=0.85, pad=2.0))
+
+'''
+f.write_text(s.replace(old, new)); print("ok")
+PY
+.venv/bin/python electron_demo.py --replot 2>&1 | tail -2``
+  ```
+  ok
+  redrew electron_fields.png from electron_results.pkl
+  ```
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/electron_fields.png``
+- **Bash**: `Ran `python3 - <<'PY'
+import pathlib
+f=pathlib.Path("README.md"); s=f.read_text()
+s = s.replace("| `electron_demo.py` | a free Dirac packet in motion and the fields it carries |",
+              "| `electron_demo.py` | a free electron and neutrino in motion, and the fields they carry |")
+s = s.replace("python electron_demo.py   # -> electron_fields.png   (~8 s)",
+              "python electron_demo.py   # -> electron_fields.png   (~10 s)")
+f.write_text(s); print("README updated")
+PY
+.venv/bin/python verify.py 2>&1 | tail -3 && ls -la *.py``
+  ```
+  README updated
+  ============================================================================
+  ALL CHECKS PASSED
+  ============================================================================
+  -rw-r--r--  1 oreilly  staff  15650 Sep 19 18:05 demo.py
+  -rw-r--r--  1 oreilly  staff  22840 Sep 20 19:05 electron_demo.py
+  -rw-r--r--  1 oreilly  staff  20567 Sep 20 11:49 higgs_gauge.py
+  -rw-r--r--  1 oreilly  staff   6982 Sep 20 10:55 potential_plot.py
+  -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
+  -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
+  ```
+- **SendUserFile**: `status, caption, display, files`
+  ```
+  1 file delivered to user.
+  ```
+
+</details>
+
+Added — same figure, now 2×3. [electron_demo.py](electron_demo.py), ~10 s.
+
+## The setup
+
+Both particles are the **identical wave packet** — same mass, momentum, width, spinor. The only thing changed is the charges, so every difference you see is traceable to two numbers:
+
+| | $Q = T^3+Y$ | $g_V = T^3 - 2Q\sin^2\theta_W$ | EM source | Z source |
+|---|---|---|---|---|
+| electron | $-1$ | $-0.054$ | $-0.303$ | $-0.020$ |
+| neutrino | $0$ | $+0.500$ | $0$ | $+0.185$ |
+
+**They swap roles completely.** The electron has a strong electric field and a nearly absent Z. The neutrino has no electric field at any distance and a Z field **9.3× the electron's**.
+
+Two accidents worth noting. The electron's Z coupling is tiny because $\sin^2\theta_W \approx 0.223$ is close to $1/4$, so $2Q\sin^2\theta_W$ nearly cancels $T^3 = -\tfrac12$ — nothing deep, just a numerical near-miss. And the neutrino gets no such cancellation because $Q = 0$ kills the second term outright, leaving the full $T^3 = +\tfrac12$.
+
+## Panel (c) is the one to look at
+
+Same colour scale as (b), same packet, same velocity. The electron's field fills the frame; the neutrino's is a compact blob that goes to **black** past about four Compton wavelengths. I removed the streamlines from that panel deliberately — drawing field lines across the dark region would imply a field that isn't there.
+
+Measured from panel (e): the neutrino's Z relative to the electron's photon is $0.21$ at $m_Z r = 1.2$, and $1.5\times10^{-3}$ by $m_Z r = 8$.
+
+## The payoff for the earlier question
+
+This is the "weak force isn't weak" point made visible. The neutrino's Z source is **61% of the electron's Coulomb source** — at short range the two particles carry comparable fields. What separates them is entirely the screening: one field is flat on the $r|A^0|$ plot (infinite reach), the other is a straight exponential line. And $g = 0.653$ against $e = 0.303$ — the weak coupling is twice the electromagnetic one.
+
+So the hierarchy between "electromagnetic" and "weak" that dominates everyday physics is not in the charges at all. It's in $m_Z$.
+
+## One caveat
+
+I gave the neutrino the electron's 100 GeV mass so the packets are strictly identical and the comparison isolates the charges. A real neutrino is below 0.1 eV and always ultra-relativistic, so its packet dynamics would be nothing like this — but the field structure, which is what the figure is about, depends only on the current and the couplings.
+
+Neither particle carries a W field, for the reason established earlier: the charged current maps one into the other, so a one-lepton state has $\langle J^+\rangle = 0$ identically.
+
+`verify.py` still passes all five checks.
+
+## 🧑 User - 2026-09-20 17:11:57
+
+what are the unitary gauge, temporal gauge, and lorenz gauge for the electroweak system, and, based on the maxwell equations, isn't the lorenz gauge the only physically realistic one (per special relativity)? which one are you using?
+
+## 🤖 Assistant - 2026-09-20 17:13:26
+
+*Model: claude-opus-5*
+
+Good question, and the premise has a real kernel in it that's worth separating from a misconception.
+
+## The gauge freedom you're fixing
+
+$SU(2)_L \times U(1)_Y$ has four parameters, each an arbitrary function of spacetime — $\alpha^{1,2,3}(x)$ and $\beta(x)$. A complete gauge fixing needs four conditions.
+
+| | condition | fixes | residual | good for | cost |
+|---|---|---|---|---|---|
+| **Unitary** | Goldstones $= 0$, i.e. $\Phi = \tfrac{1}{\sqrt2}(0, v+h)^T$ | 3 of 4 | $U(1)_{EM}$ still free | only physical particles in the spectrum | propagator $\sim k_\mu k_\nu/m^2$ doesn't fall off; renormalizability hidden. Exists **only** in the broken phase |
+| **Temporal** (Weyl) | $W^a_0 = B_0 = 0$ | 4, incompletely | time-independent $\lambda(\mathbf{x})$ | real-time evolution: a clean Hamiltonian system in the spatial components | not manifestly covariant; Gauss's law demoted to a constraint on initial data |
+| **Lorenz** | $\partial^\mu W^a_\mu = \partial^\mu B_\mu = 0$ | 4, incompletely | any $\lambda$ with $\Box\lambda = 0$ | manifest Lorentz covariance | needs Faddeev–Popov ghosts in the non-abelian sector |
+
+The one actually used for calculations is **$R_\xi$ gauge**, which interpolates between them: the gauge-fixing term is arranged to cancel the $W$–Goldstone mixing, giving Goldstones mass $\sqrt\xi\,m_W$ and ghosts alongside. $\xi = 1$ is Feynman–'t Hooft, $\xi = 0$ is Landau, and $\xi \to \infty$ recovers unitary gauge. 't Hooft's renormalizability proof lives here: you compute in $R_\xi$ where the UV behavior is manifest, and the $\xi$-dependence cancels from every physical amplitude.
+
+## Is Lorenz the only physically realistic one?
+
+No — but you've identified something real. **Lorenz gauge is the only one that is *manifestly* Lorentz covariant.** That is a genuine and useful property. It is not the same as being physically realistic.
+
+The reason: **the gauge potential is not an observable.** $A_\mu$, $W^a_\mu$, $B_\mu$ are bookkeeping. What's measurable is $E$, $B$, field strengths, masses, cross-sections — and those come out identical in every gauge. That's a theorem, and it's verified constantly in practice through $\xi$-independence.
+
+A non-covariant gauge describes a perfectly Lorentz-invariant theory whose invariance simply isn't visible term by term. The analogy is coordinates: writing a sphere in cylindrical coordinates hides its rotational symmetry, but the sphere is still round.
+
+Three concrete points against "Lorenz is the real one":
+
+- **Coulomb gauge is used constantly** in atomic physics and QED bound states, and gets the right answers. Lattice QCD frequently fixes **no gauge at all**, working directly with gauge-invariant link variables — strong evidence that the choice is bookkeeping.
+- **Lorenz gauge doesn't even fully fix the gauge.** The residual $\Box\lambda = 0$ leaves infinitely many representatives of the same physical configuration. It's not a state of the field; it's a partial choice of representative.
+- **The causality worry has a known resolution.** In Coulomb gauge, $A^0$ is the *instantaneous* Coulomb potential — apparently superluminal. But the observable $E$ and $B$ remain strictly causal: the instantaneous piece cancels against a compensating non-causal piece in the transverse field. This is exactly the case that makes people suspect non-covariant gauges are unphysical, and it's exactly the case where the suspicion is demonstrably wrong.
+
+## A subtlety that cuts across all this
+
+**A massive vector field has no gauge freedom at all.** Once you're in unitary gauge, the $W$ and $Z$ are Proca fields — the mass term breaks the invariance, all three polarizations are physical, and the condition $\partial^\mu W_\mu = 0$ is a *consequence of the equations of motion* for a conserved source, not a choice you get to make. Only the photon retains genuine gauge freedom below the electroweak scale.
+
+## Which I'm using
+
+Three different ones, deliberately, in different places:
+
+**[higgs_gauge.py](higgs_gauge.py) — temporal gauge**, $W^a_0 = B_0 = 0$. Stated at the top of the module. Chosen because it turns the system into straight Hamiltonian evolution of the spatial components, which is what makes the leapfrog integrator work. The price is that Gauss's law becomes a constraint on initial data rather than an equation of motion — and that is precisely the thing that bit us twice: the non-conserved source in `w_source_demo.py` and the forward-vs-backward difference mismatch. Both were temporal-gauge constraint violations.
+
+Note the Higgs there is **not** in unitary gauge: all four real components stay dynamical. That's deliberate — it's why you can see the three Goldstone modes as real massless waves when you set $g = g' = 0$.
+
+**Our derivations — unitary gauge.** Every time I wrote $\Phi = \tfrac{1}{\sqrt2}(0, v+h)^T$ and read off $m_W = gv/2$, that was unitary gauge.
+
+**[electron_demo.py](electron_demo.py) — Lorenz gauge**, explicitly, for the photon. For the Z it's automatic, since a Proca field with a conserved source satisfies the Lorenz condition identically.
+
+And here's the nice part: this is itself a gauge-invariance check. `demo.py` measures $m_W$ by evolving in **temporal gauge** and reading an oscillation frequency, and gets 80.4286 against the **unitary-gauge** tree-level formula $gv/2 = 80.4278$. Two different gauges, two entirely different procedures, agreeing to six digits. If gauge choice were physical, that wouldn't happen.
+
+## 🧑 User - 2026-09-20 17:33:27
+
+in standard EM / Maxwell (and then by extension, electroweak) in the Lorenz gauge, would using the diffusion instead of wave equation for A_0 more completely fix the gauge appropriately? i.e., in the wave equation, instead of using the $\nabla^2$ laplacian as the second temporal derivative, you use it as the first temporal derivative. This means that A_0 doesn't oscillate like a wave, but it would still give you the 1/r property.
+
+## 🤖 Assistant - 2026-09-20 17:35:05
+
+*Model: claude-opus-5*
+
+Sharp question, and it has a clean decisive answer — but the instinct behind it is right, and points at something that already exists.
+
+## The wave equation for $A^0$ *is* Gauss's law
+
+This is the two-line reason you can't swap the operator. Start from the definition of the electric field and take its divergence:
+
+$$\mathbf{E} = -\nabla A^0 - \partial_t\mathbf{A} \quad\Longrightarrow\quad \nabla\cdot\mathbf{E} = -\nabla^2 A^0 - \partial_t\left(\nabla\cdot\mathbf{A}\right)$$
+
+Now impose the Lorenz condition $\partial_t A^0 + \nabla\cdot\mathbf{A} = 0$, so $\nabla\cdot\mathbf{A} = -\partial_t A^0$:
+
+$$\nabla\cdot\mathbf{E} = -\nabla^2 A^0 + \partial_t^2 A^0 = \Box A^0$$
+
+And Gauss's law says $\nabla\cdot\mathbf{E} = \rho$. Therefore
+
+$$\Box A^0 = \rho$$
+
+**That's not a modelling choice — it's Gauss's law written in Lorenz gauge.** Replace $\Box$ with $\partial_t - \nabla^2$ and you are no longer solving $\nabla\cdot\mathbf{E} = \rho$. You'd have a theory in which charge does not source the divergence of the electric field.
+
+A second, independent failure: the Lorenz condition would stop being preserved. It survives in time only because $\Box(\partial\cdot A) = \partial\cdot J = 0$ — all four components evolving with the *same* operator is exactly what makes the condition self-consistent. Give $A^0$ a different operator and $\partial\cdot A$ drifts away from zero immediately, so you wouldn't be in Lorenz gauge after the first timestep.
+
+## And it would hurt the thing you're trying to protect
+
+Diffusion has **infinite signal speed**. A delta-function initial condition instantly has support everywhere, with tails outside the light cone. Its dispersion relation is $\omega = -ik^2$ — purely damped, no propagation, no light. And $\partial_t - \nabla^2$ is not a Lorentz scalar, so it singles out a frame.
+
+So a diffusive $A^0$ would be *less* relativistically respectable than the wave equation, not more. You'd be giving up manifest covariance and causality to get the one feature you already have.
+
+## But your instinct is correct, and there's a gauge that does it
+
+You're right that $A^0$ shouldn't be a propagating wave. Count the degrees of freedom:
+
+$$\underbrace{4}_{A_\mu} - \underbrace{1}_{\text{Lorenz condition}} - \underbrace{1}_{\text{residual }\Box\lambda=0} = 2 \ \text{transverse polarizations}$$
+
+$A^0$ and the longitudinal part of $\mathbf{A}$ are never physical, in any gauge. In Lorenz gauge $A^0$ *looks* like a wave, but it's a constrained combination that cancels against the longitudinal piece in every observable.
+
+**The gauge that makes this manifest already exists: Coulomb gauge**, $\nabla\cdot\mathbf{A} = 0$. Then the $A^0$ equation is
+
+$$\nabla^2 A^0 = -\rho$$
+
+Pure Poisson. No time derivative at all. Exactly $1/r$. Only the two transverse components of $\mathbf{A}$ propagate. That is precisely the structure you were reaching for — and it requires changing nothing, because it's still exactly Maxwell. Coulomb gauge also fully fixes the gauge, unlike Lorenz (residual $\nabla^2\lambda = 0$ forces $\lambda$ constant under sane boundary conditions), which answers your "more completely fix the gauge" question directly: Coulomb does, Lorenz doesn't.
+
+The price is the instantaneity paradox — $A^0$ responds with infinite speed. But $\mathbf{E}$ and $\mathbf{B}$ stay strictly causal, because the acausal piece cancels against a compensating term in the transverse field. Same resolution as before.
+
+## Where diffusion legitimately shows up
+
+Your idea isn't foreign to gauge theory — it just lives in a different time variable:
+
+- **Gauge fixing by gradient descent.** Landau gauge on the lattice is imposed by minimizing a functional, which is a diffusion equation in *fictitious* flow time. That genuinely does "more completely fix the gauge."
+- **Wilson / gradient flow**, $dA/d\tau = -\delta S/\delta A$ — a heat equation in flow time, standard for smoothing and scale setting in lattice QCD.
+- **Stochastic quantization** (Parisi–Wu), a Langevin equation in fictitious time.
+
+All three are diffusion in an auxiliary parameter, never in physical time.
+
+And one that may be what you actually want for the simulator: **divergence cleaning**. Dedner-style parabolic or hyperbolic cleaning adds a damping term specifically to suppress constraint drift ($\nabla\cdot\mathbf{B}$ errors, Gauss-law violation) in PIC and MHD codes. It's an explicit numerical modification that vanishes for exact solutions. Given that temporal gauge in `higgs_gauge.py` leaves Gauss's law as a drifting constraint, that's a legitimate tool — just labelled as numerics, not physics.
+
+## For the electroweak case
+
+Identical logic, four times over, plus one simplification: once the Higgs condenses, the $W$ and $Z$ are Proca fields with **no gauge freedom at all**. There's nothing left to fix there. Only the photon still carries a gauge redundancy worth choosing a convention for — and for that, the answer above applies unchanged.
+
+## 🧑 User - 2026-09-20 18:01:38
+
+My long-term goal for this project is to try to implement some kind of cellular-automaton like system that captures the relevant physics. This ends up being essentially identical to the lattice solution you implemented, with a fixed time step and grid spacing. So, in that context, Coulomb gauge is impossible because it is non-local. The wave equation has such a nice local form, but I've always been perplexed about how to actually enforce the Lorenz gauge. In this context, which of the above ways of "fixing" the Lorenz gauge would be local and physically realistic?
+
+## 🤖 Assistant - 2026-09-20 18:03:25
+
+*Model: claude-opus-5*
+
+This is the right question for that architecture, and the answer is better than you'd expect: **in Lorenz gauge you don't enforce anything. You set it once and the local dynamics preserves it exactly, forever.**
+
+## Why it's free
+
+Define the gauge function $\chi \equiv \partial_\mu A^\mu$. Apply $\partial_\mu$ to the equation of motion $\Box A^\mu = J^\mu$:
+
+$$\Box\chi = \partial_\mu J^\mu = 0$$
+
+$\chi$ obeys the **free wave equation**. So if $\chi = 0$ and $\dot\chi = 0$ on the initial slice, $\chi$ stays identically zero — propagated by the same local hyperbolic operator as everything else. No projection step, no solve, no per-timestep correction.
+
+That's the structural difference from Coulomb gauge. $\nabla\cdot\mathbf{A} = 0$ is an *elliptic* condition that must be re-imposed at every step, hence a global solve. $\partial_\mu A^\mu = 0$ is a *hyperbolic* condition that transports itself.
+
+And the two initial conditions have a pleasing interpretation:
+
+$$\chi(0) = 0 \quad\text{(the Lorenz condition itself)}$$
+$$\dot\chi(0) = \rho - \nabla\cdot\mathbf{E} = 0 \quad\Longleftrightarrow\quad \text{Gauss's law}$$
+
+So the recipe is: **initial data satisfying Gauss's law and the Lorenz condition, then four independent local wave equations, one per component.** Nearest-neighbour Laplacian, leapfrog in time. That's as automaton-shaped as it gets.
+
+## It holds exactly on the lattice too
+
+This isn't just a continuum argument. Apply the discrete divergence to the discrete equations of motion:
+
+$$D_t^2\chi - \Delta\chi = \underbrace{D_t J^0 + \textstyle\sum_i D_i J^i}_{\text{discrete }\partial\cdot J}$$
+
+The proof needs $D_t$ and $D_i$ to commute with $\Delta$ — and on a regular lattice every finite-difference operator is a polynomial in shift operators, which all commute. So it's exact, at machine precision, for any difference stencil you pick.
+
+## The one thing you actually have to get right
+
+**The current must satisfy the *discrete* continuity equation, using the same difference operators that define $\chi$.**
+
+That's the whole burden, and it's the thing that bit this project twice: the non-conserved source in the W demo, and then the forward-vs-backward difference mismatch where the source was divergence-free under $\partial^+$ while the constraint wanted $\partial^-$. Both times the symptom was a runaway longitudinal mode, and both times the fix was matching the operators exactly.
+
+This is a solved problem with a name. In PIC electromagnetics it's **charge-conserving current deposition** — Villasenor–Buneman, and Esirkepov's generalization — which constructs $\mathbf{J}$ on the grid so the discrete continuity equation holds to machine precision by construction. Combined with the **Yee/FDTD** staggered scheme, Gauss's law is then preserved exactly with purely local updates. Yee is essentially the canonical local electromagnetic automaton, and it's worth studying for the staggering pattern alone: $\mathbf{E}$ on edges, $\mathbf{B}$ on faces, which makes the discrete identities $\nabla\cdot\nabla\times = 0$ hold exactly rather than approximately.
+
+## The initial-data objection, and its answer
+
+A purist could object that setting up Gauss-satisfying initial data needs a global elliptic solve, which isn't local.
+
+True, but it's a one-off outside the automaton rule — and you can dodge it entirely: **start from vacuum** ($A = 0$, $E = 0$, $\rho = 0$, which satisfies everything trivially) and only ever create charge in **local neutral pairs**, moving it with a conserved current. Then Gauss's law is never violated and you never solve anything globally. Which is, not coincidentally, how nature does it.
+
+## Ranking the options for your case
+
+| approach | local? | cost per step | exactly Maxwell? |
+|---|---|---|---|
+| **Lorenz, constrained initial data** | yes | zero | yes |
+| Temporal gauge (current code) | yes | zero | yes, but Gauss drifts |
+| Dedner divergence cleaning | yes | small | no — damping term added |
+| Coulomb gauge | **no** | global solve | yes |
+
+Dedner's hyperbolic–parabolic cleaning is worth knowing about as a fallback: it introduces an auxiliary scalar that transports constraint error away at a chosen speed and damps it, all locally. It's a numerical device rather than physics, but if you ever accumulate error from a not-quite-conserving source, it's the honest way to bleed it off rather than pretending it isn't there.
+
+## What I'd actually recommend for a gauge–Higgs automaton
+
+For the abelian sector, Lorenz gauge with the recipe above is ideal — maximally local, exactly Maxwell, zero enforcement cost.
+
+For the full $SU(2)\times U(1)$ + Higgs, I'd point you at **compact link variables in temporal gauge** (Kogut–Susskind Hamiltonian lattice gauge theory — what CosmoLattice implements). The state is a group element on each *link*, gauge transformations act at *sites*, and the update rule is nearest-neighbour. That is an unusually natural automaton structure — arguably more natural than fields-on-sites, since the gauge connection genuinely is a link quantity. Gauss's law is preserved to machine precision by the discrete update given a conserved current, and you never fix a gauge at all, because every observable comes from gauge-invariant loops.
+
+The tradeoff versus what we built: non-compact potentials are far more readable and closer to the continuum equations you've been learning, which is why the Python reference uses them. Compact links are the right target for the WGSL kernel if you want exact constraint preservation and eventual access to topological physics.
+
+## 🧑 User - 2026-09-20 18:09:30
+
+cool -- that was actually my secret hope, that you just had to initialize everything the right way, and then the constraint would be automatically maintained thereafter, using the simple wave equation! so what is the best reference to cite for this?
+
+## 🤖 Assistant - 2026-09-20 18:10:00
+
+*Model: claude-opus-5*
+
+Let me verify the citations rather than quote section numbers from memory.
+
+<details>
+<summary>Tool Calls (5)</summary>
+
+- **WebSearch**: `Search `Lorenz gauge constraint propagation wave equation "d'Alembertian" preserved initial data numerical relativity Maxwell prototype``
+- **WebSearch**: `Search `Villasenor Buneman 1992 rigorous charge conservation local electromagnetic field solvers Esirkepov exact charge conservation PIC``
+  ```
+  Web search results for query: "Lorenz gauge constraint propagation wave equation "d'Alembertian" preserved initial data numerical relativity Maxwell prototype"
+  
+  Links: [{"title":"Multi-phase high frequency solutions to Klein-Gordon-Maxwell equations in Lorenz gauge in (3+1) Minkowski spacetime","url":"https://arxiv.org/pdf/2407.03554"},{"title":"The Initial-Boundary Value Problem in General Relativity","url":"https://arxiv.org/pdf/1009.0589"},{"title":"Linearised conformal Einstein field equations","url":"https://arxiv.org/pdf/2303.07385"},{"title":"Perturbations of Schwarzschild black holes in the Lorenz gauge: Formulation and numerical implementation","url":"https://arxiv.org/pdf/gr-qc/0510019"},{"title":"Coulomb Sectors and Scattering for Maxwell-Higgs Fields on Schwarzschild and Slowly Rotating Kerr Backgrounds","url":"https://arxiv.org/pdf/2603.04202"},{"title":"Well-posed formulation of Einstein-Maxwell effective field theory","url":"https://arxiv.org/pdf/2112.05603"},{"title":"Part III Gravitational Waves and Numerical Relativity Lecture Notes Abstract","url":"https://www.damtp.cam.ac.uk/user/us248/Lectures/Notes/gwnr.pdf"},{"title":"On the Quantisation of Linear Gauge Theories on Lorentzian Manifolds: Maxwell's Theory via Complete Gauge Fixing","url":"https://arxiv.org/pdf/2604.27026"},{"title":"The discrete energy method in numerical relativity: Towards long-term stability","url":"https://arxiv.org/pdf/gr-qc/0406116"}]
+  
+  Based on the search results, here's what I found regarding the Lorenz gauge constraint propagation in the context of wave equations and numerical relativity:
+  
+  ## Lorenz Gauge Constraint Propagation
+  
+  The Lorenz gauge condition propagates in time when solving hyperbolic systems. The mechanism works as follows:
+  
+  **Wave Equation Formulation:** Under the Lorenz gauge condition, Maxwell's equations reduce to wave equations (d'Alembertian equations) where the vector potential satisfies □ₘAᵥ = jᵥ.
+  
+  **Preservation of Initial Data:** When prescribing initial data that satisfy both the Lorenz gauge condition and the Maxwell constraint equation arising from Gauss's law, the Lorenz gauge condition remains satisfied for all time if the initial data are chosen so that the gauge variable and its time derivative vanish initially.
+  
+  **Mathematical Mechanism:** Taking the divergence of the Maxwell equation yields a wave equation for the gauge variable, which ensures constraint propagation through the d'Alembertian operator.
+  
+  **Maxwell as Prototype:** Maxwell's equations in the Lorentz gauge provide a wave equation formulation for the vector potential components, with the constraint that the gauge imposes being the requirement for the potential to be divergence-free. This serves as a prototype system for understanding how gauge constraints propagate in more complex systems like general relativity.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+  ```
+  Web search results for query: "Villasenor Buneman 1992 rigorous charge conservation local electromagnetic field solvers Esirkepov exact charge conservation PIC"
+  
+  Links: [{"title":"Rigorous charge conservation for local electromagnetic field solvers - ADS","url":"https://ui.adsabs.harvard.edu/abs/1992CoPhC..69..306V/abstract"},{"title":"Rigorous charge conservation for local electromagnetic field solvers - ScienceDirect","url":"https://www.sciencedirect.com/science/article/abs/pii/001046559290169Y"},{"title":"Distributed Parallelization of Exact Charge Conservative Particle Simulation Code by High Performance Fortran | Springer Nature Link","url":"https://link.springer.com/chapter/10.1007/978-3-540-77704-5_33"},{"title":"(PDF) Charge conservation methods for computing current densities in electromagnetic particle-in-cell simulations","url":"https://www.researchgate.net/publication/268206299_Charge_conservation_methods_for_computing_current_densities_in_electromagnetic_particle-in-cell_simulations"},{"title":"Rigorously conservative charge and current deposition in 3D cylindrical PIC | Computational Particle Mechanics | Springer Nature Link","url":"https://link.springer.com/article/10.1007/s40571-022-00513-6"},{"title":"A new charge conservation method in electromagnetic particle-in-cell simulations | Request PDF","url":"https://www.researchgate.net/publication/222052944_A_new_charge_conservation_method_in_electromagnetic_particle-in-cell_simulations"},{"title":"Intrinsic local Gauss's law preserving PIC method: A self-consistent field-particle update scheme for plasma simulations","url":"https://arxiv.org/pdf/2506.02407"},{"title":"Creation of Spatial Charge Separation in Plasmas with Rigorously Charge-Conserving Local Electromagnetic Field Solvers - ScienceDirect","url":"https://www.sciencedirect.com/science/article/abs/pii/S0021999102970774"},{"title":"Conservation de la charge dans les codes PIC","url":"https://www.researchgate.net/publication/243000864_Conservation_de_la_charge_dans_les_codes_PIC"},{"title":"Structure-Preserving Geometric Particle-in-Cell Methods for Vlasov-Maxwell Systems","url":"https://arxiv.org/pdf/1804.08823"}]
+  
+  Based on the search results, I found comprehensive information about these topics:
+  
+  ## Villasenor and Buneman (1992)
+  
+  Villasenor and Buneman presented a rigorous method for finding the electric field in two-and-one-half and three dimensional electromagnetic plasma simulations without resorting to computationally expensive transforms. A finite grid interpretation of the divergence equation ∇· J = -ϖρ/ϖt is offered which allows the current density and thus new local electric and magnetic field strengths to be determined directly from knowledge of charge motion. The paper was published in Computer Physics Communications in March 1992 (volume 69, pages 306-316).
+  
+  ## Esirkepov and Exact Charge Conservation in PIC
+  
+  Esirkepov published work on "Exact charge conservation scheme for Particle-in-Cell simulation with an arbitrary form-factor" in 2001. The current density or charge flux J is calculated and subtracted after the particles are moved later in the program employing a rigorous charge conservation method for the current density (Villasenor and Buneman 1992; Esirkepov 2001).
+  
+  ## Relationship Between Methods
+  
+  Charge conservation for PIC algorithms has been addressed by Eastwood, Villasenor and Buneman, and Esirkepov. These methods are complementary approaches to ensuring charge conservation in particle-in-cell simulations, with both the Villasenor-Buneman and Esirkepov methods being commonly cited in contemporary PIC code development.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+- **WebSearch**: `Search `Baumgarte Shapiro "Numerical Relativity" Maxwell equations prototype constraint propagation free evolution chapter``
+- **WebSearch**: `Search `Jackson Classical Electrodynamics third edition section 6.3 Lorenz gauge wave equation potentials gauge transformation``
+  ```
+  Web search results for query: "Baumgarte Shapiro "Numerical Relativity" Maxwell equations prototype constraint propagation free evolution chapter"
+  
+  Links: [{"title":"Constraint Propagation of 𝐶^2-adjusted Formulation II— Another Recipe for Robust Baumgarte-Shapiro-Shibata-Nakamura Evolution System —","url":"https://arxiv.org/html/1109.5782"},{"title":"A remedy for constraint growth in Numerical Relativity","url":"https://arxiv.org/html/gr-qc/0404036"},{"title":"Advantages of modified ADM formulation: constraint propagation analysis of Baumgarte-Shapiro-Shibata-Nakamura system","url":"https://arxiv.org/pdf/gr-qc/0204002"},{"title":"Numerical Relativity: Solving Einstein's Equations on the Computer - IOPscience","url":"https://iopscience.iop.org/article/10.1088/0264-9381/28/22/229002"},{"title":"BOOK REVIEW: Numerical Relativity: Solving Einstein's Equations on the Computer Numerical Relativity: Solving Einstein's Equations on the Computer - ADS","url":"https://ui.adsabs.harvard.edu/abs/2011CQGra..28v9002G/abstract"},{"title":"Numerical Relativity: Solving Einstein's Equations on the Computer - Thomas W. Baumgarte, Stuart L. Shapiro - Google Books","url":"https://books.google.com/books/about/Numerical_Relativity.html?id=dxU1OEinvRUC"},{"title":"A remedy for constraint growth in numerical relativity: the Maxwell case (Journal Article) | ETDEWEB","url":"https://www.osti.gov/etdeweb/biblio/20578907"},{"title":"Stuart L. Shapiro and Thomas W. Baumgarte - Numerical Relativity - Starting From Scratch (2021) | PDF | General Relativity | Gravity","url":"https://www.scribd.com/document/650045843/Stuart-L-Shapiro-and-Thomas-W-Baumgarte-Numerical-Relativity-Starting-from-Scratch-2021"},{"title":"Numerical Relativity","url":"https://www.cambridge.org/core/books/numerical-relativity/72D4F6D791BC6F8F9CF87A60FC354D6A"}]
+  
+  Based on the web search results, I found relevant information about your query:
+  
+  In Baumgarte and Shapiro's "Numerical Relativity" book, Chapter 2 includes an analogy with Maxwell's equations when discussing the constraints and the evolution equations. This chapter appears to use Maxwell's equations as a prototype system for understanding constraint propagation concepts in numerical relativity.
+  
+  Knapp, Walker, and Baumgarte introduced a formulation of Maxwell's equations which shares some features with the Baumgarte-Shapiro-Shibata-Nakamura formulation of Einstein equations. This demonstrates how Maxwell equations serve as an instructive model system for the more complex Einstein equations, particularly for understanding constraint propagation and free evolution.
+  
+  The search results indicate that the Maxwell equations prototype is specifically used in the pedagogical treatment of constraints and evolution equations in the context of the 3+1 formalism, which is central to numerical relativity methods discussed in their textbook.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+  ```
+  Web search results for query: "Jackson Classical Electrodynamics third edition section 6.3 Lorenz gauge wave equation potentials gauge transformation"
+  
+  Links: [{"title":"Note on Jackson's formalism of gauge transformation","url":"https://arxiv.org/pdf/2510.17054"},{"title":"Is the Lorenz Gauge a Choice? Gauge Freedom and the Structure of Electrodynamics","url":"https://arxiv.org/pdf/2509.00187"},{"title":"The physics of gauge transformations | American Journal of Physics | AIP Publishing","url":"https://pubs.aip.org/aapt/ajp/article-abstract/73/8/742/1056190/The-physics-of-gauge-transformations?redirectedFrom=fulltext"},{"title":"Gauge Invariance in Classical Electrodynamics","url":"https://arxiv.org/pdf/physics/0510070"},{"title":"From Lorenz to Coulomb and other explicit gauge ...","url":"https://arxiv.org/pdf/physics/0204034"},{"title":"Lecture notes on classical electrodynamics Ming-Che Chang","url":"https://phy.ntnu.edu.tw/~changmc/Teach/CE/latex/15.pdf"},{"title":"6.4 Lorenz gauge - Electromagnetism II","url":"https://fiveable.me/electromagnetism-ii/unit-6/lorenz-gauge/study-guide/s6D72dsV5DPQZwIn"},{"title":"Classical Electromagnetism Richard Fitzpatrick Professor of Physics","url":"https://farside.ph.utexas.edu/teaching/jk1/Electromagnetism.pdf"},{"title":"Classical Electrodynamics [3 ed.] 9780471309321","url":"https://dokumen.pub/classical-electrodynamics-3nbsped-9780471309321.html"}]
+  
+  Based on the search results, I found relevant information about Jackson's Classical Electrodynamics, third edition, Chapter 6, Section 6.3.
+  
+  Chapter 6 provides a rigorous treatment of potentials and gauge transformations, with Section 6.3 discussing the properties of the Lorenz gauge. 
+  
+  Jackson's text has the most systematic and in-depth discussions on gauge transformations of all classical electromagnetism textbooks.
+  
+  The search results indicate that Section 6.3 in Jackson's third edition covers the Lorenz gauge and its properties in relation to wave equations and potentials. The Lorenz gauge condition provides a way to fix the gauge freedom of electromagnetic potentials so that both the scalar and vector potentials satisfy symmetric, decoupled wave equations, making it the natural gauge choice for time-dependent and relativistic problems.
+  
+  Additionally, Chapter 6 includes sections on "Vector and Scalar Potentials," "Gauge Transformations, Lorenz Gauge, Coulomb Gauge," and "Green Functions for the Wave Equation", which are directly relevant to your query about the topics covered in Section 6.3.
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+- **WebSearch**: `Search `Knapp Walker Baumgarte "Illustrating stability properties of numerical relativity in electrodynamics" Physical Review D 2002 constraint``
+  ```
+  Web search results for query: "Knapp Walker Baumgarte "Illustrating stability properties of numerical relativity in electrodynamics" Physical Review D 2002 constraint"
+  
+  Links: [{"title":"Illustrating stability properties of numerical relativity in electrodynamics | Phys. Rev. D","url":"https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.064031"},{"title":"Illustrating stability properties of numerical relativity in electrodynamics (Journal Article) | ETDEWEB","url":"https://www.osti.gov/etdeweb/biblio/20467852"},{"title":"References - Numerical Relativity: Starting from Scratch","url":"https://www.cambridge.org/core/books/abs/numerical-relativity-starting-from-scratch/references/1E7169B16B486773146EEEE7AB9533D6"},{"title":"Illustrating Stability Properties of Numerical Relativity in Electrodynamics – arXiv Vanity","url":"https://www.arxiv-vanity.com/papers/gr-qc/0201051/"},{"title":"Numerical Relativity Beyond I+ | Request PDF","url":"https://www.researchgate.net/publication/253660608_Numerical_Relativity_Beyond_I"},{"title":"Numerical stability of the AA evolution system compared to the ADM and BSSN systems","url":"https://arxiv.org/pdf/gr-qc/0310100"},{"title":"Energy Norms and the Stability of the Einstein Evolution Equations","url":"https://arxiv.org/pdf/gr-qc/0206035"},{"title":"Re-formulating the Einstein equations for stable numerical simulations: Formulation Problem in Numerical Relativity","url":"https://arxiv.org/pdf/gr-qc/0209111"},{"title":"Hyperbolic formulations of General Relativity with Hamiltonian structure","url":"https://arxiv.org/pdf/1002.4119"},{"title":"General-Relativistic MHD for the Numerical Construction of Dynamical Spacetimes","url":"https://arxiv.org/pdf/astro-ph/0211340"}]
+  
+  I found the paper you're looking for. Here are the details:
+  
+  **Title:** "Illustrating stability properties of numerical relativity in electrodynamics"
+  
+  **Authors:** A. M. Knapp, E. J. Walker, and T. W. Baumgarte
+  
+  **Publication:** Physical Review D, Volume 65, Article 064031, published February 28, 2002
+  
+  **Main Contribution:** The paper demonstrates that a reformulation of the Arnowitt-Deser-Misner equations in general relativity, which has dramatically improved the stability properties of numerical implementations, has a direct analogue in classical electrodynamics. The authors numerically integrate both the original and the revised versions of Maxwell's equations, and show that their distinct numerical behavior reflects the properties found in linearized general relativity.
+  
+  The paper is available through the APS Physical Review website at https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.064031
+  
+  
+  REMINDER: You MUST include the sources above in your response to the user using markdown hyperlinks.
+  ```
+
+</details>
+
+Good news and slightly annoying news: the fact itself is a two-line identity that most texts state in passing without fanfare, so there's no single famous paper to point at. What *is* citable is the methodology built on it. Here's how I'd split it.
+
+## The terminology to search under
+
+The concept has a name in the literature — **"free evolution with constrained initial data"**, and the property is **"constraint propagation."** That vocabulary comes from numerical relativity, where it's the central methodological question, and searching those terms will get you much further than searching "Lorenz gauge enforcement."
+
+## For the continuum statement
+
+**Jackson, *Classical Electrodynamics*, 3rd ed., §6.3** ("Gauge Transformations, Lorenz Gauge, Coulomb Gauge"). This is the standard citation for $\Box A^\mu = J^\mu$ in Lorenz gauge and the residual freedom $\Box\lambda = 0$. Jackson's treatment of gauge transformations is the most thorough in the standard textbooks.
+
+Honestly though: the identity $\Box(\partial\cdot A) = \partial\cdot J$ is short enough that in a paper you'd just derive it inline and cite Jackson for the setup. It's not the kind of result that carries an attribution.
+
+## For the method — this is the real citation
+
+**Baumgarte & Shapiro, *Numerical Relativity: Solving Einstein's Equations on the Computer* (Cambridge, 2010).** Chapter 2 uses Maxwell's equations explicitly as the prototype for exactly your question: constraints versus evolution equations, and why constrained initial data plus free evolution works. Numerical relativists care about this more intensely than anyone, because for Einstein's equations the elliptic constraint solve is ruinously expensive — so "set it up right once, then evolve freely" is their whole strategy. Your instinct is their standard practice.
+
+For a paper rather than a book: **Knapp, Walker & Baumgarte, "Illustrating stability properties of numerical relativity in electrodynamics," [Phys. Rev. D 65, 064031 (2002)](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.064031)** ([gr-qc/0201051](https://www.arxiv-vanity.com/papers/gr-qc/0201051/)). They integrate different formulations of Maxwell numerically and show how constraint-violating modes behave — the EM analogue of the ADM-versus-BSSN story. Directly on point for "what actually happens to my constraint in a free-evolution code."
+
+Also worth knowing: **Alcubierre, *Introduction to 3+1 Numerical Relativity* (Oxford, 2008)** covers the same ground.
+
+## For the discrete requirement — the part that will actually bite you
+
+**Villasenor & Buneman, "Rigorous charge conservation for local electromagnetic field solvers," [Comput. Phys. Commun. 69, 306–316 (1992)](https://www.sciencedirect.com/science/article/abs/pii/001046559290169Y).** This is *the* citation for constructing a current that satisfies the **discrete** continuity equation exactly, so that Gauss's law is preserved to machine precision by a local solver. It is precisely the thing that went wrong twice in this project.
+
+Alongside it:
+- **Esirkepov, "Exact charge conservation scheme for particle-in-cell simulation with an arbitrary form-factor," Comput. Phys. Commun. 135, 144 (2001)** — the generalization, and what most modern PIC codes actually implement.
+- **Yee, IEEE Trans. Antennas Propag. 14, 302 (1966)** — the staggered FDTD scheme. Cite this for the grid layout; the staggering is what makes $\nabla\cdot\nabla\times = 0$ hold *exactly* on the lattice rather than approximately, which is half the reason the constraint survives.
+
+## For the fallback, if you ever need it
+
+- **Marder, "A method for incorporating Gauss' law into electromagnetic PIC codes," J. Comput. Phys. 68, 48 (1987)** — periodic correction passes.
+- **Dedner et al., "Hyperbolic divergence cleaning for the MHD equations," J. Comput. Phys. 175, 645 (2002)** — the local, hyperbolic version.
+
+## For the gauge–Higgs extension
+
+**Figueroa, Florio, Torrentí & Wachter, "The art of simulating the early Universe — Part I" ([arXiv:2006.15122](https://ar5iv.labs.arxiv.org/html/2006.15122))**, the CosmoLattice methods paper, treats Gauss-constraint preservation for $SU(2)\times U(1)$ + scalars on the lattice in detail. That's the closest published discussion to what you're actually building.
+
+## My suggestion
+
+If you're writing this up: cite **Jackson §6.3** for the gauge setup, derive the $\Box\chi = \partial\cdot J$ line yourself (it's two lines and self-evident once written), cite **Baumgarte & Shapiro Ch. 2** for the free-evolution methodology, and cite **Villasenor & Buneman** for the discrete charge-conservation requirement. That quartet covers the claim completely and each piece is standard in its own field.
+
+Sources: [Villasenor & Buneman 1992](https://www.sciencedirect.com/science/article/abs/pii/001046559290169Y) · [Knapp, Walker & Baumgarte 2002](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.65.064031) · [gr-qc/0201051](https://www.arxiv-vanity.com/papers/gr-qc/0201051/) · [Baumgarte & Shapiro, *Numerical Relativity*](https://www.cambridge.org/core/books/numerical-relativity/72D4F6D791BC6F8F9CF87A60FC354D6A) · [arXiv:2006.15122](https://ar5iv.labs.arxiv.org/html/2006.15122)
+
+## 🧑 User - 2026-09-20 18:33:15
+
+you wrote $B_\mu$ to talk about this four-potential , but various other sources seem to use $A^\mu$ when talking about the EM four potential. I know it is arbitrary until you actually put it in an equation, and people can (and do) even choose different sign conventions, but is using the lower index more standard in the context of electroweak?
+
+## 🤖 Assistant - 2026-09-20 18:34:22
+
+*Model: claude-opus-5*
+
+Two separate things are tangled in the question, and it's worth pulling them apart — the second one has a real answer.
+
+## First: $B_\mu$ is not the EM potential
+
+$B_\mu$ is the **hypercharge** gauge field, the one that couples to $Y$. The photon is a *mixture* of it with $W^3_\mu$:
+
+$$A_\mu = \sin\theta_W\,W^3_\mu + \cos\theta_W\,B_\mu, \qquad Z_\mu = \cos\theta_W\,W^3_\mu - \sin\theta_W\,B_\mu$$
+
+So when other sources write $A^\mu$ for "the EM four-potential," that's the same object I'd write as $A_\mu$ — but it isn't $B_\mu$. Before symmetry breaking there is no $A$; there is $B$ and $W^3$, and $A$ only exists as the combination that stays massless.
+
+## Second: yes, lower index is the norm in gauge theory
+
+Your observation is correct and there's a structural reason. Gauge fields live inside the covariant derivative:
+
+$$D_\mu = \partial_\mu - i g A_\mu$$
+
+$\partial_\mu = \partial/\partial x^\mu$ is intrinsically a **covector** — lower index. For $D_\mu$ to be a covector too, $A_\mu$ must be lower. Same for the gauge transformation, $A_\mu \to A_\mu + \tfrac{1}{g}\partial_\mu\lambda$, and for the field strength $F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu$.
+
+In the electroweak literature this is essentially universal, because the gauge fields almost never appear outside $D_\mu$ or $F_{\mu\nu}$:
+
+$$D_\mu = \partial_\mu - i g W^a_\mu T^a - i g' Y B_\mu$$
+
+You will see that written with lower indices in Peskin, Schwartz, Weinberg and the PDG without exception.
+
+## The deeper reason the lower position is "home"
+
+$A_\mu$ is defined **without a metric**. It's a connection one-form, $A = A_\mu\,dx^\mu$, and
+
+$$F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu$$
+
+needs no metric either — nor does the Bianchi identity. The metric only shows up when you build the *action*, $F_{\mu\nu}F^{\mu\nu}$, which requires $\eta^{\mu\nu}$ to raise indices.
+
+So the upper-index object $A^\mu = \eta^{\mu\nu}A_\nu$ is derived; $A_\mu$ is primitive. That's why gauge theory defaults to it.
+
+## Where upper indices legitimately show up
+
+Three places, all natural:
+
+- **Listing components.** $A^\mu = (\phi, \mathbf{A})$ — the ordinary 3-vector potential is the *contravariant* spatial part. This is why classical EM texts lean upper.
+- **Contractions.** $J^\mu A_\mu$, $F_{\mu\nu}F^{\mu\nu}$ — you need one up and one down.
+- **Wave equations.** $\Box A^\mu = J^\mu$, because $J^\mu = (\rho, \mathbf{J})$ is naturally upper.
+
+## The part that actually causes bugs
+
+Index placement isn't cosmetic once you write components. In $(+,-,-,-)$:
+
+$$A^\mu = (\phi,\ \mathbf{A}) \qquad A_\mu = (\phi,\ -\mathbf{A})$$
+$$\partial_\mu = (\partial_t,\ \nabla) \qquad \partial^\mu = (\partial_t,\ -\nabla)$$
+
+The spatial components flip sign. That's why the Lorenz condition comes out as
+
+$$\partial_\mu A^\mu = \partial_t\phi + \nabla\cdot\mathbf{A} = 0$$
+
+with a *plus* — two sign flips cancelling. Get the placement wrong and you'd write a minus and wonder why the constraint doesn't propagate.
+
+## The conventions I've been using
+
+Worth stating explicitly since you'll be porting this:
+
+- **Signature** $(+,-,-,-)$, mostly-minus, the particle-physics standard. (Relativity and string theory usually go mostly-plus.)
+- **Covariant derivative** $D_\mu = \partial_\mu - ig\,W^a_\mu T^a - ig'Y B_\mu$, with the *minus*. The opposite sign is also in use and is equivalent to flipping the sign of the charge — harmless as long as you don't mix the two.
+- **Hypercharge** $Q = T^3 + Y$ with $Y_\Phi = +1/2$.
+
+`higgs_gauge.py` implements exactly that minus sign, in `gauge_matrix_act`.
+
+## Practical suggestion
+
+Default to lower indices for every gauge field — $A_\mu$, $B_\mu$, $W^a_\mu$, $Z_\mu$ — and raise only when a contraction forces it. That matches the electroweak literature, keeps $D_\mu$ and $F_{\mu\nu}$ looking right, and means the one place you have to think about signs is the explicit component list, which is exactly where you want to be paying attention anyway.
+
+## 🧑 User - 2026-09-20 18:43:05
+
+back to gauge fixing: in practice you would always use something like the unitary gauge for the Higgs field specifically, right (with the real component of $\phi_0 = v$ getting the VEV)? but you don't need to *fix* the other 3 values to 0 -- they can update over time, but they are _initialized_ to 0. and likewise, $\phi_0$ can oscillate freely about v, right?
+
+## 🤖 Assistant - 2026-09-20 18:44:48
+
+*Model: claude-opus-5*
+
+Three separate claims in there, and they land differently. Let me take the easy one first.
+
+## $\phi^0$ oscillating about $v$ — yes, unambiguously
+
+That's the physical Higgs boson. $v$ is a **parameter of the potential** ($v^2 = -\mu^2/\lambda$), not a value the field is pinned to. In unitary gauge you write
+
+$$\Phi = \frac{1}{\sqrt2}\begin{pmatrix}0\\ v + h(x,t)\end{pmatrix}$$
+
+and $h$ is a fully dynamical field. That oscillation is exactly what `demo.py` measures — it reads off $\omega = 125.11$ GeV by kicking the radial direction and counting zero crossings.
+
+## Initializing the other three to zero — you can, but that isn't unitary gauge
+
+This is the substantive correction. Unitary gauge is a condition imposed **at all times**: $G^\pm = G^0 = 0$ for every $t$, maintained by a compensating gauge rotation at each step. Merely *initializing* them to zero and letting them run puts you in whatever gauge your evolution scheme already uses — temporal gauge, in our code — with a particular initial condition. Those are different things.
+
+**And they will not stay zero.** The term in $|D_\mu\Phi|^2$ that is linear in both the gauge field and the Goldstone,
+
+$$m_W\,W^\mu\partial_\mu G^\mp \;+\; m_Z\,Z^\mu\partial_\mu G^0$$
+
+drives them at *linear* order. This is the notorious gauge–Goldstone bilinear mixing, and cancelling it is the entire reason the $R_\xi$ gauge-fixing term has the form it does.
+
+## Why our measurements were clean anyway
+
+Worth spelling out, because it looks like a contradiction. In temporal gauge $W_0 = 0$, so the mixing term reduces to $W^j\partial_j G$. Then:
+
+- **$k=0$ (uniform fields):** $\partial_j G = 0$, so the mixing vanishes identically. That's why the mass spectroscopy in `demo.py` gave $m_W$ to six digits with no Goldstone contamination.
+- **Transverse waves:** polarization along $x$, propagation along $z$ gives $W^x\partial_x G = 0$. Clean — which is why the dispersion measurement was also exact.
+- **Longitudinal modes:** $W^z\partial_z G \neq 0$. These mix.
+
+And that last line isn't a nuisance, it's the physics: the Goldstone *is* the longitudinal polarization. The mixing is the mathematical statement of the eating.
+
+## Does the drift matter? No
+
+The Goldstone components are **not physical**. Whatever values they wander to, no observable depends on them. Letting them evolve freely in temporal gauge is perfectly correct — you're just letting the gauge drift within its orbit, which costs nothing.
+
+## Could you use unitary gauge in a CA? Surprisingly, yes — but don't
+
+Here's the part that might change your thinking: unlike Coulomb gauge, **unitary gauge is algebraically local.** At each site you compute the $SU(2)\times U(1)$ rotation $G(x)$ that takes $\Phi(x)$ to $(0, \text{real})^T$ — determined pointwise by $\Phi(x)$ alone — and apply it to the links, $U_j(x) \to G(x)\,U_j(x)\,G^\dagger(x+\hat j)$. Nearest-neighbour. Fully CA-compatible.
+
+It's also minimal: 1 scalar instead of 4, no redundancy.
+
+Two things kill it for your project, though:
+
+**It is singular wherever $\Phi \to 0$.** You can't define "rotate $\Phi$ to the neutral direction" when $\Phi$ has no direction. That rules out the symmetric phase, the tachyonic roll-off (which *starts* near zero — the roll-off demo would be impossible), and the cores of any vortices or defects. Given that watching symmetry breaking happen is presumably on your list, this alone is decisive.
+
+**You can't combine it with temporal gauge.** There are only four gauge parameters; unitary gauge consumes three of them, leaving just $U(1)_{EM}$. You cannot additionally set $W^a_0 = 0$ for the massive directions — those are Proca fields with no gauge freedom left. Instead $W^a_0$ becomes algebraically determined, $W^a_0 = (\rho^a - \nabla\cdot E^a)/m^2$, which is still local but is a different code structure from what you have.
+
+## What the code does, and what I'd recommend
+
+`higgs_gauge.py` evolves **all four real Higgs components in temporal gauge**, deliberately. That's also what CosmoLattice and the real-time lattice literature do. The three extra fields are redundant, and you pay for them in memory, but you buy: a single uniform local update rule with no case analysis, no singularities anywhere in field space, and the ability to run the symmetric phase and the transition.
+
+It also buys you something pedagogically useful that you've already seen — set $g = g' = 0$ and those three "redundant" components become genuine massless Goldstone waves you can watch propagate. In unitary gauge they simply don't exist as fields, so that demonstration isn't available.
+
+For the CA, I'd keep all four. Uniform locality is worth more than three floats per site, and the singularity at $\Phi = 0$ is not a corner case in a system whose whole point is that it started symmetric.
+
+## 🧑 User - 2026-09-20 18:51:42
+
+next question: the weak mixing angle is said to reflect the symmetry breaking. please explain why this is the case? my understanding is that symmetry breaking only fixes $\phi_0 = v$ as we've discussed. how does this result in the weak mixing angle?
+
+## 🤖 Assistant - 2026-09-20 18:52:47
+
+*Model: claude-opus-5*
+
+Your suspicion is well founded. Let me settle it numerically first, then explain what the phrase should mean.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, higgs_gauge as hg
+
+def k0(p, setup, probe, m_ref, n_per=25, spp=400):
+    dt = (2*np.pi/max(m_ref,1.0))/spp
+    st = hg.vacuum_state(p); setup(st)
+    t, y = hg.evolve_probe(st, p, dt, int(n_per*spp), probe)
+    return hg.frequency_from_zero_crossings(t, y)
+
+def measure(v, g, gp):
+    # 2^3 lattice: k=0 spectroscopy is EXACT for uniform fields, any a
+    p = hg.Params(N=2, a=1.0, v=v, lam=0.1291, g=g, gp=gp)
+    eps = 1e-3*v
+    mW = k0(p, *hg.perturb_W(p, eps), m_ref=p.m_W)
+    mZ = k0(p, *hg.perturb_Z(p, eps), m_ref=p.m_Z)
+    return mW, mZ
+
+base = hg.Params()
+print("A) vary v (the amount of symmetry breaking), hold g, g' fixed")
+print(f"{'v [GeV]':>9}{'m_W':>9}{'m_Z':>9}{'m_W/m_Z':>10}{'theta_W [deg]':>15}")
+for v in (40.0, 100.0, 180.0, 246.22, 400.0):
+    mW, mZ = measure(v, base.g, base.gp)
+    th = np.degrees(np.arccos(mW/mZ))
+    print(f"{v:>9.1f}{mW:>9.3f}{mZ:>9.3f}{mW/mZ:>10.6f}{th:>15.4f}")
+print(f"   predicted from couplings alone: arctan(g'/g) = "
+      f"{np.degrees(np.arctan(base.gp/base.g)):.4f} deg   (no v anywhere)")
+
+print("\nB) vary g' (a gauge coupling), hold v fixed at 246.22")
+print(f"{\"g'\":>9}{'m_W':>9}{'m_Z':>9}{'m_W/m_Z':>10}{'theta_W':>10}{'arctan(g/g)':>13}")
+for gp in (0.10, 0.25, 0.35, 0.50, 0.70):
+    mW, mZ = measure(base.v, base.g, gp)
+    th = np.degrees(np.arccos(mW/mZ))
+    print(f"{gp:>9.2f}{mW:>9.3f}{mZ:>9.3f}{mW/mZ:>10.6f}{th:>10.4f}"
+          f"{np.degrees(np.arctan(gp/base.g)):>13.4f}")
+EOF``
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, higgs_gauge as hg
+
+def k0(p, setup, probe, m_ref, n_per=25, spp=400):
+    dt = (2*np.pi/max(m_ref,1.0))/spp
+    st = hg.vacuum_state(p); setup(st)
+    t, y = hg.evolve_probe(st, p, dt, int(n_per*spp), probe)
+    return hg.frequency_from_zero_crossings(t, y)
+
+def measure(v, g, gp):
+    p = hg.Params(N=2, a=1.0, v=v, lam=0.1291, g=g, gp=gp)   # k=0 is exact on any lattice
+    eps = 1e-3*v
+    return k0(p, *hg.perturb_W(p, eps), m_ref=p.m_W), k0(p, *hg.perturb_Z(p, eps), m_ref=p.m_Z)
+
+base = hg.Params()
+print("A) vary v (how much symmetry breaking), hold g and g-prime fixed")
+print("  v [GeV]      m_W      m_Z   m_W/m_Z   theta_W [deg]")
+for v in (40.0, 100.0, 180.0, 246.22, 400.0):
+    mW, mZ = measure(v, base.g, base.gp)
+    print(f"{v:>9.1f}{mW:>9.3f}{mZ:>9.3f}{mW/mZ:>10.6f}{np.degrees(np.arccos(mW/mZ)):>14.4f}")
+print(f"   from couplings alone: arctan(g'/g) = {np.degrees(np.arctan(base.gp/base.g)):.4f} deg"
+      "   -- v does not appear")
+
+print("\nB) vary g-prime (a gauge coupling), hold v fixed at 246.22 GeV")
+print("  g-prime      m_W      m_Z   m_W/m_Z   theta_W    arctan(gp/g)")
+for gp in (0.10, 0.25, 0.35, 0.50, 0.70):
+    mW, mZ = measure(base.v, base.g, gp)
+    print(f"{gp:>9.2f}{mW:>9.3f}{mZ:>9.3f}{mW/mZ:>10.6f}"
+          f"{np.degrees(np.arccos(mW/mZ)):>10.4f}{np.degrees(np.arctan(gp/base.g)):>15.4f}")
+EOF``
+  ```
+  A) vary v (how much symmetry breaking), hold g and g-prime fixed
+    v [GeV]      m_W      m_Z   m_W/m_Z   theta_W [deg]
+       40.0   13.066   14.823  0.881470       28.1798
+      100.0   32.665   37.058  0.881470       28.1798
+      180.0   58.798   66.704  0.881470       28.1798
+      246.2   80.429   91.244  0.881470       28.1798
+      400.0  130.661  148.231  0.881470       28.1798
+     from couplings alone: arctan(g'/g) = 28.1798 deg   -- v does not appear
+  
+  B) vary g-prime (a gauge coupling), hold v fixed at 246.22 GeV
+    g-prime      m_W      m_Z   m_W/m_Z   theta_W    arctan(gp/g)
+       0.10   80.429   81.365  0.988487    8.7027         8.7027
+       0.25   80.429   86.116  0.933952   20.9405        20.9405
+       0.35   80.429   91.244  0.881470   28.1798        28.1798
+       0.50   80.429  101.281  0.794113   37.4284        37.4285
+       0.70   80.429  117.879  0.682300   46.9764        46.9764
+  ```
+
+</details>
+
+Your intuition is right, and the code settles it. I varied the amount of symmetry breaking by a factor of ten:
+
+```
+  v [GeV]      m_W      m_Z   m_W/m_Z   theta_W [deg]
+     40.0   13.066   14.823  0.881470       28.1798
+    100.0   32.665   37.058  0.881470       28.1798
+    246.2   80.429   91.244  0.881470       28.1798
+    400.0  130.661  148.231  0.881470       28.1798
+```
+
+**The angle doesn't move at all** — identical to four decimals while both masses change by an order of magnitude. Vary $g'$ instead and it tracks $\arctan(g'/g)$ exactly. So:
+
+$$\tan\theta_W = \frac{g'}{g}$$
+
+with no $v$, no $\lambda$, no $\mu^2$. The mixing angle is a **pure gauge-sector quantity**, fixed by two couplings that exist in the unbroken theory. Symmetry breaking does not set its value.
+
+A corollary worth noting: $\sin^2\theta_W$ *runs* with energy scale — about 0.231 at $m_Z$, different elsewhere — because $g$ and $g'$ run. A quantity determined by a single fixed vacuum configuration wouldn't do that.
+
+## So what does symmetry breaking actually contribute?
+
+**It makes the rotation mean something.**
+
+Before breaking, $W^3_\mu$ and $B_\mu$ are two *degenerate massless* gauge fields. Any orthogonal combination of them is as good as any other — there is no preferred basis, and therefore no meaningful angle. Asking "what is the mixing angle?" in the symmetric phase is like asking which direction is north in empty space.
+
+After breaking, the VEV generates a mass term
+
+$$|D_\mu\Phi|^2 \supset \frac{v^2}{8}\left(gW^3_\mu - g'B_\mu\right)^2$$
+
+whose mass matrix in the $(W^3, B)$ basis is
+
+$$M^2 = \frac{v^2}{4}\begin{pmatrix} g^2 & -gg' \\ -gg' & g'^2\end{pmatrix}$$
+
+This matrix is **rank one** — its determinant vanishes identically. So one eigenvalue is exactly zero no matter what $g$, $g'$ and $v$ are, which is the guarantee that a massless photon survives. The other eigenvalue is $(v^2/4)(g^2+g'^2)$, giving $m_Z$.
+
+Now the degeneracy is lifted, one specific basis is singled out — one massless field, one massive — and *that* basis is rotated from $(W^3, B)$ by $\theta_W$.
+
+So the clean statement is: **the couplings set the angle; the breaking makes it physical.** Both halves are needed, and the phrase you quoted collapses them.
+
+## What picks which rotation, precisely
+
+Two ingredients, neither of them $v$:
+
+1. **The ratio $g'/g$.**
+2. **The Higgs quantum numbers**, $T^3 = -\tfrac12$ and $Y = +\tfrac12$ on the component that gets the VEV. These determine which generator is left unbroken — $Q = T^3 + Y$ — and hence which field is the photon.
+
+Requiring the massless field to couple to $Q$ is exactly what forces $g\sin\theta_W = g'\cos\theta_W$.
+
+So the correct refinement of your statement "symmetry breaking only fixes $\phi^0 = v$": it fixes the **magnitude** $v$, which sets the mass *scale*, and it fixes the **direction in group space**, which sets *which generator survives*. The angle cares only about the direction. Your table above is the magnitude dropping out.
+
+## The version of the claim that is actually non-trivial
+
+Here's what I think the phrase is reaching for, and it's a real, testable statement.
+
+The same angle shows up in two logically independent places:
+
+- **In the masses:** $m_W/m_Z = \cos\theta_W$, which comes from the Higgs mass matrix.
+- **In the couplings:** the Z's coupling to fermions, $g_V = T^3 - 2Q\sin^2\theta_W$, which comes from rotating the gauge fields and has nothing to do with masses.
+
+You can measure $\sin^2\theta_W$ from Z-pole asymmetries or neutrino scattering, entirely from couplings, and separately measure $m_W/m_Z$. **That these give the same angle is the prediction**, packaged as
+
+$$\rho \equiv \frac{m_W^2}{m_Z^2\cos^2\theta_W} = 1$$
+
+and it holds at tree level **only because the Higgs is a doublet**. A triplet would give $\rho \ne 1$ and the two determinations would disagree. Measured: $\rho = 1$ to a few parts in $10^4$.
+
+*That* is the thing that reflects the symmetry breaking — not the angle's value, but the fact that one angle governs both sectors, which is a direct consequence of the breaking pattern being a doublet VEV.
+
+Our code shows the same identity: `demo.py` prints `m_W / (m_Z cos theta_W) = 1.000000`, where the masses are measured from oscillation frequencies and $\theta_W$ is computed from the couplings. Two independent routes, one angle.
+
+## Summary
+
+| quantity | depends on |
+|---|---|
+| $\theta_W$ | $g'/g$, and the Higgs representation — **not** $v$ |
+| $m_W$, $m_Z$ | $v$ **and** the couplings |
+| $m_W/m_Z$ | couplings only |
+| $m_\gamma = 0$ | guaranteed by $\det M^2 = 0$, for any parameters |
+| $\rho = 1$ | the Higgs being a **doublet** |
+
+## 🧑 User - 2026-09-20 19:03:49
+
+what exactly are $g$ and $g'$ again, and where do they come from? What is their relationship if any to the components of the Higgs doublet?
+
+## 🤖 Assistant - 2026-09-20 19:05:07
+
+*Model: claude-opus-5*
+
+Short answer to the last part first, since it's the crux: **none at all.** They're completely independent of the Higgs. Let me lay out where they do come from.
+
+## What they are
+
+One coupling constant per factor of the gauge group:
+
+$$\underbrace{SU(2)_L}_{g} \times \underbrace{U(1)_Y}_{g'}$$
+
+They enter in the covariant derivative,
+
+$$D_\mu = \partial_\mu - i\,g\,W^a_\mu T^a - i\,g'\,Y B_\mu$$
+
+and — for the non-abelian factor only — also in the field strength:
+
+$$F^a_{\mu\nu} = \partial_\mu W^a_\nu - \partial_\nu W^a_\mu + g\,\varepsilon^{abc}W^b_\mu W^c_\nu$$
+
+Note it's the **same $g$** in both places. That's not two parameters that happen to be equal; gauge invariance forces it. So the strength with which W bosons scatter off each other is locked to the strength with which they couple to matter — a genuine prediction, and one LEP tested directly through W-pair production.
+
+## Why exactly two
+
+For a **simple** group like $SU(2)$, you cannot give different generators different couplings. The commutator $[T^a, T^b] = i\varepsilon^{abc}T^c$ means the generators rotate into each other under the group, so a single coupling is the only invariant option. All three $W^a$ share $g$.
+
+$U(1)$ is abelian, so there's no such rigidity between different charges — instead, different fields simply carry different hypercharges $Y$, with one overall $g'$.
+
+A **product** group gets one coupling per factor. $SU(2)_L \times U(1)_Y$ has two factors, hence two couplings. Add colour and you get $g_s$ as the third.
+
+## Where they come from
+
+**They're free parameters.** The Standard Model does not predict them; they are measured. In practice the standard input set is
+
+$$\alpha,\quad G_F,\quad m_Z \;\longrightarrow\; g,\ g',\ v$$
+
+$\alpha$ gives $e = g\sin\theta_W$, $G_F$ gives $v = 246.22$ GeV, and $m_Z$ gives $\sqrt{g^2+g'^2}\,v/2$. Solving those three gives $g \approx 0.653$ and $g' \approx 0.350$ — the values in `higgs_gauge.py`. Everything else in the boson sector is then output, which is the whole content of that four-inputs-many-outputs point from earlier.
+
+## Their relationship to the Higgs doublet: none
+
+This is worth stating flatly. $g$ and $g'$ are **gauge-sector parameters that exist with or without a Higgs.** Delete the Higgs entirely and you still have massless $SU(2)\times U(1)$ Yang–Mills with those two couplings. They are logically prior to the scalar.
+
+The Higgs brings a separate, disjoint set of things:
+
+| from the gauge sector | from the Higgs |
+|---|---|
+| $g$, $g'$ (couplings) | $\mu^2$, $\lambda$ (potential parameters) |
+| | 4 real field components (dynamical) |
+| | $T = \tfrac12$, $Y = +\tfrac12$ (quantum numbers) |
+
+The only thing that links them is the covariant derivative: the Higgs is charged, so it couples to both gauge fields — with strengths $g$ and $g'$ that it did not choose.
+
+## What the components *do* determine
+
+Here's the part your question is circling, and it's real. The Higgs components don't set $g$ and $g'$, but their **quantum numbers** decide which combination of $g$ and $g'$ each component feels. Read off the diagonal of $g W^3 T^3 + g' Y B$ with $Y = +\tfrac12$:
+
+| component | $T^3$ | couples to |
+|---|---|---|
+| $\phi^+$ | $+\tfrac12$ | $\tfrac12\!\left(+gW^3 + g'B\right)$ |
+| $\phi^0$ | $-\tfrac12$ | $\tfrac12\!\left(-gW^3 + g'B\right)$ |
+
+The two components see **opposite signs of $g$** and the **same sign of $g'$**, purely because their $T^3$ differ while their $Y$ is shared. That sign flip is the whole story: it's why $\phi^0$ has $Q = T^3 + Y = 0$, why the VEV can sit there without breaking electromagnetism, and why the massive combination comes out as $gW^3 - g'B$ rather than anything else.
+
+So the components select the *combination*; the couplings supply the *weights*.
+
+## Two normalization traps
+
+- $T^a = \sigma^a/2$ (so $\mathrm{Tr}\,T^aT^b = \tfrac12\delta^{ab}$) is what fixes the scale of $g$. Use $T^a = \sigma^a$ instead and $g$ halves.
+- Only the product $g'Y$ is physical, so the hypercharge normalization must match the $g'$ definition. The two conventions we discussed — $Q = T^3 + Y$ with $Y_\Phi = \tfrac12$, versus $Q = T^3 + Y/2$ with $Y_\Phi = 1$ — are arranged so that $g' \approx 0.35$ either way, but mixing them will silently give you a factor of two.
+
+## Where they might actually come from
+
+"Free parameter" is where the SM stops, but not where speculation does. In a grand unified theory, $SU(2)_L$ and $U(1)_Y$ are embedded in a single **simple** group — $SU(5)$, $SO(10)$ — which by the argument above admits only **one** coupling. Then $g$ and $g'$ are equal at the unification scale, and their low-energy difference is entirely generated by renormalization-group running.
+
+Run the measured couplings up and they come close to meeting around $10^{15}$–$10^{16}$ GeV, but in the SM alone they miss. In the MSSM they come much closer, which is one of the historical arguments for supersymmetry. Suggestive, unconfirmed.
+
+## 🧑 User - 2026-09-20 19:18:12
+
+It is still not clear why the "observed" EM four-potential $A_\mu$ has to be some mix of W_3 and B -- why can't it just be pure B? This is presumably because Q is the sum of T_3 and Y_W? in general, this idea that the "real" observed EM four-potential is this weird mixed combination of other fields is really strange -- I want to understand why it might somehow make sense at a deeper level
+
+## 🤖 Assistant - 2026-09-20 19:19:14
+
+*Model: claude-opus-5*
+
+Let me demonstrate the decisive reason numerically before explaining it.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `.venv/bin/python - <<'EOF'
+import numpy as np, higgs_gauge as hg
+p = hg.Params(N=2, a=1.0)          # k=0 spectroscopy is exact on any lattice
+cA, aB = hg.photon_direction(p)    # A = cA*W3 + aB*B
+cZ, zB = hg.z_direction(p)         # Z = cZ*W3 + zB*B
+th = p.theta_W
+print(f"m_W={p.m_W:.2f}  m_Z={p.m_Z:.2f}  theta_W={np.degrees(th):.2f} deg")
+print(f"photon  A = {cA:+.4f} W3 {aB:+.4f} B      Z = {cZ:+.4f} W3 {zB:+.4f} B")
+
+# does the VEV care about each generator?  m^2 ~ |G <Phi>|^2
+print("\nDoes the generator move the vacuum?   <Phi> = (0, v/sqrt2)")
+for nm, T3, Y in (("W3  (T3)", -0.5, 0.0), ("B   (Y) ", 0.0, 0.5),
+                  ("Q=T3+Y  ", -0.5, 0.5)):
+    print(f"   {nm}:  (T3 + Y) acting on lower component = {T3+Y:+.1f}"
+          f"   -> {'ANNIHILATES it' if abs(T3+Y)<1e-12 else 'moves it -> mass'}")
+
+# perturb PURE B and watch what happens
+eps = 1e-3*p.v
+st = hg.vacuum_state(p); st.B[0] += eps
+dt = (2*np.pi/p.m_Z)/400
+probe = lambda s: (s.B[0,0,0,0]/eps,
+                   (cA*s.W[2,0,0,0,0] + aB*s.B[0,0,0,0])/eps,
+                   (cZ*s.W[2,0,0,0,0] + zB*s.B[0,0,0,0])/eps)
+t, y = hg.evolve_probe(st, p, dt, 400*6, probe)
+B, A, Z = (np.array([q[i] for q in y]) for i in range(3))
+print(f"\nperturb PURE B by eps, then evolve:")
+print(f"   photon projection : const at {A.mean():+.5f} +- {A.std():.2e}   -> frozen, massless")
+print(f"   Z projection      : oscillates, amplitude {np.abs(Z).max():.4f},"
+       f" omega = {hg.frequency_from_zero_crossings(t, Z):.3f}  (m_Z={p.m_Z:.3f})")
+print(f"   B itself          : ranges {B.min():+.4f} to {B.max():+.4f}"
+      f"   zero crossings: {int((np.signbit(B)[:-1]!=np.signbit(B)[1:]).sum())}")
+print(f"   expected split: photon fraction cos^2 = {np.cos(th)**2:.4f},"
+      f"  Z fraction sin^2 = {np.sin(th)**2:.4f}")
+print(f"   -> B never crosses zero: it is NOT a mode, it is a superposition.")
+print(f"\n   (if B *were* a mass eigenstate its mass would be the diagonal entry")
+print(f"    g'v/2 = {p.gp*p.v/2:.2f} GeV -- but the matrix is not diagonal, so that")
+print(f"    number is not an eigenvalue and no particle has it.)")
+EOF``
+  ```
+  m_W=80.43  m_Z=91.24  theta_W=28.18 deg
+  photon  A = +0.4722 W3 +0.8815 B      Z = +0.8815 W3 -0.4722 B
+  
+  Does the generator move the vacuum?   <Phi> = (0, v/sqrt2)
+     W3  (T3):  (T3 + Y) acting on lower component = -0.5   -> moves it -> mass
+     B   (Y) :  (T3 + Y) acting on lower component = +0.5   -> moves it -> mass
+     Q=T3+Y  :  (T3 + Y) acting on lower component = +0.0   -> ANNIHILATES it
+  
+  perturb PURE B by eps, then evolve:
+     photon projection : const at +0.88147 +- 4.32e-15   -> frozen, massless
+     Z projection      : oscillates, amplitude 0.4722, omega = 91.244  (m_Z=91.243)
+     B itself          : ranges +0.5540 to +1.0000   zero crossings: 0
+     expected split: photon fraction cos^2 = 0.7770,  Z fraction sin^2 = 0.2230
+     -> B never crosses zero: it is NOT a mode, it is a superposition.
+  
+     (if B *were* a mass eigenstate its mass would be the diagonal entry
+      g'v/2 = 43.09 GeV -- but the matrix is not diagonal, so that
+      number is not an eigenvalue and no particle has it.)
+  ```
+
+</details>
+
+The code gives a sharper answer than "it just is." Here's what happens when you perturb pure $B$ and let it evolve:
+
+```
+photon projection : const at +0.88147 +- 4e-15   -> frozen, massless
+Z projection      : oscillates, omega = 91.244   (m_Z = 91.243)
+B itself          : ranges +0.554 to +1.000, zero crossings: 0
+```
+
+**$B$ isn't a particle.** It doesn't oscillate at any frequency — it splits into a frozen piece (fraction $\cos^2\theta_W = 0.777$) and a piece ringing at $m_Z$ (fraction $\sin^2\theta_W = 0.223$). Asking "why isn't the photon just $B$?" is like asking why a normal mode of two coupled pendulums isn't pendulum number one.
+
+## Two independent reasons it can't be $B$
+
+**1. $B$ would be massive.** A gauge field gets mass exactly when its generator moves the vacuum. Check all three:
+
+| generator | acting on $\langle\Phi\rangle$ | |
+|---|---|---|
+| $T^3$ | $-\tfrac12$ | moves it → mass |
+| $Y$ | $+\tfrac12$ | moves it → mass |
+| $Q = T^3 + Y$ | $0$ | **annihilates it → massless** |
+
+Hypercharge does *not* leave the vacuum alone. So a pure-$B$ photon would be massive — the diagonal entry of the mass matrix is $g'v/2 = 43.1$ GeV, giving electromagnetism a range of 0.0046 fm. No atoms. Only the sum $T^3 + Y$ is blind to the condensate.
+
+**2. Electromagnetism would be chiral.** If charge were $Y$, the two chiralities of the electron would carry different charges:
+
+| | $T^3$ | $Y$ | $Q = T^3+Y$ |
+|---|---|---|---|
+| $e_L$ | $-\tfrac12$ | $-\tfrac12$ | $-1$ |
+| $e_R$ | $0$ | $-1$ | $-1$ |
+
+Different $Y$, **same $Q$**. The combination is precisely the one that makes QED parity-conserving out of a chiral theory. Pure $B$ would give $e_L$ and $e_R$ charges $-\tfrac12$ and $-1$, which is not the world.
+
+## Why this should feel less strange
+
+**There are two natural bases and no reason they'd agree.** $(W^3, B)$ is the basis in which the *gauge group factorizes* as $SU(2)\times U(1)$ — natural for writing the Lagrangian. $(A, Z)$ is the basis in which the *mass matrix is diagonal* — natural for identifying particles. These are answers to two unrelated questions. The gauge group structure knows nothing about where the Higgs vacuum happens to sit, so the two bases generically differ by some angle. That angle is $\theta_W$.
+
+**The unbroken subgroup is a property of the vacuum, not of how you factored the group.** Formally, $H = \{h \in G : h\langle\Phi\rangle = \langle\Phi\rangle\}$ — the *stabilizer* of a point in field space. There's no principle saying the stabilizer of an arbitrary point should line up with one of the factors you chose to write $G$ as a product of. It would be a coincidence if it did.
+
+**Mixing is the norm in the Standard Model, not the exception.** Neutrino flavour eigenstates aren't mass eigenstates (PMNS). Quark weak eigenstates aren't mass eigenstates (CKM). Every time one physical criterion (how something interacts) and another (how it propagates) each define a basis, you get a rotation between them. The photon/Z case is the same phenomenon in the gauge sector — and it's actually the *simplest* instance, being a single angle rather than a $3\times3$ matrix.
+
+## The reframe that I think actually dissolves it
+
+You called $A_\mu$ "the real observed" field and the mixture "weird." Try inverting that.
+
+**Above the electroweak scale there is no photon.** $W^a$ and $B$ exist at all temperatures; the photon exists only below the crossover, as the combination that survives. So the photon is the *emergent, low-energy* object, and $B$ is the more primitive one. What looks like "the real field is a weird mixture" is really "the thing we happen to observe at low energy is a remnant of a breaking, and remnants don't line up with the original factors."
+
+You are in the position of someone who grew up seeing only normal modes and is startled to learn they're combinations of the underlying oscillators. The surprise is a consequence of which regime you live in.
+
+**And even $B$ isn't sacred.** If $SU(2)_L\times U(1)_Y$ sits inside a simple group at high scale — $SU(5)$, $SO(10)$ — then $W^3$ and $B$ are *themselves* particular combinations of that group's generators. The product structure is an artifact of the low-energy description too. There is no level at which some field is finally "unmixed"; there are only bases, each natural for some question.
+
+## Why *this* combination specifically
+
+The last piece: why $Y_\Phi = +\tfrac12$ and those particular fermion hypercharges, which is what makes $Q = T^3+Y$ come out with integer and third-integer charges?
+
+**They are not free.** Requiring the theory to be quantum-mechanically consistent — cancellation of the $[SU(3)]^2U(1)$, $[SU(2)]^2U(1)$, $[U(1)]^3$ and gravitational anomalies — fixes all the hypercharges of one generation, up to overall normalization, given the observed $SU(3)\times SU(2)$ representation content. Anomalies would destroy gauge invariance at loop level and render the theory meaningless, so this is not an aesthetic constraint.
+
+So the combination isn't chosen to make things work out. It's forced, and it's the same condition that explains why the proton and electron charges match to one part in $10^{21}$.
+
+## One line
+
+The photon is a mixture because the vacuum, not the Lagrangian, decides which generator survives — and the vacuum had no obligation to pick one that you'd already given a name to.
+
+## 🧑 User - 2026-09-20 19:33:19
+
+ok, so is this a correct summary: in our mexican-hat picture of the higgs potential, there is a ring of equivalent values for the 4 higgs field values where the net derivative of the potential is 0 (the vacuum manifold). Once we decide to put all the mass at $\phi_0(real)$, then, in order to stay in this manifold, you have to make sure that the other components move together in a coordinated way. Given the covariant derivatives that drive the higgs components, the only massless direction that remains along this manifold is along T^3 + Y. Moving either one of these alone would end up moving off the manifold -- you have to keep them coordinated.
+
+## 🤖 Assistant - 2026-09-20 19:34:33
+
+*Model: claude-opus-5*
+
+About 80% right, with one crisp correction that actually makes the picture cleaner.
+
+## The correction: gauge transformations never leave the manifold
+
+Gauge transformations are **unitary**. They preserve $|\Phi|$ identically. So *every* gauge transformation — $T^3$ alone, $Y$ alone, anything — keeps you exactly on the vacuum manifold. None of them can take you off it.
+
+Watch, acting on $\langle\Phi\rangle = (0,\, v/\sqrt2)^T$:
+
+$$e^{i\alpha T^3}\begin{pmatrix}0\\ v/\sqrt2\end{pmatrix} = \begin{pmatrix}0\\ e^{-i\alpha/2}\,v/\sqrt2\end{pmatrix} \qquad \text{same length, different point}$$
+
+$$e^{i\beta Y}\begin{pmatrix}0\\ v/\sqrt2\end{pmatrix} = \begin{pmatrix}0\\ e^{+i\beta/2}\,v/\sqrt2\end{pmatrix} \qquad \text{same length, different point}$$
+
+$$e^{i\gamma Q}\begin{pmatrix}0\\ v/\sqrt2\end{pmatrix} = \begin{pmatrix}0\\ e^{i\gamma(-\frac12+\frac12)}\,v/\sqrt2\end{pmatrix} = \begin{pmatrix}0\\ v/\sqrt2\end{pmatrix} \qquad \text{unchanged}$$
+
+So the criterion isn't **on vs. off** the manifold. It's **moves the point vs. leaves the point fixed.**
+
+In fact $SU(2)\times U(1)$ acts *transitively* on the vacuum manifold — it can carry any vacuum to any other. That's precisely why all vacua are physically equivalent, which is the whole content of "which component gets the VEV is a gauge choice."
+
+## Where your intuition is exactly right
+
+The "coordinated motion" part is spot on, just applied to the right thing. Look at the third line above: $T^3$ rotates the lower component's phase *one way* by $-\alpha/2$, $Y$ rotates it *the other way* by $+\beta/2$, and for the combination $Q = T^3 + Y$ the two **cancel exactly**.
+
+The photon direction is precisely the coordinated ratio of $T^3$ and $Y$ rotations whose effects on the vacuum annihilate each other. And the ratio is 1:1 because the lower component carries $T^3 = -\tfrac12$ and $Y = +\tfrac12$ — the Higgs's quantum numbers set the coordination.
+
+That's your mechanism, correctly stated.
+
+## Why moving the point costs energy
+
+If moving along the manifold is free in the potential, why does a gauge field that does it get a mass?
+
+Because the cost isn't in $V$ — it's in $|D_\mu\Phi|^2$. A constant gauge field makes $D_\mu\Phi \neq 0$ even for a constant $\Phi$, because the covariant derivative contains the gauge term. The energy is
+
+$$m^2 \;\propto\; \left|G\,\langle\Phi\rangle\right|^2$$
+
+quadratic in the gauge field, which *is* a mass term. So:
+
+> **A gauge boson's mass measures how hard its generator rotates the condensate** — not whether it leaves the vacuum manifold.
+
+This is exactly what test [4] in `verify.py` checks: displacing along the photon direction costs *zero* energy to machine precision, while the same displacement along Z costs a finite amount.
+
+## One flip worth noting
+
+Your phrase "the only massless direction that remains along this manifold" has the geometry inverted. The directions *along* the manifold are the **three broken generators** — those are the Goldstone directions, and their gauge fields eat them and become massive ($W^\pm$, $Z$). The photon corresponds to the generator that does **not** move along the manifold at all.
+
+So: along the manifold → massive gauge bosons. Fixed point → massless photon. Nearly the opposite of the phrasing.
+
+(Minor: with four real components the manifold is a 3-sphere $S^3$, not a ring. The ring is the two-component cartoon we plotted.)
+
+## Your summary, corrected
+
+> The potential depends only on $|\Phi|$, so its minima form a 3-sphere of radius $v$ in the four-dimensional field space. Every gauge transformation is unitary, so all four generators move you *along* that sphere — none leaves it. Pick a vacuum point. Then ask of each generator whether it **moves that point**: $T^3$ does, $Y$ does, but in the coordinated combination $Q = T^3 + Y$ their effects cancel exactly, because the Higgs's lower component has $T^3 = -\tfrac12$ and $Y = +\tfrac12$. The covariant derivative charges a gauge field energy in proportion to how much its generator rotates the condensate, so the three generators that move the vacuum give massive $W^\pm$ and $Z$, while the one that leaves it untouched gives the massless photon.
+
+## 🧑 User - 2026-09-20 19:58:03
+
+Ok, so this pushes everything back to the way that the B and W fields couple to the Higgs, which presumably is where the T^3 = -1/2 and Y = +1/2 come from? And this is related to the SU(2) x U(1) symmetry group? T^3 gets the 3rd Pauli spinor matrix, which makes it negative?
+
+## 🤖 Assistant - 2026-09-20 19:59:25
+
+*Model: claude-opus-5*
+
+Careful — the causality runs the other way, and the two numbers have completely different origins. One is pure mathematics, the other is an input fixed by consistency.
+
+## The direction of causality
+
+The couplings of $W$ and $B$ to the Higgs are **derived from** $T^3$ and $Y$, not the source of them. You choose a representation for the Higgs; the quantum numbers follow; the covariant derivative then says "couple to $W^a$ with strength $g\,T^a$ and to $B$ with strength $g'\,Y$." So the question is really: why that representation?
+
+## $T^3 = -\tfrac12$: pure group theory, no freedom
+
+Once you declare the Higgs an $SU(2)$ **doublet** — a two-dimensional representation — the eigenvalues of the diagonal generator are $\pm\tfrac12$. Full stop. That's what a two-dimensional representation of $SU(2)$ *is*; those are its weights. There's nothing to choose.
+
+Your reading of the Pauli matrix is right in mechanism: $\sigma^3 = \mathrm{diag}(1,-1)$, so $T^3 = \sigma^3/2 = \mathrm{diag}(\tfrac12, -\tfrac12)$, and the lower component is the eigenvector with $-\tfrac12$. But it's not that $\sigma^3$ "makes it negative" — the representation has one state of each sign, and "lower component" is simply the label we give the negative one.
+
+Why $\sigma^3$ rather than $\sigma^1$ or $\sigma^2$? Those three don't commute, so at most one can be diagonalized. Picking $\sigma^3$ is convention; the invariant content is that there are two weights, $\pm\tfrac12$.
+
+## But there *is* a reason it must be $T^3$ that mixes with $Y$
+
+This one isn't convention. Ask which combination annihilates the vacuum. Act on $(0,1)^T$:
+
+$$T^1\begin{pmatrix}0\\1\end{pmatrix} = \tfrac12\begin{pmatrix}1\\0\end{pmatrix}, \quad T^2\begin{pmatrix}0\\1\end{pmatrix} = \tfrac12\begin{pmatrix}-i\\0\end{pmatrix}, \quad T^3\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}0\\-\tfrac12\end{pmatrix}, \quad Y\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}0\\+\tfrac12\end{pmatrix}$$
+
+$T^1$ and $T^2$ push the lower component **into the upper slot**. $Y$ is diagonal and can only ever act within the lower slot, so it can never cancel them. Solving $(a_1T^1 + a_2T^2 + a_3T^3 + bY)\langle\Phi\rangle = 0$ forces $a_1 = a_2 = 0$ and $a_3 = b$.
+
+So $Q = T^3 + Y$ is the **unique** unbroken generator, up to normalization — and $T^1, T^2$ are excluded not by convention but because they're off-diagonal.
+
+## $Y_\Phi = +\tfrac12$: not group theory at all
+
+This one is genuinely different. $U(1)$ representations are labelled by an arbitrary real number — group theory permits *any* hypercharge. So where does $+\tfrac12$ come from?
+
+**Gauge invariance of the Yukawa terms.** The electron mass term is $y_e\,\bar L_L \Phi\, e_R$, and its total hypercharge must vanish:
+
+$$\underbrace{+\tfrac12}_{\bar L_L} + Y_\Phi + \underbrace{(-1)}_{e_R} = 0 \quad\Longrightarrow\quad Y_\Phi = +\tfrac12$$
+
+And it's **over-determined**, which is the reassuring part. The down-quark Yukawa $\bar Q_L \Phi\, d_R$ gives $-\tfrac16 + Y_\Phi - \tfrac13 = 0 \Rightarrow Y_\Phi = \tfrac12$. The up-quark term uses $\tilde\Phi$ with $Y = -\tfrac12$ and works out too. Three independent conditions, one answer.
+
+So the Higgs hypercharge is fixed by the requirement that fermions can get mass at all.
+
+## And the fermion hypercharges come from anomaly cancellation
+
+Which pushes the question back one more step, to a place where it stops: requiring $[SU(3)]^2U(1)$, $[SU(2)]^2U(1)$, $[U(1)]^3$ and gravitational anomalies to cancel determines all the hypercharges of one generation, up to overall normalization, given the observed representation content. Anomalies would wreck gauge invariance at loop level, so this is a consistency requirement, not a preference.
+
+## Why a doublet in the first place
+
+Also not arbitrary. $L_L$ is an $SU(2)$ doublet and $e_R$ is a singlet, so for $\bar L_L \Phi\, e_R$ to be an $SU(2)$ singlet, $\Phi$ must be a doublet — $\bar{\mathbf{2}} \otimes \mathbf{2} \otimes \mathbf{1}$ contains a singlet, $\bar{\mathbf{2}} \otimes \mathbf{3} \otimes \mathbf{1}$ does not. The fermion content dictates the Higgs representation.
+
+And independently, measurement confirms it: $\rho = 1$ to a few parts in $10^4$, which only holds for a doublet.
+
+## Where everything actually comes from
+
+| quantity | origin | status |
+|---|---|---|
+| Higgs is a doublet | Yukawa terms need it; $\rho = 1$ confirms | forced |
+| $T^3 = \pm\tfrac12$ | weights of the 2-dim rep of $SU(2)$ | pure math |
+| which component is $-\tfrac12$ | $\sigma^3$ diagonal, "lower" = negative | convention |
+| only $T^3$ mixes with $Y$ | $T^{1,2}$ are off-diagonal, can't be cancelled | forced |
+| $Y_\Phi = +\tfrac12$ | gauge invariance of every Yukawa term | forced |
+| fermion hypercharges | anomaly cancellation | forced up to scale |
+| overall $Y$ normalization | $Q = T^3+Y$ vs $Q = T^3+Y/2$ | convention |
+
+So the chain terminates in something satisfying: **anomaly cancellation** → fermion hypercharges → **Yukawa gauge invariance** → $Y_\Phi = \tfrac12$ → combined with the doublet's $T^3 = -\tfrac12$ → the vacuum is annihilated by $Q = T^3 + Y$ → massless photon with the charges we observe.
+
+Only two links in that chain are convention. Everything else is forced by requiring the theory to be quantum-mechanically consistent and to give fermions mass.
+
+## 🧑 User - 2026-09-20 20:17:24
+
+can you show me in gory detail how the local gauge invariance coupling works in the full electroweak case, for B and W fields coupling to the Higgs?
+
+## 🤖 Assistant - 2026-09-20 20:19:27
+
+*Model: claude-opus-5*
+
+Full derivation. I'll do every step including the index gymnastics.
+
+## Step 0: The cast
+
+$$\Phi = \begin{pmatrix}\phi^+\\ \phi^0\end{pmatrix}, \qquad T^a = \frac{\sigma^a}{2}, \qquad Y_\Phi = +\tfrac12$$
+
+$$\mathcal{L} = (\partial_\mu\Phi)^\dagger(\partial^\mu\Phi) - V(\Phi^\dagger\Phi)$$
+
+## Step 1: Global invariance works for free
+
+Take a **constant** transformation $\Phi \to U\Phi$ with
+
+$$U = e^{i\alpha^a T^a}\,e^{i\beta Y} \in SU(2)\times U(1)$$
+
+The potential is fine because $U$ is unitary: $\Phi^\dagger U^\dagger U \Phi = \Phi^\dagger\Phi$. The kinetic term is fine because $U$ passes through the derivative: $\partial_\mu(U\Phi) = U\partial_\mu\Phi$.
+
+## Step 2: Make it local, and watch it break
+
+Now let $\alpha^a(x)$, $\beta(x)$ vary. The potential still survives — unitarity holds pointwise. But
+
+$$\partial_\mu\left(U(x)\Phi\right) = U\,\partial_\mu\Phi + \underbrace{(\partial_\mu U)\,\Phi}_{\text{the problem}}$$
+
+That second term wrecks the kinetic term. Everything that follows exists to cancel it.
+
+## Step 3: Demand covariance, and solve for what's required
+
+Introduce a derivative $D_\mu$ and **demand** that $D_\mu\Phi$ transform exactly like $\Phi$ itself:
+
+$$\boxed{\;(D_\mu\Phi)' = U\,(D_\mu\Phi)\;}$$
+
+If that holds, the kinetic term is automatically invariant, since $(D_\mu\Phi)'^\dagger(D^\mu\Phi)' = (D_\mu\Phi)^\dagger U^\dagger U (D^\mu\Phi)$. Write the ansatz
+
+$$D_\mu = \partial_\mu - i\,\mathcal{G}_\mu, \qquad \mathcal{G}_\mu \equiv g\,W^a_\mu T^a + g'\,Y B_\mu$$
+
+and impose the box. Left side:
+
+$$\partial_\mu(U\Phi) - i\mathcal{G}'_\mu U\Phi = U\partial_\mu\Phi + (\partial_\mu U)\Phi - i\mathcal{G}'_\mu U\Phi$$
+
+Right side:
+
+$$U\partial_\mu\Phi - iU\mathcal{G}_\mu\Phi$$
+
+Equate, cancel $U\partial_\mu\Phi$, and strip $\Phi$ (it's arbitrary):
+
+$$(\partial_\mu U) - i\,\mathcal{G}'_\mu U = -i\,U\mathcal{G}_\mu$$
+
+Right-multiply by $U^\dagger$:
+
+$$\mathcal{G}'_\mu = U\,\mathcal{G}_\mu\,U^\dagger - i\,(\partial_\mu U)U^\dagger$$
+
+**That single equation is the entire gauge-field transformation law**, and it was forced on us — we chose nothing.
+
+## Step 4: Split it into the SU(2) and U(1) pieces
+
+Write $U = U_2 U_1$ with $U_2 = e^{i\alpha^aT^a}$ and $U_1 = e^{i\beta Y}$. Since $U_1$ is a phase times the identity it commutes with everything, and
+
+$$(\partial_\mu U)U^\dagger = (\partial_\mu U_2)U_2^\dagger + i(\partial_\mu\beta)\,Y$$
+
+Matching the traceless-matrix part against the identity part:
+
+$$g\,W'^a_\mu T^a = U_2\left(g W^a_\mu T^a\right)U_2^\dagger - i(\partial_\mu U_2)U_2^\dagger$$
+
+$$B'_\mu = B_\mu + \frac{1}{g'}\partial_\mu\beta$$
+
+## Step 5: Infinitesimal form
+
+Put $U_2 \approx 1 + i\alpha^aT^a$. For the homogeneous piece, using $[T^a,T^b] = i\varepsilon^{abc}T^c$:
+
+$$U_2\left(W^bT^b\right)U_2^\dagger \approx W^bT^b + i\alpha^a W^b\left(i\varepsilon^{abc}T^c\right) = W^bT^b - \varepsilon^{abc}\alpha^a W^b T^c$$
+
+For the inhomogeneous piece, $-i(\partial_\mu U_2)U_2^\dagger \approx (\partial_\mu\alpha^a)T^a$. Collecting:
+
+$$\delta W^a_\mu = \frac{1}{g}\partial_\mu\alpha^a + \varepsilon^{abc}W^b_\mu\,\alpha^c, \qquad \delta B_\mu = \frac{1}{g'}\partial_\mu\beta, \qquad \delta\Phi = i\left(\alpha^aT^a + Y\beta\right)\Phi$$
+
+**Note the structural difference.** $B$ gets only the inhomogeneous shift. $W$ gets that *plus* a homogeneous rotation $\varepsilon^{abc}W^b\alpha^c$ — because $W$ lives in the adjoint representation, i.e. it is charged under its own group. That extra term is the seed of every W self-interaction.
+
+Also note the gauge field is **not a tensor**. The $\partial_\mu\alpha/g$ term is inhomogeneous, which is precisely what makes it a *connection* and what lets it absorb the offending $(\partial_\mu U)\Phi$.
+
+## Step 6: Verify it actually works
+
+Apply $\delta$ to $D_\mu\Phi = \partial_\mu\Phi - ig W^aT^a\Phi - ig'YB\Phi$, writing $\Lambda \equiv \alpha^aT^a + Y\beta$:
+
+$$\delta(D_\mu\Phi) = \underbrace{i(\partial_\mu\Lambda)\Phi + i\Lambda\partial_\mu\Phi}_{\text{from }\delta\Phi} \underbrace{- i(\partial_\mu\alpha^a)T^a\Phi - ig\,\varepsilon^{abc}W^b\alpha^c T^a\Phi}_{\text{from }\delta W} \underbrace{+\, gW^aT^a\Lambda\Phi}_{\text{from }\delta\Phi\text{ in the }W\text{ term}} \underbrace{- iY(\partial_\mu\beta)\Phi}_{\text{from }\delta B} + \underbrace{g'YB\Lambda\Phi}_{\text{from }\delta\Phi\text{ in the }B\text{ term}}$$
+
+**The inhomogeneous terms cancel.** Since $\partial_\mu\Lambda = (\partial_\mu\alpha^a)T^a + Y\partial_\mu\beta$, the $i(\partial_\mu\Lambda)\Phi$ piece exactly kills the $-i(\partial_\mu\alpha^a)T^a\Phi$ and $-iY(\partial_\mu\beta)\Phi$ terms. That's the whole job of the $\partial\alpha/g$ in $\delta W$.
+
+**The commutator terms cancel too.** What's left must equal $i\Lambda(D_\mu\Phi)$, which requires
+
+$$-ig\,\varepsilon^{abc}W^b\alpha^c T^a \;=\; gW^a\left[\Lambda, T^a\right]$$
+
+Evaluate the right side: only the $SU(2)$ part of $\Lambda$ contributes, giving $gW^a\alpha^b\left(i\varepsilon^{bac}T^c\right)$. Relabelling both sides so the generator index is $c$, the left gives $-\varepsilon^{cab}W^a\alpha^b$ and the right gives $+\varepsilon^{bac}W^a\alpha^b$. Since $\varepsilon^{cab} = \varepsilon^{abc}$ and $\varepsilon^{bac} = -\varepsilon^{abc}$, both equal $-\varepsilon^{abc}$. They match.
+
+$$\Longrightarrow \quad \delta(D_\mu\Phi) = i\Lambda\,(D_\mu\Phi) \quad\checkmark$$
+
+$D_\mu\Phi$ transforms exactly like $\Phi$. The kinetic term $(D_\mu\Phi)^\dagger(D^\mu\Phi)$ is now locally invariant.
+
+## Step 7: Write the gauge matrix out
+
+$$\mathcal{G}_\mu = gW^a_\mu T^a + g'Y B_\mu = \frac12\begin{pmatrix} gW^3_\mu + g'B_\mu & g\left(W^1_\mu - iW^2_\mu\right)\\[4pt] g\left(W^1_\mu + iW^2_\mu\right) & -gW^3_\mu + g'B_\mu\end{pmatrix}$$
+
+Everything from here is reading off entries. Note the $\mp g W^3$ on the diagonal — that sign flip is $T^3 = \pm\tfrac12$, and it is why the two components feel opposite $W^3$ and identical $B$.
+
+## Step 8: Feed in the VEV
+
+Put $\Phi \to \langle\Phi\rangle = (0,\, v/\sqrt2)^T$. Then $\partial_\mu\langle\Phi\rangle = 0$, so only the last term of
+
+$$|D_\mu\Phi|^2 = (\partial_\mu\Phi)^\dagger(\partial^\mu\Phi) - i(\partial_\mu\Phi)^\dagger\mathcal{G}^\mu\Phi + i\Phi^\dagger\mathcal{G}_\mu(\partial^\mu\Phi) + \Phi^\dagger\mathcal{G}_\mu\mathcal{G}^\mu\Phi$$
+
+survives. Acting on the VEV picks out the **second column**:
+
+$$\mathcal{G}_\mu\langle\Phi\rangle = \frac{v}{2\sqrt2}\begin{pmatrix} g\left(W^1_\mu - iW^2_\mu\right) \\[3pt] -gW^3_\mu + g'B_\mu \end{pmatrix}$$
+
+$$\left|\mathcal{G}_\mu\langle\Phi\rangle\right|^2 = \frac{v^2}{8}\left[g^2\left(W^1_\mu W^{1\mu} + W^2_\mu W^{2\mu}\right) + \left(gW^3_\mu - g'B_\mu\right)^2\right]$$
+
+With $W^\pm_\mu = (W^1_\mu \mp iW^2_\mu)/\sqrt2$, so that $W^1W^1 + W^2W^2 = 2W^+_\mu W^{-\mu}$:
+
+$$\Longrightarrow\quad \frac{g^2v^2}{4}\,W^+_\mu W^{-\mu} \;+\; \frac{v^2}{8}\left(gW^3_\mu - g'B_\mu\right)^2$$
+
+$$m_W = \frac{gv}{2}, \qquad m_Z = \frac{v\sqrt{g^2+g'^2}}{2}, \qquad m_\gamma = 0$$
+
+The photon combination is simply absent from that expression — there is no term to give it a mass.
+
+## What the full expansion contains
+
+Restoring $\Phi = \left(G^+,\ (v+h+iG^0)/\sqrt2\right)^T$, the same $|D_\mu\Phi|^2$ generates, in one stroke:
+
+- kinetic terms for $h$ and the Goldstones
+- the mass terms above, from $v^2$
+- $hVV$ and $hhVV$ couplings, from the $2vh$ and $h^2$ pieces of $(v+h)^2$
+- the bilinear mixing $m_W W^\mu\partial_\mu G^\mp + m_Z Z^\mu\partial_\mu G^0$ — the term $R_\xi$ gauge exists to cancel
+- assorted $VGG$ vertices
+
+All of it from one term, with no free parameters beyond $g$, $g'$, $v$. That rigidity is the point.
+
+## Where this lives in the code
+
+`gauge_matrix_act` in [higgs_gauge.py](higgs_gauge.py) is exactly $\mathcal{G}_\mu$ acting on the doublet, and `covariant_derivative` is $D_j\Phi$ with the gauge term at the link midpoint. Test [3] in [verify.py](verify.py) checks this whole construction numerically: it applies an exact finite $U(1)$ gauge transformation — transforming $\Phi$ and $B_j$ together by the rules derived in Step 4 — and confirms the energy is unchanged to $O(a^2)$, with the violation dropping by a factor of 4 each time the lattice spacing halves.
+
+## 🧑 User - 2026-09-20 22:12:53
+
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+## 1. Primary Request and Intent
+
+The user (randall@astera.org) is building a wave-based physics simulator (`wavereality/waves`, a Go + WGSL GPU project with `wavesim/shaders/HiggsKernel.wgsl`, `DiracKernel.wgsl`, `KleinGordonKernel.wgsl` etc. in progress). Their stated long-term goal is **"to try to implement some kind of cellular-automaton like system that captures the relevant physics"** — a fixed time step, fixed grid spacing, strictly *local* update rule.
+
+Within that, the requests in order were:
+
+1. Settle the **conventions** for the SM Higgs sector (which component gets the VEV, the 1/√2, the potential normalization) — "I would like to do it the most 'standard' way."
+2. Diagnose why inline LaTeX sometimes renders and sometimes doesn't in their Claude desktop app, and find a workaround.
+3. **Add the gauge fields** to a simulation so they can "see the mechanism."
+4. Move the work out of the scratch workspace into a real folder.
+5. **Scope constraint (still in force):** "don't look at any of the other code outside of electroweak_py at this time -- we'll get to that later."
+6. Explain where temperature enters SSB; how V enters the wave equation; the Lagrangian derivation of KG with arbitrary V.
+7. Plot the Higgs potential (iterated repeatedly on style: φ not ψ, standard parameters, two panels, bigger fonts, full-width heading, tighter spacing, aligned baselines).
+8. Build the **driven W-source demo** (evanescent vs radiating).
+9. Add **a single free electron in motion with its EM field**, then **a neutrino alongside for comparison**.
+10. A long conceptual sequence on gauge fixing, culminating in the CA design question: how to enforce Lorenz gauge locally.
+11. Find comparable code on GitHub.
+12. **Final, unanswered request:** "can you show me in gory detail how the local gauge invariance coupling works in the full electroweak case, for B and W fields coupling to the Higgs?"
+
+## 2. Key Technical Concepts
+
+- SU(2)_L × U(1)_Y gauge theory, Higgs doublet, spontaneous symmetry breaking
+- Conventions: Q = T³ + Y with Y_Φ = +1/2, T^a = σ^a/2, V = μ²Φ†Φ + λ(Φ†Φ)² with μ² = −λv², v = 246.22 GeV, signature (+,−,−,−), D_μ = ∂_μ − igW^a_μT^a − ig′YB_μ
+- Derived: m_h = √(2λ)v = 125.11, m_W = gv/2 = 80.43, m_Z = v√(g²+g′²)/2 = 91.24, m_γ = 0, λ = 0.1291, g = 0.6533, g′ = 0.3500, sin²θ_W = 0.2230
+- Gauges: unitary (3 conditions, singular at Φ→0, algebraically local), temporal (W^a_0 = B_0 = 0, used in the code), Lorenz (manifestly covariant), Coulomb (non-local), R_ξ
+- **Constraint propagation**: □χ = ∂·J = 0 for χ = ∂·A, so Lorenz gauge is preserved by local evolution given conserved current + constrained initial data. χ̇(0) = ρ − ∇·E, so the second initial condition *is* Gauss's law.
+- Gauss constraint in this discretization: force is a **backward** difference of F, so the constraint reads ∂⁻_m j_m = 0
+- Finite-T effective potential, T_c ≈ 159.5 GeV, electroweak crossover (not a phase transition)
+- Goldstone/gauge bilinear mixing m_W W^μ∂_μG — vanishes at k=0 and for transverse waves in temporal gauge
+- Dirac wave packet evolved exactly in k-space after positive-energy projection; Gordon decomposition / spin magnetization current
+- Evanescent vs propagating response of a massive field (ω² = k² + m²), Yukawa screening
+- Charge-conserving current deposition (Villasenor–Buneman, Esirkepov), Yee/FDTD staggering, Dedner divergence cleaning
+- Anomaly cancellation fixing hypercharges; ρ = 1 requiring a Higgs doublet
+
+## 3. Files and Code Sections
+
+All files live in `/Users/oreilly/wavereality/waves/electroweak_py`. Run with `.venv/bin/python`.
+
+### `higgs_gauge.py` (~20.5 KB) — the physics module
+Core verified engine. Temporal gauge, non-compact gauge fields, 3D periodic lattice, velocity Verlet.
+
+```python
+SIGMA = np.array([[[0,1],[1,0]], [[0,-1j],[1j,0]], [[1,0],[0,-1]]], dtype=complex)
+TGEN = SIGMA / 2.0
+Y_PHI = 0.5
+
+@dataclass(frozen=True)
+class Params:
+    N: int = 8; a: float = 0.0025; v: float = 246.22
+    lam: float = 0.1291; g: float = 0.6533; gp: float = 0.3500
+    broken: bool = True
+    # properties: mu2, m_h, m_W, m_Z, theta_W, summary()
+
+@dataclass
+class State:
+    Phi, Pi        # (2,N,N,N) complex
+    W, Wd          # (3,3,N,N,N) real  [adjoint, spatial]
+    B, Bd          # (3,N,N,N) real
+```
+
+The **midpoint covariant derivative** (the O(a) → O(a²) fix):
+```python
+def covariant_derivative(st, p):
+    """D_j Phi(x) = [Phi(x+j) - Phi(x)]/a - i G_j(x) * [Phi(x) + Phi(x+j)]/2
+    The gauge term is at the link MIDPOINT. Putting it on Phi(x) degrades
+    lattice gauge invariance from O(a^2) to O(a) -- see verify.py test [3]."""
+    for j in range(3):
+        Phi_f = fwd(st.Phi, j); mid = 0.5*(st.Phi + Phi_f)
+        out[j] = (Phi_f - st.Phi)/p.a - 1j*gauge_matrix_act(st.W[:,j], st.B[j], mid, p)
+```
+
+Matching Higgs force:
+```python
+    for j in range(3):
+        GD = gauge_matrix_act(st.W[:, j], st.B[j], D[j], p)
+        dU_dPhistar += (bwd(D[j], j) - D[j]) / p.a
+        dU_dPhistar += 0.5j * (GD + bwd(GD, j))
+    dU_dPhistar += (p.mu2 + 2.0*p.lam*rho) * st.Phi
+    Phi_ddot = -dU_dPhistar
+```
+
+`forces(st, p, jW=None)` accepts an **external conserved SU(2) source**; `step(st, p, dt, acc=None, damping=0.0, jW=None)` where `damping` applies Hubble-like friction **to the Higgs velocity only**.
+
+Helpers: `mode_frequency`, `evolve_probe`, `perturb_W/Z/photon/higgs/goldstone`, `z_direction`, `photon_direction`, `lattice_momentum_sq`, `frequency_from_zero_crossings`, `cfl_dt`.
+
+### `verify.py` — five tests, ALL PASSING
+1. Analytic forces vs numerical gradient: 2.0e-9, 9.9e-10, 2.2e-10
+2. Verlet energy error bounded and O(dt²): ratios 4.23, 3.85, 4.31
+3. Lattice gauge invariance O(a²) via exact finite U(1) transform: ratios 5.39, 4.24, 4.05
+4. Photon direction exactly flat at the VEV: dE = 0.000e+00, force = 0.000e+00; Z direction dE = 5.3e-3 > 0
+5. k=0 spectrum: m_W 80.4278/80.4278, m_Z 91.2428/91.2428, m_γ = 0, m_h 125.1078/125.1127
+
+### `demo.py` — the main figure (`higgs_mechanism.png`, ~2.5 min, `--replot` from `demo_results.pkl`)
+Six panels: three kicks (W/Z/photon), mass vs VEV sweep, dispersion, real-time mass acquisition, ω_W(t) tracking g⟨r⟩/2, results table. k=0 spectroscopy runs on a 2³ lattice because uniform fields are exact on any lattice.
+
+### `potential_plot.py` — `higgs_potential.png`
+Canonical form V(φ) = −½μ²φ² + ¼λφ⁴, μ = 88.47, λ = 0.1291. Two panels: double well + Mexican hat (polar mesh, cut at V=0, `set_box_aspect((1,1,0.46), zoom=1.22)`). Contains the baseline-alignment trick:
+```python
+    DROP = 0.085
+    p = ax.get_position()
+    ax.set_position([p.x0, p.y0 - DROP, p.width, p.height])
+    ax.set_title("(b)  two components: the Mexican hat",
+                 pad=10 + DROP * fig.get_figheight() * 72)
+```
+
+### `w_source_demo.py` — `w_source.png`
+Part 1: static conserved source in full 3D. **The source must be a lattice curl built with BACKWARD differences:**
+```python
+    def bw(f, ax):
+        return (f - np.roll(f, 1, axis=ax)) / a
+    jW[0, 0] = charge * bw(Az, 1)
+    jW[0, 1] = -charge * bw(Az, 0)
+```
+Part 2: 1D driven massive field with quadratic sponge, flux S = −(∂_tW)(∂_xW). Results: fitted 81.9 vs lattice 80.1; 10⁹ suppression below cutoff; theory match 1–3% above.
+
+### `electron_demo.py` (~22.8 KB) — `electron_fields.png`
+Positive-energy Dirac packet evolved exactly:
+```python
+        self.psi_hat = 0.5 * (chi + self._H(chi) / self.E)   # positive-energy projector
+    def psi(self, t):
+        return np.fft.ifftn(self.psi_hat * np.exp(-1j*self.E*t), axes=(1,2,3))
+```
+Steady-state fields for uniform motion:
+```python
+    D = KX**2 + KY**2 + KZ**2/pk.gamma**2 + mass**2
+    if mass == 0.0: D[0,0,0] = np.inf        # neutralising background
+    Eh = [-1j*K*A0 + 1j*pk.v*KZ*A for K, A in zip(pk.K, Av)]
+```
+Six panels: electron at rest (Coulomb + spin dipole), electron moving (pancaked), neutrino moving (Z only, goes black), E_⊥/E_∥, three reaches, quantum-number table. Electron/neutrino: Q = −1/0, g_V = −0.054/+0.500, Z source ratio 9.26×.
+
+### `README.md`, `.gitignore` (`.venv/`, `__pycache__/`, `*.pyc`, `demo_results.pkl`)
+
+### Memory files at `/Users/oreilly/.claude/projects/-Users-oreilly-wavereality-waves-electroweak-py/memory/`
+- `inline-math-58-char-limit.md`
+- `electroweak-py-reference-impl.md`
+- `MEMORY.md`
+
+## 4. Errors and Fixes
+
+1. **`np.einsum("ji...,ji...->", ...)`** — numpy requires `->...` with ellipsis. Replaced with `float(np.real(np.sum(D.conj()*D)))`.
+2. **Energy conservation "FAIL" at 3.6e-2** — not a bug; my threshold was unrealistic. Verified clean dt² scaling and small secular drift; rewrote the test as a convergence check.
+3. **Gauss-law test ill-posed** — non-compact discretization has no exactly conserved Gauss law. Replaced with a gauge-invariance convergence test.
+4. **Gauge invariance only O(a)** — traced to the gauge term on Φ(x); switched to the link midpoint, giving O(a²). Re-derived and re-verified the matching forces.
+5. **Non-conserved source → runaway** (w_source_demo): `max|acc|` pinned at a constant, W growing linearly, 84% longitudinal power. First fix (curl with forward differences) still failed. **Real fix: the Yang-Mills force is a backward difference of F, so the constraint is ∂⁻_m j_m = 0; build the curl with backward differences.** Residual dropped 10³ → 10⁻¹².
+6. **`streamplot` transpose** (electron_demo) — arrays are `[x, z]` and the plot's x-axis *is* z, so matplotlib already wanted that shape. The `.T` reflected the field about the diagonal and produced a convincing fake quadrupole. User-facing lesson I flagged: "It looked like a physics result rather than an indexing error, which is the dangerous kind."
+7. **Periodic-box contamination** — E_⊥/E_∥ read 4.95 at 75% of L/2. Fixed by zooming panels to ~20% of L/2, enlarging the box to N=128, and adding `validate_boost()` (pure Gaussian, ratio → 9.85 as the box grows vs γ³ = 11.18).
+8. **matplotlib**: `axhline` rejects `transform`; `\frac12` needs `\frac{1}{2}`; `\Box` unknown to mathtext (used `\partial_t^2-\nabla^2`); `return mesh` accidentally placed before the axis-limit block, killing all panel formatting.
+9. **My own wrong hypotheses about the LaTeX bug** — headings/tables, then backslash-space. Both disproven by the user's data before I searched and found the 58-character limit.
+10. **My mis-centered test charge** in a throwaway diagnostic (spurious `np.roll`) produced ratio 0.024; caught and fixed.
+
+**User feedback that changed direction:** use φ instead of ψ; standard parameters; only two panels; bigger fonts; heading should fill the width; less gutter; second panel's *bottom* not aligned; and the scope constraint about not looking outside `electroweak_py`.
+
+## 5. Problem Solving
+
+Solved: convention disambiguation with a self-consistent parameter set; empirical diagnosis of the 58-char LaTeX limit; a fully verified 3D electroweak lattice simulation reproducing the boson spectrum to 6 digits; the Gauss-constraint/difference-operator matching problem (twice); exact k=0 spectroscopy on a 2³ lattice; demonstrating evanescent-vs-radiating behaviour with a 10⁹ threshold; a Dirac packet with Ehrenfest to 1e-13 and an emergent spin magnetic moment; numerically proving θ_W is independent of v and that pure B is not a mass eigenstate.
+
+Established limitations, all documented: non-compact gauge fields (O(a²), no exact Gauss law, unsuitable for sphalerons); classical not quantum; no fermions in `higgs_gauge.py`; `electron_demo.py` uses a 100 GeV lepton because the electron/Z scale ratio is 1.8×10⁵; no back-reaction; `damping` is not SM physics.
+
+## 6. All User Messages
+
+1. "I'm trying to implement a model of the Higgs mechanism in the standard model of physics..." (three convention questions)
+2. "thanks -- all makes sense! why does some of your inline math output show up still as $..$ and others are properly formatted? this seems like a claude bug. is there an update or a workaround?"
+3. "I'm using 'Claude for Mac' version 2.2553.1 ... the first part shows up as $ while the second expression was properly typeset."
+4. "A-F rendered, G and H are raw! and nothing else was incorrectly rendered so it isn't the unpaired $. next theory? and might as well search the web for math rendering issues."
+5. "yes, re-render the first answer with display blocks"
+6. "I'm confused about the way that spontaneous symmetry breaking is described... I don't see any equivalent of the temperature or energy scale parameter in these equations. The mexican hat shape is always there..."
+7. "I'm a bit confused about the translation between the V(Φ) potential expression... and the actual KG wave equation that results..."
+8. "so I think I need to update my understanding of how a potential enters into a standard wave equation... can you show me how that works, in the context of an arbitrary potential function?"
+9. "please re-render using the length constraint of 58 chars so the inline math renders"
+10. "I'm solving a simple version of the higgs potential on state χ = φ_a + iφ_b... it seems to be the inverse of what it should be -- what am I doing wrong?"
+11. "what is the status of the 3 zero-VEV-valued components of the 4-component higgs field -- they end up corresponding directly to the W and Z bosonic fields?..."
+12. "now add the gauge fields so I can see the mechanism"
+13. "yes, move this to a folder I just chose"
+14. **"don't look at any of the other code outside of electroweak_py at this time -- we'll get to that later."**
+15. "going back to the spontaneous symmetry breaking logic: presumably the fermions and everything else remains coupled to the Higgs field even at the high energies... isn't this symmetry breaking point practically irrelevant?"
+16. "How is ⟨Ψ⟩ actually computed for this coupling? what is the expectation over? time? space?"
+17. "This sounds like the whole symmetry breaking thing is a kind of cover story..."
+18. "Ok, but the *full* story is the one with broken symmetry, and the pre-break case is just one where lots of terms drop out because ⟨Ψ⟩ is zero. Correct or no?"
+19. "I'm still confused because you said that things couple in terms of the mean, but you also said the mean is not in the symmetric version... can you show me exactly how that works in math, as we go from symmetric to broken?"
+20. "Ok this is making more sense, but to really understand it in detail, I'm going to need to back up and fully understand the symmetric lagrangian, just for the electroweak sector... I really have no idea what W and B are, actually..."
+21. "plot the higgs potential using a simple scalar value -- does it show the mexican hat? V(ψ) = -μ²ψ² + λ(ψ²)²"
+22. "can you change the plot to use \phi instead of \psi and update the equation so that the standard parameters work"
+23. "update potential_plot.py to only plot the first two panels, and increase the font size so it is legible at a smaller scaling."
+24. "even larger font please -- the heading should fill the entire width. and there can be less space between the two panels and to the right of the second one, and the second panel should have the same height as the first."
+25. "the bottom of the second panel is still, visually, not aligned with the bottom of the first panel."
+26. "perfect! :)"
+27. "in the electroweak framework, the B and W fields coupling to the higgs doublet... doesn't this somehow create interactions of some form? is it possible that this somehow explains how photons actually interact with electrons in some deeper way?"
+28. "But the 'indirect' interaction via the W bosons seems like it is just as real as anything else. When a fermion (electron) is present, doesn't it also imply a non-zero wave field in the W^1, W^2...?"
+29. "I want to understand how the W^1 and W^2 are driven by the 'interference between the electron and neutrino fields'. aren't there neutrinos everywhere, all the time? what else drives those W components?"
+30. "so what does the W field actually look like during beta decay?"
+31. "yes, do the driven source demo"
+32. "can you find other code in github that does roughly the same thing you've done in this simulation?"
+33. "add a single free electron in motion, with associated em field, so I can see what that looks like"
+34. "now add a neutrino alongside for comparison"
+35. "what are the unitary gauge, temporal gauge, and lorenz gauge for the electroweak system, and, based on the maxwell equations, isn't the lorenz gauge the only physically realistic one (per special relativity)? which one are you using?"
+36. "in standard EM / Maxwell... in the Lorenz gauge, would using the diffusion instead of wave equation for A_0 more completely fix the gauge appropriately?..."
+37. "My long-term goal for this project is to try to implement some kind of cellular-automaton like system that captures the relevant physics... Coulomb gauge is impossible because it is non-local... which of the above ways of 'fixing' the Lorenz gauge would be local and physically realistic?"
+38. "cool -- that was actually my secret hope, that you just had to initialize everything the right way, and then the constraint would be automatically maintained thereafter, using the simple wave equation! so what is the best reference to cite for this?"
+39. "you wrote B_μ to talk about this four-potential, but various other sources seem to use A^μ... is using the lower index more standard in the context of electroweak?"
+40. "back to gauge fixing: in practice you would always use something like the unitary gauge for the Higgs field specifically, right...? but you don't need to *fix* the other 3 values to 0 -- they can update over time, but they are _initialized_ to 0. and likewise, φ_0 can oscillate freely about v, right?"
+41. "next question: the weak mixing angle is said to reflect the symmetry breaking. please explain why this is the case?..."
+42. "what exactly are g and g' again, and where do they come from? What is their relationship if any to the components of the Higgs doublet?"
+43. "It is still not clear why the 'observed' EM four-potential A_μ has to be some mix of W_3 and B -- why can't it just be pure B?... I want to understand why it might somehow make sense at a deeper level"
+44. "ok, so is this a correct summary: in our mexican-hat picture... the only massless direction that remains along this manifold is along T^3 + Y. Moving either one of these alone would end up moving off the manifold -- you have to keep them coordinated."
+45. "Ok, so this pushes everything back to the way that the B and W fields couple to the Higgs, which presumably is where the T^3 = -1/2 and Y = +1/2 come from? And this is related to the SU(2) x U(1) symmetry group? T^3 gets the 3rd Pauli spinor matrix, which makes it negative?"
+46. **"can you show me in gory detail how the local gauge invariance coupling works in the full electroweak case, for B and W fields coupling to the Higgs?"** (unanswered)
+
+## 7. Pending Tasks
+
+- **The final message is unanswered**: a detailed walkthrough of how local gauge invariance forces the B and W couplings to the Higgs. No tools needed; pure explanation.
+- Standing constraint: **do not look at any code outside `electroweak_py`** until the user says otherwise.
+- Previously offered, not accepted: cross-validation harness against `HiggsKernel.wgsl`; a compact-link (Kogut–Susskind) reformulation.
+
+## 8. Current Work
+
+The last several turns were pure conceptual Q&A about the electroweak gauge structure, with occasional short numerical demonstrations using the existing verified code.
+
+Immediately before the summary request, I answered message 45 about the origin of T³ = −1/2 and Y = +1/2. Key content delivered:
+- **Causality correction:** the couplings of W and B to the Higgs are *derived from* T³ and Y, not the source of them.
+- **T³ = ±1/2 is pure group theory** — the weights of the 2-dimensional rep of SU(2). σ³ = diag(1,−1) is the conventional choice of Cartan generator; "lower component" labels the −1/2 eigenvector.
+- **Only T³ can mix with Y**, shown explicitly: T¹ and T² map (0,1)ᵀ into the upper slot, which the diagonal Y can never cancel. Solving (a₁T¹+a₂T²+a₃T³+bY)⟨Φ⟩ = 0 forces a₁ = a₂ = 0 and a₃ = b, making Q = T³+Y the unique unbroken generator.
+- **Y_Φ = +1/2 is NOT group theory** — U(1) charges are arbitrary reals. It's forced by gauge invariance of the Yukawa terms: +½ + Y_Φ − 1 = 0 for the electron, and independently confirmed by the down-quark (−⅙ + Y_Φ − ⅓ = 0) and up-quark terms. Over-determined.
+- Fermion hypercharges come from **anomaly cancellation**; the Higgs must be a **doublet** because 2̄⊗2⊗1 contains a singlet (and ρ = 1 confirms it).
+- Closed with a table separating forced-by-math / forced-by-consistency / convention.
+
+Two supporting numerical results from the immediately preceding turns, both run with the existing code and worth preserving:
+- **θ_W is independent of v**: 28.1798° identically for v = 40, 100, 180, 246.22, 400 GeV, while tracking arctan(g′/g) exactly when g′ is varied.
+- **Pure B is not a mass eigenstate**: perturbing B alone gives a frozen photon projection at +0.88147 ± 4.3e-15 (= cos θ_W) plus a Z projection oscillating at ω = 91.244 (m_Z = 91.243); B itself ranges +0.554 to +1.000 with **zero** zero-crossings. Expected split cos²θ_W = 0.7770 / sin²θ_W = 0.2230.
+
+## 9. Optional Next Step
+
+Answer message 46 verbatim: **"can you show me in gory detail how the local gauge invariance coupling works in the full electroweak case, for B and W fields coupling to the Higgs?"**
+
+This is a text-only explanation. Working from the immediately preceding context (T³, Y, Q = T³+Y, the covariant derivative), the natural content is: (1) write the free Higgs Lagrangian and show ∂_μΦ fails to transform covariantly under a *local* SU(2)×U(1) transformation Φ → U(x)Φ, producing the offending (∂_μU)Φ term; (2) show that introducing W^a_μ and B_μ with the transformation laws W_μ → UW_μU† − (i/g)(∂_μU)U† and B_μ → B_μ + (1/g′)∂_μβ makes D_μΦ → U(D_μΦ) exactly, with the inhomogeneous term cancelling; (3) write out the 2×2 gauge matrix explicitly and expand |D_μΦ|² term by term; (4) show how the same requirement forces the non-abelian ε^{abc} term in F^a_{μν} and hence the single shared g; (5) connect back to the code's `gauge_matrix_act` and `covariant_derivative`, and to the lattice version where the exact statement is Φ(x) → G(x)Φ(x), U_j(x) → G(x)U_j(x)G†(x+ĵ).
+
+Formatting constraint that must be respected: inline `$...$` math must stay under 58 characters of LaTeX source; anything longer goes in a `$$...$$` display block.
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/oreilly/.claude/projects/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+## 🧑 User - 2026-09-20 22:14:14
+
+how do the other 3 components of the Higgs field end up "eating" the longitudinal aspects of the W and Z boson fields?
+
+## 🤖 Assistant - 2026-09-20 22:15:37
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_gauge.py``
+
+</details>
+
+Good question — this is the cleanest place where the bookkeeping becomes visible. Let me give you the math and then measure it in your code.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat > /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad/eaten.py <<'PY'
+"""Numerical demonstration that the Goldstone becomes the longitudinal W."""
+import sys, time
+import numpy as np
+sys.path.insert(0, "/Users/oreilly/wavereality/waves/electroweak_py")
+import higgs_gauge as hg
+
+N, A = 8, 0.020
+KPH = 2.0 * np.pi / (N * A)                      # lowest lattice momentum, along z
+KHAT = np.sqrt(hg.lattice_momentum_sq(KPH, A))   # what the discrete Laplacian sees
+prof = np.cos(KPH * np.arange(N) * A).reshape(1, 1, N)
+
+EPS = 0.2
+
+def run(p, kick, probe, ref, n_per=8.0, safety=0.04):
+    st = hg.vacuum_state(p)
+    kick(st)
+    dt = hg.cfl_dt(p, safety)
+    nst = max(400, int(n_per * 2.0 * np.pi / max(ref, 1.0) / dt))
+    t, y = hg.evolve_probe(st, p, dt, nst, probe)
+    return hg.frequency_from_zero_crossings(t, y), y
+
+# ---- kicks (all at momentum k along z) ------------------------------------
+def kick_WL(st):  st.W[0, 2] += EPS * prof        # W^1 polarized ALONG k  (longitudinal)
+def kick_WT(st):  st.W[0, 0] += EPS * prof        # W^1 polarized across k (transverse)
+def kick_GS(st):  st.Phi[0] += EPS * prof         # charged Goldstone
+
+pr_WL = lambda st: float(np.sum(st.Wd[0, 2] * prof))    # probe the VELOCITY: no zero-mode offset
+pr_WT = lambda st: float(np.sum(st.Wd[0, 0] * prof))
+pr_GS = lambda st: float(np.sum(np.real(st.Pi[0]) * prof))
+
+gauged   = hg.Params(N=N, a=A)
+ungauged = hg.Params(N=N, a=A, g=0.0, gp=0.0)
+symm     = hg.Params(N=N, a=A, broken=False)
+
+mW = gauged.m_W
+wmass = np.sqrt(KHAT**2 + mW**2)
+
+print(f"k_phys = {KPH:.3f}   khat = {KHAT:.4f} GeV   m_W = {mW:.4f} GeV")
+print(f"expected massive dispersion  sqrt(khat^2 + m_W^2) = {wmass:.4f}\n")
+
+rows = [
+    ("ungauged broken (g=g'=0)", "charged Goldstone", ungauged, kick_GS, pr_GS, KHAT,  f"khat = {KHAT:.3f}"),
+    ("ungauged broken (g=g'=0)", "W transverse",      ungauged, kick_WT, pr_WT, KHAT,  f"khat = {KHAT:.3f}"),
+    ("ungauged broken (g=g'=0)", "W longitudinal",    ungauged, kick_WL, pr_WL, KHAT,  "0  (pure gauge)"),
+    ("symmetric  <Phi> = 0",     "W transverse",      symm,     kick_WT, pr_WT, KHAT,  f"khat = {KHAT:.3f}"),
+    ("symmetric  <Phi> = 0",     "W longitudinal",    symm,     kick_WL, pr_WL, KHAT,  "0  (pure gauge)"),
+    ("BROKEN + GAUGED",          "W transverse",      gauged,   kick_WT, pr_WT, wmass, f"{wmass:.3f}"),
+    ("BROKEN + GAUGED",          "W longitudinal",    gauged,   kick_WL, pr_WL, wmass, f"{wmass:.3f}  <= EATEN"),
+    ("BROKEN + GAUGED",          "charged Goldstone", gauged,   kick_GS, pr_GS, wmass, f"{wmass:.3f}  <= EATEN"),
+]
+
+print(f"{'background':26s} {'kicked direction':19s} {'measured w':>12s}   expected")
+print("-" * 86)
+for bg, nm, p, k, pr, ref, exp in rows:
+    w, _ = run(p, k, pr, ref)
+    print(f"{bg:26s} {nm:19s} {w:12.4f}   {exp}")
+
+# ---- does a pure longitudinal-W kick CREATE a Goldstone? -------------------
+print()
+for label, p in (("gauged  ", gauged), ("ungauged", ungauged)):
+    st = hg.vacuum_state(p)
+    kick_WL(st)
+    dt = hg.cfl_dt(p, 0.04)
+    nst = int(2.0 * 2.0 * np.pi / wmass / dt)
+    _, y = hg.evolve_probe(st, p, dt, nst, lambda s: float(np.max(np.abs(s.Phi[0]))))
+    print(f"{label}: pure longitudinal-W kick -> max |Phi_upper| reached {y.max():.4e} GeV")
+PY
+time .venv/bin/python /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad/eaten.py``
+  ```
+  k_phys = 39.270   khat = 38.2683 GeV   m_W = 80.4278 GeV
+  expected massive dispersion  sqrt(khat^2 + m_W^2) = 89.0679
+  
+  background                 kicked direction      measured w   expected
+  --------------------------------------------------------------------------------------
+  ungauged broken (g=g'=0)   charged Goldstone        38.2686   khat = 38.268
+  ungauged broken (g=g'=0)   W transverse             38.2686   khat = 38.268
+  ungauged broken (g=g'=0)   W longitudinal            0.0000   0  (pure gauge)
+  symmetric  <Phi> = 0       W transverse             38.2686   khat = 38.268
+  symmetric  <Phi> = 0       W longitudinal            0.0000   0  (pure gauge)
+  BROKEN + GAUGED            W transverse             89.0709   89.068
+  BROKEN + GAUGED            W longitudinal           89.0709   89.068  <= EATEN
+  BROKEN + GAUGED            charged Goldstone        89.0709   89.068  <= EATEN
+  
+  gauged  : pure longitudinal-W kick -> max |Phi_upper| reached 1.0138e-01 GeV
+  ungauged: pure longitudinal-W kick -> max |Phi_upper| reached 0.0000e+00 GeV
+  
+  real	0m19.157s
+  user	0m19.005s
+  sys	0m0.133s
+  ```
+
+</details>
+
+## The bookkeeping problem
+
+Count real degrees of freedom on each side.
+
+| | before | after |
+|---|---|---|
+| scalars | $\Phi$: 4 real | $h$: 1 |
+| $W^1,W^2,W^3$ | massless, 2 each = 6 | $W^\pm, Z$: 3 each = 9 |
+| $B$ | massless, 2 | $\gamma$: 2 |
+| **total** | **12** | **12** |
+
+Nothing is created or destroyed. Three scalar degrees of freedom disappear from $\Phi$ and three longitudinal polarizations appear on the vectors. "Eating" is the name for that transfer.
+
+## The term that does it
+
+Go back to $|D_\mu\Phi|^2$ and keep the cross term — one field from $\partial_\mu\delta\Phi$, one from $\mathcal{G}_\mu\langle\Phi\rangle$:
+
+$$\mathcal{L} \supset -2\,\mathrm{Im}\left[\langle\Phi\rangle^\dagger\mathcal{G}_\mu\,\partial^\mu\delta\Phi\right]$$
+
+With $\langle\Phi\rangle^\dagger = (0,\ v/\sqrt2)$ this picks the **second row** of the gauge matrix, and with $\delta\Phi = \left(G^+,\ (h+iG^0)/\sqrt2\right)^T$:
+
+$$\langle\Phi\rangle^\dagger\mathcal{G}_\mu\,\partial^\mu\delta\Phi = \frac{v}{2\sqrt2}\left[\sqrt2\,g\,W^-_\mu\partial^\mu G^+ - \frac{\sqrt{g^2+g'^2}}{\sqrt2}\,Z_\mu\left(\partial^\mu h + i\,\partial^\mu G^0\right)\right]$$
+
+Taking $-2\,\mathrm{Im}$: the $Z_\mu\partial^\mu h$ piece is real and drops out (no $Zh$ mixing — $h$ is not eaten), and what survives is
+
+$$\boxed{\;\mathcal{L}_{\rm mix} = m_Z\,Z_\mu\partial^\mu G^0 + i\,m_W\left(W^-_\mu\partial^\mu G^+ - W^+_\mu\partial^\mu G^-\right)\;}$$
+
+Two things about this term are the whole story:
+
+1. **It is bilinear.** The quadratic Lagrangian is not diagonal. The propagator has an off-diagonal entry, so a $Z$ line can turn into a $G^0$ line at order $m_Z$. They are not separate particles — they are two coordinates on one physical mode.
+2. **The coefficient is exactly the mass.** Not a coincidence: the mass term and the mixing term both come from $|D_\mu\Phi|^2$ with the same $\langle\Phi\rangle$, one from $\mathcal{G}\langle\Phi\rangle \cdot \mathcal{G}\langle\Phi\rangle$ and one from $\mathcal{G}\langle\Phi\rangle \cdot \partial\delta\Phi$. Mass and eating are the same event.
+
+## Three ways to see the transfer
+
+### (a) The change of variables — "eating" made literal
+
+Write the doublet in polar form, which is always possible:
+
+$$\Phi(x) = \exp\!\left(\frac{i\,\xi^a(x)\,T^a}{v}\right)\begin{pmatrix}0\\ \dfrac{v+h(x)}{\sqrt2}\end{pmatrix}$$
+
+The three real fields $\xi^a$ are the would-be Goldstones; $h$ is the radial mode. Now do a **local** $SU(2)$ transformation with $\alpha^a(x) = -\xi^a(x)/v$. That is a legal gauge transformation, so nothing physical changes, and it removes the exponential entirely:
+
+$$\Phi \;\longrightarrow\; \begin{pmatrix}0\\ (v+h)/\sqrt2\end{pmatrix}$$
+
+The Goldstones are gone from $\Phi$. But they went *somewhere* — under that same transformation,
+
+$$W^a_\mu \;\longrightarrow\; W^a_\mu - \frac{1}{gv}\,\partial_\mu\xi^a + \ldots$$
+
+The Goldstone's gradient is now sitting inside the gauge potential. That is the eating: a field-space change of variables that moves $\xi^a$ from the scalar multiplet into the vector. And notice the price — the gauge freedom was *spent* doing it. It is no longer available to remove a polarization from $W$, which is precisely why $W$ now has 3 instead of 2.
+
+### (b) Momentum space — the longitudinal polarization *is* the Goldstone
+
+A massive vector with momentum along $z$ has a third polarization
+
+$$\varepsilon^\mu_L(k) = \frac{1}{m}\left(|\vec k|,\,0,\,0,\,E\right) = \frac{k^\mu}{m} + \mathcal{O}\!\left(\frac{m}{E}\right)$$
+
+It blows up as $m\to0$, which is the statement that it does not exist in the massless theory. And at high energy it degenerates to $k^\mu/m$ — a pure gradient, i.e. a *scalar* wearing a vector index. This is the Goldstone boson equivalence theorem:
+
+$$\mathcal{M}\left(W_L^\pm,\, Z_L,\,\ldots\right) = \mathcal{M}\left(G^\pm,\, G^0,\,\ldots\right)\left[1+\mathcal{O}(m/E)\right]$$
+
+At $E \gg m_W$ the longitudinal $W$ scatters *exactly like the Goldstone*. This is the sharpest possible form of "eaten."
+
+### (c) $R_\xi$ gauge — cancelling the mixing on purpose
+
+The mixing term is a nuisance for perturbation theory, so the gauge-fixing term is chosen to kill it:
+
+$$\mathcal{L}_{\rm gf} = -\frac{1}{2\xi}\left(\partial^\mu Z_\mu - \xi\, m_Z\, G^0\right)^2$$
+
+Its cross term is $m_Z(\partial^\mu Z_\mu)G^0$, which integrates by parts into $-m_Z Z_\mu\partial^\mu G^0$ — exactly cancelling $\mathcal{L}_{\rm mix}$. What you are left with is
+
+$$D_{G}(k) = \frac{i}{k^2-\xi m_Z^2}, \qquad D^{\mu\nu}_Z(k) = \frac{-i}{k^2-m_Z^2}\left[g^{\mu\nu}-(1-\xi)\frac{k^\mu k^\nu}{k^2-\xi m_Z^2}\right]$$
+
+The Goldstone's pole sits at $\xi m_Z^2$ — a gauge-parameter-dependent location, which is the signature of an unphysical field. The same spurious pole appears in the gauge propagator's longitudinal piece with the opposite residue, and the two cancel in every S-matrix element. Take $\xi\to\infty$ and you are in unitary gauge: the Goldstone's mass goes to infinity, it decouples completely, and the vector propagator becomes the Proca form $\left(-g^{\mu\nu}+k^\mu k^\nu/m^2\right)/(k^2-m^2)$ — with the longitudinal piece now built in.
+
+## Why exactly three, and why $h$ survives
+
+Goldstone's theorem: one massless mode per *broken* generator. Of the four generators $T^1,T^2,T^3,Y$, three combinations move $\langle\Phi\rangle$ and one — $Q = T^3+Y$ — annihilates it. So three Goldstones, three massive vectors, one massless photon. The photon has nothing to eat because $Q$ is unbroken.
+
+$h$ is the *radial* direction, not a flat direction of the potential. It is massive from the start, there is no Goldstone associated with it, and no gauge field can absorb it. It stays as a physical particle.
+
+## Measured in your code
+
+Temporal gauge keeps the Goldstones as explicit fields, so this is directly testable. I kicked a single mode at momentum $k$ along $z$ on an $8^3$ lattice and read off the frequency from zero crossings of the field velocity:
+
+```
+k_phys = 39.270   khat = 38.2683 GeV   m_W = 80.4278 GeV
+expected massive dispersion  sqrt(khat^2 + m_W^2) = 89.0679
+
+background                 kicked direction      measured w   expected
+--------------------------------------------------------------------------------
+ungauged broken (g=g'=0)   charged Goldstone        38.2686   khat = 38.268
+ungauged broken (g=g'=0)   W transverse             38.2686   khat = 38.268
+ungauged broken (g=g'=0)   W longitudinal            0.0000   0  (pure gauge)
+symmetric  <Phi> = 0       W transverse             38.2686   khat = 38.268
+symmetric  <Phi> = 0       W longitudinal            0.0000   0  (pure gauge)
+BROKEN + GAUGED            W transverse             89.0709   89.068
+BROKEN + GAUGED            W longitudinal           89.0709   89.068  <= EATEN
+BROKEN + GAUGED            charged Goldstone        89.0709   89.068  <= EATEN
+```
+
+Read the three blocks in order:
+
+- **Ungauged**: the Goldstone is a genuine massless propagating scalar, $\omega = \hat k$. The longitudinal $W$ does not propagate at all — its curl vanishes, so it feels zero force and simply drifts. Two rows, two separate facts.
+- **Symmetric phase**: same thing without the condensate. Longitudinal is still dead.
+- **Broken + gauged**: the longitudinal direction is suddenly alive, oscillating at $\sqrt{\hat k^2+m_W^2}$ — a *massive* dispersion relation on a mode that did not exist a moment ago. And the Goldstone probe now returns the same frequency. There is no longer a mode at $\omega = \hat k$ in this sector. The massless scalar and the dead longitudinal vector have merged into one massive vector polarization.
+
+The mixing term is visible directly too:
+
+```
+gauged  : pure longitudinal-W kick -> max |Phi_upper| reached 1.0138e-01 GeV
+ungauged: pure longitudinal-W kick -> max |Phi_upper| reached 0.0000e+00 GeV
+```
+
+Start the Higgs *exactly* at the VEV and disturb only the gauge field. With $g\neq0$ the charged Goldstone is generated immediately — that is $m_W W^-_\mu\partial^\mu G^+$ doing its job. Turn off $g$ and it stays identically zero.
+
+## The one-line version
+
+The Goldstone never disappears — it is relabelled. In temporal gauge it is still a scalar field, but it is locked to the gauge field by a bilinear term whose coefficient is the mass, so the two are one mode. In unitary gauge a change of variables moves it bodily out of $\Phi$ and into $W_\mu$. At high energy it re-emerges as $\varepsilon^\mu_L \to k^\mu/m$. Same object, three coordinate systems.
+
+Worth saving as a permanent demo alongside the others? It fits naturally as a `goldstone_eaten.py`, and it's a 20-second run.
+
+## 🧑 User - 2026-09-21 06:19:17
+
+yes save that demo
+
+## 🤖 Assistant - 2026-09-21 06:19:58
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat > goldstone_eaten.py <<'PY'
+"""
+The Goldstone bosons becoming the longitudinal polarizations of W and Z.
+
+Degrees of freedom are conserved across symmetry breaking:
+
+    before:  Phi (4 real) + 4 massless vectors (2 each)   = 12
+    after:   h   (1 real) + W+-,Z (3 each) + photon (2)   = 12
+
+So three scalar degrees of freedom have to leave Phi and reappear as the third
+(longitudinal) polarization of each massive vector. The term that does it is the
+bilinear mixing hiding in |D_mu Phi|^2,
+
+    L_mix = m_Z Z_mu d^mu G0 + i m_W (W-_mu d^mu G+ - W+_mu d^mu G-)
+
+whose coefficient is exactly the mass -- mass generation and "eating" are the same
+event, both coming from G_mu <Phi>.
+
+This script measures the transfer directly, in temporal gauge, where the Goldstones
+are still explicit fields rather than gauged away. One Fourier mode at momentum k
+along z is kicked and its frequency is read off:
+
+    background                 longitudinal W        Goldstone
+    -------------------------  --------------------  --------------------
+    ungauged (g = g' = 0)      omega = 0 (dead)      omega = khat (massless)
+    symmetric <Phi> = 0        omega = 0 (dead)      --
+    broken + gauged            sqrt(khat^2 + m_W^2)  sqrt(khat^2 + m_W^2)
+
+In the first two rows the longitudinal vector does not propagate at all (its curl
+vanishes, so it feels no force) and the Goldstone is an independent massless scalar.
+In the third they have merged: one massive vector polarization, and no mode left at
+omega = khat.
+
+Run:  python goldstone_eaten.py     (~20 s, text output only)
+"""
+
+import numpy as np
+
+import higgs_gauge as hg
+
+# Lattice: 8 sites and a = 0.02 GeV^-1 put the lowest mode at k ~ 39 GeV, safely
+# below m_W. Coarseness costs nothing here -- the massive dispersion is exactly
+# sqrt(khat^2 + m^2) on the lattice, since the mass term is a local k=0 term and
+# the gradient term gives khat^2 by construction.
+N, A = 8, 0.020
+EPS = 0.2  # kick amplitude [GeV], small against v = 246
+
+KPH = 2.0 * np.pi / (N * A)  # lowest lattice momentum, directed along z
+KHAT = np.sqrt(hg.lattice_momentum_sq(KPH, A))  # what the discrete Laplacian sees
+PROF = np.cos(KPH * np.arange(N) * A).reshape(1, 1, N)  # varies along the last axis
+
+
+# ---------------------------------------------------------------------------
+# kicks and probes -- all at momentum k along z, all in the W^1 / charged sector
+# ---------------------------------------------------------------------------
+
+
+def kick_W_long(st):
+    """W^1 polarized ALONG k. Curl-free, so pure gauge in the unbroken theory."""
+    st.W[0, 2] += EPS * PROF
+
+
+def kick_W_trans(st):
+    """W^1 polarized ACROSS k. The ordinary propagating polarization."""
+    st.W[0, 0] += EPS * PROF
+
+
+def kick_goldstone(st):
+    """The charged would-be Goldstone (upper doublet component)."""
+    st.Phi[0] += EPS * PROF
+
+
+# Probe the VELOCITY, not the field. In the broken phase the longitudinal sector
+# is a 2x2 system (W_L, G) whose mass matrix [[m^2, mk], [mk, k^2]] has eigenvalues
+# 0 and k^2 + m^2 -- the zero eigenvalue being the residual gauge mode. A kick
+# excites both, so the field oscillates about a nonzero offset and zero-crossing
+# detection fails. The gauge mode is static, so it drops out of the velocity.
+def pr_W_long(st):
+    return float(np.sum(st.Wd[0, 2] * PROF))
+
+
+def pr_W_trans(st):
+    return float(np.sum(st.Wd[0, 0] * PROF))
+
+
+def pr_goldstone(st):
+    return float(np.sum(np.real(st.Pi[0]) * PROF))
+
+
+# ---------------------------------------------------------------------------
+
+
+def frequency(p, kick, probe, ref, n_periods=8.0, safety=0.04):
+    """Kick one mode of the vacuum and return its measured angular frequency."""
+    st = hg.vacuum_state(p)
+    kick(st)
+    dt = hg.cfl_dt(p, safety)
+    n_steps = max(400, int(n_periods * 2.0 * np.pi / max(ref, 1.0) / dt))
+    t, y = hg.evolve_probe(st, p, dt, n_steps, probe)
+    return hg.frequency_from_zero_crossings(t, y)
+
+
+def main():
+    gauged = hg.Params(N=N, a=A)
+    ungauged = hg.Params(N=N, a=A, g=0.0, gp=0.0)  # broken, but no gauge coupling
+    symmetric = hg.Params(N=N, a=A, broken=False)  # <Phi> = 0, free gauge fields
+
+    m_W = gauged.m_W
+    w_massive = np.sqrt(KHAT**2 + m_W**2)
+
+    print(f"k_phys = {KPH:.3f}   khat = {KHAT:.4f} GeV   m_W = {m_W:.4f} GeV")
+    print(f"massive dispersion  sqrt(khat^2 + m_W^2) = {w_massive:.4f} GeV\n")
+
+    rows = [
+        ("ungauged broken (g=g'=0)", "charged Goldstone", ungauged, kick_goldstone,
+         pr_goldstone, KHAT, f"khat = {KHAT:.3f}   massless scalar"),
+        ("ungauged broken (g=g'=0)", "W transverse", ungauged, kick_W_trans,
+         pr_W_trans, KHAT, f"khat = {KHAT:.3f}   massless vector"),
+        ("ungauged broken (g=g'=0)", "W longitudinal", ungauged, kick_W_long,
+         pr_W_long, KHAT, "0               pure gauge, dead"),
+        ("symmetric  <Phi> = 0", "W transverse", symmetric, kick_W_trans,
+         pr_W_trans, KHAT, f"khat = {KHAT:.3f}   massless vector"),
+        ("symmetric  <Phi> = 0", "W longitudinal", symmetric, kick_W_long,
+         pr_W_long, KHAT, "0               pure gauge, dead"),
+        ("BROKEN + GAUGED", "W transverse", gauged, kick_W_trans,
+         pr_W_trans, w_massive, f"{w_massive:.3f}"),
+        ("BROKEN + GAUGED", "W longitudinal", gauged, kick_W_long,
+         pr_W_long, w_massive, f"{w_massive:.3f}          <== EATEN"),
+        ("BROKEN + GAUGED", "charged Goldstone", gauged, kick_goldstone,
+         pr_goldstone, w_massive, f"{w_massive:.3f}          <== EATEN"),
+    ]
+
+    print(f"{'background':26s} {'kicked direction':19s} {'measured w':>12s}   expected")
+    print("-" * 92)
+    last = None
+    for bg, name, p, kick, probe, ref, expected in rows:
+        if last is not None and bg != last:
+            print()
+        last = bg
+        w = frequency(p, kick, probe, ref)
+        print(f"{bg:26s} {name:19s} {w:12.4f}   {expected}")
+
+    # ---- the mixing term caught in the act --------------------------------
+    # Start the Higgs EXACTLY at the VEV and disturb only the gauge field. The
+    # bilinear m_W W^-_mu d^mu G^+ then sources the Goldstone immediately.
+    print("\npure longitudinal-W kick, Higgs started exactly at the VEV:")
+    for label, p in (("  gauged  (g = 0.6533)", gauged), ("  ungauged (g = 0)     ", ungauged)):
+        st = hg.vacuum_state(p)
+        kick_W_long(st)
+        dt = hg.cfl_dt(p, 0.04)
+        n_steps = int(2.0 * 2.0 * np.pi / w_massive / dt)
+        _, y = hg.evolve_probe(st, p, dt, n_steps, lambda s: float(np.max(np.abs(s.Phi[0]))))
+        print(f"{label}  ->  max |Phi_upper| = {y.max():.4e} GeV")
+
+    print("\nThe Goldstone is generated out of nothing by the gauge field alone;")
+    print("with g = 0 it stays identically zero. That coupling is the eating.")
+
+
+if __name__ == "__main__":
+    main()
+PY
+time .venv/bin/python goldstone_eaten.py``
+  ```
+  k_phys = 39.270   khat = 38.2683 GeV   m_W = 80.4278 GeV
+  massive dispersion  sqrt(khat^2 + m_W^2) = 89.0679 GeV
+  
+  background                 kicked direction      measured w   expected
+  --------------------------------------------------------------------------------------------
+  ungauged broken (g=g'=0)   charged Goldstone        38.2686   khat = 38.268   massless scalar
+  ungauged broken (g=g'=0)   W transverse             38.2686   khat = 38.268   massless vector
+  ungauged broken (g=g'=0)   W longitudinal            0.0000   0               pure gauge, dead
+  
+  symmetric  <Phi> = 0       W transverse             38.2686   khat = 38.268   massless vector
+  symmetric  <Phi> = 0       W longitudinal            0.0000   0               pure gauge, dead
+  
+  BROKEN + GAUGED            W transverse             89.0709   89.068
+  BROKEN + GAUGED            W longitudinal           89.0709   89.068          <== EATEN
+  BROKEN + GAUGED            charged Goldstone        89.0709   89.068          <== EATEN
+  
+  pure longitudinal-W kick, Higgs started exactly at the VEV:
+    gauged  (g = 0.6533)  ->  max |Phi_upper| = 1.0138e-01 GeV
+    ungauged (g = 0)       ->  max |Phi_upper| = 0.0000e+00 GeV
+  
+  ...
+  ```
+
+</details>
+
+Saved as [goldstone_eaten.py](goldstone_eaten.py), runs in ~19 s. Let me add it to the README.
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `grep -n "^|" README.md | head -30 && echo "---BASH---" && grep -n "^```bash" -A 12 README.md | head -30``
+  ```
+  /bin/bash: eval: line 0: unexpected EOF while looking for matching ``'
+  /bin/bash: eval: line 1: syntax error: unexpected end of file
+  ```
+- **Bash**: `Ran `sed -n '1,40p' README.md``
+  ````
+  # The Higgs mechanism on a lattice
+  
+  Note: This is code written entirely by Claude Opus 5, with full session log recorded in the contrails directory, courtesy of the https://github.com/ThreePalmTrees/Contrails app. On a mac, https://github.com/MarkEdit-app provides a good viewer.
+  
+  Real-time classical lattice field theory for the SU(2)<sub>L</sub> × U(1)<sub>Y</sub>
+  Higgs sector. Four numbers go in — `v`, `λ`, `g`, `g'` — and the whole boson spectrum
+  comes out, measured from oscillation frequencies rather than read off a formula.
+  
+  ```bash
+  python verify.py     # correctness tests -- run this first
+  python demo.py       # spectrum + higgs_mechanism.png   (~2.5 min)
+  python demo.py --replot   # redraw the figure from cached results
+  python potential_plot.py  # -> higgs_potential.png
+  python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)
+  python electron_demo.py   # -> electron_fields.png   (~10 s)
+  ```
+  
+  ## Files
+  
+  | file | what it is |
+  ...
+  ````
+- **Bash**: `Ran `python3 - <<'PY'
+import re, io
+p = "README.md"
+s = open(p).read()
+
+s = s.replace(
+    "python electron_demo.py   # -> electron_fields.png   (~10 s)\n",
+    "python electron_demo.py   # -> electron_fields.png   (~10 s)\n"
+    "python goldstone_eaten.py # the Goldstones becoming longitudinal W/Z   (~20 s, text)\n",
+)
+
+s = s.replace(
+    "| `electron_demo.py` | a free electron and neutrino in motion, and the fields they carry |\n",
+    "| `electron_demo.py` | a free electron and neutrino in motion, and the fields they carry |\n"
+    "| `goldstone_eaten.py` | degree-of-freedom transfer: the longitudinal mode measured before and after |\n",
+)
+open(p, "w").write(s)
+PY
+sed -n '9,29p' README.md``
+  ````
+  ```bash
+  python verify.py     # correctness tests -- run this first
+  python demo.py       # spectrum + higgs_mechanism.png   (~2.5 min)
+  python demo.py --replot   # redraw the figure from cached results
+  python potential_plot.py  # -> higgs_potential.png
+  python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)
+  python electron_demo.py   # -> electron_fields.png   (~10 s)
+  python goldstone_eaten.py # the Goldstones becoming longitudinal W/Z   (~20 s, text)
+  ```
+  
+  ## Files
+  
+  | file | what it is |
+  |---|---|
+  | `higgs_gauge.py` | the physics: fields, energy, forces, integrator, probes |
+  | `verify.py` | five correctness tests, all passing |
+  | `demo.py` | the demonstrations and the figure |
+  | `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
+  | `w_source_demo.py` | driving the W field: Yukawa blob, evanescent vs radiating, cutoff at $m_W$ |
+  | `electron_demo.py` | a free electron and neutrino in motion, and the fields they carry |
+  ...
+  ````
+
+</details>
+
+Saved.
+
+**[goldstone_eaten.py](goldstone_eaten.py)** — text-only, ~19 s, no new dependencies. Cleaned up from the scratch version with the physics written into the module docstring and two things documented that were implicit before:
+
+- **Why the probe reads velocity, not the field.** The longitudinal sector is a 2×2 system $(W_L, G)$ with mass matrix $\begin{psmallmatrix}m^2 & mk\\ mk & k^2\end{psmallmatrix}$, whose eigenvalues are $0$ and $k^2+m^2$. A kick excites both, so the *field* oscillates about a nonzero offset and zero-crossing detection breaks. The zero mode is static, so it drops out of the velocity.
+- **Why the coarse lattice is free.** The massive dispersion is exactly $\sqrt{\hat k^2+m^2}$ on the lattice — the mass term is a local $k=0$ term and the gradient term gives $\hat k^2$ by construction — so $N=8$, $a=0.02$ costs nothing and puts the lowest mode at $k \approx 39$ GeV, comfortably below $m_W$.
+
+Also added to the README's run block and file table.
+
+Saved.
+
+**[goldstone_eaten.py](goldstone_eaten.py)** — text-only, ~19 s, no new dependencies. Cleaned up from the scratch version with the physics written into the module docstring and two things documented that were implicit before:
+
+- **Why the probe reads velocity, not the field.** The longitudinal sector is a 2×2 system $(W_L, G)$ with mass matrix $\begin{psmallmatrix}m^2 & mk\\ mk & k^2\end{psmallmatrix}$, whose eigenvalues are $0$ and $k^2+m^2$. A kick excites both, so the *field* oscillates about a nonzero offset and zero-crossing detection breaks. The zero mode is static, so it drops out of the velocity.
+- **Why the coarse lattice is free.** The massive dispersion is exactly $\sqrt{\hat k^2+m^2}$ on the lattice — the mass term is a local $k=0$ term and the gradient term gives $\hat k^2$ by construction — so $N=8$, $a=0.02$ costs nothing and puts the lowest mode at $k \approx 39$ GeV, comfortably below $m_W$.
+
+Also added to the README's run block and file table.
 

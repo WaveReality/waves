@@ -12,6 +12,8 @@ python demo.py       # spectrum + higgs_mechanism.png   (~2.5 min)
 python demo.py --replot   # redraw the figure from cached results
 python potential_plot.py  # -> higgs_potential.png
 python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)
+python electron_demo.py   # -> electron_fields.png   (~10 s)
+python goldstone_eaten.py # the Goldstones becoming longitudinal W/Z   (~20 s, text)
 ```
 
 ## Files
@@ -23,6 +25,8 @@ python w_source_demo.py   # -> w_source.png   (~2 min; --replot to redraw)
 | `demo.py` | the demonstrations and the figure |
 | `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
 | `w_source_demo.py` | driving the W field: Yukawa blob, evanescent vs radiating, cutoff at $m_W$ |
+| `electron_demo.py` | a free electron and neutrino in motion, and the fields they carry |
+| `goldstone_eaten.py` | degree-of-freedom transfer: the longitudinal mode measured before and after |
 
 ## Conventions
 
@@ -103,7 +107,13 @@ promise.
 - **`damping` in `step()` is not Standard Model physics.** It stands in for Hubble
   friction in an expanding universe, and is applied to the Higgs only so that a
   gauge probe keeps ringing at readable amplitude. Off by default.
-- **Fermions are absent**, so no Yukawa couplings and no top quark.
+- **Fermions are absent from `higgs_gauge.py`**, so no Yukawa couplings and no top
+  quark. `electron_demo.py` adds a standalone Dirac packet, but it is a *source* for
+  the gauge fields, not a dynamically coupled field: there is no back-reaction.
+- **`electron_demo.py` uses a 100 GeV lepton, not a real electron.** An electron's
+  Compton wavelength is 386 fm and the Z range is 0.0022 fm — a ratio of 1.8e5, so no
+  single lattice shows both. The electromagnetic structure is scale free and looks
+  the same either way; only the Z panel depends on the mass choice.
 
 ## Things worth trying
 
