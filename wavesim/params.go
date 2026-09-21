@@ -132,6 +132,13 @@ type Parameters struct {
 	// value 0.6533. Sets m_W = g v / 2.
 	GW float32
 
+	// YangMills enables the Yang-Mills self-coupling of the W fields: the
+	// terms that make SU(2) genuinely non-abelian rather than three
+	// independent copies of U(1). They are quadratic and cubic in W, so they
+	// vanish at linear order and change no boson mass; what they add is W
+	// self-interaction. Costs 12 extra Gradient10 evaluations per site.
+	YangMills slbool.Bool
+
 	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
 	// the B field to the Higgs doublet. Dimensionless. Standard Model value
 	// 0.3500. Together with g it sets the weak mixing angle and m_Z.
@@ -213,6 +220,11 @@ type Parameters struct {
 	// MZ = HiggsV * sqrt(GW^2 + GpW^2) / 2 is the Z boson mass in 1/cube,
 	// likewise for reference only. The photon mass is zero.
 	MZ float32 `display:"-"`
+
+	// The GPU struct must be a multiple of 16 bytes; sz_test.go checks it.
+	pad0 float32
+	pad1 float32
+	pad2 float32
 }
 
 func (pr *Parameters) Update() {
@@ -260,6 +272,7 @@ func (pr *Parameters) Defaults() {
 	pr.HiggsLambda = 0.1291
 	pr.GW = 0.6533
 	pr.GpW = 0.3500
+	pr.YangMills.SetBool(true)
 	pr.Diff = 0.5
 	pr.Decay = 0.98
 	pr.Update()

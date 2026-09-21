@@ -396,6 +396,20 @@ fn EWDiv(x: i32,y: i32,z: i32,vX: i32,tidx: i32) -> f32 {
 	var gz = Gradient10(x, y, z, vX+2, tidx);
 return gx.x + gy.y + gz.z;
 }
+fn EWCrossUp(a0: vec3<f32>,ax: vec3<f32>,ay: vec3<f32>,az: vec3<f32>,b0: vec3<f32>,bx: vec3<f32>,by: vec3<f32>,bz: vec3<f32>) -> vec3<f32> {
+	var r = Cross3(a0, b0);
+	r = r+(Cross3(ax, bx));
+	r = r+(Cross3(ay, by));
+	r = r+(Cross3(az, bz));
+return r;
+}
+fn EWCrossLor(a0: vec3<f32>,ax: vec3<f32>,ay: vec3<f32>,az: vec3<f32>,b0: vec3<f32>,bx: vec3<f32>,by: vec3<f32>,bz: vec3<f32>) -> vec3<f32> {
+	var r = Cross3(a0, b0);
+	r = r-(Cross3(ax, bx));
+	r = r-(Cross3(ay, by));
+	r = r-(Cross3(az, bz));
+return r;
+}
 fn ElectroweakKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -449,9 +463,21 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var dZ = dzp+(az);
 	var dtp = vec4<f32>(oc*psv.x, oc*psv.y, oc*psv.z, oc*psv.w);
 	var d0 = dtp+(a0);
-	var dvW1 = EWDiv(x, y, z, i32(EWW1Xs), prv);
-	var dvW2 = EWDiv(x, y, z, i32(EWW2Xs), prv);
-	var dvW3 = EWDiv(x, y, z, i32(EWW3Xs), prv);
+	var g10 = Gradient10(x, y, z, i32(EWW10s), prv);
+	var g1x = Gradient10(x, y, z, i32(EWW1Xs), prv);
+	var g1y = Gradient10(x, y, z, i32(EWW1Ys), prv);
+	var g1z = Gradient10(x, y, z, i32(EWW1Zs), prv);
+	var g20 = Gradient10(x, y, z, i32(EWW20s), prv);
+	var g2x = Gradient10(x, y, z, i32(EWW2Xs), prv);
+	var g2y = Gradient10(x, y, z, i32(EWW2Ys), prv);
+	var g2z = Gradient10(x, y, z, i32(EWW2Zs), prv);
+	var g30 = Gradient10(x, y, z, i32(EWW30s), prv);
+	var g3x = Gradient10(x, y, z, i32(EWW3Xs), prv);
+	var g3y = Gradient10(x, y, z, i32(EWW3Ys), prv);
+	var g3z = Gradient10(x, y, z, i32(EWW3Zs), prv);
+	var dvW1 = g1x.x + g1y.y + g1z.z;
+	var dvW2 = g2x.x + g2y.y + g2z.z;
+	var dvW3 = g3x.x + g3y.y + g3z.z;
 	var dvB = EWDiv(x, y, z, i32(EWBXs), prv);
 	var lap = vec4<f32>(Laplacian19(x, y, z, i32(EWHsCa), prv, psi.x),
 		Laplacian19(x, y, z, i32(EWHsCb), prv, psi.y),
@@ -461,6 +487,15 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	cov = cov+(EWGaugeAct(w1x, w2x, w3x, bx, dxp+(dX)));
 	cov = cov+(EWGaugeAct(w1y, w2y, w3y, by, dyp+(dY)));
 	cov = cov+(EWGaugeAct(w1z, w2z, w3z, bz, dzp+(dZ)));
+	var w1xv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Xv), u32(prv)));
+	var w1yv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Yv), u32(prv)));
+	var w1zv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Zv), u32(prv)));
+	var w2xv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Xv), u32(prv)));
+	var w2yv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Yv), u32(prv)));
+	var w2zv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Zv), u32(prv)));
+	var w3xv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Xv), u32(prv)));
+	var w3yv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Yv), u32(prv)));
+	var w3zv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Zv), u32(prv)));
 	var w10v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW10v), u32(prv)));
 	var w20v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW20v), u32(prv)));
 	var w30v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW30v), u32(prv)));
@@ -478,9 +513,64 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var jx = EWCurrent(psi, dX);
 	var jy = EWCurrent(psi, dY);
 	var jz = EWCurrent(psi, dZ);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW10s), csq, j0.x, jx.x, jy.x, jz.x);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW20s), csq, j0.y, jx.y, jy.y, jz.y);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWW30s), csq, j0.z, jx.z, jy.z, jz.z);
+	var ym0: vec3<f32>;
+	var ymx: vec3<f32>;
+	var ymy: vec3<f32>;
+	var ymz: vec3<f32>;
+	if (Params[0].YangMills == 1) {
+		var gw = Params[0].GW;
+		var w0 = vec3<f32>(w10, w20, w30);
+		var wx = vec3<f32>(w1x, w2x, w3x);
+		var wy = vec3<f32>(w1y, w2y, w3y);
+		var wz = vec3<f32>(w1z, w2z, w3z);
+		var t0 = vec3<f32>(w10v, w20v, w30v)*(oc);
+		var tx = vec3<f32>(w1xv, w2xv, w3xv)*(oc);
+		var ty = vec3<f32>(w1yv, w2yv, w3yv)*(oc);
+		var tz = vec3<f32>(w1zv, w2zv, w3zv)*(oc);
+		var x0 = vec3<f32>(g10.x, g20.x, g30.x);
+		var y0 = vec3<f32>(g10.y, g20.y, g30.y);
+		var z0 = vec3<f32>(g10.z, g20.z, g30.z);
+		var xx = vec3<f32>(g1x.x, g2x.x, g3x.x);
+		var yx = vec3<f32>(g1x.y, g2x.y, g3x.y);
+		var zx = vec3<f32>(g1x.z, g2x.z, g3x.z);
+		var xy = vec3<f32>(g1y.x, g2y.x, g3y.x);
+		var yy = vec3<f32>(g1y.y, g2y.y, g3y.y);
+		var zy = vec3<f32>(g1y.z, g2y.z, g3y.z);
+		var xz = vec3<f32>(g1z.x, g2z.x, g3z.x);
+		var yz = vec3<f32>(g1z.y, g2z.y, g3z.y);
+		var zz = vec3<f32>(g1z.z, g2z.z, g3z.z);
+		var dv = t0+(xx)+(yy)+(zz);
+		ym0 = EWCrossUp(w0, wx, wy, wz, t0, x0, y0, z0)*(2 * gw);
+		ym0 = ym0-(EWCrossLor(w0, wx, wy, wz, t0, tx, ty, tz)*(gw));
+		ym0 = ym0-(EWCrossLor(w0, wx, wy, wz,
+			Cross3(w0, w0), Cross3(wx, w0),
+			Cross3(wy, w0), Cross3(wz, w0))*(gw * gw));
+		ym0 = ym0+(Cross3(dv, w0)*(gw));
+		ymx = EWCrossUp(w0, wx, wy, wz, tx, xx, yx, zx)*(2 * gw);
+		ymx = ymx+(EWCrossLor(w0, wx, wy, wz, x0, xx, xy, xz)*(gw));
+		ymx = ymx-(EWCrossLor(w0, wx, wy, wz,
+			Cross3(w0, wx), Cross3(wx, wx),
+			Cross3(wy, wx), Cross3(wz, wx))*(gw * gw));
+		ymx = ymx+(Cross3(dv, wx)*(gw));
+		ymy = EWCrossUp(w0, wx, wy, wz, ty, xy, yy, zy)*(2 * gw);
+		ymy = ymy+(EWCrossLor(w0, wx, wy, wz, y0, yx, yy, yz)*(gw));
+		ymy = ymy-(EWCrossLor(w0, wx, wy, wz,
+			Cross3(w0, wy), Cross3(wx, wy),
+			Cross3(wy, wy), Cross3(wz, wy))*(gw * gw));
+		ymy = ymy+(Cross3(dv, wy)*(gw));
+		ymz = EWCrossUp(w0, wx, wy, wz, tz, xz, yz, zz)*(2 * gw);
+		ymz = ymz+(EWCrossLor(w0, wx, wy, wz, z0, zx, zy, zz)*(gw));
+		ymz = ymz-(EWCrossLor(w0, wx, wy, wz,
+			Cross3(w0, wz), Cross3(wx, wz),
+			Cross3(wy, wz), Cross3(wz, wz))*(gw * gw));
+		ymz = ymz+(Cross3(dv, wz)*(gw));
+	}
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW10s), csq,
+		j0.x+ym0.x, jx.x+ymx.x, jy.x+ymy.x, jz.x+ymz.x);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW20s), csq,
+		j0.y+ym0.y, jx.y+ymx.y, jy.y+ymy.y, jz.y+ymz.y);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW30s), csq,
+		j0.z+ym0.z, jx.z+ymx.z, jy.z+ymy.z, jz.z+ymz.z);
 	EWGaugeStep(x, y, z, cur, prv, i32(EWB0s), csq, j0.w, jx.w, jy.w, jz.w);
 	var hvCaN = psv.x + hf.x;
 	var hvCbN = psv.y + hf.y;
@@ -668,6 +758,7 @@ struct Parameters {
 	HiggsMu: f32,
 	HiggsLambda: f32,
 	GW: f32,
+	YangMills: i32,
 	GpW: f32,
 	Diff: f32,
 	Decay: f32,
@@ -689,6 +780,9 @@ struct Parameters {
 	HiggsV: f32,
 	MW: f32,
 	MZ: f32,
+	pad0: f32,
+	pad1: f32,
+	pad2: f32,
 }
 
 //////// import: "particle.go"
@@ -734,6 +828,9 @@ const SLPi = 3.141592653589793;
 //////// import: "slmath-vector2.go"
 
 //////// import: "slmath-vector3.go"
+fn Cross3(v: vec3<f32>,o: vec3<f32>) -> vec3<f32> {
+	return vec3<f32>(v.y*o.z-v.z*o.y, v.z*o.x-v.x*o.z, v.x*o.y-v.y*o.x);
+}
 
 //////// import: "spinfield.go"
 alias SpinfieldStates = CabStates; //enums:enum -trim-prefix=Spinfield

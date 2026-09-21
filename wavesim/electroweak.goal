@@ -6,6 +6,7 @@ package wavesim
 
 import (
 	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/gosl/slmath"
 )
 
 //gosl:start
@@ -217,6 +218,30 @@ func EWDiv(x, y, z, vX, tidx int32) float32 {
 	return gx.X + gy.Y + gz.Z
 }
 
+// EWCrossUp returns sum_mu (A^mu x B_mu), the contraction of an UPPER with a
+// LOWER spacetime index. No metric signs: all four terms add.
+//
+// Every eps^{abc} in the Yang-Mills equation is a cross product in adjoint
+// space, since eps^{abc} X^b Y^c = (X x Y)^a. Writing the self-coupling this
+// way turns a triple-index mess into four cross products.
+func EWCrossUp(a0, ax, ay, az, b0, bx, by, bz math32.Vector3) math32.Vector3 {
+	r := slmath.Cross3(a0, b0)
+	r = r.Add(slmath.Cross3(ax, bx))
+	r = r.Add(slmath.Cross3(ay, by))
+	r = r.Add(slmath.Cross3(az, bz))
+	return r
+}
+
+// EWCrossLor returns sum_mu (A_mu x B^mu) where BOTH carry the same index
+// position, so the (+,-,-,-) metric appears: time adds, space subtracts.
+func EWCrossLor(a0, ax, ay, az, b0, bx, by, bz math32.Vector3) math32.Vector3 {
+	r := slmath.Cross3(a0, b0)
+	r = r.Sub(slmath.Cross3(ax, bx))
+	r = r.Sub(slmath.Cross3(ay, by))
+	r = r.Sub(slmath.Cross3(az, bz))
+	return r
+}
+
 // ElectroweakKernel is the kernel for the SU(2)_L x U(1)_Y electroweak model:
 // the Higgs doublet coupled to the three W^a gauge fields and the B field.
 // Only supports 3D.
@@ -244,20 +269,33 @@ func EWDiv(x, y, z, vX, tidx int32) float32 {
 // lambda the bare dimensionless Standard Model numbers, needing no conversion
 // (see Units.Update).
 //
-// # Not yet included
+// # Yang-Mills self-coupling
 //
-// The Yang-Mills self-coupling. The full non-abelian equation in Lorenz gauge
-// carries three more terms beyond box W = j:
+// Enabled by Params.YangMills. With a Feynman-type gauge-fixing term (xi = 1)
+// cancelling the -d^nu(d.W) piece, the non-abelian equation of motion is
 //
-//	2 g eps^abc W^b_mu d^mu W^c_nu
-//	- g eps^abc W^b_mu d_nu W^c^mu
-//	+ g^2 eps^abc eps^cde W^b_mu W^d^mu W^e_nu
+//	box W^a_nu = j^a_nu
+//	             + g eps^abc (d.W^b) W^c_nu                  [divergence]
+//	             + 2g eps^abc W^{b mu} d_mu W^c_nu           [transport]
+//	             - g eps^abc W^b_mu d^nu W^{c mu}            [transpose]
+//	             - g^2 eps^abc eps^cde (W^b.W^d) W^e_nu      [quartic]
 //
-// All three are quadratic or cubic in W, so they vanish identically at linear
-// order and contribute nothing to the boson masses -- the spectrum below is
-// exact without them. What they do provide is the W self-interaction, i.e. the
-// difference between genuine SU(2) and three independent copies of U(1). Add
-// them before trusting anything involving large-amplitude W fields.
+// The three CUBIC signs are fixed by requiring the force to be -dU/dphi for the
+// standard energy with F^a_jk = d_j W^a_k - d_k W^a_j + g eps^abc W^b_j W^c_k;
+// see TestElectroweakForceIsEnergyGradient. They cannot be fixed by the
+// pure-gauge test alone, because flipping them also reverses the rotation sense
+// it predicts, so that test passes either way. The quartic sign is independent
+// and is checked exactly on uniform fields.
+//
+// Note the divergence term is kept rather than dropped: unlike the abelian
+// case, d.W^a = 0 is NOT preserved by the non-abelian evolution, so it cannot
+// simply be imposed.
+//
+// Every term is quadratic or cubic in W, so all four vanish identically at
+// linear order and the boson spectrum is unchanged -- TestGaugeBosonMasses
+// passes with this on or off. What they add is the W self-interaction, i.e.
+// the difference between genuine SU(2) and three independent copies of U(1).
+//
 func ElectroweakKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -325,9 +363,25 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	//             = lap(Psi) - i(d_j G_j)Psi - i G_j d_j Psi - i G_j D_j Psi
 	// Each -i G ... piece is just EWGaugeAct applied to a different argument,
 	// so the whole covariant Laplacian composes out of the one operation.
-	dvW1 := EWDiv(x, y, z, int32(EWW1Xs), prv)
-	dvW2 := EWDiv(x, y, z, int32(EWW2Xs), prv)
-	dvW3 := EWDiv(x, y, z, int32(EWW3Xs), prv)
+	// Spatial gradients of all twelve W components. These serve double duty:
+	// their traces give the divergences the Higgs covariant Laplacian needs,
+	// and the full tensor is what the Yang-Mills self-coupling runs on.
+	g10 := Gradient10(x, y, z, int32(EWW10s), prv)
+	g1x := Gradient10(x, y, z, int32(EWW1Xs), prv)
+	g1y := Gradient10(x, y, z, int32(EWW1Ys), prv)
+	g1z := Gradient10(x, y, z, int32(EWW1Zs), prv)
+	g20 := Gradient10(x, y, z, int32(EWW20s), prv)
+	g2x := Gradient10(x, y, z, int32(EWW2Xs), prv)
+	g2y := Gradient10(x, y, z, int32(EWW2Ys), prv)
+	g2z := Gradient10(x, y, z, int32(EWW2Zs), prv)
+	g30 := Gradient10(x, y, z, int32(EWW30s), prv)
+	g3x := Gradient10(x, y, z, int32(EWW3Xs), prv)
+	g3y := Gradient10(x, y, z, int32(EWW3Ys), prv)
+	g3z := Gradient10(x, y, z, int32(EWW3Zs), prv)
+
+	dvW1 := g1x.X + g1y.Y + g1z.Z
+	dvW2 := g2x.X + g2y.Y + g2z.Z
+	dvW3 := g3x.X + g3y.Y + g3z.Z
 	dvB := EWDiv(x, y, z, int32(EWBXs), prv)
 
 	lap := math32.Vec4(Laplacian19(x, y, z, int32(EWHsCa), prv, psi.X),
@@ -351,6 +405,15 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	// sources W_0 and B_0 through j_0 but never feels them back, which breaks
 	// gauge invariance: a constant A_0 is pure gauge and must produce a phase
 	// rotation at constant |Phi|, not a change in the magnitude.
+	w1xv := State[z, y, x, EWW1Xv, prv]
+	w1yv := State[z, y, x, EWW1Yv, prv]
+	w1zv := State[z, y, x, EWW1Zv, prv]
+	w2xv := State[z, y, x, EWW2Xv, prv]
+	w2yv := State[z, y, x, EWW2Yv, prv]
+	w2zv := State[z, y, x, EWW2Zv, prv]
+	w3xv := State[z, y, x, EWW3Xv, prv]
+	w3yv := State[z, y, x, EWW3Yv, prv]
+	w3zv := State[z, y, x, EWW3Zv, prv]
 	w10v := State[z, y, x, EWW10v, prv]
 	w20v := State[z, y, x, EWW20v, prv]
 	w30v := State[z, y, x, EWW30v, prv]
@@ -381,10 +444,83 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	jy := EWCurrent(psi, dY)
 	jz := EWCurrent(psi, dZ)
 
+	// ---- Yang-Mills self-coupling -----------------------------------------
+	// Adjoint 3-vectors: for each spacetime index mu, the SU(2) triplet
+	// (W^1_mu, W^2_mu, W^3_mu). In this form every eps^{abc} becomes a cross
+	// product and the whole self-coupling is a handful of them.
+	var ym0, ymx, ymy, ymz math32.Vector3
+	if Params[0].YangMills.IsTrue() {
+		gw := Params[0].GW
+		w0 := math32.Vec3(w10, w20, w30)
+		wx := math32.Vec3(w1x, w2x, w3x)
+		wy := math32.Vec3(w1y, w2y, w3y)
+		wz := math32.Vec3(w1z, w2z, w3z)
+
+		// d_mu W^nu, indexed [derivative direction][component]. The time
+		// derivatives are the stored velocities: per step, so divide by c to
+		// land in the same 1/cube units as the spatial gradients.
+		t0 := math32.Vec3(w10v, w20v, w30v).MulScalar(oc)
+		tx := math32.Vec3(w1xv, w2xv, w3xv).MulScalar(oc)
+		ty := math32.Vec3(w1yv, w2yv, w3yv).MulScalar(oc)
+		tz := math32.Vec3(w1zv, w2zv, w3zv).MulScalar(oc)
+
+		x0 := math32.Vec3(g10.X, g20.X, g30.X)
+		y0 := math32.Vec3(g10.Y, g20.Y, g30.Y)
+		z0 := math32.Vec3(g10.Z, g20.Z, g30.Z)
+		xx := math32.Vec3(g1x.X, g2x.X, g3x.X)
+		yx := math32.Vec3(g1x.Y, g2x.Y, g3x.Y)
+		zx := math32.Vec3(g1x.Z, g2x.Z, g3x.Z)
+		xy := math32.Vec3(g1y.X, g2y.X, g3y.X)
+		yy := math32.Vec3(g1y.Y, g2y.Y, g3y.Y)
+		zy := math32.Vec3(g1y.Z, g2y.Z, g3y.Z)
+		xz := math32.Vec3(g1z.X, g2z.X, g3z.X)
+		yz := math32.Vec3(g1z.Y, g2z.Y, g3z.Y)
+		zz := math32.Vec3(g1z.Z, g2z.Z, g3z.Z)
+
+		// divergence d.W^a = d_0 W^{a0} + d_j W^{aj}, as an adjoint vector
+		dv := t0.Add(xx).Add(yy).Add(zz)
+
+		// [transport] -2g sum_mu (W^mu x d_mu W^nu)  (upper-lower, no signs)
+		// [transpose] +g sum_mu (W_mu x d^nu W^mu)   (metric signs, and
+		//             d^nu = +d_0 for nu=0 but -d_j for nu=j)
+		// [quartic]   -g^2 sum_mu (W_mu x (W^mu x W^nu))
+		// [divergence] -g (dv x W^nu)
+		ym0 = EWCrossUp(w0, wx, wy, wz, t0, x0, y0, z0).MulScalar(2 * gw)
+		ym0 = ym0.Sub(EWCrossLor(w0, wx, wy, wz, t0, tx, ty, tz).MulScalar(gw))
+		ym0 = ym0.Sub(EWCrossLor(w0, wx, wy, wz,
+			slmath.Cross3(w0, w0), slmath.Cross3(wx, w0),
+			slmath.Cross3(wy, w0), slmath.Cross3(wz, w0)).MulScalar(gw * gw))
+		ym0 = ym0.Add(slmath.Cross3(dv, w0).MulScalar(gw))
+
+		ymx = EWCrossUp(w0, wx, wy, wz, tx, xx, yx, zx).MulScalar(2 * gw)
+		ymx = ymx.Add(EWCrossLor(w0, wx, wy, wz, x0, xx, xy, xz).MulScalar(gw))
+		ymx = ymx.Sub(EWCrossLor(w0, wx, wy, wz,
+			slmath.Cross3(w0, wx), slmath.Cross3(wx, wx),
+			slmath.Cross3(wy, wx), slmath.Cross3(wz, wx)).MulScalar(gw * gw))
+		ymx = ymx.Add(slmath.Cross3(dv, wx).MulScalar(gw))
+
+		ymy = EWCrossUp(w0, wx, wy, wz, ty, xy, yy, zy).MulScalar(2 * gw)
+		ymy = ymy.Add(EWCrossLor(w0, wx, wy, wz, y0, yx, yy, yz).MulScalar(gw))
+		ymy = ymy.Sub(EWCrossLor(w0, wx, wy, wz,
+			slmath.Cross3(w0, wy), slmath.Cross3(wx, wy),
+			slmath.Cross3(wy, wy), slmath.Cross3(wz, wy)).MulScalar(gw * gw))
+		ymy = ymy.Add(slmath.Cross3(dv, wy).MulScalar(gw))
+
+		ymz = EWCrossUp(w0, wx, wy, wz, tz, xz, yz, zz).MulScalar(2 * gw)
+		ymz = ymz.Add(EWCrossLor(w0, wx, wy, wz, z0, zx, zy, zz).MulScalar(gw))
+		ymz = ymz.Sub(EWCrossLor(w0, wx, wy, wz,
+			slmath.Cross3(w0, wz), slmath.Cross3(wx, wz),
+			slmath.Cross3(wy, wz), slmath.Cross3(wz, wz)).MulScalar(gw * gw))
+		ymz = ymz.Add(slmath.Cross3(dv, wz).MulScalar(gw))
+	}
+
 	// ---- gauge field updates: box W = j, box B = j^Y ----------------------
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW10s), csq, j0.X, jx.X, jy.X, jz.X)
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW20s), csq, j0.Y, jx.Y, jy.Y, jz.Y)
-	EWGaugeStep(x, y, z, cur, prv, int32(EWW30s), csq, j0.Z, jx.Z, jy.Z, jz.Z)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW10s), csq,
+		j0.X+ym0.X, jx.X+ymx.X, jy.X+ymy.X, jz.X+ymz.X)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW20s), csq,
+		j0.Y+ym0.Y, jx.Y+ymx.Y, jy.Y+ymy.Y, jz.Y+ymz.Y)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW30s), csq,
+		j0.Z+ym0.Z, jx.Z+ymx.Z, jy.Z+ymy.Z, jz.Z+ymz.Z)
 	EWGaugeStep(x, y, z, cur, prv, int32(EWB0s), csq, j0.W, jx.W, jy.W, jz.W)
 
 	// ---- Higgs update ------------------------------------------------------

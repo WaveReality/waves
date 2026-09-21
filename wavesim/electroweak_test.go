@@ -351,3 +351,241 @@ func TestGaugeTimeComponent(t *testing.T) {
 		}
 	}
 }
+
+// --- Yang-Mills self-coupling ---------------------------------------------
+
+// ymSim is pure Yang-Mills: HiggsMu = 0 makes vfac = -lambda*mag, so Phi = 0
+// is an exact fixed point and every Higgs current vanishes identically. What
+// is left is the gauge sector alone.
+func ymSim(sz int32) *Sim {
+	ss := ewSim(sz)
+	ss.Params.HiggsMu = 0
+	ss.Params.Update()
+	State.SetZeros()
+	GetCtx(0).Init()
+	return ss
+}
+
+// ewWBase returns the first state variable of SU(2) component a (1..3);
+// the four potentials are at +0..+3 and their velocities at +4..+7.
+func ewWBase(a int) int { return int(EWW10s) + (a-1)*8 }
+
+// TestYangMillsPureGauge is the acceptance test for the self-coupling.
+//
+// A constant uniform W^3_0 = B over a vacuum gauge field is PURE GAUGE: it is
+// the gauge transform, by U = exp(i g B c t T^3), of a static uniform W^1_x.
+// So the exact solution has (W^1_x, W^2_x) turning in the adjoint 1-2 plane at
+//
+//	omega = +c * g * B
+//
+// with |W| constant and W^3_0 standing still. Consistency of BOTH the nu = x
+// and the nu = 0 equations is needed for that, and they involve different
+// terms, which is what makes this test pin down all the coefficients at once:
+//
+//	nu = x: transport (-2g) and quartic (-g^2) must cancel to leave -omega^2 W
+//	nu = 0: transpose (+g) and quartic (-g^2) must cancel exactly
+//
+// Get the factor of 2 on transport wrong, or the relative sign of the transpose
+// term, and the radius runs away instead of holding. Reversing the assumed
+// rotation sense makes the rate wrong by 2x and W^3_0 collapse.
+//
+// LIMITATION: this test cannot fix the OVERALL sign of the three cubic terms.
+// Flipping them all reverses the rotation sense, and the test then passes with
+// the opposite omega -- which is how an earlier sign error survived it.
+// TestElectroweakForceIsEnergyGradient is what pins that down.
+//
+// As in TestGaugeTimeComponent the rotating-frame system is only marginally
+// stable under an explicit integrator, so the radius error is measured as a
+// convergence rate rather than an absolute.
+func TestYangMillsPureGauge(t *testing.T) {
+	const drSteps = 64
+	var prevDrift float64
+	var ratios []float64
+	r := float32(0.05)
+	t.Logf("%8s %11s %12s %9s %13s %8s %12s", "B", "omega", "measured", "ratio", "drift/step", "x4?", "W30 drift")
+	for k, b := range []float32{0.02, 0.01, 0.005} {
+		ss := ymSim(4)
+		p := ss.Params
+		om := float64(p.C) * float64(p.GW) * float64(b)
+		ss.Fill(EWW30s, Both, b)
+		ss.Fill(EWW1Xs, Both, r)
+		ss.Fill(EWW2Xv, Both, float32(om)*r)
+		ewWrap()
+
+		n1 := int(0.4 / math.Abs(om))
+		nrun := 2 * n1
+		if nrun < drSteps {
+			nrun = drSteps
+		}
+		r0 := float64(r) * float64(r)
+		var th1, th2, drift float64
+		for i := range nrun {
+			ewStep(ss)
+			switch i + 1 {
+			case n1:
+				th1 = math.Atan2(float64(ewGet(EWW2Xs)), float64(ewGet(EWW1Xs)))
+			case 2 * n1:
+				th2 = math.Atan2(float64(ewGet(EWW2Xs)), float64(ewGet(EWW1Xs)))
+			case drSteps:
+				w1, w2 := float64(ewGet(EWW1Xs)), float64(ewGet(EWW2Xs))
+				drift = math.Abs((w1*w1+w2*w2)-r0) / (r0 * drSteps)
+			}
+		}
+		got := (th2 - th1) / float64(n1)
+		bd := math.Abs(float64(ewGet(EWW30s)-b)) / float64(b)
+		scale := ""
+		if k > 0 {
+			ratios = append(ratios, prevDrift/drift)
+			scale = fmt.Sprintf("%.2f", prevDrift/drift)
+		}
+		prevDrift = drift
+		t.Logf("%8.3f %11.6f %12.6f %9.4f %13.3e %8s %11.2e", b, om, got, got/om, drift, scale, bd)
+
+		// tolerance covers the scheme's own O(omega) phase error, as in
+		// TestGaugeTimeComponent; the sharp assertion is the drift scaling
+		if math.IsNaN(got) || math.Abs(got/om-1) > 0.02 {
+			t.Errorf("B=%g: rotation %g, want +c*g*B = %g", b, got, om)
+		}
+		if bd > 0.02 {
+			t.Errorf("B=%g: W^3_0 drifted %.3g relative; pure gauge must hold it", b, bd)
+		}
+	}
+	for i, rr := range ratios {
+		if math.IsNaN(rr) || math.Abs(rr-4.0) > 0.6 {
+			t.Errorf("step %d: radius drift scaled by %.3f when omega halved, want ~4", i, rr)
+		}
+	}
+}
+
+// TestYangMillsCovariance checks the eps^{abc} structure with NON-uniform
+// fields, which the pure-gauge test cannot reach.
+//
+// A constant SO(3) rotation of the adjoint index is an exact symmetry of the
+// Yang-Mills equations, because eps is invariant under SO(3) and the Laplacian
+// and gradients act componentwise. So rotating the initial condition, evolving,
+// and rotating back must reproduce plain evolution. Using a signed permutation
+// (90 degrees about the 3-axis: W1 -> -W2, W2 -> W1) makes the comparison exact
+// in floating point rather than merely close.
+func TestYangMillsCovariance(t *testing.T) {
+	const sz, nst = 6, 40
+	fill := func(ss *Sim) {
+		n := int(sz) + 2
+		for z := range n {
+			for y := range n {
+				for x := range n {
+					for a := 1; a <= 3; a++ {
+						for c := range 4 {
+							v := 0.03 * math.Sin(float64(a+c)+0.7*float64(x)+
+								0.5*float64(y)-0.3*float64(z))
+							State.Set(float32(v), z, y, x, ewWBase(a)+c, 0)
+							State.Set(float32(v), z, y, x, ewWBase(a)+c, 1)
+						}
+					}
+				}
+			}
+		}
+	}
+	// rotate 90 degrees about adjoint axis 3: (W1, W2, W3) -> (-W2, W1, W3)
+	rot := func(inv bool) {
+		n := int(sz) + 2
+		s := 1.0
+		if inv {
+			s = -1.0
+		}
+		for z := range n {
+			for y := range n {
+				for x := range n {
+					for c := range 8 {
+						w1 := State.Value(z, y, x, ewWBase(1)+c, 0)
+						w2 := State.Value(z, y, x, ewWBase(2)+c, 0)
+						State.Set(float32(-s)*w2, z, y, x, ewWBase(1)+c, 0)
+						State.Set(float32(s)*w1, z, y, x, ewWBase(2)+c, 0)
+					}
+				}
+			}
+		}
+	}
+	// plain evolution
+	ss := ymSim(sz)
+	fill(ss)
+	ewWrap()
+	for range nst {
+		ewStep(ss)
+	}
+	plain := make([]float32, 0, 4096)
+	cur := int(GetCtx(0).CurState)
+	n := int(sz) + 2
+	for z := range n {
+		for y := range n {
+			for x := range n {
+				for a := 1; a <= 3; a++ {
+					for c := range 8 {
+						plain = append(plain, State.Value(z, y, x, ewWBase(a)+c, cur))
+					}
+				}
+			}
+		}
+	}
+
+	// rotate -> evolve -> rotate back
+	ss2 := ymSim(sz)
+	fill(ss2)
+	rot(false)
+	ewWrap()
+	for range nst {
+		ewStep(ss2)
+	}
+	// bring the result back into the cur slot layout rot() edits
+	cur2 := int(GetCtx(0).CurState)
+	worst := 0.0
+	i := 0
+	for z := range n {
+		for y := range n {
+			for x := range n {
+				for c := range 8 {
+					w1 := State.Value(z, y, x, ewWBase(1)+c, cur2)
+					w2 := State.Value(z, y, x, ewWBase(2)+c, cur2)
+					// inverse rotation: (W1,W2) -> (W2,-W1)
+					got := []float32{w2, -w1, State.Value(z, y, x, ewWBase(3)+c, cur2)}
+					for a := range 3 {
+						worst = math.Max(worst, math.Abs(float64(got[a]-plain[i+a*8+c])))
+					}
+				}
+				i += 24
+			}
+		}
+	}
+	t.Logf("global SO(3) covariance over %d steps on a %d^3 lattice: max deviation %.3e", nst, sz, worst)
+	if worst > 1e-6 {
+		t.Errorf("Yang-Mills not covariant under a constant adjoint rotation: %g", worst)
+	}
+}
+
+// TestYangMillsSpectrumUnchanged verifies the defining property of the
+// self-coupling: every term is quadratic or cubic in W, so all four vanish at
+// linear order and cannot shift a boson mass. Turning them on must leave the
+// W frequency alone, up to the O(eps^2) correction they genuinely do produce.
+func TestYangMillsSpectrumUnchanged(t *testing.T) {
+	eps := float32(1e-4)
+	nsteps := 3000
+	var freq [2]float64
+	for i, on := range []bool{false, true} {
+		ss := ewSim(4)
+		ss.Params.YangMills.SetBool(on)
+		ss.Params.Update()
+		ss.Fill(EWW1Xs, Both, eps)
+		ewWrap()
+		y := make([]float64, nsteps)
+		for j := range nsteps {
+			ewStep(ss)
+			y[j] = float64(ewGet(EWW1Xv))
+		}
+		freq[i] = freqZC(y)
+	}
+	rel := math.Abs(freq[1]/freq[0] - 1)
+	t.Logf("W frequency: YangMills off %.8f, on %.8f -- relative shift %.2e (kick eps = %.0e)",
+		freq[0], freq[1], rel, eps)
+	if rel > 1e-5 {
+		t.Errorf("Yang-Mills terms shifted the W mass by %g; they must vanish at linear order", rel)
+	}
+}
