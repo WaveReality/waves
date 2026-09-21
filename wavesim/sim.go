@@ -189,23 +189,27 @@ func (ss *Sim) InitRandSeed(run int) {
 	ss.RandSeeds.Set(run)
 }
 
-// UpdateUnits updates Units from Params and vice-versa.
-func (ss *Sim) UpdateUnits() {
+// FromUnits sets active Params from values computed in Units, which
+// are based on the known physical values. It first copies the C and Hbar
+// values from Params over to Units, so those are used in the updated units.
+func (ss *Sim) FromUnits() { //types:add
 	ss.Units.C = float64(ss.Params.C)
 	ss.Units.Hbar = float64(ss.Params.Hbar)
 	ss.Units.Update()
+	ss.Params.Mass = float32(ss.Units.EMass)
 	ss.Params.Mu0 = float32(ss.Units.Mu0)
-	ss.Params.Eps0 = float32(ss.Units.Eps0)
 	ss.Params.HiggsMu = float32(ss.Units.HiggsMu)
 	ss.Params.HiggsLambda = float32(ss.Units.HiggsLambda)
-	ss.Params.HiggsV = float32(ss.Units.HiggsV)
 	ss.Params.Update()
 }
 
 // Init initializes the state and prepares everything for running.
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
-	ss.UpdateUnits()
+	// The GUI Form calls Params.Update itself after an edit, but programmatic
+	// paths (RunNoGUI, tests, anything setting Params directly) have no such
+	// hook, and InitFunc below reads derived values such as HiggsV.
+	ss.Params.Update()
 	ctx := GetCtx(0)
 	ctx.Init()
 	State.SetZeros()

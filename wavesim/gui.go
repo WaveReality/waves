@@ -143,9 +143,9 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	gui.sim = sim
 	gui.Splits = split
 	gui.SimForm = core.NewForm(split).SetStruct(sim)
-	gui.SimForm.OnChange(func(e events.Event) {
-		sim.UpdateUnits()
-	})
+	// gui.SimForm.OnChange(func(e events.Event) {
+	// 	sim.FromUnits() // now doing manually
+	// })
 	gui.SimForm.Name = "sim-form"
 	if gui.Body != nil {
 		gui.Body.AddTopBar(func(bar *core.Frame) {
@@ -192,6 +192,12 @@ func (gui *GUI) FinalizeGUI(closePrompt bool) {
 }
 
 func (gui *GUI) MakeToolbar(p *tree.Plan) {
+	tree.Add(p, func(w *core.FuncButton) {
+		w.SetFunc(gui.sim.FromUnits)
+		w.AfterFunc = func() {
+			gui.SimForm.Update()
+		}
+	})
 	tree.AddAt(p, "Init", func(w *core.Button) {
 		w.SetText("Init").SetIcon(icons.Update).
 			SetTooltip("Run simulation until Stop").OnClick(func(e events.Event) {
