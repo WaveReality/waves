@@ -43,8 +43,8 @@ const (
 	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
 	Dirac
 
-	// Higgs is a focused simulation of the Higgs mechanism.
-	Higgs
+	// Electroweak simulates the electroweak system, including the Higgs
+	Electroweak
 
 	// Spinfield is the Klein-Gordon complex version of stochastic particles.
 	Spinfield

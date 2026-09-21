@@ -151,8 +151,8 @@ func (ss *Sim) ConfigSim() {
 		ss.MaxwellConfig()
 	case Dirac:
 		ss.DiracConfig()
-	case Higgs:
-		ss.HiggsConfig()
+	case Electroweak:
+		ss.ElectroweakConfig()
 	case Spinfield:
 		ss.SpinfieldConfig()
 	}
@@ -197,6 +197,8 @@ func (ss *Sim) UpdateUnits() {
 	ss.Units.Update()
 	ss.Params.Mu0 = float32(ss.Units.Mu0)
 	ss.Params.Eps0 = float32(ss.Units.Eps0)
+	ss.Params.HiggsMu = float32(ss.Units.HiggsMu)
+	ss.Params.HiggsLambda = float32(ss.Units.HiggsLambda)
 	ss.Params.Update()
 }
 
@@ -260,9 +262,9 @@ func (ss *Sim) StepRun() {
 	case Dirac:
 		RunMaxwellKernel(ns)
 		RunDiracKernel(ns)
-	case Higgs:
+	case Electroweak:
 		RunMaxwellKernel(ns)
-		RunHiggsKernel(ns)
+		RunElectroweakKernel(ns)
 	case Spinfield:
 		RunSpinfieldKernel(ns)
 	}
@@ -287,7 +289,7 @@ func (ss *Sim) StepRun() {
 			case Dirac:
 				RunMaxwellDampKernel(ne)
 				// RunDiracDampKernel(ne) // todo
-			case Higgs:
+			case Electroweak:
 				RunMaxwellDampKernel(ne)
 			case Spinfield:
 				RunKleinGordonCDampKernel(ne)

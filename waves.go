@@ -28,7 +28,7 @@ func main() {
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	eqs := wavesim.Higgs
+	eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
@@ -98,7 +98,7 @@ func main() {
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
-			case wavesim.Higgs:
+			case wavesim.Electroweak:
 				sim.Units.E = 0.55
 				sim.Params.E = 0.01
 				sim.Params.HiggsMu = 0.2
@@ -108,8 +108,8 @@ func main() {
 				sim.Params.Edges = wavesim.EdgesWrap
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(100, 100, 100)
-				sim.HiggsStats()
-				sim.ViewInit(wavesim.HiggsViewAll)
+				sim.ElectroweakStats()
+				sim.ViewInit(wavesim.ElectroweakViewAll)
 			case wavesim.Dirac:
 				if threed {
 					sim.Params.Edges = wavesim.EdgesDamp
@@ -166,9 +166,9 @@ func main() {
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}
-			case wavesim.Higgs:
+			case wavesim.Electroweak:
 				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-				sim.HiggsInit()
+				sim.ElectroweakInit()
 			case wavesim.Spinfield:
 				sim.ParticleAtConfig(ctrInt, 1)
 				sim.ParticleField(ctrInt, 8)

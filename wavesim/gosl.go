@@ -133,10 +133,9 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/HiggsKernel.wgsl", sy)
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ElectroweakKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
-		pl.AddVarUsed(0, "FaceOffs")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
@@ -417,46 +416,46 @@ func RunOneEdgesWrapKernel(n int, syncVars ...GPUVars) {
 		RunEdgesWrapKernelCPU(n)
 	}
 }
-// RunHiggsKernel runs the HiggsKernel kernel with given number of elements,
+// RunElectroweakKernel runs the ElectroweakKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
 // in the same command submission on the GPU, which is by far the most efficient.
 // MUST call RunDone (with optional vars to sync) after all Run calls.
-// Alternatively, a single-shot RunOneHiggsKernel call does Run and Done for a
+// Alternatively, a single-shot RunOneElectroweakKernel call does Run and Done for a
 // single run-and-sync case.
-func RunHiggsKernel(n int) {
+func RunElectroweakKernel(n int) {
 	if UseGPU {
-		RunHiggsKernelGPU(n)
+		RunElectroweakKernelGPU(n)
 	} else {
-		RunHiggsKernelCPU(n)
+		RunElectroweakKernelCPU(n)
 	}
 }
 
-// RunHiggsKernelGPU runs the HiggsKernel kernel on the GPU. See [RunHiggsKernel] for more info.
-func RunHiggsKernelGPU(n int) {
+// RunElectroweakKernelGPU runs the ElectroweakKernel kernel on the GPU. See [RunElectroweakKernel] for more info.
+func RunElectroweakKernelGPU(n int) {
 	sy := GPUSystem
-	pl := sy.ComputePipelines["HiggsKernel"]
+	pl := sy.ComputePipelines["ElectroweakKernel"]
 	ce, _ := sy.BeginComputePass()
 	pl.Dispatch1D(ce, n, 64)
 }
 
-// RunHiggsKernelCPU runs the HiggsKernel kernel on the CPU.
-func RunHiggsKernelCPU(n int) {
-	gpu.VectorizeFunc(0, n, HiggsKernel)
+// RunElectroweakKernelCPU runs the ElectroweakKernel kernel on the CPU.
+func RunElectroweakKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, ElectroweakKernel)
 }
 
-// RunOneHiggsKernel runs the HiggsKernel kernel with given number of elements,
+// RunOneElectroweakKernel runs the ElectroweakKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // This version then calls RunDone with the given variables to sync
 // after the Run, for a single-shot Run-and-Done call. If multiple kernels
 // can be run in sequence, it is much more efficient to do multiple Run*
 // calls followed by a RunDone call.
-func RunOneHiggsKernel(n int, syncVars ...GPUVars) {
+func RunOneElectroweakKernel(n int, syncVars ...GPUVars) {
 	if UseGPU {
-		RunHiggsKernelGPU(n)
+		RunElectroweakKernelGPU(n)
 		RunDone(syncVars...)
 	} else {
-		RunHiggsKernelCPU(n)
+		RunElectroweakKernelCPU(n)
 	}
 }
 // RunKleinGordonCDampKernel runs the KleinGordonCDampKernel kernel with given number of elements,

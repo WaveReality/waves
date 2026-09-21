@@ -317,13 +317,58 @@ const  EdgesFixed: Edges = 0;
 const  EdgesWrap: Edges = 1;
 const  EdgesDamp: Edges = 2;
 
+//////// import: "electroweak.go"
+alias EWStates = EMStates; //enums:enum -trim-prefix=EW
+const  EWHsCa: EWStates = 18;
+const  EWHsCb: EWStates = 19;
+const  EWHs0a: EWStates = 20;
+const  EWHs0b: EWStates = 21;
+const  EWHvCa: EWStates = 22;
+const  EWHvCb: EWStates = 23;
+const  EWHv0a: EWStates = 24;
+const  EWHv0b: EWStates = 25;
+const  EWHmag: EWStates = 26;
+const  EWHV: EWStates = 27;
+const  EWB0s: EWStates = 28;
+const  EWBXs: EWStates = 29;
+const  EWBYs: EWStates = 30;
+const  EWBZs: EWStates = 31;
+const  EWB0v: EWStates = 32;
+const  EWBXv: EWStates = 33;
+const  EWBYv: EWStates = 34;
+const  EWBZv: EWStates = 35;
+const  EWW10s: EWStates = 36;
+const  EWW1Xs: EWStates = 37;
+const  EWW1Ys: EWStates = 38;
+const  EWW1Zs: EWStates = 39;
+const  EWW10v: EWStates = 40;
+const  EWW1Xv: EWStates = 41;
+const  EWW1Yv: EWStates = 42;
+const  EWW1Zv: EWStates = 43;
+const  EWW20s: EWStates = 44;
+const  EWW2Xs: EWStates = 45;
+const  EWW2Ys: EWStates = 46;
+const  EWW2Zs: EWStates = 47;
+const  EWW20v: EWStates = 48;
+const  EWW2Xv: EWStates = 49;
+const  EWW2Yv: EWStates = 50;
+const  EWW2Zv: EWStates = 51;
+const  EWW30s: EWStates = 52;
+const  EWW3Xs: EWStates = 53;
+const  EWW3Ys: EWStates = 54;
+const  EWW3Zs: EWStates = 55;
+const  EWW30v: EWStates = 56;
+const  EWW3Xv: EWStates = 57;
+const  EWW3Yv: EWStates = 58;
+const  EWW3Zv: EWStates = 59;
+
 //////// import: "enumgen.go"
 const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
+const EWStatesN: EWStates = 60;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
-const HiggsStatesN: HiggsStates = 31;
 const CabStatesN: CabStates = 15;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 9;
@@ -382,22 +427,6 @@ fn GetRandomNumber(index: u32, counter: su64, funIndex: u32) -> f32 {
 	return RandFloat32(counter, funIndex, index);
 }
 
-//////// import: "higgs.go"
-alias HiggsStates = EMStates; //enums:enum -trim-prefix=Higgs
-const  HiggsHs0a: HiggsStates = 18;
-const  HiggsHs0b: HiggsStates = 19;
-const  HiggsHs1a: HiggsStates = 20;
-const  HiggsHs1b: HiggsStates = 21;
-const  HiggsHv0a: HiggsStates = 22;
-const  HiggsHv0b: HiggsStates = 23;
-const  HiggsHv1a: HiggsStates = 24;
-const  HiggsHv1b: HiggsStates = 25;
-const  HiggsCC: HiggsStates = 26;
-const  HiggsV: HiggsStates = 27;
-const  HiggsWp: HiggsStates = 28;
-const  HiggsWn: HiggsStates = 29;
-const  HiggsZ0: HiggsStates = 30;
-
 //////// import: "klein-gordon.go"
 alias CabStates = i32; //enums:enum -trim-prefix=Cab
 const  CabPosA: CabStates = 0;
@@ -445,7 +474,7 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
-const  Higgs: Equations = 6;
+const  Electroweak: Equations = 6;
 const  Spinfield: Equations = 7;
 const  ParticleMove: Equations = 8;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;

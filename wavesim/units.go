@@ -16,6 +16,12 @@ const (
 	// Hbar is the normalized Planck constant h / (2 Pi) = J s = m^2 kg / s
 	Hbar = 1.054571628e-34
 
+	// eV/c^2 to kg
+	EVcsqToKg = 1.7826619216279e-36
+
+	// GeV/c^2 to kg
+	GEVcsqToKg = 1.7826619216279e-27
+
 	// E is the unit of electrical charge: C = A s
 	E = 1.602176487e-19
 
@@ -44,8 +50,11 @@ const (
 	// A0 is the Bohr radius in hbar: hbar / (m0 c alpha) = 5.2917720859e-11 m
 	A0 = Hbar / (EMass * C * Alpha)
 
-	// HiggsLambda is the lambda self-coupling constant for the Higgs field.
-	HiggsLambda = 0.129
+	// HiggsLambda is the lambda factor in the Higgs potential, in natural units (/hbar c) = m_h^2 / (2v^2)
+	HiggsLambda = 0.1291
+
+	// HiggsMu is the mu factor in the Higgs potential, in GeV/c^2 = m_h / \sqrt(2)
+	HiggsMu = 88.47
 
 	//////// Planck scale constants
 
@@ -60,9 +69,6 @@ const (
 
 	// Planck current, A
 	Ip = 3.47899e25
-
-	// eV/c^2 to kg
-	EVcsqToKg = 1.7826619216279e-36
 )
 
 // Units establishes a consistent set of units for computing
@@ -99,6 +105,12 @@ type Units struct {
 	// Eps0 is the computed Eps0 electric constant, permittivity of free space
 	// F/m = (s^4 A^2) / (m^3 kg)
 	Eps0 float64 `edit:"-"`
+
+	// HiggsLambda is the lambda factor in the Higgs potential = m_h^2 / (2v^2) in cube units.
+	HiggsLambda float64 `edit:"-"`
+
+	// HiggsMu is the mu factor in the Higgs potential, in GeV = m_h / \sqrt(2) in cube units.
+	HiggsMu float64 `edit:"-"`
 
 	// CuM is the computed length of a cubic element, in meters.
 	CuM float64 `edit:"-"`
@@ -202,4 +214,7 @@ func (un *Units) Update() {
 	un.EMass = EMass / un.CuKg
 	un.Mu0 = Mu0 * ((un.CuS * un.CuS * un.CuA * un.CuA) / (un.CuM * un.CuKg))
 	un.Eps0 = 1.0 / (un.Mu0 * un.C * un.C)
+
+	un.HiggsLambda = HiggsLambda / (un.C * un.Hbar)
+	un.HiggsMu = HiggsMu * GEVcsqToKg
 }

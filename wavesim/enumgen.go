@@ -104,6 +104,55 @@ func (i Edges) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Edges) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "Edges") }
 
+var _EWStatesValues = []EWStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59}
+
+// EWStatesN is the highest valid value for type EWStates, plus one.
+//
+//gosl:start
+const EWStatesN EWStates = 60
+
+//gosl:end
+
+var _EWStatesValueMap = map[string]EWStates{`HsCa`: 18, `HsCb`: 19, `Hs0a`: 20, `Hs0b`: 21, `HvCa`: 22, `HvCb`: 23, `Hv0a`: 24, `Hv0b`: 25, `Hmag`: 26, `HV`: 27, `B0s`: 28, `BXs`: 29, `BYs`: 30, `BZs`: 31, `B0v`: 32, `BXv`: 33, `BYv`: 34, `BZv`: 35, `W10s`: 36, `W1Xs`: 37, `W1Ys`: 38, `W1Zs`: 39, `W10v`: 40, `W1Xv`: 41, `W1Yv`: 42, `W1Zv`: 43, `W20s`: 44, `W2Xs`: 45, `W2Ys`: 46, `W2Zs`: 47, `W20v`: 48, `W2Xv`: 49, `W2Yv`: 50, `W2Zv`: 51, `W30s`: 52, `W3Xs`: 53, `W3Ys`: 54, `W3Zs`: 55, `W30v`: 56, `W3Xv`: 57, `W3Yv`: 58, `W3Zv`: 59}
+
+var _EWStatesDescMap = map[EWStates]string{18: `EWHsCa is the Higgs doublet charged state Ca (real)`, 19: `EWHsCb is the Higgs doublet charged state Cb (imaginary)`, 20: `EWHs0a is the Higgs doublet neutral state 0a (real)`, 21: `EWHs0b is the Higgs doublet neutral state 0b (imaginary)`, 22: `EWHvCa is the Higgs doublet charged vel 0a (real)`, 23: `EWHvCb is the Higgs doublet charged vel 0b (imaginary)`, 24: `EWHv0a is the Higgs doublet neutral vel 0a (real)`, 25: `EWHv0b is the Higgs doublet neutral vel 0b (imaginary)`, 26: `EWHmag is the Higgs magnitude (h.c. * state = squared magnitude)`, 27: `EWV is the Higgs potential as a function of Hmag`, 28: `EWB0s is the B weak hypercharge scalar potential 0 component.`, 29: `EWBXs is the B weak hypercharge vector potential X component.`, 30: `EWBYs is the B weak hypercharge vector potential Y component.`, 31: `EWBZs is the B weak hypercharge vector potential Z component.`, 32: `EWB0v is the B weak hypercharge scalar potential 0 velocity.`, 33: `EWBXv is the B weak hypercharge vector potential X velocity.`, 34: `EWBYv is the B weak hypercharge vector potential Y velocity.`, 35: `EWBZv is the B weak hypercharge vector potential Z velocity.`, 36: `EWW10s is the W weak isospin 1 scalar potential 0 component.`, 37: `EWW1Xs is the W weak isospin 1 vector potential X component.`, 38: `EWW1Ys is the W weak isospin 1 vector potential Y component.`, 39: `EWW1Zs is the W weak isospin 1 vector potential Z component.`, 40: `EWW10v is the W weak isospin 1 scalar potential 0 velocity.`, 41: `EWW1Xv is the W weak isospin 1 vector potential X velocity.`, 42: `EWW1Yv is the W weak isospin 1 vector potential Y velocity.`, 43: `EWW1Zv is the W weak isospin 1 vector potential Z velocity.`, 44: `EWW20s is the W weak isospin 2 scalar potential 0 component.`, 45: `EWW2Xs is the W weak isospin 2 vector potential X component.`, 46: `EWW2Ys is the W weak isospin 2 vector potential Y component.`, 47: `EWW2Zs is the W weak isospin 2 vector potential Z component.`, 48: `EWW20v is the W weak isospin 2 scalar potential 0 velocity.`, 49: `EWW2Xv is the W weak isospin 2 vector potential X velocity.`, 50: `EWW2Yv is the W weak isospin 2 vector potential Y velocity.`, 51: `EWW2Zv is the W weak isospin 2 vector potential Z velocity.`, 52: `EWW30s is the W weak isospin 3 scalar potential 0 component.`, 53: `EWW3Xs is the W weak isospin 3 vector potential X component.`, 54: `EWW3Ys is the W weak isospin 3 vector potential Y component.`, 55: `EWW3Zs is the W weak isospin 3 vector potential Z component.`, 56: `EWW30v is the W weak isospin 3 scalar potential 0 velocity.`, 57: `EWW3Xv is the W weak isospin 3 vector potential X velocity.`, 58: `EWW3Yv is the W weak isospin 3 vector potential Y velocity.`, 59: `EWW3Zv is the W weak isospin 3 vector potential Z velocity.`}
+
+var _EWStatesMap = map[EWStates]string{18: `HsCa`, 19: `HsCb`, 20: `Hs0a`, 21: `Hs0b`, 22: `HvCa`, 23: `HvCb`, 24: `Hv0a`, 25: `Hv0b`, 26: `Hmag`, 27: `HV`, 28: `B0s`, 29: `BXs`, 30: `BYs`, 31: `BZs`, 32: `B0v`, 33: `BXv`, 34: `BYv`, 35: `BZv`, 36: `W10s`, 37: `W1Xs`, 38: `W1Ys`, 39: `W1Zs`, 40: `W10v`, 41: `W1Xv`, 42: `W1Yv`, 43: `W1Zv`, 44: `W20s`, 45: `W2Xs`, 46: `W2Ys`, 47: `W2Zs`, 48: `W20v`, 49: `W2Xv`, 50: `W2Yv`, 51: `W2Zv`, 52: `W30s`, 53: `W3Xs`, 54: `W3Ys`, 55: `W3Zs`, 56: `W30v`, 57: `W3Xv`, 58: `W3Yv`, 59: `W3Zv`}
+
+// String returns the string representation of this EWStates value.
+func (i EWStates) String() string { return enums.StringExtended[EWStates, EMStates](i, _EWStatesMap) }
+
+// SetString sets the EWStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *EWStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*EMStates)(i), s, _EWStatesValueMap)
+}
+
+// Int64 returns the EWStates value as an int64.
+func (i EWStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the EWStates value from an int64.
+func (i *EWStates) SetInt64(in int64) { *i = EWStates(in) }
+
+// Desc returns the description of the EWStates value.
+func (i EWStates) Desc() string { return enums.DescExtended[EWStates, EMStates](i, _EWStatesDescMap) }
+
+// EWStatesValues returns all possible values for the type EWStates.
+func EWStatesValues() []EWStates {
+	return enums.ValuesGlobalExtended(_EWStatesValues, EMStatesValues())
+}
+
+// Values returns all possible values for the type EWStates.
+func (i EWStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_EWStatesValues, EMStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i EWStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *EWStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EWStates") }
+
 var _MinusPlusOneValues = []MinusPlusOne{0, 1}
 
 // MinusPlusOneN is the highest valid value for type MinusPlusOne, plus one.
@@ -243,61 +292,6 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _HiggsStatesValues = []HiggsStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
-
-// HiggsStatesN is the highest valid value for type HiggsStates, plus one.
-//
-//gosl:start
-const HiggsStatesN HiggsStates = 31
-
-//gosl:end
-
-var _HiggsStatesValueMap = map[string]HiggsStates{`Hs0a`: 18, `Hs0b`: 19, `Hs1a`: 20, `Hs1b`: 21, `Hv0a`: 22, `Hv0b`: 23, `Hv1a`: 24, `Hv1b`: 25, `CC`: 26, `V`: 27, `Wp`: 28, `Wn`: 29, `Z0`: 30}
-
-var _HiggsStatesDescMap = map[HiggsStates]string{18: `HiggsHs0a is the Higgs state 0a`, 19: `HiggsHs0b is the Higgs state 0b`, 20: `HiggsHs1a is the Higgs state 1a`, 21: `HiggsHs1b is the Higgs state 1b`, 22: `HiggsHs0a is the Higgs vel 0a`, 23: `HiggsHv0b is the Higgs vel 0b`, 24: `HiggsHv1a is the Higgs vel 1a`, 25: `HiggsHv1b is the Higgs vel 1b`, 26: `HiggsCC is the Higgs complex conjugate`, 27: `HiggsV is the Higgs potential as a function of CC`, 28: `HiggsWp is the W+ weak boson field.`, 29: `HiggsWn is the W- weak boson field.`, 30: `HiggsZ0 is the Z0 weak neutral boson field.`}
-
-var _HiggsStatesMap = map[HiggsStates]string{18: `Hs0a`, 19: `Hs0b`, 20: `Hs1a`, 21: `Hs1b`, 22: `Hv0a`, 23: `Hv0b`, 24: `Hv1a`, 25: `Hv1b`, 26: `CC`, 27: `V`, 28: `Wp`, 29: `Wn`, 30: `Z0`}
-
-// String returns the string representation of this HiggsStates value.
-func (i HiggsStates) String() string {
-	return enums.StringExtended[HiggsStates, EMStates](i, _HiggsStatesMap)
-}
-
-// SetString sets the HiggsStates value from its string representation,
-// and returns an error if the string is invalid.
-func (i *HiggsStates) SetString(s string) error {
-	return enums.SetStringExtended(i, (*EMStates)(i), s, _HiggsStatesValueMap)
-}
-
-// Int64 returns the HiggsStates value as an int64.
-func (i HiggsStates) Int64() int64 { return int64(i) }
-
-// SetInt64 sets the HiggsStates value from an int64.
-func (i *HiggsStates) SetInt64(in int64) { *i = HiggsStates(in) }
-
-// Desc returns the description of the HiggsStates value.
-func (i HiggsStates) Desc() string {
-	return enums.DescExtended[HiggsStates, EMStates](i, _HiggsStatesDescMap)
-}
-
-// HiggsStatesValues returns all possible values for the type HiggsStates.
-func HiggsStatesValues() []HiggsStates {
-	return enums.ValuesGlobalExtended(_HiggsStatesValues, EMStatesValues())
-}
-
-// Values returns all possible values for the type HiggsStates.
-func (i HiggsStates) Values() []enums.Enum {
-	return enums.ValuesExtended(_HiggsStatesValues, EMStatesValues())
-}
-
-// MarshalText implements the [encoding.TextMarshaler] interface.
-func (i HiggsStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
-
-// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
-func (i *HiggsStates) UnmarshalText(text []byte) error {
-	return enums.UnmarshalText(i, text, "HiggsStates")
-}
-
 var _CabStatesValues = []CabStates{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
 
 // CabStatesN is the highest valid value for type CabStates, plus one.
@@ -399,11 +393,11 @@ const EquationsN Equations = 9
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Higgs`: 6, `Spinfield`: 7, `ParticleMove`: 8}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Electroweak`: 6, `Spinfield`: 7, `ParticleMove`: 8}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Higgs is a focused simulation of the Higgs mechanism.`, 7: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 8: `ParticleMove is just particle motion without any wave field.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Electroweak simulates the electroweak system, including the Higgs`, 7: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 8: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Higgs`, 7: `Spinfield`, 8: `ParticleMove`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Electroweak`, 7: `Spinfield`, 8: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }

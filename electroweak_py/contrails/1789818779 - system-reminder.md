@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-21 06:20:45
+- **Last Message:** 2026-09-21 11:10:00
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -172,7 +172,7 @@ I'll search, and I have a new theory from your results.
 <details>
 <summary>Tool Calls (3)</summary>
 
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
 - **WebSearch**: `Search `Claude desktop app inline LaTeX math not rendering raw dollar signs``
 - **WebSearch**: `Search `Claude Code markdown KaTeX inline math rendering bug github issue``
   ```
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -8081,12 +8081,357 @@ Saved.
 
 Also added to the README's run block and file table.
 
-Saved.
+## 🧑 User - 2026-09-21 06:32:51
 
-**[goldstone_eaten.py](goldstone_eaten.py)** — text-only, ~19 s, no new dependencies. Cleaned up from the scratch version with the physics written into the module docstring and two things documented that were implicit before:
+is it correct that the gauge fields are always updating with simple massless wave equations then? the only one that has the mass is the longitudinal goldstone?
 
-- **Why the probe reads velocity, not the field.** The longitudinal sector is a 2×2 system $(W_L, G)$ with mass matrix $\begin{psmallmatrix}m^2 & mk\\ mk & k^2\end{psmallmatrix}$, whose eigenvalues are $0$ and $k^2+m^2$. A kick excites both, so the *field* oscillates about a nonzero offset and zero-crossing detection breaks. The zero mode is static, so it drops out of the velocity.
-- **Why the coarse lattice is free.** The massive dispersion is exactly $\sqrt{\hat k^2+m^2}$ on the lattice — the mass term is a local $k=0$ term and the gradient term gives $\hat k^2$ by construction — so $N=8$, $a=0.02$ costs nothing and puts the lowest mode at $k \approx 39$ GeV, comfortably below $m_W$.
+## 🤖 Assistant - 2026-09-21 06:33:31
 
-Also added to the README's run block and file table.
+*Model: claude-opus-5*
+
+No — that's the natural inference from the demo, but it's backwards. Let me measure it rather than assert it.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat > /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad/whohasmass.py <<'PY'
+import sys
+import numpy as np
+sys.path.insert(0, "/Users/oreilly/wavereality/waves/electroweak_py")
+import higgs_gauge as hg
+
+N, A, EPS = 8, 0.020, 0.2
+KPH  = 2*np.pi/(N*A)
+KHAT2 = hg.lattice_momentum_sq(KPH, A)
+KHAT = np.sqrt(KHAT2)
+PROF = np.cos(KPH*np.arange(N)*A).reshape(1,1,N)
+p = hg.Params(N=N, a=A)
+mW = p.m_W
+print(f"khat = {KHAT:.4f}   m_W = {mW:.4f}   sqrt(khat^2+m_W^2) = {np.sqrt(KHAT2+mW**2):.4f}\n")
+
+# ---- split the W acceleration into its two sources -------------------------
+def split(st):
+    D = hg.covariant_derivative(st, p)
+    F = hg.su2_field_strength(st.W, p)
+    ym = np.zeros_like(st.W); hc = np.zeros_like(st.W)
+    for m in range(3):
+        acc = np.zeros_like(st.W[:,0])
+        for j in range(3):
+            acc += (F[:,j,m] - hg.bwd(F[:,j,m], j)) / p.a
+        for k in range(3):
+            acc -= p.g*np.einsum("adc,a...,c...->d...", hg.EPS, F[:,m,k], st.W[:,k])
+        ym[:,m] = acc
+        Phi_mid = 0.5*(st.Phi + hg.fwd(st.Phi, m))
+        cur = np.einsum("i...,dik,k...->d...", Phi_mid.conj(), hg.TGEN, D[m])
+        hc[:,m] = 2.0*p.g*np.imag(cur)
+    return ym, hc
+
+cases = [("uniform  (k=0)", 0, lambda s: s.W.__setitem__((0,0), EPS)),
+         ("transverse",     0, lambda s: s.W.__setitem__((0,0), EPS*PROF)),
+         ("longitudinal",   2, lambda s: s.W.__setitem__((0,2), EPS*PROF))]
+print(f"{'kick':16s} {'Yang-Mills / W':>16s} {'Higgs current / W':>20s}")
+print("-"*56)
+for nm, j, kick in cases:
+    st = hg.vacuum_state(p); kick(st)
+    ym, hc = split(st)
+    w = st.W[0, j]
+    msk = np.abs(w) > 1e-12
+    print(f"{nm:16s} {np.mean(ym[0,j][msk]/w[msk]):16.4f} {np.mean(hc[0,j][msk]/w[msk]):20.4f}")
+print(f"{'':16s} {'-khat^2 = '+f'{-KHAT2:.1f}':>16s} {'-m_W^2 = '+f'{-mW**2:.1f}':>20s}")
+
+# ---- freeze the Goldstone and see which mode notices -----------------------
+def freq(kick, probe, freeze):
+    st = hg.vacuum_state(p); kick(st)
+    vac = st.Phi.copy(); dt = hg.cfl_dt(p, 0.04)
+    n = int(10*2*np.pi/mW/dt); ts=[]; ys=[]; acc=None
+    for i in range(n):
+        acc = hg.step(st, p, dt, acc)
+        if freeze:
+            st.Phi[...] = vac; st.Pi[...] = 0.0; acc = None
+        ts.append((i+1)*dt); ys.append(probe(st))
+    return hg.frequency_from_zero_crossings(np.asarray(ts), np.asarray(ys))
+
+kT = lambda s: s.W.__setitem__((0,0), EPS*PROF); pT = lambda s: float(np.sum(s.Wd[0,0]*PROF))
+kL = lambda s: s.W.__setitem__((0,2), EPS*PROF); pL = lambda s: float(np.sum(s.Wd[0,2]*PROF))
+print(f"\n{'mode':16s} {'Goldstone free':>16s} {'Goldstone frozen':>18s}")
+print("-"*54)
+print(f"{'transverse':16s} {freq(kT,pT,False):16.4f} {freq(kT,pT,True):18.4f}")
+print(f"{'longitudinal':16s} {freq(kL,pL,False):16.4f} {freq(kL,pL,True):18.4f}")
+PY
+.venv/bin/python /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/scratchpad/whohasmass.py``
+  ```
+  khat = 38.2683   m_W = 80.4278   sqrt(khat^2+m_W^2) = 89.0679
+  
+  kick               Yang-Mills / W    Higgs current / W
+  --------------------------------------------------------
+  uniform  (k=0)             0.0000           -6468.6251
+  transverse             -1464.4661           -6468.6251
+  longitudinal               0.0000           -6468.6251
+                   -khat^2 = -1464.5     -m_W^2 = -6468.6
+  
+  mode               Goldstone free   Goldstone frozen
+  ------------------------------------------------------
+  transverse                89.0709            89.0709
+  longitudinal              89.0709            80.4285
+  ```
+
+</details>
+
+No on both counts. Two separate things are going on, and the demo's table conflates them.
+
+## The gauge field equation is massive — all three polarizations
+
+Split the W acceleration in the code into its two contributions, the Yang–Mills term and the Higgs current, and take the ratio to $W$ itself:
+
+```
+kick               Yang-Mills / W    Higgs current / W
+--------------------------------------------------------
+uniform  (k=0)             0.0000           -6468.6251
+transverse             -1464.4661           -6468.6251
+longitudinal               0.0000           -6468.6251
+                 -khat^2 = -1464.5     -m_W^2 = -6468.6
+```
+
+The Higgs current returns $-m_W^2 W$ **identically in all three cases**. It does not care about polarization, or about $k$ at all. The transverse mode is just as massive as the longitudinal one — that's why the transverse row in the earlier table also read 89.07, not 38.27.
+
+So the update rule for $W$ is not a massless wave equation. It is
+
+$$\partial_t^2 W^a_m = \underbrace{\left[\vec\nabla\times\vec\nabla\times W\right]^a_m + g\,\varepsilon\text{-terms}}_{\text{Yang–Mills}} \;+\; \underbrace{2g\,\mathrm{Im}\!\left[\Phi^\dagger T^a D_m\Phi\right]}_{\text{Higgs current}}$$
+
+and near the VEV the current linearizes to
+
+$$2g\,\mathrm{Im}\!\left[\Phi^\dagger T^a D_m\Phi\right] \;\simeq\; -m_W^2\,W^a_m \;+\; m_W\,\partial_m G^a$$
+
+That first piece **is** the mass term. A source proportional to $-m^2$ times the field *is* a mass, whatever you call it.
+
+## The structural point (this is the part that matters for your CA)
+
+There is no mass parameter for $W$ anywhere in `higgs_gauge.py`. Grep for one and you won't find it. What's written is a purely local rule: *the gauge field is sourced by the current of whatever charged matter is at that site.* The mass appears because the charged matter $\Phi$ is non-zero **everywhere**, so the current is proportional to the field itself at every point, uniformly, forever.
+
+The gauge field is not massive. It is massless and permanently immersed in a condensate that feeds back on it. Those are operationally identical and the second is the local one.
+
+The photon is the one case where your guess is right, and for the correct reason: $Q\langle\Phi\rangle = 0$, so the current in the photon direction vanishes exactly, and the photon really does obey an unmodified massless wave equation. Test [4] in [verify.py](verify.py) checks that to machine precision.
+
+## What the Goldstone actually does
+
+Not carry the mass. Hold $\Phi$ pinned at the VEV — killing the Goldstone response entirely while leaving $-m_W^2 W$ intact — and re-measure:
+
+```
+mode               Goldstone free   Goldstone frozen
+------------------------------------------------------
+transverse                89.0709            89.0709
+longitudinal              89.0709            80.4285
+```
+
+The transverse mode doesn't notice. It never needed the Goldstone; it had 2 polarizations before breaking and it still has them, now with a mass.
+
+The longitudinal mode collapses to $\omega = 80.43 = m_W$ exactly — and stays there **for every $k$**. That is a flat dispersion relation, $\omega$ independent of momentum: manifestly not Lorentz invariant, and therefore not a consistent theory. The $\hat k^2$ is missing.
+
+The Goldstone is what supplies it. The longitudinal channel is a coupled 2×2 system whose mass matrix
+
+$$M = \begin{pmatrix} m^2 & mk \\ mk & k^2\end{pmatrix}, \qquad \det M = 0$$
+
+has eigenvalues $0$ and $k^2+m^2$. Drop the Goldstone row and column and you're left with the top-left entry alone, $\omega^2 = m^2$ — exactly the 80.43 above. The off-diagonal $mk$ is the mixing term $m_W W^-_\mu\partial^\mu G^+$, and it is what rotates $m^2$ into $k^2+m^2$ and simultaneously pushes the spurious extra state down to $\omega = 0$ where it is pure gauge.
+
+## Summary
+
+| | mass | third polarization |
+|---|---|---|
+| source | Higgs current $\to -m_W^2 W$ | Goldstone, via $m_W W\partial G$ |
+| affects | all polarizations equally | longitudinal only |
+| if removed | everything goes massless | longitudinal gets $\omega = m$, Lorentz broken |
+
+The Goldstone is not where the mass lives. The mass is universal and comes from the condensate. The Goldstone is what makes the longitudinal mode *exist as a propagating state* — it provides the degree of freedom and the momentum dependence, without which the massive vector would be neither Lorentz invariant nor correctly counted.
+
+## 🧑 User - 2026-09-21 06:39:55
+
+are there papers that actually discuss all of this phenomenology of the electroweak system? or is it just in textbooks? what is the best textbook to read / cite about all of this?
+
+## 🤖 Assistant - 2026-09-21 06:41:34
+
+*Model: claude-opus-5*
+
+Mostly textbooks for the mechanism itself — but there are three live paper literatures that touch exactly what you've been doing, and one of them is directly about the questions you kept asking.
+
+## The short answer on textbooks
+
+**For your project specifically: Rubakov, *Classical Theory of Gauge Fields* (Princeton, 2002).** This is the one almost nobody recommends and the one that actually fits. It treats gauge fields, spontaneous breaking, the Higgs mechanism, solitons and sphalerons as *classical field theory* — no quantization, no loops, no path integral. That is literally what your code integrates. Every other book does the mechanism as a prelude to Feynman rules, which is why the classical content gets compressed into three pages. Rubakov also co-wrote the foundational real-time classical lattice paper, so the book and the simulation method come from the same place.
+
+**For the standard modern treatment: Schwartz, *QFT and the Standard Model* (2014), Ch. 28–29.** Best-written account of the eating, the $R_\xi$ gauges, and the degree-of-freedom counting. Ch. 28 does abelian then non-abelian; Ch. 29 does the electroweak sector with the conventions you're using.
+
+**For citing: Peskin & Schroeder Ch. 20–21.** Not the best exposition, but it is the reference everyone recognizes, and your conventions match it.
+
+**For the definitive careful version: Weinberg Vol. 2, Ch. 21.** Hard going, but he is the only one who treats "the Goldstone is eaten" explicitly as a change of variables in field space rather than a slogan, which is the framing you arrived at independently.
+
+**For where the parameters come from: Langacker, *The Standard Model and Beyond* (2nd ed., 2017).** The most phenomenology-dense book on the list — hypercharge assignments, anomaly cancellation, $\rho = 1$, $\theta_W$ and its running. This answers the "why $Y_\Phi = +1/2$" class of question better than any QFT textbook.
+
+**For gory worked detail: Cheng & Li, *Gauge Theory of Elementary Particle Physics* (1984)**, together with its companion *Problems and Solutions* volume. Dated on phenomenology, but the problems book works the SU(2)×U(1) algebra out longhand in a way nothing modern does.
+
+## The papers that are not just history
+
+### Foundational questions about what's actually physical
+
+This is the literature you'd have found if you'd pushed on "is symmetry breaking a cover story?" — and the answer turns out to be genuinely subtle:
+
+- **Elitzur (1975)**, *Phys. Rev.* D12, 3978 — a local gauge symmetry *cannot* be spontaneously broken. $\langle\Phi\rangle \neq 0$ is a gauge-fixing artifact.
+- **Osterwalder & Seiler (1978)**; **Fradkin & Shenker (1979)**, *Phys. Rev.* D19, 3682 — the "Higgs phase" and the "confining phase" are analytically connected; there is no order parameter separating them.
+- **Fröhlich, Morchio & Strocchi (1981)**, *Nucl. Phys.* B190, 553 — how to get the physical spectrum from manifestly gauge-invariant composite operators, reproducing the perturbative answer without ever choosing a vacuum direction.
+- **Maas (2019)**, *Prog. Part. Nucl. Phys.* 106, 132 — a review tying all of this together. **This is the single best paper for your conceptual questions.** It is specifically about what in the Higgs mechanism is physics and what is bookkeeping.
+
+### Real-time classical lattice simulation — i.e. your code
+
+- **Grigoriev & Rubakov (1988)**, *Nucl. Phys.* B299, 67 — the founding paper of the method you're using.
+- **Ambjørn, Askgaard, Porter & Shaposhnikov (1991)**, *Nucl. Phys.* B353, 346 — real-time SU(2)-Higgs on a lattice, sphaleron rate.
+- **Rubakov & Shaposhnikov (1996)**, *Phys. Usp.* 39, 461 — review of electroweak baryon number violation; good on what classical lattice evolution can and can't tell you.
+- **Kajantie, Laine, Rummukainen & Shaposhnikov (1996)**, *PRL* 77, 2887, and **D'Onofrio, Rummukainen & Tranberg (2014)**, *PRL* 113, 141602 — the crossover and $T_c = 159.5$ GeV.
+
+Note these all use **compact** links. Your non-compact discretization is fine for the spectroscopy you're doing and wrong for anything topological, which is exactly the limitation your README already states.
+
+### The longitudinal/Goldstone equivalence
+
+- **Cornwall, Levin & Tiktopoulos (1974)**, *Phys. Rev.* D10, 1145 — first statement.
+- **Lee, Quigg & Thacker (1977)**, *Phys. Rev.* D16, 1519 — the unitarity bound on $m_h$; this is where $W_L W_L$ scattering became the tool it is.
+- **Chanowitz & Gaillard (1985)**, *Nucl. Phys.* B261, 379 — the definitive formulation.
+
+### Constraint preservation for your CA
+
+- **Villasenor & Buneman (1992)**, *Comput. Phys. Commun.* 69, 306, and **Esirkepov (2001)**, *Comput. Phys. Commun.* 135, 144 — exactly charge-conserving current deposition, so Gauss's law is preserved to machine precision by construction.
+- **Dedner et al. (2002)**, *J. Comput. Phys.* 175, 645 — hyperbolic divergence cleaning, if you'd rather damp constraint violation than avoid it.
+
+### Historical originals
+
+Englert & Brout, Higgs, and Guralnik–Hagen–Kibble, all *PRL* 13 (1964), pp. 321, 508, 585. **Anderson (1963)**, *Phys. Rev.* 130, 439, for the non-relativistic precursor — worth reading because his framing (a massless field immersed in a condensate that feeds back on it) is exactly the one your numerical decomposition landed on. And **Kibble (1967)**, *Phys. Rev.* 155, 1554, which is the paper that actually does the general non-abelian case with mixing — the closest original to the SU(2)×U(1) structure you worked through.
+
+---
+
+If I had to name three: **Rubakov** to read alongside the code, **Maas 2019** for the conceptual questions, **Schwartz Ch. 28–29** as the reference you keep open.
+
+One caveat: I'd verify volume and page numbers against INSPIRE before putting any of these in a bibliography — I'm confident about the works and authors, less so about every page number.
+
+## 🧑 User - 2026-09-21 11:06:45
+
+what are the units of \lambda in higgs potential?
+
+## 🤖 Assistant - 2026-09-21 11:07:04
+
+*Model: claude-opus-5*
+
+**Dimensionless** — in 4 spacetime dimensions, with $\hbar = c = 1$.
+
+The counting: the action is dimensionless, so the Lagrangian density has mass dimension 4. A scalar field has dimension 1 (from its kinetic term $(\partial\Phi)^2$), so $\Phi^\dagger\Phi$ has dimension 2 and
+
+$$[\lambda] \cdot \text{mass}^4 = \text{mass}^4 \quad\Longrightarrow\quad [\lambda] = 0$$
+
+Same in the canonical real-field form $V = -\tfrac12\mu^2\phi^2 + \tfrac14\lambda\phi^4$. You can see it directly in the code — [potential_plot.py:32](potential_plot.py:32) computes
+
+$$\lambda = \frac{m_h^2}{2v^2} = \frac{(125.11)^2}{2(246.22)^2} = 0.1291$$
+
+which is GeV²/GeV², a pure number. Likewise $g = 0.6533$ and $g' = 0.3500$ are dimensionless.
+
+The only dimensionful parameter in the Higgs potential is $\mu^2$, with dimension mass²:
+
+$$\mu = m_h/\sqrt2 = 88.47\ \text{GeV}$$
+
+That asymmetry is worth noting — $\mu^2$ is the sole dimensionful input to the whole electroweak sector, and everything else (all the masses, $v$ itself) is $\mu$ times a dimensionless combination. It's also the parameter with the quadratically divergent radiative correction, which is the hierarchy problem stated in one line.
+
+Two footnotes:
+
+- **Dimension-dependent.** In $d$ spacetime dimensions $[\phi] = (d-2)/2$, so $[\lambda] = 4-d$. It vanishes only at $d=4$. That's why the quartic is a *marginal* coupling — classically scale-invariant, renormalizable, and running only logarithmically.
+- **Convention-dependent by a factor, not a dimension.** Some books write $V = \tfrac{\lambda}{4}(\Phi^\dagger\Phi - v^2/2)^2$ or use $\lambda/4!$; the numerical value of $\lambda$ shifts but it stays dimensionless. Your code's convention is stated in [higgs_gauge.py:16](higgs_gauge.py:16), and $m_h = \sqrt{2\lambda}\,v$ is the relation that pins it down.
+
+## 🧑 User - 2026-09-21 11:08:53
+
+just to be clear, the units of mu are GeV / c^2, right? my sim code has full hbar, c params
+
+## 🤖 Assistant - 2026-09-21 11:09:57
+
+*Model: claude-opus-5*
+
+Yes — μ is a mass-dimension-1 quantity, so **GeV/c²** is right. (Worth noting it isn't itself any particle's mass; $m_h = \sqrt2\,\mu$. But it carries mass units.)
+
+The thing to watch is that GeV/c² is probably *not* the number you actually feed the solver.
+
+## What the wave equation wants
+
+With ħ and c restored, the KG equation is one of these depending on how you arrange it:
+
+$$\frac{1}{c^2}\partial_t^2\psi = \nabla^2\psi - \left(\frac{mc}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{length}^{-2}$$
+
+$$\partial_t^2\psi = c^2\nabla^2\psi - \left(\frac{mc^2}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{time}^{-2}$$
+
+So what multiplies $\psi$ is an inverse **Compton wavelength** squared, or an inverse time squared — never a mass. For μ:
+
+| form | value |
+|---|---|
+| $\mu$ | 88.467 GeV/c² |
+| $\mu c^2$ | 88.467 GeV |
+| $\mu c/\hbar$ | 448.33 fm⁻¹ = 4.4833×10¹⁷ m⁻¹ |
+| $\hbar/\mu c$ | 2.2305×10⁻³ fm |
+| $\mu c^2/\hbar$ | 1.3441×10²⁶ s⁻¹ |
+
+(using $\hbar c = 197.327$ MeV·fm). The conversion rule is just: a mass $M$ becomes $Mc^2$ for an energy, $Mc/\hbar$ for an inverse length, $Mc^2/\hbar$ for an inverse frequency — pick whichever slot it occupies in your equation.
+
+## The part that usually bites
+
+**λ is dimensionless only if φ is measured in mass units.** If your code normalizes the field so the kinetic term is $\tfrac12(\nabla\phi)^2$ with no ħ or c, then $[\phi] = \sqrt{\text{energy}/\text{length}}$, and
+
+$$\left[\lambda\right] = \frac{1}{\text{energy}\cdot\text{length}} = \frac{1}{\hbar c} \quad\Longrightarrow\quad \lambda_{\rm code} = \frac{0.1291}{\hbar c} = 0.654\ \text{GeV}^{-1}\text{fm}^{-1}$$
+
+Which is exactly the statement that λ is dimensionless *in units where ħc = 1*. Same question applies to $v = 246.22$ GeV — mass dimension 1, so it converts like μ does, and $\phi_{\min}$ in your field variable is $v$ times whatever normalization factor you chose.
+
+So before wiring this up, pin down one thing: **what are the units of φ itself in your code?** Everything else follows mechanically. If φ is in mass units, λ is a pure number and μ is a mass. If φ carries √(energy/length), λ picks up $1/\hbar c$.
+
+## Practical suggestion
+
+The thing that actually controls your simulation is the dimensionless product
+
+$$\hat\mu = \frac{\mu c}{\hbar}\,\Delta x$$
+
+— mass times lattice spacing. That's what tells you whether the mode is resolved, and it's the same number in any unit system. In [higgs_gauge.py](higgs_gauge.py) that's `p.m_h * p.a` with `a` in GeV⁻¹; in a ħ/c code it's the same quantity with `a` in fm.
+
+Given that, the usual move is to convert to natural units at the boundary and run the kernel with ħ = c = 1 internally. It removes a whole class of unit bugs from the inner loop, and you only need the conversion table above at I/O. If your existing solver is already committed to carrying ħ and c explicitly that's fine too — just make sure the mass parameter you hand it is $\mu c/\hbar$ and not 88.47.
+
+Yes — μ is a mass-dimension-1 quantity, so **GeV/c²** is right. (Worth noting it isn't itself any particle's mass; $m_h = \sqrt2\,\mu$. But it carries mass units.)
+
+The thing to watch is that GeV/c² is probably *not* the number you actually feed the solver.
+
+## What the wave equation wants
+
+With ħ and c restored, the KG equation is one of these depending on how you arrange it:
+
+$$\frac{1}{c^2}\partial_t^2\psi = \nabla^2\psi - \left(\frac{mc}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{length}^{-2}$$
+
+$$\partial_t^2\psi = c^2\nabla^2\psi - \left(\frac{mc^2}{\hbar}\right)^2\psi \qquad\text{coefficient in } \text{time}^{-2}$$
+
+So what multiplies $\psi$ is an inverse **Compton wavelength** squared, or an inverse time squared — never a mass. For μ:
+
+| form | value |
+|---|---|
+| $\mu$ | 88.467 GeV/c² |
+| $\mu c^2$ | 88.467 GeV |
+| $\mu c/\hbar$ | 448.33 fm⁻¹ = 4.4833×10¹⁷ m⁻¹ |
+| $\hbar/\mu c$ | 2.2305×10⁻³ fm |
+| $\mu c^2/\hbar$ | 1.3441×10²⁶ s⁻¹ |
+
+(using $\hbar c = 197.327$ MeV·fm). The conversion rule is just: a mass $M$ becomes $Mc^2$ for an energy, $Mc/\hbar$ for an inverse length, $Mc^2/\hbar$ for an inverse frequency — pick whichever slot it occupies in your equation.
+
+## The part that usually bites
+
+**λ is dimensionless only if φ is measured in mass units.** If your code normalizes the field so the kinetic term is $\tfrac12(\nabla\phi)^2$ with no ħ or c, then $[\phi] = \sqrt{\text{energy}/\text{length}}$, and
+
+$$\left[\lambda\right] = \frac{1}{\text{energy}\cdot\text{length}} = \frac{1}{\hbar c} \quad\Longrightarrow\quad \lambda_{\rm code} = \frac{0.1291}{\hbar c} = 0.654\ \text{GeV}^{-1}\text{fm}^{-1}$$
+
+Which is exactly the statement that λ is dimensionless *in units where ħc = 1*. Same question applies to $v = 246.22$ GeV — mass dimension 1, so it converts like μ does, and $\phi_{\min}$ in your field variable is $v$ times whatever normalization factor you chose.
+
+So before wiring this up, pin down one thing: **what are the units of φ itself in your code?** Everything else follows mechanically. If φ is in mass units, λ is a pure number and μ is a mass. If φ carries √(energy/length), λ picks up $1/\hbar c$.
+
+## Practical suggestion
+
+The thing that actually controls your simulation is the dimensionless product
+
+$$\hat\mu = \frac{\mu c}{\hbar}\,\Delta x$$
+
+— mass times lattice spacing. That's what tells you whether the mode is resolved, and it's the same number in any unit system. In [higgs_gauge.py](higgs_gauge.py) that's `p.m_h * p.a` with `a` in GeV⁻¹; in a ħ/c code it's the same quantity with `a` in fm.
+
+Given that, the usual move is to convert to natural units at the boundary and run the kernel with ħ = c = 1 internally. It removes a whole class of unit bugs from the inner loop, and you only need the conversion table above at I/O. If your existing solver is already committed to carrying ħ and c explicitly that's fine too — just make sure the mass parameter you hand it is $\mu c/\hbar$ and not 88.47.
 
