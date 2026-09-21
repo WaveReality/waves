@@ -5,6 +5,7 @@
 package wavesim
 
 import (
+	"image"
 	"io/fs"
 	"sync"
 
@@ -207,6 +208,18 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 			}
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
+	})
+	tree.AddAt(p, "Config", func(w *core.Button) {
+		w.SetText("Config").SetIcon(icons.Update).
+			SetTooltip("Select a configuration option for initializing the state (will also take effect on subsequent Inits")
+		w.SetMenu(func(m *core.Scene, pos image.Point) {
+			for _, ic := range gui.sim.initFuncs {
+				core.NewButton(m).SetText(ic.Name).SetTooltip(ic.Doc).OnClick(func(e events.Event) {
+					gui.sim.InitFunc = ic.Func
+					gui.sim.Init()
+				})
+			}
+		})
 	})
 	tree.AddAt(p, "Run", func(w *core.Button) {
 		w.SetText("Run").SetIcon(icons.PlayArrow).

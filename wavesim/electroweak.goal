@@ -783,6 +783,8 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32) {
 func (ss *Sim) ElectroweakConfig() {
 	ParamsShouldDisplay = ElectroweakDisplay
 	ss.StateVars = EWStatesN
+	ss.initFuncs = ElectroweakConfigs
+	ss.InitFunc = HiggsBroken
 	ss.ViewInit(func(view *View) {
 		view.SetVar(EWHs0a, -1)
 	})
@@ -810,11 +812,12 @@ func (ss *Sim) ElectroweakStats() {
 	// ss.AddStat(ss.StatParticle(0))
 }
 
-func (ss *Sim) ElectroweakInit() {
-	// The vacuum is <Phi> = (0, v/sqrt2)^T, i.e. the NEUTRAL (lower) component
-	// holds the VEV, with magnitude v = mu/sqrt(lambda) -- not mu. Putting it
-	// in the charged component instead would leave Q = T^3 + Y broken and give
-	// the photon a mass.
+// HiggsBroken initializes the vacuum is <Phi> = (0, v/sqrt2)^T, i.e.
+// the NEUTRAL (lower) component holds the VEV, with magnitude
+// v = mu/sqrt(lambda) -- not mu. Putting it
+// in the charged component instead would leave Q = T^3 + Y broken
+// and give the photon a mass.
+func HiggsBroken(ss *Sim) {
 	ss.Fill(EWHs0a, Both, ss.Params.HiggsV)
 	ctx := GetCtx(0)
 	ne := int(ctx.EdgesN())
@@ -823,3 +826,7 @@ func (ss *Sim) ElectroweakInit() {
 
 // ElectroweakDisplay determines which Parameters fields to display.
 var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "EM", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda"}
+
+var ElectroweakConfigs = []InitFunc{
+	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value",	Func: HiggsBroken},
+}

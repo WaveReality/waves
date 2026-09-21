@@ -39,6 +39,10 @@ type Sim struct {
 	// the initial State, using functions in init.
 	InitFunc func(sim *Sim) `display:"-"`
 
+	// initFuncs is a list of InitFunc options presented to the user in GUI
+	// to demonstrate different aspects of a wave system.
+	initFuncs []InitFunc `display:"-"`
+
 	// viewInitFuncs are run at initialization of the GUI wave View.
 	// use ViewInit method to add.
 	viewInitFuncs []func(view *View) `display:"-"`

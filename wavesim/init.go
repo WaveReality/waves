@@ -11,6 +11,19 @@ import (
 	"cogentcore.org/core/math32"
 )
 
+// InitFunc is used for making a GUI representation of different initialization
+// functions that the user can select, which will be run when Init is pressed.
+type InitFunc struct {
+	// Name of init function.
+	Name string
+
+	// Doc provides brief documentation of what it does.
+	Doc string
+
+	// Func is the function to call
+	Func func(sim *Sim)
+}
+
 // CopyCurToPrev copies the current values to previous values
 // for all variables.
 func (ss *Sim) CopyCurToPrev() {
