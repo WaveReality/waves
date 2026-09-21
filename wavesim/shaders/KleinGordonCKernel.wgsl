@@ -359,12 +359,26 @@ const  EWW30v: EWStates = 56;
 const  EWW3Xv: EWStates = 57;
 const  EWW3Yv: EWStates = 58;
 const  EWW3Zv: EWStates = 59;
+const  EWZ0: EWStates = 60;
+const  EWZX: EWStates = 61;
+const  EWZY: EWStates = 62;
+const  EWZZ: EWStates = 63;
+const  EWWPr0: EWStates = 64;
+const  EWWPrX: EWStates = 65;
+const  EWWPrY: EWStates = 66;
+const  EWWPrZ: EWStates = 67;
+const  EWWPi0: EWStates = 68;
+const  EWWPiX: EWStates = 69;
+const  EWWPiY: EWStates = 70;
+const  EWWPiZ: EWStates = 71;
+const  EWWMag: EWStates = 72;
 const YPhi = 0.5;
+const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
 const DiracStatesN: DiracStates = 27;
 const EdgesN: Edges = 3;
-const EWStatesN: EWStates = 60;
+const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
@@ -576,8 +590,8 @@ struct Parameters {
 	HiggsV: f32,
 	MW: f32,
 	MZ: f32,
-	pad0: f32,
-	pad1: f32,
+	SinThetaW: f32,
+	CosThetaW: f32,
 }
 
 //////// import: "particle.go"

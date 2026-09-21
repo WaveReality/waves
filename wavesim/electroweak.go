@@ -143,12 +143,62 @@ const (
 
 	// EWW3Zv is the W weak isospin 3 vector potential Z velocity.
 	EWW3Zv
+
+	//////// Derived mass-eigenstate views.
+	//
+	// These are not evolved: the dynamics lives entirely in (W^1, W^2, W^3, B),
+	// and these are recomputed from them every step. They are the physical
+	// basis -- what an experiment sees -- as opposed to the gauge basis the
+	// equations are written in.
+	//
+	// The photon does NOT appear here: it is written into the ordinary Maxwell
+	// state variables A0s..AZs instead, because it is the electromagnetic
+	// field, not a separate thing.
+
+	// EWZ0 is the Z boson scalar potential, cos(theta_W) W^3_0 - sin(theta_W) B_0.
+	EWZ0
+
+	// EWZX is the Z boson vector potential, X component.
+	EWZX
+
+	// EWZY is the Z boson vector potential, Y component.
+	EWZY
+
+	// EWZZ is the Z boson vector potential, Z component.
+	EWZZ
+
+	// EWWPr0 is Re(W^+_0), where W^+_mu = (W^1_mu - i W^2_mu)/sqrt(2).
+	//
+	// W^- is the CONJUGATE of W^+, not an independent field: the charged sector
+	// has exactly two real degrees of freedom per spacetime index, W^1 and W^2,
+	// and the +/- basis repackages them as one complex field. So Re and Im of
+	// W^+ carry everything; EWWMag below is the amplitude both charge states
+	// share.
+	EWWPr0
+
+	// EWWPrX, EWWPrY, EWWPrZ are Re(W^+) for the vector components.
+	EWWPrX
+	EWWPrY
+	EWWPrZ
+
+	// EWWPi0, EWWPiX, EWWPiY, EWWPiZ are Im(W^+_mu) = -W^2_mu/sqrt(2).
+	EWWPi0
+	EWWPiX
+	EWWPiY
+	EWWPiZ
+
+	// EWWMag is the charged-W amplitude, sum_mu |W^+_mu|^2, identical for
+
+	EWWMag
 )
 
 // YPhi is the weak hypercharge of the Higgs doublet in the Q = T^3 + Y
 // convention. Together with T^3 = -1/2 for the lower component this makes
 // Q = 0 there, so the photon does not couple to the vacuum and stays massless.
 const YPhi = 0.5
+
+// InvSqrt2 is 1/sqrt(2), the normalization of the W^+/W^- basis.
+const InvSqrt2 = 0.70710678118654752440
 
 // EWGaugeAct returns -i * G * Psi in real components, where G is the Hermitian
 // 2x2 gauge matrix that the covariant derivative is built from:
@@ -623,6 +673,38 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	State.Set(hvCbN, int(z), int(y), int(x), int(EWHvCb), int(cur))
 	State.Set(hv0aN, int(z), int(y), int(x), int(EWHv0a), int(cur))
 	State.Set(hv0bN, int(z), int(y), int(x), int(EWHv0b), int(cur))
+
+	// ---- mass-eigenstate views ---------------------------------------------
+	// Rotate the freshly-updated (W^3, B) pair through the weak mixing angle.
+	// The photon goes into the ordinary Maxwell variables: it IS the
+	// electromagnetic field, so A0s..AZs is where it belongs. Nothing here is
+	// evolved -- these are recomputed from the gauge basis every step, which is
+	// why StepRun must NOT also run MaxwellKernel in Electroweak mode.
+	sw := Params[0].SinThetaW
+	cw := Params[0].CosThetaW
+	for k := range 4 {
+		ki := int32(k)
+		w3s := State.Value(int(z), int(y), int(x), int(int32(EWW30s)+ki), int(cur))
+		w3v := State.Value(int(z), int(y), int(x), int(int32(EWW30v)+ki), int(cur))
+		bs := State.Value(int(z), int(y), int(x), int(int32(EWB0s)+ki), int(cur))
+		bv := State.Value(int(z), int(y), int(x), int(int32(EWB0v)+ki), int(cur))
+		State.Set(sw*w3s+cw*bs, int(z), int(y), int(x), int(int32(A0s)+ki), int(cur))
+		State.Set(sw*w3v+cw*bv, int(z), int(y), int(x), int(int32(A0v)+ki), int(cur))
+		State.Set(cw*w3s-sw*bs, int(z), int(y), int(x), int(int32(EWZ0)+ki), int(cur))
+
+		w1s := State.Value(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
+		w2s := State.Value(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
+		State.Set(w1s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPr0)+ki), int(cur))
+		State.Set(-w2s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPi0)+ki), int(cur))
+	}
+	wm := float32(0)
+	for k := range 4 {
+		ki := int32(k)
+		w1s := State.Value(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
+		w2s := State.Value(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
+		wm += 0.5 * (w1s*w1s + w2s*w2s)
+	}
+	State.Set(wm, int(z), int(y), int(x), int(EWWMag), int(cur))
 
 	State.Set(mag, int(z), int(y), int(x), int(EWHmag), int(cur))
 	State.Set(-0.5*musq*mag+0.25*lambda*mag*mag, int(z), int(y), int(x), int(EWHV), int(cur))

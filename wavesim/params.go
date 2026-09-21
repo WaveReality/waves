@@ -230,9 +230,15 @@ type Parameters struct {
 	// likewise for reference only. The photon mass is zero.
 	MZ float32 `display:"-"`
 
-	// The GPU struct must be a multiple of 16 bytes.
-	pad0 float32
-	pad1 float32
+	// SinThetaW, CosThetaW are sin and cos of the weak mixing angle,
+	//	tan(theta_W) = g'/g
+	// which rotates the (W^3, B) pair into the physical (Z, photon) pair:
+	//	A_mu = sin(theta_W) W^3_mu + cos(theta_W) B_mu   (massless)
+	//	Z_mu = cos(theta_W) W^3_mu - sin(theta_W) B_mu   (mass m_Z)
+	// The photon direction is exactly the one that Q = T^3 + Y annihilates,
+	// which is why it stays massless.
+	SinThetaW float32 `display:"-"`
+	CosThetaW float32 `display:"-"`
 }
 
 func (pr *Parameters) Update() {
@@ -260,6 +266,11 @@ func (pr *Parameters) Update() {
 	}
 	pr.MW = pr.GW * pr.HiggsV / 2.0
 	pr.MZ = pr.HiggsV * math32.Sqrt(pr.GW*pr.GW+pr.GpW*pr.GpW) / 2.0
+	nw := math32.Sqrt(pr.GW*pr.GW + pr.GpW*pr.GpW)
+	if nw > 0 {
+		pr.SinThetaW = pr.GpW / nw
+		pr.CosThetaW = pr.GW / nw
+	}
 }
 
 //gosl:end

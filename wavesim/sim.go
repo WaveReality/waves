@@ -269,7 +269,9 @@ func (ss *Sim) StepRun() {
 		RunMaxwellKernel(ns)
 		RunDiracKernel(ns)
 	case Electroweak:
-		RunMaxwellKernel(ns)
+		// No MaxwellKernel here: ElectroweakKernel writes A0s..AZs itself, as
+		// the weak-mixing-angle rotation of (W^3, B). Letting MaxwellKernel
+		// also evolve those by the free wave equation would fight it.
 		RunElectroweakKernel(ns)
 	case Spinfield:
 		RunSpinfieldKernel(ns)

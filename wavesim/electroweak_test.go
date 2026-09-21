@@ -650,3 +650,108 @@ func TestBorisStability(t *testing.T) {
 	}
 	t.Logf("improvement: unbounded -> bounded at %.3g", res[1])
 }
+
+// TestMixedBasisPropagation checks the mass-eigenstate views written into the
+// Maxwell and Z / W^+- state variables, and that each carries the right
+// dispersion relation.
+//
+// The wave is set up directly in the PHYSICAL basis -- the photon direction
+// (sin tw, cos tw) or the Z direction (cos tw, -sin tw) in the (W^3, B) plane
+// -- and the frequency is read back out of A0s..AZs / EWZ* / EWWPr*, which the
+// kernel recomputes from the gauge basis every step. So it exercises the whole
+// round trip: physical -> gauge -> evolve -> physical.
+//
+//	photon:  omega = c * khat                      (massless, phase velocity c)
+//	Z:       omega = c * sqrt(khat^2 + m_Z^2)
+//	W+-:     omega = c * sqrt(khat^2 + m_W^2)
+//
+// The Higgs scale is raised so the boson masses are comparable to khat --
+// otherwise all three frequencies agree to a fraction of a percent and the test
+// would not actually discriminate between a massless photon and a massive one.
+//
+// The photon staying exactly massless is the sharp part: it is the direction
+// Q = T^3 + Y annihilates, and any error in the mixing angle would leak Z mass
+// into it and drag the phase velocity below c.
+func TestMixedBasisPropagation(t *testing.T) {
+	const sz = 8
+	eps := float32(1e-4)
+	kph := 2 * math.Pi / float64(sz)
+	khat := math.Sqrt(float64(lattice2(kph)))
+
+	fill := func(v int32, amp float32) {
+		n := sz + 2
+		for z := range n {
+			for y := range n {
+				for x := range n {
+					for tt := range 2 {
+						State.Set(amp*float32(math.Cos(kph*float64(z))), z, y, x, int(v), tt)
+					}
+				}
+			}
+		}
+	}
+
+	for _, tc := range []struct {
+		name  string
+		setup func(p *Parameters, amp float32)
+		probe int32
+		mass  func(p *Parameters) float64
+	}{
+		{"photon -> A_x", func(p *Parameters, a float32) {
+			fill(int32(EWW3Xs), p.SinThetaW*a)
+			fill(int32(EWBXs), p.CosThetaW*a)
+		}, int32(AXs), func(p *Parameters) float64 { return 0 }},
+		{"Z -> Z_x", func(p *Parameters, a float32) {
+			fill(int32(EWW3Xs), p.CosThetaW*a)
+			fill(int32(EWBXs), -p.SinThetaW*a)
+		}, int32(EWZX), func(p *Parameters) float64 { return float64(p.MZ) }},
+		{"W+- -> Re(W+_x)", func(p *Parameters, a float32) {
+			fill(int32(EWW1Xs), a)
+		}, int32(EWWPrX), func(p *Parameters) float64 { return float64(p.MW) }},
+	} {
+		ss := ewSim(sz)
+		p := ss.Params
+		// raise the electroweak scale so m_W, m_Z are comparable to khat
+		p.HiggsMu = 0.58
+		p.Update()
+		State.SetZeros()
+		GetCtx(0).Init()
+		ss.ElectroweakInit()
+		tc.setup(p, eps)
+		ewWrap()
+
+		m := tc.mass(p)
+		want := discFreq(float64(p.C) * math.Sqrt(khat*khat+m*m))
+		nst := int(10 * 2 * math.Pi / want)
+		y := make([]float64, nst)
+		for i := range nst {
+			ewStep(ss)
+			y[i] = float64(State.Value(1, 1, 1, int(tc.probe), int(GetCtx(0).CurState)))
+		}
+		got := freqZC(y)
+		t.Logf("%-16s omega = %.6f  want %.6f  ratio %.5f   (m = %.4f, khat = %.4f)",
+			tc.name, got, want, got/want, m, khat)
+		if math.Abs(got/want-1) > 0.01 {
+			t.Errorf("%s: omega %g, want %g", tc.name, got, want)
+		}
+		if m == 0 {
+			// undo the leapfrog dispersion to recover the physical phase velocity
+			v := 2 * math.Sin(got/2) / khat
+			t.Logf("%-16s phase velocity = %.6f vs c = %.6f  (ratio %.6f)  <= massless",
+				"", v, float64(p.C), v/float64(p.C))
+			if math.Abs(v/float64(p.C)-1) > 1e-3 {
+				t.Errorf("photon phase velocity %g, want c = %g", v, p.C)
+			}
+		}
+	}
+}
+
+// discFreq is the frequency the leapfrog actually produces for a mode whose
+// continuum frequency is w: the update x[n+1] - 2x[n] + x[n-1] = -w^2 x[n] has
+// characteristic frequency 2 asin(w/2). At these wavenumbers that is a 0.6%
+// correction, well above the 1% tolerance, so it has to be included.
+func discFreq(w float64) float64 { return 2 * math.Asin(w/2) }
+
+func lattice2(k float64) float32 {
+	return float32(4.0 * math.Sin(k/2) * math.Sin(k/2))
+}
