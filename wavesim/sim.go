@@ -200,6 +200,8 @@ func (ss *Sim) FromUnits() { //types:add
 	ss.Params.Mu0 = float32(ss.Units.Mu0)
 	ss.Params.HiggsMu = float32(ss.Units.HiggsMu)
 	ss.Params.HiggsLambda = float32(ss.Units.HiggsLambda)
+	ss.Params.GW = float32(ss.Units.GW)
+	ss.Params.GpW = float32(ss.Units.GpW)
 	ss.Params.Update()
 }
 

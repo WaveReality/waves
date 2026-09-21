@@ -89,6 +89,7 @@ const  EWW30v: EWStates = 56;
 const  EWW3Xv: EWStates = 57;
 const  EWW3Yv: EWStates = 58;
 const  EWW3Zv: EWStates = 59;
+const YPhi = 0.5;
 
 //////// import: "enumgen.go"
 const DiracStatesN: DiracStates = 27;
@@ -188,6 +189,8 @@ struct Parameters {
 	Move: i32,
 	HiggsMu: f32,
 	HiggsLambda: f32,
+	GW: f32,
+	GpW: f32,
 	Diff: f32,
 	Decay: f32,
 	CSq: f32,
@@ -206,6 +209,8 @@ struct Parameters {
 	EOverHSq: f32,
 	HiggsMuSq: f32,
 	HiggsV: f32,
+	MW: f32,
+	MZ: f32,
 }
 
 //////// import: "particle.go"

@@ -6,6 +6,10 @@
 
 package wavesim
 
+import (
+	"cogentcore.org/core/math32"
+)
+
 //gosl:start
 //gosl:import "cogentcore.org/lab/gosl/slmath"
 
@@ -140,22 +144,122 @@ const (
 	EWW3Zv
 )
 
-// ElectroweakKernel is the kernel for computing Electroweak model.
+// YPhi is the weak hypercharge of the Higgs doublet in the Q = T^3 + Y
+// convention. Together with T^3 = -1/2 for the lower component this makes
+// Q = 0 there, so the photon does not couple to the vacuum and stays massless.
+const YPhi = 0.5
+
+// EWGaugeAct returns -i * G * Psi in real components, where G is the Hermitian
+// 2x2 gauge matrix that the covariant derivative is built from:
+//
+//	G = g W^a T^a + g' Y_Phi B,   T^a = sigma^a / 2
+//	  = [[ du, or + i oi ], [ or - i oi, dd ]]
+//	du = (g/2) W3 + g' Y B      or = (g/2) W1
+//	dd = -(g/2) W3 + g' Y B     oi = -(g/2) W2
+//
+// The opposite sign of W3 on the two diagonal entries is T^3 = +-1/2, and it
+// is the whole reason the upper and lower doublet components feel W3
+// oppositely while feeling B identically. Solving for the combination that
+// annihilates the vacuum is what picks out Q = T^3 + Y and leaves one
+// massless direction.
+//
+// This single operation is the entire content of the gauge coupling. The
+// covariant derivative is
+//
+//	D_mu Psi = d_mu Psi + EWGaugeAct(W_mu, B_mu, Psi)
+//
+// and the covariant Laplacian composes out of it (see the kernel).
+//
+// Psi is the doublet written as four real fields,
+// Psi = (X + iY, Z + iW) = sqrt(2) Phi, so Phi^dag Phi = |Psi|^2 / 2.
+func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
+	hg := 0.5 * Params[0].GW
+	gy := Params[0].GpW * YPhi
+	du := hg*w3 + gy*b
+	dd := -hg*w3 + gy*b
+	or := hg * w1
+	oi := -hg * w2
+	var o math32.Vector4
+	o.X = du*psi.Y + or*psi.W + oi*psi.Z
+	o.Y = -(du*psi.X + or*psi.Z - oi*psi.W)
+	o.Z = or*psi.Y - oi*psi.X + dd*psi.W
+	o.W = -(or*psi.X + oi*psi.Y + dd*psi.Z)
+	return o
+}
+
+// EWCurrent returns the four gauge currents that a doublet Psi with covariant
+// derivative d = D_mu Psi puts into the gauge fields at spacetime index mu:
+//
+//	X,Y,Z = j^a_mu = 2 g  Im[Phi^dag T^a D_mu Phi]   (a = 1,2,3, sourcing W^a)
+//	W     = j^Y_mu = 2 g' Y Im[Phi^dag D_mu Phi]     (sourcing B)
+//
+// with Phi = Psi/sqrt(2) folding one factor of 1/2 into each expression.
+//
+// NOTHING in this kernel contains a gauge boson mass term. The masses arise
+// because Psi is non-zero everywhere: evaluated at the vacuum this current
+// reduces to exactly -m^2 times the gauge field itself, uniformly and
+// permanently. That feedback is the Higgs mechanism.
+func EWCurrent(psi, d math32.Vector4) math32.Vector4 {
+	hg := 0.5 * Params[0].GW
+	gy := Params[0].GpW * YPhi
+	var j math32.Vector4
+	j.X = hg * ((psi.X*d.W - psi.Y*d.Z) + (psi.Z*d.Y - psi.W*d.X))
+	j.Y = hg * (-(psi.X*d.Z + psi.Y*d.W) + (psi.Z*d.X + psi.W*d.Y))
+	j.Z = hg * ((psi.X*d.Y - psi.Y*d.X) - (psi.Z*d.W - psi.W*d.Z))
+	j.W = gy * ((psi.X*d.Y - psi.Y*d.X) + (psi.Z*d.W - psi.W*d.Z))
+	return j
+}
+
+// EWDiv returns the lattice divergence of a 3-vector gauge potential whose
+// X, Y, Z components are the three consecutive state variables at vX.
+func EWDiv(x, y, z, vX, tidx int32) float32 {
+	gx := Gradient18(x, y, z, vX, tidx)
+	gy := Gradient18(x, y, z, vX+1, tidx)
+	gz := Gradient18(x, y, z, vX+2, tidx)
+	return gx.X + gy.Y + gz.Z
+}
+
+// ElectroweakKernel is the kernel for the SU(2)_L x U(1)_Y electroweak model:
+// the Higgs doublet coupled to the three W^a gauge fields and the B field.
 // Only supports 3D.
 //
-// The Higgs doublet is carried as four real fields:
+// # Fields
 //
-//	Phi = (1/sqrt2) * ( hsCa + i hsCb , hs0a + i hs0b )^T
+// The Higgs doublet is carried as four real fields,
 //
-// so that mag = hsCa^2 + hsCb^2 + hs0a^2 + hs0b^2 = 2 Phi^dag Phi, and the
-// vacuum <Phi> = (0, v/sqrt2)^T corresponds to hs0a = v with the other three
-// zero. The VEV must sit in the NEUTRAL (lower) component: that is what makes
-// the unbroken generator Q = T^3 + Y annihilate the vacuum, and hence what
-// leaves the photon massless.
+//	Phi = (1/sqrt2) ( hsCa + i hsCb , hs0a + i hs0b )^T
 //
-// All quantities are in inverse cube units (1/cube), which is what makes
-// lambda (and later g, g') dimensionless Standard Model values needing no
-// conversion. See Units.Update.
+// so mag = hsCa^2 + hsCb^2 + hs0a^2 + hs0b^2 = 2 Phi^dag Phi. The vacuum
+// <Phi> = (0, v/sqrt2)^T is hs0a = v with the other three zero. It MUST be the
+// neutral (lower) component: that is what makes Q = T^3 + Y annihilate the
+// vacuum and leaves the photon massless.
+//
+// Each gauge field is a four-potential (0, X, Y, Z) with its own velocity,
+// exactly as in MaxwellKernel, and is evolved in Lorenz gauge where the
+// equation of motion is simply
+//
+//	box W^a_mu = j^a_mu,    box B_mu = j^Y_mu
+//
+// # Units
+//
+// Everything is in inverse cube units (1/cube). That is what makes g, g' and
+// lambda the bare dimensionless Standard Model numbers, needing no conversion
+// (see Units.Update).
+//
+// # Not yet included
+//
+// The Yang-Mills self-coupling. The full non-abelian equation in Lorenz gauge
+// carries three more terms beyond box W = j:
+//
+//	2 g eps^abc W^b_mu d^mu W^c_nu
+//	- g eps^abc W^b_mu d_nu W^c^mu
+//	+ g^2 eps^abc eps^cde W^b_mu W^d^mu W^e_nu
+//
+// All three are quadratic or cubic in W, so they vanish identically at linear
+// order and contribute nothing to the boson masses -- the spectrum below is
+// exact without them. What they do provide is the W self-interaction, i.e. the
+// difference between genuine SU(2) and three independent copies of U(1). Add
+// them before trusting anything involving large-amplitude W fields.
 func ElectroweakKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -163,93 +267,140 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	if !ok {
 		return
 	}
-	// sz := ctx.Size.V()
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	csq := Params[0].CSq
-	// e2h := Params[0].E2OverH
-	// e := Params[0].E
-	// c := Params[0].C
-	// ehsq := Params[0].EOverHSq
-	// em := Params[0].EM.IsTrue()
+	oc := 1.0 / Params[0].C
 	musq := Params[0].HiggsMuSq
 	lambda := Params[0].HiggsLambda
 
-	// a0 := State[z, y, x, A0s, prv]
-	// aX := State[z, y, x, AXs, prv]
-	// aY := State[z, y, x, AYs, prv]
-	// aZ := State[z, y, x, AZs, prv]
+	// ---- Higgs doublet and its velocity ----------------------------------
+	psi := math32.Vec4(State.Value(int(z), int(y), int(x), int(EWHsCa), int(prv)), State.Value(int(z), int(y), int(x), int(EWHsCb), int(prv)),
+		State.Value(int(z), int(y), int(x), int(EWHs0a), int(prv)), State.Value(int(z), int(y), int(x), int(EWHs0b), int(prv)))
+	psv := math32.Vec4(State.Value(int(z), int(y), int(x), int(EWHvCa), int(prv)), State.Value(int(z), int(y), int(x), int(EWHvCb), int(prv)),
+		State.Value(int(z), int(y), int(x), int(EWHv0a), int(prv)), State.Value(int(z), int(y), int(x), int(EWHv0b), int(prv)))
 
-	// aV := math32.Vec3(aX, aY, aZ)
-	// a0sq := a0 * a0
-	// aVsq := slmath.LengthSquared3(aV)
-	// aSqD := ehsq * (a0sq - aVsq)
+	// ---- gauge potentials, per spacetime index ---------------------------
+	w10 := State.Value(int(z), int(y), int(x), int(EWW10s), int(prv))
+	w1x := State.Value(int(z), int(y), int(x), int(EWW1Xs), int(prv))
+	w1y := State.Value(int(z), int(y), int(x), int(EWW1Ys), int(prv))
+	w1z := State.Value(int(z), int(y), int(x), int(EWW1Zs), int(prv))
+	w20 := State.Value(int(z), int(y), int(x), int(EWW20s), int(prv))
+	w2x := State.Value(int(z), int(y), int(x), int(EWW2Xs), int(prv))
+	w2y := State.Value(int(z), int(y), int(x), int(EWW2Ys), int(prv))
+	w2z := State.Value(int(z), int(y), int(x), int(EWW2Zs), int(prv))
+	w30 := State.Value(int(z), int(y), int(x), int(EWW30s), int(prv))
+	w3x := State.Value(int(z), int(y), int(x), int(EWW3Xs), int(prv))
+	w3y := State.Value(int(z), int(y), int(x), int(EWW3Ys), int(prv))
+	w3z := State.Value(int(z), int(y), int(x), int(EWW3Zs), int(prv))
+	b0 := State.Value(int(z), int(y), int(x), int(EWB0s), int(prv))
+	bx := State.Value(int(z), int(y), int(x), int(EWBXs), int(prv))
+	by := State.Value(int(z), int(y), int(x), int(EWBYs), int(prv))
+	bz := State.Value(int(z), int(y), int(x), int(EWBZs), int(prv))
 
-	hsCa := State.Value(int(z), int(y), int(x), int(EWHsCa), int(prv))
-	hsCb := State.Value(int(z), int(y), int(x), int(EWHsCb), int(prv))
-	hs0a := State.Value(int(z), int(y), int(x), int(EWHs0a), int(prv))
-	hs0b := State.Value(int(z), int(y), int(x), int(EWHs0b), int(prv))
+	// ---- ordinary gradients of the four Higgs components -----------------
+	gCa := Gradient18(x, y, z, int32(EWHsCa), prv)
+	gCb := Gradient18(x, y, z, int32(EWHsCb), prv)
+	g0a := Gradient18(x, y, z, int32(EWHs0a), prv)
+	g0b := Gradient18(x, y, z, int32(EWHs0b), prv)
 
-	hvCa := State.Value(int(z), int(y), int(x), int(EWHvCa), int(prv))
-	hvCb := State.Value(int(z), int(y), int(x), int(EWHvCb), int(prv))
-	hv0a := State.Value(int(z), int(y), int(x), int(EWHv0a), int(prv))
-	hv0b := State.Value(int(z), int(y), int(x), int(EWHv0b), int(prv))
+	dxp := math32.Vec4(gCa.X, gCb.X, g0a.X, g0b.X) // d_x Psi
+	dyp := math32.Vec4(gCa.Y, gCb.Y, g0a.Y, g0b.Y)
+	dzp := math32.Vec4(gCa.Z, gCb.Z, g0a.Z, g0b.Z)
 
-	// hsCaG := Gradient18(x, y, z, int32(hsCa), prv)
-	// hsCbG := Gradient18(x, y, z, int32(hsCb), prv)
+	// ---- covariant derivatives D_mu Psi = d_mu Psi - i G_mu Psi ----------
+	ax := EWGaugeAct(w1x, w2x, w3x, bx, psi)
+	ay := EWGaugeAct(w1y, w2y, w3y, by, psi)
+	az := EWGaugeAct(w1z, w2z, w3z, bz, psi)
+	a0 := EWGaugeAct(w10, w20, w30, b0, psi)
 
-	// mag = 2 Phi^dag Phi: the SQUARED RADIUS in the 4D field space. The
-	// potential depends on this and nothing else, which is exactly why it is
-	// a Mexican hat rather than four independent wells.
-	mag := hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b
+	dX := dxp.Add(ax)
+	dY := dyp.Add(ay)
+	dZ := dzp.Add(az)
+	// the time component: velocities are per step and c is cubes per step, so
+	// psv/c is d_0 Psi in the same 1/cube units as the spatial gradients.
+	dtp := math32.Vec4(oc*psv.X, oc*psv.Y, oc*psv.Z, oc*psv.W)
+	d0 := dtp.Add(a0)
 
+	// ---- covariant Laplacian ---------------------------------------------
+	// D_j D_j Psi = d_j(D_j Psi) - i G_j (D_j Psi)
+	//
+	//	= lap(Psi) - i(d_j G_j)Psi - i G_j d_j Psi - i G_j D_j Psi
+	//
+	// Each -i G ... piece is just EWGaugeAct applied to a different argument,
+	// so the whole covariant Laplacian composes out of the one operation.
+	dvW1 := EWDiv(x, y, z, int32(EWW1Xs), prv)
+	dvW2 := EWDiv(x, y, z, int32(EWW2Xs), prv)
+	dvW3 := EWDiv(x, y, z, int32(EWW3Xs), prv)
+	dvB := EWDiv(x, y, z, int32(EWBXs), prv)
+
+	lap := math32.Vec4(Laplacian26(x, y, z, int32(EWHsCa), prv, psi.X),
+		Laplacian26(x, y, z, int32(EWHsCb), prv, psi.Y),
+		Laplacian26(x, y, z, int32(EWHs0a), prv, psi.Z),
+		Laplacian26(x, y, z, int32(EWHs0b), prv, psi.W))
+
+	cov := lap.Add(EWGaugeAct(dvW1, dvW2, dvW3, dvB, psi))
+	cov = cov.Add(EWGaugeAct(w1x, w2x, w3x, bx, dxp.Add(dX)))
+	cov = cov.Add(EWGaugeAct(w1y, w2y, w3y, by, dyp.Add(dY)))
+	cov = cov.Add(EWGaugeAct(w1z, w2z, w3z, bz, dzp.Add(dZ)))
+
+	// ---- time-component gauge terms ---------------------------------------
+	// D_0 D_0 Psi expands exactly as the spatial case does:
+	//
+	//	D_0D_0 Psi = (1/c^2) d_t^2 Psi + (1/c)(d_t G_0) Psi
+	//	             + (1/c) G_0 d_t Psi + G_0 D_0 Psi
+	//
+	// and the equation of motion is D_0D_0 = vfac + D_jD_j, so solving it for
+	// the acceleration SUBTRACTS the last three. Without these the Higgs
+	// sources W_0 and B_0 through j_0 but never feels them back, which breaks
+	// gauge invariance: a constant A_0 is pure gauge and must produce a phase
+	// rotation at constant |Phi|, not a change in the magnitude.
+	w10v := State.Value(int(z), int(y), int(x), int(EWW10v), int(prv))
+	w20v := State.Value(int(z), int(y), int(x), int(EWW20v), int(prv))
+	w30v := State.Value(int(z), int(y), int(x), int(EWW30v), int(prv))
+	b0v := State.Value(int(z), int(y), int(x), int(EWB0v), int(prv))
+
+	q0 := EWGaugeAct(oc*w10v, oc*w20v, oc*w30v, oc*b0v, psi)
+	q1 := EWGaugeAct(w10, w20, w30, b0, dtp)
+	q2 := EWGaugeAct(w10, w20, w30, b0, d0)
+	cov = math32.Vec4(cov.X-q0.X-q1.X-q2.X, cov.Y-q0.Y-q1.Y-q2.Y,
+		cov.Z-q0.Z-q1.Z-q2.Z, cov.W-q0.W-q1.W-q2.W)
+
+	// ---- the potential ----------------------------------------------------
 	// V = -(1/2) mu^2 mag + (1/4) lambda mag^2
 	// force_i = -dV/dphi_i = (mu^2 - lambda*mag) * phi_i
-	//
-	// The SAME radial factor multiplies EACH component. That is what makes the
-	// force point along the field vector and depend only on |Phi|, leaving the
-	// phase directions exactly flat -- the Goldstone modes. Applying a single
-	// shared additive term instead would break the symmetry and destroy the
-	// mechanism. At the VEV, mag = mu^2/lambda so vfac = 0 and the vacuum is
-	// exactly stationary.
+	// The SAME radial factor multiplies EACH component, so the force points
+	// along the field vector and depends only on |Phi|. That leaves the phase
+	// directions exactly flat -- the Goldstone modes. At the vacuum
+	// mag = mu^2/lambda, vfac = 0, and the state is exactly stationary.
+	mag := psi.X*psi.X + psi.Y*psi.Y + psi.Z*psi.Z + psi.W*psi.W
 	vfac := musq - lambda*mag
 
-	hfCa := Laplacian26(x, y, z, int32(EWHsCa), prv, hsCa) // force
-	hfCa += vfac * hsCa
-	hfCa *= csq
-	//	if em {
-	//		vd := hsCbG.Mul(aV)
-	//		hsCaF += e2h*(a0*hv0b+c*(vd.X+vd.Y+vd.Z)) + hsCa*aSqD
-	//	}
-	hvCaN := hvCa + hfCa
-	hsCaN := hsCa + hvCaN
+	hf := math32.Vec4(csq*(cov.X+vfac*psi.X), csq*(cov.Y+vfac*psi.Y),
+		csq*(cov.Z+vfac*psi.Z), csq*(cov.W+vfac*psi.W))
 
-	hfCb := Laplacian26(x, y, z, int32(EWHsCb), prv, hsCb)
-	hfCb += vfac * hsCb
-	hfCb *= csq
-	//	if em {
-	//		vd := hsCaG.Mul(aV)
-	//		hsCbF += e2h*(a0*hv0aC+c*(vd.X+vd.Y+vd.Z)) + hsCb*aSqD // note: cur hv0aC
-	//	}
-	hvCbN := hvCb + hfCb
-	hsCbN := hsCb + hvCbN
+	// ---- currents, one per spacetime index --------------------------------
+	j0 := EWCurrent(psi, d0)
+	jx := EWCurrent(psi, dX)
+	jy := EWCurrent(psi, dY)
+	jz := EWCurrent(psi, dZ)
 
-	hf0a := Laplacian26(x, y, z, int32(EWHs0a), prv, hs0a)
-	hf0a += vfac * hs0a
-	hf0a *= csq
-	hv0aN := hv0a + hf0a
-	hs0aN := hs0a + hv0aN
+	// ---- gauge field updates: box W = j, box B = j^Y ----------------------
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW10s), csq, j0.X, jx.X, jy.X, jz.X)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW20s), csq, j0.Y, jx.Y, jy.Y, jz.Y)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWW30s), csq, j0.Z, jx.Z, jy.Z, jz.Z)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWB0s), csq, j0.W, jx.W, jy.W, jz.W)
 
-	hf0b := Laplacian26(x, y, z, int32(EWHs0b), prv, hs0b)
-	hf0b += vfac * hs0b
-	hf0b *= csq
-	hv0bN := hv0b + hf0b
-	hs0bN := hs0b + hv0bN
+	// ---- Higgs update ------------------------------------------------------
+	hvCaN := psv.X + hf.X
+	hvCbN := psv.Y + hf.Y
+	hv0aN := psv.Z + hf.Z
+	hv0bN := psv.W + hf.W
 
-	State.Set(hsCaN, int(z), int(y), int(x), int(EWHsCa), int(cur))
-	State.Set(hsCbN, int(z), int(y), int(x), int(EWHsCb), int(cur))
-	State.Set(hs0aN, int(z), int(y), int(x), int(EWHs0a), int(cur))
-	State.Set(hs0bN, int(z), int(y), int(x), int(EWHs0b), int(cur))
+	State.Set(psi.X+hvCaN, int(z), int(y), int(x), int(EWHsCa), int(cur))
+	State.Set(psi.Y+hvCbN, int(z), int(y), int(x), int(EWHsCb), int(cur))
+	State.Set(psi.Z+hv0aN, int(z), int(y), int(x), int(EWHs0a), int(cur))
+	State.Set(psi.W+hv0bN, int(z), int(y), int(x), int(EWHs0b), int(cur))
 
 	State.Set(hvCaN, int(z), int(y), int(x), int(EWHvCa), int(cur))
 	State.Set(hvCbN, int(z), int(y), int(x), int(EWHvCb), int(cur))
@@ -258,6 +409,39 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 
 	State.Set(mag, int(z), int(y), int(x), int(EWHmag), int(cur))
 	State.Set(-0.5*musq*mag+0.25*lambda*mag*mag, int(z), int(y), int(x), int(EWHV), int(cur))
+}
+
+// EWGaugeStep advances one four-potential (the 0,X,Y,Z state variables
+// starting at v0, with their four velocities at v0+4) by one leapfrog step of
+//
+//	d2 A_mu / dt2 = c^2 [ lap(A_mu) + j_mu ]
+//
+// which is box A_mu = j_mu in Lorenz gauge -- the same equation MaxwellKernel
+// solves for the photon, with the electroweak current in place of the
+// electromagnetic one. No mass term appears here or anywhere else.
+func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32) {
+	for ki := range 4 {
+		k := int32(ki)
+		vs := v0 + k
+		vv := v0 + 4 + k
+		var jc float32
+		switch ki {
+		case 0:
+			jc = j0
+		case 1:
+			jc = jx
+		case 2:
+			jc = jy
+		default:
+			jc = jz
+		}
+		ps := State.Value(int(z), int(y), int(x), int(vs), int(prv))
+		vp := State.Value(int(z), int(y), int(x), int(vv), int(prv))
+		f := csq * (Laplacian26(x, y, z, vs, prv, ps) + jc)
+		vc := vp + f
+		State.Set(vc, int(z), int(y), int(x), int(vv), int(cur))
+		State.Set(ps+vc, int(z), int(y), int(x), int(vs), int(cur))
+	}
 }
 
 //gosl:end

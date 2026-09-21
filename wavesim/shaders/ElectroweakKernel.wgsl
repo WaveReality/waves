@@ -8,6 +8,8 @@ var<storage, read> TensorStrides: array<u32>;
 var<storage, read> Params: array<Parameters>;
 @group(0) @binding(2)
 var<storage, read_write> NeighOffs: array<i32>;
+@group(0) @binding(3)
+var<storage, read_write> FaceOffs: array<i32>;
 @group(0) @binding(4)
 var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
@@ -44,6 +46,10 @@ fn main(@builtin(workgroup_id) wgid: vec3<u32>, @builtin(num_workgroups) nwg: ve
 
 fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 	return s0 * i0 + s1 * i1;
+}
+
+fn Index4D(s0: u32, s1: u32, s2: u32, s3: u32, i0: u32, i1: u32, i2: u32, i3: u32) -> u32 {
+	return s0 * i0 + s1 * i1 + s2 * i2 + s3 * i3;
 }
 
 fn StateGet(ix: u32) -> f32 {
@@ -359,6 +365,37 @@ const  EWW30v: EWStates = 56;
 const  EWW3Xv: EWStates = 57;
 const  EWW3Yv: EWStates = 58;
 const  EWW3Zv: EWStates = 59;
+const YPhi = 0.5;
+fn EWGaugeAct(w1: f32,w2: f32,w3: f32,b: f32, psi: vec4<f32>) -> vec4<f32> {
+	var hg = 0.5 * Params[0].GW;
+	var gy = Params[0].GpW * YPhi;
+	var du = hg*w3 + gy*b;
+	var dd = -hg*w3 + gy*b;
+	var or = hg * w1;
+	var oi = -hg * w2;
+	var o: vec4<f32>;
+	o.x = du*psi.y + or*psi.w + oi*psi.z;
+	o.y = -(du*psi.x + or*psi.z - oi*psi.w);
+	o.z = or*psi.y - oi*psi.x + dd*psi.w;
+	o.w = -(or*psi.x + oi*psi.y + dd*psi.z);
+return o;
+}
+fn EWCurrent(psi: vec4<f32>,d: vec4<f32>) -> vec4<f32> {
+	var hg = 0.5 * Params[0].GW;
+	var gy = Params[0].GpW * YPhi;
+	var j: vec4<f32>;
+	j.x = hg * ((psi.x*d.w - psi.y*d.z) + (psi.z*d.y - psi.w*d.x));
+	j.y = hg * (-(psi.x*d.z + psi.y*d.w) + (psi.z*d.x + psi.w*d.y));
+	j.z = hg * ((psi.x*d.y - psi.y*d.x) - (psi.z*d.w - psi.w*d.z));
+	j.w = gy * ((psi.x*d.y - psi.y*d.x) + (psi.z*d.w - psi.w*d.z));
+return j;
+}
+fn EWDiv(x: i32,y: i32,z: i32,vX: i32,tidx: i32) -> f32 {
+	var gx = Gradient18(x, y, z, vX, tidx);
+	var gy = Gradient18(x, y, z, vX+1, tidx);
+	var gz = Gradient18(x, y, z, vX+2, tidx);
+return gx.x + gy.y + gz.z;
+}
 fn ElectroweakKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -371,49 +408,123 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
 	var csq = Params[0].CSq;
+	var oc = 1.0 / Params[0].C;
 	var musq = Params[0].HiggsMuSq;
 	var lambda = Params[0].HiggsLambda;
-	var hsCa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(prv)));
-	var hsCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(prv)));
-	var hs0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(prv)));
-	var hs0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(prv)));
-	var hvCa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCa), u32(prv)));
-	var hvCb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(prv)));
-	var hv0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0a), u32(prv)));
-	var hv0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0b), u32(prv)));
-	var mag = hsCa*hsCa + hsCb*hsCb + hs0a*hs0a + hs0b*hs0b;
+	var psi = vec4<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(prv))),
+		StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(prv))));
+	var psv = vec4<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCa), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(prv))),
+		StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+		TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0b), u32(prv))));
+	var w10 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW10s), u32(prv)));
+	var w1x = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Xs), u32(prv)));
+	var w1y = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Ys), u32(prv)));
+	var w1z = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW1Zs), u32(prv)));
+	var w20 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW20s), u32(prv)));
+	var w2x = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Xs), u32(prv)));
+	var w2y = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Ys), u32(prv)));
+	var w2z = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW2Zs), u32(prv)));
+	var w30 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW30s), u32(prv)));
+	var w3x = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Xs), u32(prv)));
+	var w3y = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Ys), u32(prv)));
+	var w3z = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW3Zs), u32(prv)));
+	var b0 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWB0s), u32(prv)));
+	var bx = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWBXs), u32(prv)));
+	var by = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWBYs), u32(prv)));
+	var bz = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWBZs), u32(prv)));
+	var gCa = Gradient18(x, y, z, i32(EWHsCa), prv);
+	var gCb = Gradient18(x, y, z, i32(EWHsCb), prv);
+	var g0a = Gradient18(x, y, z, i32(EWHs0a), prv);
+	var g0b = Gradient18(x, y, z, i32(EWHs0b), prv);
+	var dxp = vec4<f32>(gCa.x, gCb.x, g0a.x, g0b.x); // d_x Psi
+	var dyp = vec4<f32>(gCa.y, gCb.y, g0a.y, g0b.y);
+	var dzp = vec4<f32>(gCa.z, gCb.z, g0a.z, g0b.z);
+	var ax = EWGaugeAct(w1x, w2x, w3x, bx, psi);
+	var ay = EWGaugeAct(w1y, w2y, w3y, by, psi);
+	var az = EWGaugeAct(w1z, w2z, w3z, bz, psi);
+	var a0 = EWGaugeAct(w10, w20, w30, b0, psi);
+	var dX = dxp+(ax);
+	var dY = dyp+(ay);
+	var dZ = dzp+(az);
+	var dtp = vec4<f32>(oc*psv.x, oc*psv.y, oc*psv.z, oc*psv.w);
+	var d0 = dtp+(a0);
+	var dvW1 = EWDiv(x, y, z, i32(EWW1Xs), prv);
+	var dvW2 = EWDiv(x, y, z, i32(EWW2Xs), prv);
+	var dvW3 = EWDiv(x, y, z, i32(EWW3Xs), prv);
+	var dvB = EWDiv(x, y, z, i32(EWBXs), prv);
+	var lap = vec4<f32>(Laplacian26(x, y, z, i32(EWHsCa), prv, psi.x),
+		Laplacian26(x, y, z, i32(EWHsCb), prv, psi.y),
+		Laplacian26(x, y, z, i32(EWHs0a), prv, psi.z),
+		Laplacian26(x, y, z, i32(EWHs0b), prv, psi.w));
+	var cov = lap+(EWGaugeAct(dvW1, dvW2, dvW3, dvB, psi));
+	cov = cov+(EWGaugeAct(w1x, w2x, w3x, bx, dxp+(dX)));
+	cov = cov+(EWGaugeAct(w1y, w2y, w3y, by, dyp+(dY)));
+	cov = cov+(EWGaugeAct(w1z, w2z, w3z, bz, dzp+(dZ)));
+	var w10v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW10v), u32(prv)));
+	var w20v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW20v), u32(prv)));
+	var w30v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWW30v), u32(prv)));
+	var b0v = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWB0v), u32(prv)));
+	var q0 = EWGaugeAct(oc*w10v, oc*w20v, oc*w30v, oc*b0v, psi);
+	var q1 = EWGaugeAct(w10, w20, w30, b0, dtp);
+	var q2 = EWGaugeAct(w10, w20, w30, b0, d0);
+	cov = vec4<f32>(cov.x-q0.x-q1.x-q2.x, cov.y-q0.y-q1.y-q2.y,
+		cov.z-q0.z-q1.z-q2.z, cov.w-q0.w-q1.w-q2.w);
+	var mag = psi.x*psi.x + psi.y*psi.y + psi.z*psi.z + psi.w*psi.w;
 	var vfac = musq - lambda*mag;
-	var hfCa = Laplacian26(x, y, z, i32(EWHsCa), prv, hsCa); // force
-	hfCa += vfac * hsCa;
-	hfCa *= csq;
-	var hvCaN = hvCa + hfCa;
-	var hsCaN = hsCa + hvCaN;
-	var hfCb = Laplacian26(x, y, z, i32(EWHsCb), prv, hsCb);
-	hfCb += vfac * hsCb;
-	hfCb *= csq;
-	var hvCbN = hvCb + hfCb;
-	var hsCbN = hsCb + hvCbN;
-	var hf0a = Laplacian26(x, y, z, i32(EWHs0a), prv, hs0a);
-	hf0a += vfac * hs0a;
-	hf0a *= csq;
-	var hv0aN = hv0a + hf0a;
-	var hs0aN = hs0a + hv0aN;
-	var hf0b = Laplacian26(x, y, z, i32(EWHs0b), prv, hs0b);
-	hf0b += vfac * hs0b;
-	hf0b *= csq;
-	var hv0bN = hv0b + hf0b;
-	var hs0bN = hs0b + hv0bN;
-	StateSet(hsCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(cur)));
-	StateSet(hsCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(cur)));
-	StateSet(hs0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(cur)));
-	StateSet(hs0bN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(cur)));
+	var hf = vec4<f32>(csq*(cov.x+vfac*psi.x), csq*(cov.y+vfac*psi.y),
+		csq*(cov.z+vfac*psi.z), csq*(cov.w+vfac*psi.w));
+	var j0 = EWCurrent(psi, d0);
+	var jx = EWCurrent(psi, dX);
+	var jy = EWCurrent(psi, dY);
+	var jz = EWCurrent(psi, dZ);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW10s), csq, j0.x, jx.x, jy.x, jz.x);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW20s), csq, j0.y, jx.y, jy.y, jz.y);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWW30s), csq, j0.z, jx.z, jy.z, jz.z);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWB0s), csq, j0.w, jx.w, jy.w, jz.w);
+	var hvCaN = psv.x + hf.x;
+	var hvCbN = psv.y + hf.y;
+	var hv0aN = psv.z + hf.z;
+	var hv0bN = psv.w + hf.w;
+	StateSet(psi.x + hvCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCa), u32(cur)));
+	StateSet(psi.y + hvCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHsCb), u32(cur)));
+	StateSet(psi.z + hv0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0a), u32(cur)));
+	StateSet(psi.w + hv0bN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHs0b), u32(cur)));
 	StateSet(hvCaN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCa), u32(cur)));
 	StateSet(hvCbN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHvCb), u32(cur)));
 	StateSet(hv0aN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0a), u32(cur)));
 	StateSet(hv0bN, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHv0b), u32(cur)));
 	StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHmag), u32(cur)));
-	StateSet(-0.5*musq*mag + 0.25*lambda*mag*mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
+	StateSet(-0.5*musq*mag + 0.25*lambda*mag*mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
+}
+fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,jx: f32,jy: f32,jz: f32) {
+	for (var ki=0; ki<4; ki++) {
+		var k = i32(ki);
+		var vs = v0 + k;
+		var vv = v0 + 4 + k;
+		var jc: f32;
+		switch (ki) {
+		case 0: {
+			jc = j0;
+		}
+		case 1: {
+			jc = jx;
+		}
+		case 2: {
+			jc = jy;
+		}
+		default: {
+			jc = jz;
+		}
+		}
+		var ps = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(prv)));
+		var vp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(prv)));
+		var f = csq * (Laplacian26(x, y, z, vs, prv, ps) + jc);
+		var vc = vp + f;
+		StateSet(vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(cur)));
+		StateSet(ps + vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
+	}
 }
 
 //////// import: "enumgen.go"
@@ -454,6 +565,35 @@ fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
+}
+fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
+	var g: vec3<f32>;
+	for (var xyz=0; xyz<3; xyz++) {
+		var sum = f32(0);
+		for (var j=0; j<9; j++) {
+			var xp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(0))];
+			var xm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(0))];
+			var yp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(1))];
+			var ym = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(1))];
+			var zp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(2))];
+			var zm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(2))];
+			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad18Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
+			sum += grad;
+		}
+		switch (xyz) {
+		case 0: {
+			g.x = sum;
+		}
+		case 1: {
+			g.y = sum;
+		}
+		case 2: {
+			g.z = sum;
+		}
+		default: {
+		}
+		}
+	}return g;
 }
 
 //////// import: "klein-gordon.go"
@@ -524,6 +664,8 @@ struct Parameters {
 	Move: i32,
 	HiggsMu: f32,
 	HiggsLambda: f32,
+	GW: f32,
+	GpW: f32,
 	Diff: f32,
 	Decay: f32,
 	CSq: f32,
@@ -542,6 +684,8 @@ struct Parameters {
 	EOverHSq: f32,
 	HiggsMuSq: f32,
 	HiggsV: f32,
+	MW: f32,
+	MZ: f32,
 }
 
 //////// import: "particle.go"

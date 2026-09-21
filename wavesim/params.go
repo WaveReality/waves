@@ -122,6 +122,16 @@ type Parameters struct {
 	// effectively how strongly the complex magnitude minus mu_H contributes.
 	HiggsLambda float32
 
+	// GW is g, the SU(2)_L weak isospin gauge coupling, which couples the
+	// three W^a fields to the Higgs doublet. Dimensionless. Standard Model
+	// value 0.6533. Sets m_W = g v / 2.
+	GW float32
+
+	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
+	// the B field to the Higgs doublet. Dimensionless. Standard Model value
+	// 0.3500. Together with g it sets the weak mixing angle and m_Z.
+	GpW float32
+
 	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
 	Diff float32
 
@@ -189,6 +199,15 @@ type Parameters struct {
 	// value: the radius of the minimum of the potential, in 1/cube. The
 	// neutral (lower) doublet component is initialized to this.
 	HiggsV float32 `display:"-"`
+
+	// MW = GW * HiggsV / 2 is the W boson mass in 1/cube. Nothing in the
+	// kernel uses it -- the mass is generated dynamically by the Higgs
+	// current. It is here to check that against.
+	MW float32 `display:"-"`
+
+	// MZ = HiggsV * sqrt(GW^2 + GpW^2) / 2 is the Z boson mass in 1/cube,
+	// likewise for reference only. The photon mass is zero.
+	MZ float32 `display:"-"`
 }
 
 func (pr *Parameters) Update() {
@@ -214,6 +233,8 @@ func (pr *Parameters) Update() {
 	if pr.HiggsLambda > 0 {
 		pr.HiggsV = pr.HiggsMu / math32.Sqrt(pr.HiggsLambda)
 	}
+	pr.MW = pr.GW * pr.HiggsV / 2.0
+	pr.MZ = pr.HiggsV * math32.Sqrt(pr.GW*pr.GW+pr.GpW*pr.GpW) / 2.0
 }
 
 //gosl:end
@@ -232,6 +253,8 @@ func (pr *Parameters) Defaults() {
 	// Gives v = 0.1230, m_W Compton 24.9 cubes, m_Z Compton 21.9 cubes.
 	pr.HiggsMu = 0.0441942
 	pr.HiggsLambda = 0.1291
+	pr.GW = 0.6533
+	pr.GpW = 0.3500
 	pr.Diff = 0.5
 	pr.Decay = 0.98
 	pr.Update()

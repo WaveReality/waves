@@ -72,6 +72,14 @@ const (
 	// else about it is a choice of units.
 	HiggsMhOverV = 0.50813
 
+	// GW is g, the SU(2)_L gauge coupling. Dimensionless, so like
+	// HiggsLambda it carries into cube units unchanged.
+	GW = 0.6533
+
+	// GpW is g', the U(1)_Y gauge coupling. Dimensionless.
+	// sin^2(theta_W) = g'^2/(g^2+g'^2) = 0.2230.
+	GpW = 0.3500
+
 	//////// Planck scale constants
 
 	// Planck length, m
@@ -148,6 +156,22 @@ type Units struct {
 	// inverse cube units (1/cube). This is the radius of the minimum of the
 	// potential, i.e. the value the neutral component settles at.
 	HiggsV float64 `edit:"-"`
+
+	// GW is g, the SU(2)_L gauge coupling: dimensionless, hence the
+	// Standard Model value unconverted.
+	GW float64 `edit:"-"`
+
+	// GpW is g', the U(1)_Y gauge coupling: likewise dimensionless.
+	GpW float64 `edit:"-"`
+
+	// MW is the resulting W boson mass, g v / 2, in 1/cube.
+	MW float64 `edit:"-"`
+
+	// MZ is the resulting Z boson mass, v sqrt(g^2+g'^2) / 2, in 1/cube.
+	MZ float64 `edit:"-"`
+
+	// ThetaW is the weak mixing angle, atan(g'/g), in degrees.
+	ThetaW float64 `edit:"-"`
 
 	// CuM is the computed length of a cubic element, in meters.
 	CuM float64 `edit:"-"`
@@ -270,4 +294,9 @@ func (un *Units) Update() {
 	un.HiggsLambda = HiggsLambda
 	un.HiggsMu = un.HiggsMh / math.Sqrt2
 	un.HiggsV = un.HiggsMu / math.Sqrt(un.HiggsLambda)
+	un.GW = GW
+	un.GpW = GpW
+	un.MW = un.GW * un.HiggsV / 2
+	un.MZ = un.HiggsV * math.Hypot(un.GW, un.GpW) / 2
+	un.ThetaW = math.Atan2(un.GpW, un.GW) * 180 / math.Pi
 }
