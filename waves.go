@@ -23,12 +23,12 @@ func main() {
 
 	// threed := false
 	threed := true
-	// eqs := wavesim.Wave
+	eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	eqs := wavesim.Electroweak
+	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
@@ -45,7 +45,7 @@ func main() {
 			sim.Config.Equation = eqs
 			switch eqs {
 			case wavesim.Wave:
-				sim.Params.C = 1
+				sim.Params.C = 0.5
 				// sim.Params.Edges = wavesim.EdgesWrap
 				sim.Params.Edges = wavesim.EdgesDamp
 				sim.ViewInit(func(vw *wavesim.View) {

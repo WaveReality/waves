@@ -26,7 +26,25 @@ func (ss *Sim) ConfigVars() {
 	Ctx[0].Init()
 	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
 	NeighOffs = tensor.NewInt32(26, 3)
-	lnorm := float32(3.0 / 13.0)
+	// Stencil weights indexed by SQUARED distance: 1 = face (6 of them),
+	// 2 = edge (12), 3 = corner (8). Both tables are chosen so that the
+	// leading error term is ISOTROPIC, not merely so the stencil has the right
+	// normalization. See funcs_test.go, which locks both conditions in.
+	//
+	// Laplacian, ratios 28 : 10 : 1. Normalization (sum_j w_j dx_j^2 = 2) makes
+	// the stencil exact on quadratics; isotropy of the leading 4th-order error
+	// additionally needs
+	//
+	//	sum_j w_j dx^4 == 3 sum_j w_j dx^2 dy^2
+	//
+	// The intuitive 1/d^2 weighting normalizes correctly but leaves that ratio
+	// at 1.615 instead of 1, giving ~36x more directional spread in the wave
+	// dispersion relation (1.97% vs 0.055% at |k| = 0.8).
+	//
+	// The trade: these weights have spectral radius 16/3 rather than 4, so the
+	// CFL limit tightens from C < 1 to C < sqrt(3)/2 = 0.866. Isotropy costs
+	// about 13% of the timestep.
+	lapWt := [4]float32{0, 28.0 / 72.0, 10.0 / 72.0, 1.0 / 72.0}
 	// sum := float32(0)
 	idx := 0
 	for z := -1; z <= 1; z++ {
@@ -41,9 +59,7 @@ func (ss *Sim) ConfigVars() {
 
 				v := math32.Vec3(float32(x), float32(y), float32(z))
 				d2 := v.LengthSquared()
-				invD2 := 1.0 / d2
-				wt := lnorm * invD2
-				NeighWts.Set(wt, int(LaplacianWts), int(idx))
+				NeighWts.Set(lapWt[int(d2+0.5)], int(LaplacianWts), int(idx))
 
 				d := v.Length()
 				invD := 1.0 / d
@@ -58,6 +74,7 @@ func (ss *Sim) ConfigVars() {
 	// sum += 1.0
 	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 
+	grdWt := [4]float32{0, 16, 4, 1}
 	FaceOffs = tensor.NewInt32(3, 2, 9, 3)
 	n := math32.Vec3i(-1, 0, 0)
 	idx = 0
@@ -72,9 +89,16 @@ func (ss *Sim) ConfigVars() {
 			FaceOffs.Set(o.Y, int(math32.X), int(Plus1), int(idx), int(math32.Y))
 			FaceOffs.Set(o.Z, int(math32.X), int(Plus1), int(idx), int(math32.Z))
 
+			// Gradient, ratios 16 : 4 : 1 -- the D3Q27 weighting. Every pair here
+			// sits at x = +-1, so sum_j w_j is pinned by the normalization below
+			// and the MAGNITUDE error is the same for any choice of ratios; only
+			// the isotropy can be tuned. Isotropy of the leading 3rd-order error
+			// needs T111 == 3*T122, i.e. face = 2*edge + 8*corner. The intuitive
+			// 1/d weighting satisfies the normalization but overshoots that by
+			// 82%, giving ~26x more directional spread (5.04% vs 0.19% at 0.8).
 			var v math32.Vector3
 			v.SetFromVector3i(n)
-			wt := 1.0 / v.Length()
+			wt := grdWt[int(v.LengthSquared()+0.5)]
 			NeighWts.Set(wt, int(Grad18Wts), int(idx))
 			sum += wt
 			idx++
