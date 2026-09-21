@@ -24,47 +24,44 @@ func (ss *Sim) ConfigVars() {
 	Ctx[0].Init()
 	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
 	NeighOffs = tensor.NewInt32(26,3)
-	// Stencil weights indexed by SQUARED distance: 1 = face (6 of them),
-	// 2 = edge (12), 3 = corner (8). Both tables are chosen so that the
-	// leading error term is ISOTROPIC, not merely so the stencil has the right
-	// normalization. See funcs_test.go, which locks both conditions in.
+	// NeighOffs is ordered by SHELL: faces first (indices 0-5), then edges
+	// (6-17), then corners (18-25). That ordering is what lets the Laplacian
+	// stop at NLapNeigh = 18 and never read the corners at all.
 	//
-	// Laplacian, ratios 28 : 10 : 1. Normalization (sum_j w_j dx_j^2 = 2) makes
-	// the stencil exact on quadratics; isotropy of the leading 4th-order error
-	// additionally needs
-	//
+	// Laplacian weights, face : edge : corner = 2 : 1 : 0 -- the 19-point
+	// stencil. Two conditions pin these down. Normalization
+	//	sum_j w_j dx_j^2 = 2
+	// makes the stencil exact on quadratics. Isotropy of the leading
+	// (4th-order) error additionally needs
 	//	sum_j w_j dx^4 == 3 sum_j w_j dx^2 dy^2
+	// The intuitive 1/d^2 weighting over all 26 neighbors normalizes correctly
+	// but leaves that ratio at 1.615, giving ~36x more directional spread in
+	// the wave dispersion (1.97% vs 0.055% at |k| = 0.8). The 18 face+edge
+	// neighbors at 2:1 land EXACTLY on the isotropy condition: the 19-point
+	// stencil of O'Reilly & Beck (2006) is already isotropic, and extending
+	// 1/d^2 out to the corners is precisely what breaks it.
 	//
-	// The intuitive 1/d^2 weighting normalizes correctly but leaves that ratio
-	// at 1.615 instead of 1, giving ~36x more directional spread in the wave
-	// dispersion relation (1.97% vs 0.055% at |k| = 0.8).
-	//
-	// The trade: these weights have spectral radius 16/3 rather than 4, so the
-	// CFL limit tightens from C < 1 to C < sqrt(3)/2 = 0.866. Isotropy costs
-	// about 13% of the timestep.
-	lapWt := [4]float32{0, 28.0 / 72.0, 10.0 / 72.0, 1.0 / 72.0}
-	// sum := float32(0)
+	// The trade: spectral radius rises from 4 to 16/3, so the CFL limit
+	// tightens from C < 1 to C < sqrt(3)/2 = 0.866 -- isotropy costs ~13% of
+	// the timestep. Adding the corners back with any isotropic weighting buys
+	// nothing: same spectral radius, same directional spread.
+	lapWt := [4]float32{0, 1.0 / 3.0, 1.0 / 6.0, 0}
 	idx := 0
-	for z := -1; z <= 1; z++ {
-		for y := -1; y <= 1; y++ {
-			for x := -1; x <= 1; x++ {
-				if x == 0 && y == 0 && z == 0 {
-					continue
+	for shell := 1; shell <= 3; shell++ {
+		for z := -1; z <= 1; z++ {
+			for y := -1; y <= 1; y++ {
+				for x := -1; x <= 1; x++ {
+					d2 := x*x + y*y + z*z
+					if d2 != shell {
+						continue
+					}
+					NeighOffs[idx, math32.X] = int32(x)
+					NeighOffs[idx, math32.Y] = int32(y)
+					NeighOffs[idx, math32.Z] = int32(z)
+					NeighWts[LaplacianWts, idx] = lapWt[shell]
+					NeighWts[AverageWts, idx] = 1.0 / math32.Sqrt(float32(d2))
+					idx++
 				}
-				NeighOffs[idx, math32.X] = int32(x)
-				NeighOffs[idx, math32.Y] = int32(y)
-				NeighOffs[idx, math32.Z] = int32(z)
-				
-				v := math32.Vec3(float32(x),float32(y),float32(z))
-				d2 := v.LengthSquared()
-				NeighWts[LaplacianWts, idx] = lapWt[int(d2+0.5)]
-				
-				d := v.Length()
-				invD := 1.0 / d
-				// sum += invD
-				NeighWts[AverageWts, idx] = invD
-				
-				idx++
 			}
 		}
 	}
@@ -72,63 +69,54 @@ func (ss *Sim) ConfigVars() {
 	// sum += 1.0
 	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 	
-	grdWt := [4]float32{0, 16, 4, 1}
+	// Gradient / divergence / curl. Each of the 9 entries is an antipodal PAIR
+	// (minus at -1 along the axis, plus at its exact negation), which is what
+	// makes every even-order error term cancel and the stencil 2nd order.
+	//
+	// Weights face : edge : corner = 2 : 1 : 0, ordered by shell so the loops
+	// stop at NGradPair = 5 pairs (10 points) instead of 9 (18 points). Every
+	// pair sits at x = +-1, so sum_j w_j is pinned by the normalization below
+	// and the MAGNITUDE error is identical for any ratios; only the isotropy
+	// can be tuned. Isotropy of the leading 3rd-order error needs
+	//	T111 == 3*T122,  i.e.  face = 2*edge + 8*corner
+	// The intuitive 1/d weighting satisfies the normalization but overshoots
+	// that by 82%, giving ~26x more directional spread (5.04% vs 0.16% at
+	// |k| = 0.8). Dropping the corner pairs is both cheaper AND slightly more
+	// isotropic than keeping them at 16:4:1.
 	FaceOffs = tensor.NewInt32(3, 2, 9, 3)
-	n := math32.Vec3i(-1, 0, 0)
-	idx = 0
+	grdWt := [3]float32{2, 1, 0}
+	// transverse offsets for the 9 pairs, in shell order: the face pair, then
+	// the 4 edge pairs, then the 4 zero-weight corner pairs.
+	var tra [9][2]int32
+	ti := 0
+	for shell := 0; shell <= 2; shell++ {
+		for b := -1; b <= 1; b++ {
+			for a := -1; a <= 1; a++ {
+				if a*a+b*b != shell {
+					continue
+				}
+				tra[ti][0], tra[ti][1] = int32(a), int32(b)
+				ti++
+			}
+		}
+	}
+	setPair := func(dim math32.Dims, j int32, mx, my, mz int32) {
+		FaceOffs[dim, Minus1, j, math32.X] = mx
+		FaceOffs[dim, Minus1, j, math32.Y] = my
+		FaceOffs[dim, Minus1, j, math32.Z] = mz
+		FaceOffs[dim, Plus1, j, math32.X] = -mx
+		FaceOffs[dim, Plus1, j, math32.Y] = -my
+		FaceOffs[dim, Plus1, j, math32.Z] = -mz
+	}
 	sum := float32(0)
-	for n.Z = -1; n.Z <= 1; n.Z++ {
-		for n.Y = -1; n.Y <= 1; n.Y++ {
-			FaceOffs[math32.X, Minus1, idx, math32.X] = n.X
-			FaceOffs[math32.X, Minus1, idx, math32.Y] = n.Y
-			FaceOffs[math32.X, Minus1, idx, math32.Z] = n.Z
-			o := n.MulScalar(-1)
-			FaceOffs[math32.X, Plus1, idx, math32.X] = o.X
-			FaceOffs[math32.X, Plus1, idx, math32.Y] = o.Y
-			FaceOffs[math32.X, Plus1, idx, math32.Z] = o.Z
-			
-			// Gradient, ratios 16 : 4 : 1 -- the D3Q27 weighting. Every pair here
-			// sits at x = +-1, so sum_j w_j is pinned by the normalization below
-			// and the MAGNITUDE error is the same for any choice of ratios; only
-			// the isotropy can be tuned. Isotropy of the leading 3rd-order error
-			// needs T111 == 3*T122, i.e. face = 2*edge + 8*corner. The intuitive
-			// 1/d weighting satisfies the normalization but overshoots that by
-			// 82%, giving ~26x more directional spread (5.04% vs 0.19% at 0.8).
-			var v math32.Vector3
-			v.SetFromVector3i(n)
-			wt := grdWt[int(v.LengthSquared()+0.5)]
-			NeighWts[Grad18Wts, idx] = wt
-			sum += wt
-			idx++
-		}
-	}
-	n.Y = -1
-	idx = 0
-	for n.Z = -1; n.Z <= 1; n.Z++ {
-		for n.X = -1; n.X <= 1; n.X++ {
-			FaceOffs[math32.Y, Minus1, idx, math32.X] = n.X
-			FaceOffs[math32.Y, Minus1, idx, math32.Y] = n.Y
-			FaceOffs[math32.Y, Minus1, idx, math32.Z] = n.Z
-			o := n.MulScalar(-1)
-			FaceOffs[math32.Y, Plus1, idx, math32.X] = o.X
-			FaceOffs[math32.Y, Plus1, idx, math32.Y] = o.Y
-			FaceOffs[math32.Y, Plus1, idx, math32.Z] = o.Z
-			idx++
-		}
-	}
-	n.Z = -1
-	idx = 0
-	for n.Y = -1; n.Y <= 1; n.Y++ {
-		for n.X = -1; n.X <= 1; n.X++ {
-			FaceOffs[math32.Z, Minus1, idx, math32.X] = n.X
-			FaceOffs[math32.Z, Minus1, idx, math32.Y] = n.Y
-			FaceOffs[math32.Z, Minus1, idx, math32.Z] = n.Z
-			o := n.MulScalar(-1)
-			FaceOffs[math32.Z, Plus1, idx, math32.X] = o.X
-			FaceOffs[math32.Z, Plus1, idx, math32.Y] = o.Y
-			FaceOffs[math32.Z, Plus1, idx, math32.Z] = o.Z
-			idx++
-		}
+	for j := range 9 {
+		a, b := tra[j][0], tra[j][1]
+		w := grdWt[a*a+b*b]
+		NeighWts[Grad18Wts, j] = w
+		sum += w
+		setPair(math32.X, int32(j), -1, a, b)
+		setPair(math32.Y, int32(j), a, -1, b)
+		setPair(math32.Z, int32(j), a, b, -1)
 	}
 	sum *= 2
 	for j := range 9 {
@@ -148,6 +136,23 @@ const (
 
 // NeighWeights
 type NeighWeights int32 //enums:enum
+
+const (
+	// NNeigh is the full 26-neighborhood in NeighOffs, ordered by shell:
+	// faces 0-5, edges 6-17, corners 18-25.
+	NNeigh = 26
+
+	// NLapNeigh is how many of those the Laplacian sums over. The isotropic
+	// weights are ZERO on the 8 corners, so the loop stops at 18 and never
+	// reads them -- the 19-point stencil. Operators that genuinely need all 26
+	// (NeighAverage27, NeighMax26) still use NNeigh.
+	NLapNeigh = 18
+
+	// NGradPair is how many antipodal PAIRS the gradient, divergence and curl
+	// sum over, out of the 9 in FaceOffs. Same story: the 4 corner pairs carry
+	// zero weight, so 5 pairs = 10 points instead of 18.
+	NGradPair = 5
+)
 
 const (
 	// LaplacianWts are weighting factors for 3D Laplacian = 3 / (13 * d^2)
@@ -182,7 +187,7 @@ func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 // and cur / prev time index tidx. ctr is the center value.
 func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
-	for j := range 26 {
+	for j := range NLapNeigh {
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]
@@ -197,7 +202,7 @@ func Laplacian26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 // and cur / prev time index tidx. ctr is the center value.
 func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	avg := float32(0)
-	for j := range 26 {
+	for j := range NNeigh {
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]
@@ -215,7 +220,7 @@ func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 func NeighMax26(x, y, z, vidx, tidx int32) int32 {
 	mx := float32(0)
 	mxi := int32(0)
-	for j := range 26 {
+	for j := range NNeigh {
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]
@@ -246,7 +251,7 @@ func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var g math32.Vector3
 	for xyz := range 3 {
 		sum := float32(0)
-		for j := range 9 {
+		for j := range NGradPair {
 			xp := FaceOffs[xyz, Plus1, j, math32.X]
 			xm := FaceOffs[xyz, Minus1, j, math32.X]
 			yp := FaceOffs[xyz, Plus1, j, math32.Y]
@@ -275,16 +280,29 @@ func Gradient18(x, y, z, vidx, tidx int32) math32.Vector3 {
 func Divergence18(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 	sum := float32(0)
 	for xyz := range 3 {
-		for j := range 9 {
+		d := float32(0)
+		// component xyz of the vector field lives at vidx+xyz, and is
+		// differentiated along direction xyz -- that pairing is what makes this
+		// a divergence rather than a sum of derivatives of one scalar.
+		vi := vidx + int32(xyz)
+		for j := range NGradPair {
 			xp := FaceOffs[xyz, Plus1, j, math32.X]
 			xm := FaceOffs[xyz, Minus1, j, math32.X]
 			yp := FaceOffs[xyz, Plus1, j, math32.Y]
 			ym := FaceOffs[xyz, Minus1, j, math32.Y]
 			zp := FaceOffs[xyz, Plus1, j, math32.Z]
 			zm := FaceOffs[xyz, Minus1, j, math32.Z]
-			grad := NeighWts[Grad18Wts, j] * (State[z+zp, y+yp, x+xp, vidx, tidx] - State[z+zm, y+ym, x+xm, vidx, tidx])
-			sum += grad
+			d += NeighWts[Grad18Wts, j] * (State[z+zp, y+yp, x+xp, vi, tidx] - State[z+zm, y+ym, x+xm, vi, tidx])
 		}
+		switch xyz {
+		case 0:
+			*dx = d
+		case 1:
+			*dy = d
+		default:
+			*dz = d
+		}
+		sum += d
 	}
 	return sum
 }
@@ -297,7 +315,7 @@ func Curl18(x, y, z, vidx, tidx int32) math32.Vector3 {
 	dimX := vidx + int32(math32.X)
 	dimY := vidx + int32(math32.Y)
 	dimZ := vidx + int32(math32.Z)
-	for j := range 9 {
+	for j := range NGradPair {
 		xpX := FaceOffs[math32.X, Plus1, j, math32.X]
 		xmX := FaceOffs[math32.X, Minus1, j, math32.X]
 		ypX := FaceOffs[math32.X, Plus1, j, math32.Y]
@@ -368,7 +386,7 @@ func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 // For computation at the edge, checks against given full size bounds.
 func LaplacianEdge26(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
-	for j := range 26 {
+	for j := range NLapNeigh {
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]
@@ -396,7 +414,7 @@ func PotentialEnergy1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 // and cur / prev time index tidx. ctr is the center value.
 func PotentialEnergy26(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
-	for j := range 26 {
+	for j := range NLapNeigh {
 		xo := NeighOffs[j, math32.X]
 		yo := NeighOffs[j, math32.Y]
 		zo := NeighOffs[j, math32.Z]

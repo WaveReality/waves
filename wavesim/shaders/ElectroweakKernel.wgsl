@@ -551,6 +551,9 @@ alias MinusPlusOne = i32; //enums:enum
 const  Minus1: MinusPlusOne = 0;
 const  Plus1: MinusPlusOne  = 1;
 alias NeighWeights = i32; //enums:enum
+const  NNeigh = 26;
+const  NLapNeigh = 18;
+const  NGradPair = 5;
 const  LaplacianWts: NeighWeights = 0;
 const  AverageWts: NeighWeights = 1;
 const  Grad18Wts: NeighWeights = 2;
@@ -558,7 +561,7 @@ const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
 fn Laplacian26(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
-	for (var j=0; j<26; j++) {
+	for (var j=0; j<NLapNeigh; j++) {
 		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
 		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
 		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
@@ -570,7 +573,7 @@ fn Gradient18(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	var g: vec3<f32>;
 	for (var xyz=0; xyz<3; xyz++) {
 		var sum = f32(0);
-		for (var j=0; j<9; j++) {
+		for (var j=0; j<NGradPair; j++) {
 			var xp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(0))];
 			var xm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(0))];
 			var yp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(1))];
