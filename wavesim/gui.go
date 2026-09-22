@@ -214,11 +214,19 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 		w.SetText("Config").SetIcon(icons.Update).
 			SetTooltip("Select a configuration option for initializing the state (will also take effect on subsequent Inits")
 		w.SetMenu(func(m *core.Scene, pos image.Point) {
-			for _, ic := range gui.sim.initFuncs {
-				core.NewButton(m).SetText(ic.Name).SetTooltip(ic.Doc).OnClick(func(e events.Event) {
+			for ici, ic := range gui.sim.initFuncs {
+				mb := core.NewButton(m)
+				mb.SetText(ic.Name).SetTooltip(ic.Doc).OnClick(func(e events.Event) {
+					for i := range gui.sim.initFuncs {
+						gui.sim.initFuncs[i].Current = false
+					}
+					gui.sim.initFuncs[ici].Current = true
 					gui.sim.InitFunc = ic.Func
 					gui.sim.Init()
 				})
+				if ic.Current {
+					mb.SetIcon(icons.Check)
+				}
 			}
 		})
 	})

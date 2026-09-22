@@ -22,6 +22,9 @@ type InitFunc struct {
 
 	// Func is the function to call
 	Func func(sim *Sim)
+
+	// Current indicates that this is the currently-selected item.
+	Current bool
 }
 
 // WrapEdges re-wraps the edges. This is called automatically in Init for

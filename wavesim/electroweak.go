@@ -1024,7 +1024,7 @@ func WCollision(ss *Sim) {
 }
 
 var ElectroweakConfigs = []InitFunc{
-	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken},
+	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
 	InitFunc{Name: "Thermal Quench", Doc: "Starts above the critical temperature where the symmetry is unbroken and the field is stable at zero; lower Temp through TempCrit to watch the electroweak phase transition happen", Func: ThermalQuench},
 	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
