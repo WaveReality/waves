@@ -4,6 +4,8 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 //gosl:start
 
 // EMStates are the state variables for EM wave equations.
@@ -228,6 +230,11 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 func (ss *Sim) MaxwellConfig() {
 	ParamsShouldDisplay = MaxwellShouldDisplay
 	ss.StateVars = EMStatesN
+	ss.initFuncs = MaxwellConfigs
+	ss.InitFunc = ElectricPotential
+	ss.Config.Wavelength = 16
+	ss.Config.PacketWidth = 2 * ss.Config.Wavelength
+	ss.Config.Velocity.X = 0.5 * ss.Params.C
 	ss.ViewInit(func(view *View) {
 		view.SetVar(A0s, -1)
 		MaxwellViewAll(view)
@@ -252,4 +259,192 @@ func MaxwellViewAll(view *View) {
 }
 
 // MaxwellShouldDisplay determines which Parameters fields to display.
-var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0Velocity"}
+var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0NoWave"}
+
+//////// initialization helpers
+
+// emSourceI returns the integer cell of [Config.Source], where negatives mean
+// the center.
+func emSourceI(ss *Sim) math32.Vector3i {
+	return CoordToInt(ss.Config.Source)
+}
+
+// emTransverse returns the potential and velocity variables for the transverse
+// direction [Config.Polarization], and the orthogonal pair. A wave running
+// along X can be polarized along Y or Z, and nothing else.
+func emTransverse(ss *Sim) (pos, vel, orthoPos, orthoVel EMStates) {
+	if ss.Config.Polarization == math32.Z {
+		return AZs, AZv, AYs, AYv
+	}
+	return AYs, AYv, AZs, AZv
+}
+
+//////// configurations
+
+// ElectricPotential puts a point charge at [Config.Source] and lets the scalar
+// potential build up around it: A0 falls off as 1/r, and E = -grad A0 as 1/r^2.
+//
+// With Params.A0NoWave on (the default) the A0 update sets velocity from force
+// rather than accumulating it, which makes it Jacobi relaxation of Poisson's
+// equation instead of a wave. The potential fills in from the charge outward
+// and settles. It is not quick: relaxation is diffusive, so reaching the far
+// wall takes on the order of (L/pi)^2 / C^2 steps.
+//
+// Edges are FIXED, which holds A0 at zero on the walls: a charge inside a
+// grounded metal box. Wrapping would put an image charge in every neighboring
+// copy and never settle, and damping leaves the wall floating, so A0 comes out
+// as 1/r plus an arbitrary constant. Grounding fixes that constant, at the
+// price of a known one: the solution is
+//
+//	A0 = k (1/r - 1/R)
+//
+// with R the distance to the wall, which is the Dirichlet Green's function.
+// Near the charge it is 1/r; near the wall it is bent down to meet zero.
+//
+// Watch the A0 radial stats: the X and diagonal samples at the same radius
+// should agree, which is what the 19-point stencil buys.
+func ElectricPotential(ss *Sim) {
+	ss.Params.Edges = EdgesFixed
+	ss.Params.A0NoWave.SetBool(true)
+	ss.Params.Update()
+	ss.Point(Charge, Both, emSourceI(ss), ss.Config.Amplitude)
+}
+
+// ChargeDipole is two opposite charges, one [Config.Wavelength] either side of
+// [Config.Source] along X.
+//
+// The far field is the dipole one, falling as 1/r^3 rather than 1/r^2, because
+// the two potentials cancel to leading order. Along the axis between them E is
+// strongest and points from positive to negative; on the perpendicular bisector
+// it is half the strength and points the other way.
+func ChargeDipole(ss *Sim) {
+	ss.Params.Edges = EdgesFixed
+	ss.Params.A0NoWave.SetBool(true)
+	ss.Params.Update()
+	d := int32(ss.Config.Wavelength)
+	c := emSourceI(ss)
+	ss.Point(Charge, Both, math32.Vec3i(c.X-d, c.Y, c.Z), ss.Config.Amplitude)
+	ss.Point(Charge, Both, math32.Vec3i(c.X+d, c.Y, c.Z), -ss.Config.Amplitude)
+}
+
+// PolarizedPhoton sends a linearly polarized electromagnetic packet along X.
+//
+// Only the vector potential is set, in the single transverse component
+// [Config.Polarization]. Everything else follows from the kernel: E = -dA/dt
+// is along that same component, and B = curl A is along the OTHER transverse
+// one. So with Y polarization you get E along Y and B along Z, and with Z
+// polarization E along Z and B along -Y. E, B and the direction of travel are
+// mutually perpendicular, and there is nothing along X: that is what makes it
+// a transverse wave, and it is the whole content of "polarization" for a plane
+// wave -- which of the two transverse directions E points along.
+//
+// A longitudinal wave is not available to pick, and that is not an omission:
+// setting AX instead would be pure gauge, giving E = B = 0.
+func PolarizedPhoton(ss *Sim) {
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	pos, vel, _, _ := emTransverse(ss)
+	om := ss.LatticeFreq(ss.Config.Wavelength, 0)
+	cx := float32(ss.Config.Size.X) * 0.25
+	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+}
+
+// CircularPolarization sends a circularly polarized packet along X: both
+// transverse components at once, a quarter cycle out of step.
+//
+// A_pol goes as cos(kx - wt) and the orthogonal component as sin(kx - wt), so
+// their sum has constant magnitude and a direction that turns. At a fixed
+// point E rotates in the transverse plane once per period; at a fixed time it
+// traces a helix along X. Neither component is doing anything a linear wave
+// does not do -- circular polarization is not a third kind of wave, it is two
+// linear ones added with a phase offset, which is why any polarization can be
+// written in either basis.
+//
+// [Config.Polarization] picks which component leads, and that is the
+// handedness: Y leading Z turns one way, Z leading Y the other.
+func CircularPolarization(ss *Sim) {
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	pos, vel, opos, ovel := emTransverse(ss)
+	om := ss.LatticeFreq(ss.Config.Wavelength, 0)
+	cx := float32(ss.Config.Size.X) * 0.25
+	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+	ss.SlabPacketConfig(opos, ovel, math32.X, cx, 1, 1, om, -0.5*math32.Pi)
+}
+
+// StandingWave fills the box with a sinusoidal vector potential and NO
+// velocity, which is equal parts running each way: a standing wave.
+//
+// A = cos(kx) held still evolves as cos(kx) cos(wt), so E = -dA/dt goes as
+// cos(kx) sin(wt) and B = curl A as sin(kx) cos(wt). Their nodes are a quarter
+// wavelength apart -- E vanishes where B peaks -- and they are also a quarter
+// PERIOD apart in time. That double offset is why a standing wave stores
+// energy without transporting it: E x B averages to zero both ways.
+//
+// Edges wrap, so put a whole number of wavelengths in the box or the two ends
+// will not meet.
+func StandingWave(ss *Sim) {
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	pos, _, _, _ := emTransverse(ss)
+	ss.Sine(pos, math32.X, ss.Config.Wavelength, 0, ss.Config.Amplitude, 0)
+	ss.CopyCurToPrev() // no velocity
+}
+
+// MovingCharge shows the magnetic field that moving charge produces: a
+// uniformly charged line along X, moving along its own length at
+// [Config.Velocity].X, which is a current.
+//
+// A line rather than a blob, because this kernel has no advection: charge and
+// current are set once and stay put. A line of charge sliding along itself is
+// the one moving-charge configuration for which that is exactly right, since
+// the density it leaves behind is the density it had. Anything localized would
+// need the charge to actually move, and would violate continuity.
+//
+// The result is E pointing radially away from the line and B circling around
+// it, with |B|/|E| = v/c^2. Set Config.Velocity.X to zero and B disappears
+// while E stays: magnetism is what electric charge looks like when it moves.
+func MovingCharge(ss *Sim) {
+	// damped, not grounded: A0 relaxes but the vector potential obeys the wave
+	// equation, and a static source started from zero leaves it ringing about
+	// the steady state forever in a box with nowhere for the energy to go.
+	// E and B do not care that A0 then floats by a constant.
+	ss.Params.Edges = EdgesDamp
+	ss.Params.A0NoWave.SetBool(true)
+	ss.Params.Update()
+	v := ss.Config.Velocity.X
+	c := CenterFull(emSourceI(ss))
+	q := ss.Config.Amplitude
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	for x := int32(1); x <= sz.X; x++ {
+		State[c.Z, c.Y, x, Charge, cur] += q
+		State[c.Z, c.Y, x, Charge, prv] += q
+		State[c.Z, c.Y, x, CurrentX, cur] += q * v
+		State[c.Z, c.Y, x, CurrentX, prv] += q * v
+	}
+}
+
+// MaxwellConfigs are the initialization options offered in the GUI.
+var MaxwellConfigs = []InitFunc{
+	InitFunc{Name: "Electric Potential", Doc: "A point charge at Config.Source: A0 relaxes to 1/r and E to 1/r^2; watch the A0 radial stats", Func: ElectricPotential, Current: true},
+	InitFunc{Name: "Charge Dipole", Doc: "Two opposite charges: the far field falls as 1/r^3 because the potentials cancel to leading order", Func: ChargeDipole},
+	InitFunc{Name: "Polarized Photon", Doc: "A linearly polarized packet along X, in the Config.Polarization transverse direction; E along it, B along the other", Func: PolarizedPhoton},
+	InitFunc{Name: "Circular Polarization", Doc: "Both transverse components a quarter cycle apart, so E turns as it travels; Config.Polarization picks the handedness", Func: CircularPolarization},
+	InitFunc{Name: "Standing Wave", Doc: "Two packets sent at each other: E and B stand still with nodes a quarter wavelength apart", Func: StandingWave},
+	InitFunc{Name: "Moving Charge", Doc: "A charged line moving along itself at Config.Velocity.X: E radial, B circling, with |B|/|E| = v/c^2", Func: MovingCharge},
+}
+
+// MaxwellStats adds the stats plotted over time in the GUI.
+func (ss *Sim) MaxwellStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatRadial("A0", A0s, EMNRadii))
+	ss.AddStat(ss.StatRadialVec("Emag", EX, EMNRadii))
+	ss.AddStat(ss.StatRadialVec("Bmag", BX, EMNRadii))
+	ss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))
+}
+
+// EMNRadii is how many Config.Wavelength steps out the radial stats sample.
+const EMNRadii = 4

@@ -26,9 +26,9 @@ func main() {
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
-	// eqs := wavesim.Maxwell
+	eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	eqs := wavesim.Electroweak
+	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
@@ -90,17 +90,13 @@ func main() {
 				}
 				sim.SchrodingerStats()
 			case wavesim.Maxwell:
-				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
 				if threed {
-					sim.Params.Edges = wavesim.EdgesDamp
 					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(100, 100, 100)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
-				sim.Params.Edges = wavesim.EdgesWrap
-				sim.Params.ThreeD.SetBool(true)
-				sim.Config.Size.Set(100, 100, 100)
+				sim.MaxwellStats()
 				sim.ViewInit(wavesim.MaxwellViewAll)
 			case wavesim.Dirac:
 				if threed {
@@ -112,7 +108,6 @@ func main() {
 				}
 			case wavesim.Electroweak:
 				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
-				sim.Params.Edges = wavesim.EdgesDamp
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(100, 100, 100)
 				sim.Params.Edges = wavesim.EdgesWrap
@@ -155,9 +150,7 @@ func main() {
 			case wavesim.Schrodinger:
 				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
-				sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-				sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
-				sim.MovingWavePacketConfig(wavesim.AYs, wavesim.AYv, math32.X, ctrPos, -1, 0, 1)
+				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)

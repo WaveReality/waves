@@ -41,6 +41,15 @@ type Config struct {
 	// Higgs condensate around: turn it down for the linear regime.
 	Amplitude float32
 
+	// Source is the location of a point source (a charge, say) for functions
+	// that use it. Negative values mean the center, as in [CenterF].
+	Source math32.Vector3
+
+	// Polarization is the transverse direction a linearly polarized wave is
+	// polarized along, for functions that use it: Y or Z for a wave running
+	// along X.
+	Polarization math32.Dims
+
 	// Velocity provides the default particle velocity.
 	Velocity math32.Vector3
 
@@ -55,6 +64,8 @@ func (cfg *Config) Defaults() {
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 12
 	cfg.Amplitude = 1
+	cfg.Source.Set(-1, -1, -1) // center
+	cfg.Polarization = math32.Y
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {

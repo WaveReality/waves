@@ -842,19 +842,6 @@ var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoW
 
 //////// initialization helpers
 
-// ewFreq returns the lattice angular frequency in radians per step, for a
-// gauge wave of given carrier wavelength and mass, both in cube units:
-//
-//	omega = c sqrt(khat^2 + m^2),  khat = 2 sin(k/2)
-//
-// khat, not k: that is what the discrete Laplacian sees. Using k mistunes the
-// packet and leaves a backward-moving remnant.
-func ewFreq(ss *Sim, wavelength, mass float32) float32 {
-	k := TwoPi / wavelength
-	khat := 2 * math32.Sin(k/2)
-	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
-}
-
 // ewDemoScale raises the electroweak scale so m_W and m_Z are comparable to a
 // packet a few tens of cubes long. At the SM scale the boson Compton
 // wavelengths are ~22 cubes, so a visible packet is far above threshold and the
@@ -915,11 +902,11 @@ func PhotonPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
 	wl := ss.Config.Wavelength
-	om := ewFreq(ss, wl, 0) // massless
+	om := ss.LatticeFreq(wl, 0) // massless
 	cx := float32(ss.Config.Size.X) * 0.2
 	// the weights are the photon direction itself; Config.Amplitude sets the size
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om)
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
 }
 
 // ZPulse sends a Z boson pulse along X, which travels SLOWER than light.
@@ -939,11 +926,11 @@ func ZPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
 	wl := ss.Config.Wavelength
-	om := ewFreq(ss, wl, p.MZ)
+	om := ss.LatticeFreq(wl, p.MZ)
 	cx := float32(ss.Config.Size.X) * 0.2
 	// the weights are the Z direction itself; Config.Amplitude sets the size
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om)
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
 }
 
 // WCollision fires two W packets at each other. They do not bounce -- gauge
@@ -970,11 +957,11 @@ func WCollision(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
 	wl := ss.Config.Wavelength
-	om := ewFreq(ss, wl, p.MW)
+	om := ss.LatticeFreq(wl, p.MW)
 	amp := 0.25 * p.HiggsV * ss.Config.Amplitude
 	xl := float32(ss.Config.Size.X)
-	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om)
-	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om)
+	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
 }
 
 var ElectroweakConfigs = []InitFunc{

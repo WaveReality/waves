@@ -7,6 +7,7 @@
 package wavesim
 
 import (
+	"math"
 	"strconv"
 
 	"cogentcore.org/core/base/metadata"
@@ -370,4 +371,127 @@ func (ss *Sim) StatVals(name string) []float64 {
 		vals[i] = tsr.Float1D(i)
 	}
 	return vals
+}
+
+// StateAt returns the value of the given variable at the cell nearest to pos,
+// in non-edge coordinates, clamped to the interior.
+func StateAt(sz math32.Vector3i, vri int, pos math32.Vector3, curPrv int32) float32 {
+	c := CoordToInt(pos)
+	c.X = min(max(c.X, 0), sz.X-1)
+	c.Y = min(max(c.Y, 0), sz.Y-1)
+	c.Z = min(max(c.Z, 0), sz.Z-1)
+	f := c.AddScalar(1)
+	return State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
+}
+
+// invSqrt3 is 1/sqrt(3), normalizing the (1,1,1) diagonal.
+const invSqrt3 = 0.57735026918962576451
+
+// StateAtInterp returns the trilinearly interpolated value of the given
+// variable at pos, in non-edge coordinates, clamped to the interior.
+//
+// Interpolated rather than nearest-cell because the radial stats compare an
+// axis against a diagonal: [CoordToInt] truncates, which along a diagonal
+// shortens the radius by up to 13% and reads as an anisotropy that is not
+// there.
+func StateAtInterp(sz math32.Vector3i, vri int, pos math32.Vector3, curPrv int32) float32 {
+	b := math32.Vec3i(int32(math32.Floor(pos.X)), int32(math32.Floor(pos.Y)), int32(math32.Floor(pos.Z)))
+	f := pos.Sub(CoordToFloat(b))
+	tot := float32(0)
+	for k := range 2 {
+		wz := f.Z
+		if k == 0 {
+			wz = 1 - f.Z
+		}
+		for j := range 2 {
+			wy := f.Y
+			if j == 0 {
+				wy = 1 - f.Y
+			}
+			for i := range 2 {
+				wx := f.X
+				if i == 0 {
+					wx = 1 - f.X
+				}
+				c := math32.Vec3i(b.X+int32(i), b.Y+int32(j), b.Z+int32(k))
+				c.X = min(max(c.X, 0), sz.X-1)
+				c.Y = min(max(c.Y, 0), sz.Y-1)
+				c.Z = min(max(c.Z, 0), sz.Z-1)
+				g := c.AddScalar(1)
+				tot += wx * wy * wz * State.Value(int(g.Z), int(g.Y), int(g.X), int(vri), int(curPrv))
+			}
+		}
+	}
+	return tot
+}
+
+// Direction labels for [StatRadialName].
+const (
+	// StatRadialAxis is the +X direction, along a face axis of the stencil.
+	StatRadialAxis = "X"
+
+	// StatRadialDiag is the (1,1,1) direction, through a corner of the stencil.
+	StatRadialDiag = "D"
+)
+
+// StatRadialName is the stat name for a radial sample: name, direction label
+// and radius index.
+func StatRadialName(name, dir string, i int) string {
+	return name + dir + strconv.Itoa(i)
+}
+
+// StatRadial records the given variable sampled at radii of
+// [Config.Wavelength], twice that and so on out to nrad, from [Config.Source],
+// along +X and along the (1,1,1) diagonal.
+//
+// The two directions at the same radius are the point: a field that should be
+// spherical reads the same both ways only if the discretization is isotropic,
+// so the pair measures the anisotropy directly.
+func (ss *Sim) StatRadial(name string, vr enums.Enum, nrad int) func(init bool) {
+	return ss.statRadial(name, vr, nrad, false)
+}
+
+// StatRadialVec is [Sim.StatRadial] for the MAGNITUDE of the three-vector
+// whose X component is vr, such as E or B.
+func (ss *Sim) StatRadialVec(name string, vr enums.Enum, nrad int) func(init bool) {
+	return ss.statRadial(name, vr, nrad, true)
+}
+
+func (ss *Sim) statRadial(name string, vr enums.Enum, nrad int, vec bool) func(init bool) {
+	dirs := []string{StatRadialAxis, StatRadialDiag}
+	unit := make([]math32.Vector3, 2)
+	unit[0] = math32.Vec3(1, 0, 0)
+	unit[1] = math32.Vec3(invSqrt3, invSqrt3, invSqrt3)
+	return func(init bool) {
+		what := "Value of " + vr.String()
+		if vec {
+			what = "Magnitude of the vector at " + vr.String()
+		}
+		for d, dir := range dirs {
+			for i := 1; i <= nrad; i++ {
+				tsr := ss.Stats.Float64(StatRadialName(name, dir, i))
+				if init {
+					tsr.SetNumRows(0)
+					plot.SetFirstStyler(tsr, func(s *plot.Style) {
+						s.On = !vec
+					})
+					doc := what + " at " + strconv.Itoa(i) + " x Config.Wavelength from Config.Source, along " + dir
+					metadata.SetDoc(tsr, doc)
+					continue
+				}
+				ctx := GetCtx(0)
+				sz := ss.Config.Size
+				ctr := CenterF(ss.Config.Source)
+				pos := ctr.Add(unit[d].MulScalar(float32(i) * ss.Config.Wavelength))
+				vri := int(vr.Int64())
+				v := float64(StateAtInterp(sz, vri, pos, ctx.CurState))
+				if vec {
+					vy := float64(StateAtInterp(sz, vri+1, pos, ctx.CurState))
+					vz := float64(StateAtInterp(sz, vri+2, pos, ctx.CurState))
+					v = math.Sqrt(v*v + vy*vy + vz*vz)
+				}
+				tsr.AppendRowFloat(v)
+			}
+		}
+	}
 }

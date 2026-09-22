@@ -339,6 +339,19 @@ func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims
 	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, ss.Config.Amplitude*amp)
 }
 
+// LatticeFreq returns the lattice angular frequency in radians per step, for a
+// wave of given carrier wavelength and mass, both in cube units:
+//
+//	omega = c sqrt(khat^2 + m^2),  khat = 2 sin(k/2)
+//
+// khat, not k: that is what the discrete Laplacian sees. Using k mistunes the
+// packet and leaves a backward-moving remnant.
+func (ss *Sim) LatticeFreq(wavelength, mass float32) float32 {
+	k := TwoPi / wavelength
+	khat := 2 * math32.Sin(k/2)
+	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
+}
+
 // SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
 // its velocity: a cosine carrier under a Gaussian envelope along dim, centered
 // at ctr and uniform across the other two dims. A slab, not a blob, so it does
@@ -350,7 +363,9 @@ func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims
 //
 // dim is normally [math32.X], the horizontal display axis; pos should then be
 // a TRANSVERSE component, normally Y, which the X-Z view draws vertically.
-func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, width, amp, dir, om float32) {
+// phase shifts the carrier under the envelope: two packets a quarter cycle
+// apart in orthogonal components make a circularly polarized wave.
+func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
 	pi := int(pos.Int64())
 	vi := int(vel.Int64())
 	ctx := GetCtx(0)
@@ -365,8 +380,9 @@ func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, w
 				d := float32(c.Dim(dim)) - ctr
 				g := d / width
 				env := amp * math32.FastExp(-g*g)
-				pv := env * math32.Cos(k*d)
-				vv := dir * om * env * math32.Sin(k*d)
+				ph := k*d + phase
+				pv := env * math32.Cos(ph)
+				vv := dir * om * env * math32.Sin(ph)
 				f := c.AddScalar(1)
 				State[f.Z, f.Y, f.X, pi, cur] += pv
 				State[f.Z, f.Y, f.X, pi, prv] += pv
@@ -381,8 +397,8 @@ func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, w
 // width variables from [Config]. amp is relative to [Config.Amplitude], so a
 // caller can keep a mixing weight such as cos(theta_W) in amp and leave the
 // overall size to the user.
-func (ss *Sim) SlabPacketConfig(pos, vel EWStates, dim math32.Dims, ctr, amp, dir, om float32) {
-	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om)
+func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
 // SmoothNoise seeds a state variable with a sum of a few long-wavelength modes
