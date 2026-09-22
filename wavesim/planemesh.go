@@ -10,11 +10,14 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
-// PlaneMesh is a xyz.Mesh that represents an X-Y plane through the state,
+// PlaneMesh is a xyz.Mesh that represents one slice plane through the state,
 // as either a Heightfield or bars.
 // It is dynamically updated using the Set method.
 // The geometry is literal in the size:
-// 0,0,0 lower-left corner and increasing X,Z in display for the X,Y plane.
+// 0,0,0 lower-left corner, increasing display X to the right and increasing
+// display -Z going back into the screen. Which state dimensions those are is
+// [View.Depth]: display X is always state X, and display depth is state Z for
+// an X-Z view or state Y for an X-Y view.
 // Display applies an overall scaling to make it fit within the larger view.
 type PlaneMesh struct {
 	xyz.MeshBase
@@ -38,7 +41,7 @@ func (pm *PlaneMesh) MeshSize() (nVtx, nIndex int, hasColor bool) {
 	hasColor = true
 	pm.HasColor = hasColor
 
-	nz := int(pm.view.Size.Y)
+	nz := int(pm.view.DepthSize())
 	nx := int(pm.view.Size.X)
 	segs := 1
 
@@ -78,7 +81,7 @@ func (pm *PlaneMesh) Set(vtxAry, normAry, texAry, clrAry math32.ArrayF32, idxAry
 }
 
 func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, idxAry math32.ArrayU32) {
-	nz := int(pm.view.Size.Y)
+	nz := int(pm.view.DepthSize())
 	nx := int(pm.view.Size.X)
 
 	if nz < 2 {
@@ -109,10 +112,9 @@ func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, i
 	// have to write all verticies first, so have access to all the data
 	// for computing norms!
 	for zi := nz - 1; zi >= 0; zi-- {
-		ys := int(st.Y) + zi
 		for xi := 0; xi < nx; xi++ {
-			xs := int(st.X) + xi
-			val := State.Value(int(st.Z), ys, xs, vri, tidx)
+			sc := pm.view.StateCoord(st, int32(xi), int32(zi))
+			val := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri, tidx)
 			scaled, _, clr := pm.view.ValColor(val, pm.panelNo)
 			v4c := math32.NewVector4Color(clr)
 			shape.SetColor(clrAry, vidx, 1, v4c)
@@ -175,7 +177,7 @@ func (pm *PlaneMesh) SetPlane(vtxAry, normAry, texAry, clrAry math32.ArrayF32, i
 }
 
 func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, idxAry math32.ArrayU32) {
-	nz := int(pm.view.Size.Y)
+	nz := int(pm.view.DepthSize())
 	nx := int(pm.view.Size.X)
 
 	fnz := float32(nz)
@@ -205,15 +207,14 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 
 	pm.view.Lock()
 	for zi := nz - 1; zi >= 0; zi-- {
-		ys := int(st.Y) + zi
 		z0 := uo - float32(zi+1)
 		for xi := range nx {
-			xs := int(st.X) + xi
 			poff := pidx * vtxSz * nper
 			ioff := pidx * idxSz * nper
 			x0 := uo + float32(xi)
 
-			val := State.Value(int(st.Z), ys, xs, vri, tidx)
+			sc := pm.view.StateCoord(st, int32(xi), int32(zi))
+			val := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri, tidx)
 			scaled, _, clr := pm.view.ValColor(val, pm.panelNo)
 			v4c := math32.NewVector4Color(clr)
 			shape.SetColor(clrAry, poff, nper*vtxSz, v4c)
@@ -254,7 +255,7 @@ func (pm *PlaneMesh) SetBars(vtxAry, normAry, texAry, clrAry math32.ArrayF32, id
 }
 
 func (pm *PlaneMesh) SetVectors(vtxAry, normAry, texAry, clrAry math32.ArrayF32, idxAry math32.ArrayU32) {
-	nz := int(pm.view.Size.Y)
+	nz := int(pm.view.DepthSize())
 	nx := int(pm.view.Size.X)
 
 	fnz := float32(nz)
@@ -303,16 +304,17 @@ func (pm *PlaneMesh) SetVectors(vtxAry, normAry, texAry, clrAry math32.ArrayF32,
 
 	pm.view.Lock()
 	for zi := nz - 1; zi >= 0; zi-- {
-		ys := int(st.Y) + zi
 		z0 := start - float32(zi+1)
 		for xi := range nx {
-			xs := int(st.X) + xi
 			x0 := start + float32(xi)
 
-			vx := State.Value(int(st.Z), ys, xs, vri, tidx)
-			vy := State.Value(int(st.Z), ys, xs, vri+1, tidx)
-			vz := State.Value(int(st.Z), ys, xs, vri+2, tidx)
-			ed := math32.Vec3(vx, vy, vz)
+			sc := pm.view.StateCoord(st, int32(xi), int32(zi))
+			vx := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri, tidx)
+			vy := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri+1, tidx)
+			vz := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri+2, tidx)
+			// the arrow is drawn in DISPLAY space, so the components have to be
+			// permuted the same way the positions are.
+			ed := pm.view.DisplayVector(math32.Vec3(vx, vy, vz))
 			d := ed.Length()
 			ned := ed
 			if d > 0 {

@@ -10,6 +10,7 @@ import (
 	"cogentcore.org/core/base/fsx"
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/lab/base/randx"
 	"cogentcore.org/lab/tensor"
@@ -347,12 +348,14 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	vw.Size = ss.Config.Size
 	fs := ss.Config.SizeFull()
 	// vw.Size = fs
+	// The X-Z plane, sliced at a Y level, is the standard orientation: X is
+	// horizontal in every view, so a packet travelling along X runs across the
+	// display. See [View.Depth] for the one case that wants something else.
+	vw.Depth = math32.Z
+	sd := vw.SliceDim()
 	vw.Start.X = 1
-	vw.Start.Y = 1
-	vw.Start.Z = fs.Z / 2
-	if vw.Start.Z == 0 {
-		vw.Start.Z = 1
-	}
+	vw.Start.SetDim(vw.Depth, 1)
+	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
 	fmt.Println("start:", vw.Start)
 	ss.callViewInit(vw)
 	ss.RunStats(true)

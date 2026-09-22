@@ -196,6 +196,16 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 			})
 	})
 
+	tree.Add(p, func(w *core.Chooser) {
+		w.SetEnums(math32.Y, math32.Z).SetTooltip("state dimension drawn going back into the screen, which is what selects the display plane: Z shows the X-Z plane sliced at a Y level, and Y shows the X-Y plane sliced at a Z level, which is what a 2D sim needs because it has only one Z")
+		w.OnChange(func(e events.Event) {
+			vw.SetDepth(w.CurrentItem.Value.(math32.Dims))
+		})
+		w.Updater(func() {
+			w.SetCurrentValue(vw.Depth)
+		})
+	})
+
 	tree.Add(p, func(w *core.Button) {
 		w.SetIcon(icons.ZoomIn).SetTooltip("zoom in size of region displayed. Shift goes in increments of 4, and Alt in 8")
 		w.Styler(func(s *styles.Style) {
@@ -240,21 +250,21 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 		})
 	})
 	tree.Add(p, func(w *core.Button) {
-		w.SetIcon(icons.KeyboardArrowUp).SetTooltip("Move Z plane up")
+		w.SetIcon(icons.KeyboardArrowUp).SetTooltip("Move the slice plane up: the one dimension not on screen, Y for an X-Z view and Z for an X-Y view")
 		w.Styler(func(s *styles.Style) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
 		w.OnClick(func(e events.Event) {
-			vw.MoveStart(math32.Vec3i(0, 0, 1))
+			vw.MoveSlice(1)
 		})
 	})
 	tree.Add(p, func(w *core.Button) {
-		w.SetIcon(icons.KeyboardArrowDown).SetTooltip("Move Z plane down")
+		w.SetIcon(icons.KeyboardArrowDown).SetTooltip("Move the slice plane down: the one dimension not on screen, Y for an X-Z view and Z for an X-Y view")
 		w.Styler(func(s *styles.Style) {
 			s.SetAbilities(true, abilities.RepeatClickable)
 		})
 		w.OnClick(func(e events.Event) {
-			vw.MoveStart(math32.Vec3i(0, 0, -1))
+			vw.MoveSlice(-1)
 		})
 	})
 	tree.Add(p, func(w *core.Button) {

@@ -23,9 +23,14 @@ type PlaneObj struct {
 	view    *View
 }
 
+// planeScale returns the extent of the plane grid and the scale factors that
+// fit it into the view box. sz.X is the horizontal extent and sz.Y the extent
+// going back into the screen ([View.DepthSize], not necessarily state Y);
+// correspondingly nsc.X and nsc.Y are the horizontal and depth scales.
 func (vw *View) planeScale() (sz math32.Vector3i, nsc math32.Vector3) {
 	npanels := vw.Settings.NPanels.N()
 	sz = vw.Size
+	sz.Y = vw.DepthSize()
 	if npanels > 1 {
 		sz.X *= 2
 	}
@@ -115,7 +120,9 @@ func (vw *View) UpdatePlanes() {
 
 		txt := plg.Child(1).(*xyz.Text2D)
 		ed := vw.Start.Add(vw.Size)
-		vwpos := fmt.Sprintf("[%d-%d, %d-%d, %d]", vw.Start.X, ed.X, vw.Start.Y, ed.Y, vw.Start.Z)
+		dd, sd := vw.Depth, vw.SliceDim()
+		vwpos := fmt.Sprintf("[X %d-%d, %s %d-%d, %s %d]", vw.Start.X, ed.X,
+			dd.String(), vw.Start.Dim(dd), ed.Dim(dd), sd.String(), vw.Start.Dim(sd))
 		ntxt := vw.Panels[li].CurPrev.String() + " " + vw.Panels[li].Var.String() + " " + vwpos
 		if txt.Text != ntxt {
 			txt.Defaults()

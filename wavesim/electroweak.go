@@ -815,7 +815,7 @@ func ElectroweakViewAll(view *View) {
 	view.Settings.Camera = 2
 	view.Settings.Height = 0.8
 	view.Panels[0].Var = EWHs0a
-	view.Panels[1].Var = A0s
+	view.Panels[1].Var = AYs // the transverse component: A0s is zero for a pulse
 	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = EWHmag
 	// view.SetCurPrev(Previous, 3)
@@ -898,25 +898,29 @@ func HiggsSymmetric(ss *Sim) {
 	ss.SmoothNoise(EWHs0b, amp, 6)
 }
 
-// PhotonPulse sends a transverse electromagnetic pulse along Z at exactly the
+// PhotonPulse sends a transverse electromagnetic pulse along X at exactly the
 // speed of light.
 //
 // The packet is written in the PHYSICAL basis: the photon is the combination
 // sin(theta_W) W^3 + cos(theta_W) B, the direction that Q = T^3 + Y annihilates,
-// so the condensate gives it no mass and it moves at c. Watch AXs, which the
+// so the condensate gives it no mass and it moves at c. Watch AYs, which the
 // kernel reconstructs from the gauge fields every step.
+//
+// It travels along X because X is the horizontal display axis in every view,
+// and is polarized along Y, which the X-Z view draws as the vertical: a
+// transverse wave then looks like one.
 func PhotonPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, 0) // massless
-	amp := float32(0.02)
-	cz := float32(ss.Config.Size.Z) * 0.2
-	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.SinThetaW*amp, 1, om)
-	ss.SlabPacketConfig(EWBXs, EWBXv, cz, p.CosThetaW*amp, 1, om)
+	amp := float32(1)
+	cx := float32(ss.Config.Size.X) * 0.2
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW*amp, 1, om)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW*amp, 1, om)
 }
 
-// ZPulse sends a Z boson pulse along Z, which travels SLOWER than light.
+// ZPulse sends a Z boson pulse along X, which travels SLOWER than light.
 //
 // Same construction as PhotonPulse but in the orthogonal combination,
 // cos(theta_W) W^3 - sin(theta_W) B. That direction does not annihilate the
@@ -926,8 +930,8 @@ func PhotonPulse(ss *Sim) {
 //	v_g = c khat / sqrt(khat^2 + m_Z^2)
 //
 // which is about 0.70 c here, against 0.98 c for the photon at the same carrier
-// wavelength (the lattice makes even a massless packet slightly subluminal). Run this and PhotonPulse back to back and the lag
-// is obvious. Watch EWZX.
+// wavelength (the lattice makes even a massless packet slightly subluminal).
+// Run this and PhotonPulse back to back and the lag is obvious. Watch EWZY.
 //
 // Note this raises the Higgs scale, for the reason given in ewDemoScale.
 func ZPulse(ss *Sim) {
@@ -936,10 +940,10 @@ func ZPulse(ss *Sim) {
 	p := ss.Params
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MZ)
-	amp := float32(0.02)
-	cz := float32(ss.Config.Size.Z) * 0.2
-	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.CosThetaW*amp, 1, om)
-	ss.SlabPacketConfig(EWBXs, EWBXv, cz, -p.SinThetaW*amp, 1, om)
+	amp := float32(1)
+	cx := float32(ss.Config.Size.X) * 0.2
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW*amp, 1, om)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW*amp, 1, om)
 }
 
 // WCollision fires two W packets at each other and shows them interact.
@@ -951,11 +955,12 @@ func ZPulse(ss *Sim) {
 // Params.YangMills and the two cross without a trace, which is exactly the
 // difference between SU(2) and three separate copies of U(1).
 //
-// Watch EWW3Zs, and EWZZ which is built from it. Note Z, not X: both packets are
-// transversely polarised along X and travel along Z, so W^{b mu} d_mu vanishes
-// identically -- nothing varies along the polarisation -- and the transport term
-// is silent. What survives is the transpose term, which sources the LONGITUDINAL
-// W^3_z. For a massive vector that mode is physical: it is the eaten Goldstone.
+// Watch EWW3Xs, and EWZX which is built from it. Note X, not Y: both packets
+// are transversely polarised along Y and travel along X, so W^{b mu} d_mu
+// vanishes identically -- nothing varies along the polarisation -- and the
+// transport term is silent. What survives is the transpose term, which sources
+// the LONGITUDINAL W^3_x. For a massive vector that mode is physical: it is
+// the eaten Goldstone.
 //
 // A single packet on its own generates exactly zero, so what appears really is
 // the two fields coupling and not one of them self-interacting. With wrapped
@@ -966,7 +971,7 @@ func ZPulse(ss *Sim) {
 // because the shared default of 1.5 wavelengths is too wide here. The packets
 // start 40% of the box apart, so at 1.5 wl the two Gaussians already overlap at
 // half their peak amplitude before the first step -- one broad blob, not two
-// packets that meet. Measured on a 100-deep box: width 1.5 wl leaves 50% overlap
+// packets that meet. Measured on a 100-wide box: width 1.5 wl leaves 50% overlap
 // at t=0, 1.2 wl leaves 34%, and 0.75 wl leaves 6%, which is the first value
 // that looks like a collision.
 //
@@ -982,15 +987,15 @@ func WCollision(ss *Sim) {
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MW)
 	amp := 0.25 * p.HiggsV
-	zl := float32(ss.Config.Size.Z)
-	ss.SlabPacket(EWW1Xs, EWW1Xv, zl*0.3, wl, 0.75*wl, amp, 1, om)
-	ss.SlabPacket(EWW2Xs, EWW2Xv, zl*0.7, wl, 0.75*wl, amp, -1, om)
+	xl := float32(ss.Config.Size.X)
+	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om)
+	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om)
 }
 
 var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
-	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along Z at exactly c; watch AXs", Func: PhotonPulse},
-	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along Z at about 0.7 c, slower than light because the condensate gives it mass; watch ZX", Func: ZPulse},
-	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Zs and ZZ", Func: WCollision},
+	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
+	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.7 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
 }

@@ -60,6 +60,16 @@ type View struct {
 	// Size of planes
 	Size math32.Vector3i
 
+	// Depth is the state dimension drawn going back into the screen.
+	// The horizontal display axis is always state X and the height is the
+	// value, so this is what picks the plane. [math32.Z] is the standard
+	// orientation and the default: the X-Z plane, sliced at a Y level. The
+	// alternative, [math32.Y], gives the X-Y plane sliced at a Z level, which
+	// is only useful for a flat sim that has a single Z and so no X-Z plane to
+	// look at. The dimension left over is the slice level, [View.SliceDim],
+	// whose position [View.Start] holds along with the in-plane corner.
+	Depth math32.Dims `set:"-"`
+
 	// parameters for the list of variables to view
 	VarSettings map[enums.Enum]*VarSettings
 
@@ -269,7 +279,8 @@ func (vw *View) UpdateImpl() {
 		if pos != (math32.Vector3i{}) {
 			szh := vw.Size.DivScalar(2)
 			vw.Start = pos.Sub(szh)
-			vw.Start.Z = pos.Z
+			// the slice dimension is not a corner: follow the particle exactly.
+			vw.Start.SetDim(vw.SliceDim(), pos.Dim(vw.SliceDim()))
 		}
 	}
 	for i := range 4 {
@@ -508,24 +519,77 @@ func (vw *View) PlaneAtNumber(no int) *xyz.Group {
 	return pl.(*xyz.Group)
 }
 
+// SliceDim returns the state dimension held fixed by the current view: the
+// one that is neither horizontal (always X) nor [View.Depth].
+func (vw *View) SliceDim() math32.Dims {
+	if vw.Depth == math32.Z {
+		return math32.Y
+	}
+	return math32.Z
+}
+
+// DepthSize returns the number of state cells drawn going back into the screen.
+func (vw *View) DepthSize() int32 {
+	return vw.Size.Dim(vw.Depth)
+}
+
+// SetDepth sets the state dimension drawn going back into the screen, which
+// selects the display plane, and re-centers the slice level on the dimension
+// that is now off screen. Only [math32.Y] and [math32.Z] are meaningful:
+// the horizontal axis is always state X.
+func (vw *View) SetDepth(dim math32.Dims) {
+	if dim != math32.Y && dim != math32.Z {
+		return
+	}
+	vw.Depth = dim
+	fs := GetCtx(0).SizeFull()
+	sd := vw.SliceDim()
+	vw.Start.SetDim(dim, 1)
+	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
+	// the depth extent changes, so the mesh has to be rebuilt, not just redrawn
+	vw.RebuildView()
+}
+
+// DisplayVector maps a state-space vector into display space, where X is
+// across, Y is up and Z goes back into the screen. In an X-Z view the two
+// already agree; in an X-Y view the state Y and Z components swap, so that a
+// vector always points along the axis its own dimension is drawn on.
+func (vw *View) DisplayVector(v math32.Vector3) math32.Vector3 {
+	if vw.Depth == math32.Z {
+		return v
+	}
+	return math32.Vec3(v.X, v.Z, v.Y)
+}
+
+// StateCoord returns the state coordinate sampled by the display cell xi
+// across and di back into the screen, given the already offset start corner.
+func (vw *View) StateCoord(st math32.Vector3i, xi, di int32) math32.Vector3i {
+	c := st
+	c.X = st.X + xi
+	c.SetDim(vw.Depth, st.Dim(vw.Depth)+di)
+	return c
+}
+
 func (vw *View) ZoomInSize(n int32) {
 	if vw.Size.X <= 4 {
 		return
 	}
+	dd := vw.Depth
 	n = min(n, vw.Size.X-4)
 	vw.Size.X -= 2 * n
 	vw.Start.X += n
-	if vw.Size.Y > 4 {
-		vw.Size.Y -= 2 * n
-		vw.Start.Y += n
+	if vw.Size.Dim(dd) > 4 {
+		vw.Size.SetDim(dd, vw.Size.Dim(dd)-2*n)
+		vw.Start.SetDim(dd, vw.Start.Dim(dd)+n)
 	}
 	vw.UpdateView()
 }
 
 func (vw *View) ZoomOutSize(n int32) {
 	ctx := GetCtx(0)
-	sz := ctx.Size
+	sz := ctx.Size.V()
 	fs := ctx.SizeFull()
+	dd := vw.Depth
 	vw.Size.X += 2 * n
 	if vw.Start.X > 1 {
 		vw.Start.X -= n
@@ -536,47 +600,51 @@ func (vw *View) ZoomOutSize(n int32) {
 	if vw.Start.X+vw.Size.X >= fs.X {
 		vw.Start.X = (fs.X - 1) - vw.Size.X
 	}
-	if sz.Y > 1 {
-		vw.Size.Y += 2 * n
-		if vw.Start.Y > 1 {
-			vw.Start.Y -= n
+	if sz.Dim(dd) > 1 {
+		vw.Size.SetDim(dd, vw.Size.Dim(dd)+2*n)
+		if vw.Start.Dim(dd) > 1 {
+			vw.Start.SetDim(dd, vw.Start.Dim(dd)-n)
 		}
-		if vw.Size.Y >= sz.Y {
-			vw.Size.Y = sz.Y
+		if vw.Size.Dim(dd) >= sz.Dim(dd) {
+			vw.Size.SetDim(dd, sz.Dim(dd))
 		}
-		if vw.Start.Y+vw.Size.Y >= fs.Y {
-			vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+		if vw.Start.Dim(dd)+vw.Size.Dim(dd) >= fs.Dim(dd) {
+			vw.Start.SetDim(dd, (fs.Dim(dd)-1)-vw.Size.Dim(dd))
 		}
 	}
 	vw.UpdateView()
 }
 
+// MoveSlice moves the slice plane by n along [View.SliceDim]: the one state
+// dimension that is not on screen.
+func (vw *View) MoveSlice(n int32) {
+	sd := vw.SliceDim()
+	sz := GetCtx(0).Size.V()
+	p := vw.Start.Dim(sd) + n
+	p = max(p, 0)
+	p = min(p, sz.Dim(sd)+1)
+	vw.Start.SetDim(sd, p)
+	vw.UpdateView()
+}
+
+// MoveStart moves the displayed region within the slice plane, by mv.X across
+// and mv.Y back into the screen. Use [View.MoveSlice] to change which slice.
 func (vw *View) MoveStart(mv math32.Vector3i) {
-	ctx := GetCtx(0)
-	sz := ctx.Size
-	fs := ctx.SizeFull()
-	if mv.Z != 0 {
-		vw.Start.Z += mv.Z
-		if vw.Start.Z < 0 {
-			vw.Start.Z = 0
-		} else if vw.Start.Z > sz.Z+1 {
-			vw.Start.Z = sz.Z + 1
-		}
-		vw.UpdateView()
-		return
-	}
-	vw.Start.SetAdd(mv)
+	fs := GetCtx(0).SizeFull()
+	dd := vw.Depth
+	vw.Start.X += mv.X
+	vw.Start.SetDim(dd, vw.Start.Dim(dd)+mv.Y)
 	if vw.Start.X < 0 {
 		vw.Start.X = 0
 	}
-	if vw.Start.Y < 0 {
-		vw.Start.Y = 0
+	if vw.Start.Dim(dd) < 0 {
+		vw.Start.SetDim(dd, 0)
 	}
 	if vw.Start.X+vw.Size.X >= fs.X {
 		vw.Start.X = (fs.X - 1) - vw.Size.X
 	}
-	if vw.Start.Y+vw.Size.Y >= fs.Y {
-		vw.Start.Y = (fs.Y - 1) - vw.Size.Y
+	if vw.Start.Dim(dd)+vw.Size.Dim(dd) >= fs.Dim(dd) {
+		vw.Start.SetDim(dd, (fs.Dim(dd)-1)-vw.Size.Dim(dd))
 	}
 	vw.UpdateView()
 }

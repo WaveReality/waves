@@ -338,15 +338,22 @@ func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims
 }
 
 // SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
-// its velocity: a cosine carrier under a Gaussian envelope along Z, uniform
-// across X and Y. A slab rather than a blob, so it does not diffract and the
-// propagation speed stays unambiguous to the eye.
+// its velocity: a cosine carrier under a Gaussian envelope along dim, centered
+// at ctr and uniform across the other two dimensions. A slab rather than a
+// blob, so it does not diffract and the propagation speed stays unambiguous to
+// the eye.
 //
-// The velocity is the point. For psi = env(z) cos(k z - om t) the initial time
-// derivative is om env sin(k z), and dir flips it for the other direction.
+// The velocity is the point. For psi = env(d) cos(k d - om t) the initial time
+// derivative is om env sin(k d), and dir flips it for the other direction.
 // Setting only the position would split the packet into two halves running
 // opposite ways at half amplitude each.
-func (ss *Sim) SlabPacket(pos, vel EWStates, ctrZ, wavelength, width, amp, dir, om float32) {
+//
+// dim is normally [math32.X], since X is the horizontal display axis in every
+// view, so the packet then runs across the screen. pos should be a component
+// TRANSVERSE to dim, which for an X-Z view means the Y component: [View]
+// draws state Y along the vertical, so a Y-polarized wave travelling along X
+// is the textbook transverse picture.
+func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, width, amp, dir, om float32) {
 	pi := int(pos.Int64())
 	vi := int(vel.Int64())
 	ctx := GetCtx(0)
@@ -356,13 +363,13 @@ func (ss *Sim) SlabPacket(pos, vel EWStates, ctrZ, wavelength, width, amp, dir, 
 	k := TwoPi / wavelength
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
-		dz := float32(c.Z) - ctrZ
-		g := dz / width
-		env := amp * math32.FastExp(-g*g)
-		pv := env * math32.Cos(k*dz)
-		vv := dir * om * env * math32.Sin(k*dz)
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
+				d := float32(c.Dim(dim)) - ctr
+				g := d / width
+				env := amp * math32.FastExp(-g*g)
+				pv := env * math32.Cos(k*d)
+				vv := dir * om * env * math32.Sin(k*d)
 				f := c.AddScalar(1)
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(cur))
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(prv))
@@ -375,8 +382,8 @@ func (ss *Sim) SlabPacket(pos, vel EWStates, ctrZ, wavelength, width, amp, dir, 
 
 // SlabPacketConfig is a version of [SlabPacket] that takes its
 // wavelength and width variables from [Config]
-func (ss *Sim) SlabPacketConfig(pos, vel EWStates, ctrZ, amp, dir, om float32) {
-	ss.SlabPacket(pos, vel, ctrZ, ss.Config.Wavelength, ss.Config.PacketWidth, amp, dir, om)
+func (ss *Sim) SlabPacketConfig(pos, vel EWStates, dim math32.Dims, ctr, amp, dir, om float32) {
+	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, amp, dir, om)
 }
 
 // SmoothNoise seeds a state variable with smooth random fluctuation: a sum of a few

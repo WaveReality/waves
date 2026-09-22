@@ -14,7 +14,7 @@ func cfgSim(sz int32, init func(*Sim)) *Sim {
 	ss.Config.GPU = false
 	ss.Config.GUI = false
 	ss.Config.Equation = Electroweak
-	ss.Config.Size.Set(4, 4, sz) // thin in x,y: the packets are Z slabs
+	ss.Config.Size.Set(sz, 4, 4) // thin in y,z: the packets are X slabs
 	ss.ConfigSim()
 	ss.Params.Edges = EdgesWrap
 	ss.StateVars = EWStatesN
@@ -24,15 +24,15 @@ func cfgSim(sz int32, init func(*Sim)) *Sim {
 	return ss
 }
 
-// cfgCentroid returns the energy-weighted Z centroid of a state variable,
+// cfgCentroid returns the energy-weighted X centroid of a state variable,
 // which tracks the packet even as it disperses.
 func cfgCentroid(sz int32, vr int32) float64 {
 	var num, den float64
 	cur := int(GetCtx(0).CurState)
-	for z := int32(1); z <= sz; z++ {
-		v := float64(State.Value(int(z), 2, 2, int(vr), cur))
+	for x := int32(1); x <= sz; x++ {
+		v := float64(State.Value(2, 2, int(x), int(vr), cur))
 		w := v * v
-		num += w * float64(z)
+		num += w * float64(x)
 		den += w
 	}
 	if den == 0 {
@@ -44,8 +44,8 @@ func cfgCentroid(sz int32, vr int32) float64 {
 func cfgSumSq(sz int32, vr int32) float64 {
 	var s float64
 	cur := int(GetCtx(0).CurState)
-	for z := int32(1); z <= sz; z++ {
-		v := float64(State.Value(int(z), 2, 2, int(vr), cur))
+	for x := int32(1); x <= sz; x++ {
+		v := float64(State.Value(2, 2, int(x), int(vr), cur))
 		s += v * v
 	}
 	return s
@@ -57,11 +57,11 @@ func TestConfigHiggsSymmetric(t *testing.T) {
 	const sz = 32
 	ss := cfgSim(sz, HiggsSymmetric)
 	v2 := float64(ss.Params.HiggsV) * float64(ss.Params.HiggsV)
-	start := float64(State.Value(8, 2, 2, int(EWHmag), int(GetCtx(0).CurState)))
+	start := float64(State.Value(2, 2, 8, int(EWHmag), int(GetCtx(0).CurState)))
 	var peak, last float64
 	for i := range 4000 {
 		ewStep(ss)
-		m := float64(State.Value(8, 2, 2, int(EWHmag), int(GetCtx(0).CurState)))
+		m := float64(State.Value(2, 2, 8, int(EWHmag), int(GetCtx(0).CurState)))
 		peak = math.Max(peak, m)
 		last = m
 		_ = i
@@ -94,8 +94,8 @@ func TestConfigPulseSpeeds(t *testing.T) {
 		probe int32
 		mass  func(p *Parameters) float64
 	}{
-		{"photon", PhotonPulse, int32(AXs), func(p *Parameters) float64 { return 0 }},
-		{"Z", ZPulse, int32(EWZX), func(p *Parameters) float64 { return float64(p.MZ) }},
+		{"photon", PhotonPulse, int32(AYs), func(p *Parameters) float64 { return 0 }},
+		{"Z", ZPulse, int32(EWZY), func(p *Parameters) float64 { return float64(p.MZ) }},
 	} {
 		ss := cfgSim(sz, tc.init)
 		p := ss.Params
@@ -110,7 +110,7 @@ func TestConfigPulseSpeeds(t *testing.T) {
 		khat := 2 * math.Sin(k/2)
 		wantV := c * khat * math.Cos(k/2) / math.Sqrt(khat*khat+m*m)
 
-		// AXs / EWZX are written BY the kernel, so they are still zero before
+		// AYs / EWZY are written BY the kernel, so they are still zero before
 		// the first step: measure the baseline after one step, not before.
 		// And keep the run short enough that the packet cannot wrap the box.
 		ewStep(ss)
@@ -150,10 +150,10 @@ func TestConfigWCollision(t *testing.T) {
 			WCollision(s)
 		})
 		// Sum over ALL FOUR W^3 components. Both packets are transversely
-		// polarised along x and travel along z, so W^{b mu} d_mu vanishes
+		// polarised along y and travel along x, so W^{b mu} d_mu vanishes
 		// identically (nothing varies along the polarisation) and the transport
 		// term is silent. What survives is the transpose term, which sources the
-		// LONGITUDINAL W^3_z -- probing only W^3_x finds nothing.
+		// LONGITUDINAL W^3_x -- probing only W^3_y finds nothing.
 		w3 := func() float64 {
 			t := 0.0
 			for c := int32(0); c < 4; c++ {

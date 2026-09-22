@@ -109,14 +109,14 @@ func (sw *Scene) PlaneUnitAtPoint(pos image.Point) (panelNo int, pt math32.Vecto
 		if !ok || ipt.Z > 0 { // Z > 0 means clicked "in front" of plane -- where labels are
 			continue
 		}
-		pt.Set(int32(ipt.X), int32(-ipt.Z), 0)
-		// fmt.Printf("\tpanel: %d coords: %v\n", li, pt)
-		if pt.X < 0 || pt.Y < 0 || pt.X >= sz.X || pt.Y >= sz.Y {
+		// display coords: across, and back into the screen
+		dx, dz := int32(ipt.X), int32(-ipt.Z)
+		if dx < 0 || dz < 0 || dx >= sz.X || dz >= vw.DepthSize() {
 			continue
 		}
 		panelNo = li
 		pl := vw.Panels[li]
-		pt = pt.Add(vw.Start).Add(pl.Offset)
+		pt = vw.StateCoord(vw.Start.Add(pl.Offset), dx, dz)
 		// fmt.Printf("*** selected panel: %d coords: %v\n", li, pt)
 		break
 	}

@@ -23,12 +23,12 @@ func main() {
 
 	// threed := false
 	threed := true
-	eqs := wavesim.Electroweak
+	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordon
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	// eqs := wavesim.Electroweak
+	eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	ctrPos := math32.Vec3(-1, -1, -1)
