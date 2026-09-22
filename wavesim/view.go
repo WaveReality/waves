@@ -60,14 +60,12 @@ type View struct {
 	// Size of planes
 	Size math32.Vector3i
 
-	// Depth is the state dimension drawn going back into the screen.
-	// The horizontal display axis is always state X and the height is the
-	// value, so this is what picks the plane. [math32.Z] is the standard
-	// orientation and the default: the X-Z plane, sliced at a Y level. The
-	// alternative, [math32.Y], gives the X-Y plane sliced at a Z level, which
-	// is only useful for a flat sim that has a single Z and so no X-Z plane to
-	// look at. The dimension left over is the slice level, [View.SliceDim],
-	// whose position [View.Start] holds along with the in-plane corner.
+	// Depth is the state dimension drawn going back into the screen. Display X
+	// is always state X and the height is the value, so this picks the plane.
+	// [math32.Z] is the standard orientation and the default: the X-Z plane,
+	// sliced at a Y level. [math32.Y] gives X-Y sliced at a Z level, only
+	// useful for a flat sim with a single Z. The leftover dimension is
+	// [View.SliceDim], positioned by [View.Start].
 	Depth math32.Dims `set:"-"`
 
 	// parameters for the list of variables to view

@@ -856,10 +856,8 @@ func ewDemoScale(ss *Sim, mu float32) {
 	ss.Params.Update()
 }
 
-// ewVZero returns the ZERO-temperature vacuum value, mu/sqrt(lambda). That
-// stays the natural scale for field amplitudes even when Params.Temp has driven
-// the actual HiggsV to zero, which is why the configs size their noise and
-// their packets against it rather than against HiggsV.
+// ewVZero returns the zero-temperature vacuum value, mu/sqrt(lambda), which
+// stays the natural amplitude scale even when Temp has driven HiggsV to zero.
 func ewVZero(ss *Sim) float32 {
 	p := ss.Params
 	if p.HiggsLambda <= 0 {
@@ -905,26 +903,14 @@ func HiggsSymmetric(ss *Sim) {
 	ss.SmoothNoise(EWHs0b, amp, 6)
 }
 
-// ThermalQuench starts ABOVE the critical temperature, in the symmetric phase,
-// and waits for you to cool it.
+// ThermalQuench starts above TempCrit, in the symmetric phase, and waits for
+// you to cool it. Above TempCrit the origin is a genuine minimum, not the top
+// of a hat, so unlike HiggsSymmetric this sits still until you act.
 //
-// Params.Temp adds -ThermalC*Temp^2 to mu^2, so above Params.TempCrit the
-// coefficient is negative and the origin is a genuine minimum rather than the
-// top of a hat: the field sits at zero and stays there, the W and Z are
-// massless, and the whole electroweak symmetry is intact. That is the state of
-// the universe before about a picosecond.
-//
-// The demonstration is interactive. Run it, then drag Temp down through
-// TempCrit in the parameters and watch the transition happen: HiggsV, MW and
-// MZ come off zero together, the field rolls out to v(T), and different
-// regions pick different directions in the internal space, leaving domain
-// walls behind. Drop Temp to zero in one jump instead and you get a quench,
-// with far more violent ringing and more domains that survive.
-//
-// Unlike HiggsSymmetric, which sits on an unstable maximum at Temp = 0 and
-// falls the moment it is nudged, this one is genuinely stable until you cool
-// it. The noise is here so there is something for the transition to amplify
-// once you do.
+// Drag Temp down through TempCrit and watch HiggsV, MW and MZ come off zero
+// together. Regions pick different internal directions, leaving domain walls.
+// Dropping straight to zero quenches instead, with more ringing and more
+// surviving domains. The noise is what the transition amplifies.
 func ThermalQuench(ss *Sim) {
 	p := ss.Params
 	p.Temp = 1.25 * p.TempCrit
@@ -944,9 +930,8 @@ func ThermalQuench(ss *Sim) {
 // so the condensate gives it no mass and it moves at c. Watch AYs, which the
 // kernel reconstructs from the gauge fields every step.
 //
-// It travels along X because X is the horizontal display axis in every view,
-// and is polarized along Y, which the X-Z view draws as the vertical: a
-// transverse wave then looks like one.
+// Along X because X is horizontal in every view, polarized along Y because the
+// X-Z view draws that as the vertical: a transverse wave then looks like one.
 func PhotonPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
@@ -973,13 +958,10 @@ func PhotonPulse(ss *Sim) {
 // Watch EWZY.
 //
 // The measured speed is nearer 0.75 c at the default [Config.Amplitude] of 1,
-// because there the packet is comparable to v and is NOT a small perturbation:
-// it melts the condensate it is passing through down to about a third of the
-// vacuum value, and a lighter Z travels faster. Turn Amplitude down to 0.02
-// and it sits on the tree-level group velocity to within 1%; the whole
-// crossover is worth sweeping interactively. The photon is immune to this at
-// any amplitude, since Q annihilates the vacuum and its packet costs the
-// condensate nothing.
+// because there the packet is comparable to v: it melts the condensate it
+// passes through to about a third of vacuum, and a lighter Z travels faster.
+// At Amplitude 0.02 it sits on the tree-level velocity to within 1%. The
+// photon is immune at any amplitude, since Q annihilates the vacuum.
 //
 // Note this raises the Higgs scale, for the reason given in ewDemoScale.
 func ZPulse(ss *Sim) {
@@ -1015,19 +997,15 @@ func ZPulse(ss *Sim) {
 // edges the pair re-collides every lap, so the signal accumulates rather than
 // peaking once.
 //
-// This one sets its own envelope width rather than taking Config.PacketWidth,
-// because the shared default of 1.5 wavelengths is too wide here. The packets
-// start 40% of the box apart, so at 1.5 wl the two Gaussians already overlap at
-// half their peak amplitude before the first step -- one broad blob, not two
-// packets that meet. Measured on a 100-wide box: width 1.5 wl leaves 50% overlap
-// at t=0, 1.2 wl leaves 34%, and 0.75 wl leaves 6%, which is the first value
-// that looks like a collision.
+// It sets its own envelope width instead of taking Config.PacketWidth: the
+// packets start 40% of the box apart, and the shared default of 1.5 wl leaves
+// them already overlapping at half amplitude before the first step. Measured
+// on a 100-wide box, 1.5 wl gives 50% overlap at t=0, 1.2 wl gives 34%, and
+// 0.75 wl gives 6% -- the first that looks like a collision.
 //
-// The amplitude is deliberately large, a quarter of the vacuum value, because
-// the source is quadratic in W and vanishes for small packets. Amplitude, not
-// overlap, is what sets the signal: narrowing the envelope from 1.5 wl to
-// 0.75 wl costs a factor of 260, and raising the amplitude from 0.1 v to 0.25 v
-// wins back a factor of 6 for free, since the effect goes as amp^2.
+// The amplitude is large because the source is quadratic in W. That is also
+// what pays for the narrow envelope: 1.5 wl -> 0.75 wl costs 260x, and 0.1 v
+// -> 0.25 v wins back 6x.
 func WCollision(ss *Sim) {
 	ewDemoScale(ss, 0.388)
 	HiggsBroken(ss)

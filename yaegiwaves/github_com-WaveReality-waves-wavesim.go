@@ -223,6 +223,7 @@ func init() {
 		"MaxwellKernel":                reflect.ValueOf(wavesim.MaxwellKernel),
 		"MaxwellShouldDisplay":         reflect.ValueOf(&wavesim.MaxwellShouldDisplay).Elem(),
 		"MaxwellViewAll":               reflect.ValueOf(wavesim.MaxwellViewAll),
+		"MemoryReport":                 reflect.ValueOf(&wavesim.MemoryReport).Elem(),
 		"MinUnitHeight":                reflect.ValueOf(&wavesim.MinUnitHeight).Elem(),
 		"Minus1":                       reflect.ValueOf(wavesim.Minus1),
 		"MinusPlusOneN":                reflect.ValueOf(wavesim.MinusPlusOneN),

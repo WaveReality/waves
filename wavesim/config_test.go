@@ -184,20 +184,17 @@ func TestConfigPulseSpeeds(t *testing.T) {
 	}
 }
 
-// TestPulseCondensateBackReaction measures what the pulses do to the Higgs
-// condensate they travel through, which at the default amplitude is the
-// difference between a linear wave and a strongly nonlinear one.
+// TestPulseCondensateBackReaction measures what the pulses do to the condensate
+// they travel through.
 //
-// The photon direction is the combination that Q = T^3 + Y annihilates, so it
-// costs the condensate nothing no matter how large it gets -- at amplitude 1
-// the packet is many times v and |Phi|^2 does not move, and its speed is the
-// same as in the linear regime. That is exact masslessness shown directly,
-// rather than inferred from a propagation speed.
+// Q annihilates the photon direction, so a photon packet costs the condensate
+// nothing however large: at amplitude 1 it is many times v, |Phi|^2 does not
+// move, and its speed matches the linear regime. That is exact masslessness
+// shown directly rather than inferred from a speed.
 //
-// The Z direction does not annihilate the vacuum, so a packet comparable to v
-// partially restores the symmetry underneath itself. The local mass falls with
-// the condensate and the packet speeds up, which is why the tree-level group
-// velocity only applies to a small Z.
+// The Z direction does not, so a packet comparable to v partially restores the
+// symmetry under itself, loses mass and speeds up -- which is why the
+// tree-level group velocity only applies to a small Z.
 func TestPulseCondensateBackReaction(t *testing.T) {
 	const sz = 96
 	for _, tc := range []struct {

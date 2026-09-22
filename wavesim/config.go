@@ -35,12 +35,10 @@ type Config struct {
 	PacketWidth float32
 
 	// Amplitude scales the peak value of wave packets made by the functions
-	// that use it (Config suffix). The amp argument to those functions becomes
-	// a relative weight, so that e.g. the sin / cos theta_W mixing of a photon
-	// packet stays intact while this sets the overall size. 1 is the default
-	// display range, so a packet at 1 fills the color scale; it is also large
-	// enough that a massive field can push the Higgs condensate around, so
-	// turn it down to explore the linear regime.
+	// that use it (Config suffix), whose own amp argument becomes a relative
+	// weight, so mixing factors such as cos(theta_W) stay intact. 1 fills the
+	// display range, and is also large enough for a massive field to push the
+	// Higgs condensate around: turn it down for the linear regime.
 	Amplitude float32
 
 	// Velocity provides the default particle velocity.

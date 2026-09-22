@@ -349,11 +349,9 @@ func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims
 // Setting only the position would split the packet into two halves running
 // opposite ways at half amplitude each.
 //
-// dim is normally [math32.X], since X is the horizontal display axis in every
-// view, so the packet then runs across the screen. pos should be a component
-// TRANSVERSE to dim, which for an X-Z view means the Y component: [View]
-// draws state Y along the vertical, so a Y-polarized wave travelling along X
-// is the textbook transverse picture.
+// dim is normally [math32.X], the horizontal display axis, so the packet runs
+// across the screen; pos should then be a TRANSVERSE component, normally Y,
+// which the X-Z view draws along the vertical.
 func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, width, amp, dir, om float32) {
 	pi := int(pos.Int64())
 	vi := int(vel.Int64())

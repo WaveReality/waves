@@ -226,28 +226,26 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
-	// HiggsMuSq is the EFFECTIVE mu^2 that the kernel actually uses, in
-	// 1/cube^2: HiggsMu^2 - ThermalC * Temp^2. The Higgs equivalent of
-	// MOverHSq, occupying the same slot in the update. It goes negative
-	// above TempCrit, at which point the origin becomes the minimum.
+	// HiggsMuSq is the EFFECTIVE mu^2 the kernel uses, in 1/cube^2:
+	// HiggsMu^2 - ThermalC * Temp^2. The Higgs equivalent of MOverHSq,
+	// occupying the same slot in the update. Negative above TempCrit, where
+	// the origin becomes the minimum.
 	HiggsMuSq float32 `display:"-"`
 
-	// TempCrit is the critical temperature, HiggsMu / sqrt(ThermalC), where
-	// the thermal mass exactly cancels mu^2 and the broken minimum closes up.
-	// Above it the symmetry is restored and the gauge bosons are massless.
+	// TempCrit = HiggsMu / sqrt(ThermalC) is where the thermal mass cancels
+	// mu^2: above it the symmetry is restored and the gauge bosons massless.
 	TempCrit float32 `edit:"-"`
 
 	// HiggsV = sqrt(HiggsMuSq / HiggsLambda) is the Higgs vacuum expectation
 	// value: the radius of the minimum of the potential, in 1/cube. The
-	// neutral (lower) doublet component is initialized to this. It is the
-	// THERMAL VEV v(T), equal to HiggsMu/sqrt(HiggsLambda) at Temp = 0 and
-	// falling to zero at TempCrit.
+	// neutral (lower) doublet component is initialized to this. This is the
+	// thermal v(T), falling to zero at TempCrit.
 	HiggsV float32 `edit:"-"`
 
 	// MW = GW * HiggsV / 2 is the W boson mass in 1/cube. Nothing in the
 	// kernel uses it -- the mass is generated dynamically by the Higgs
-	// current. It is here to check that against. Since it follows HiggsV it
-	// is likewise the thermal mass, and vanishes above TempCrit.
+	// current. It is here to check that against. Follows HiggsV, so it is the
+	// thermal mass and vanishes above TempCrit.
 	MW float32 `edit:"-"`
 
 	// MZ = HiggsV * sqrt(GW^2 + GpW^2) / 2 is the Z boson mass in 1/cube,
