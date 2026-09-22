@@ -20,10 +20,10 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
+	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
 	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
 
 	// need to alternate the updating for stability
@@ -31,41 +31,37 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	var forceA, velA, posA, forceB, velB, posB float32
 	if cur == 0 {
 		if Params[0].ThreeD.IsTrue() {
-			forceA = Laplacian19(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+			forceA = Laplacian19(x, y, z, int32(CabBs), prv, pposB) // A driven by B
 		} else {
-			forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+			forceA = Laplacian1D(x, y, z, int32(CabBs), prv, pposB) // A driven by B
 		}
 		forceA *= -Params[0].HSqOver2M + vpot*pposB // note neg here, not in B
 		velA = forceA                               // first order, not +=
 		posA = pposA + velA
 
-		// carry B forward
-		forceB = State.Value(int(z), int(y), int(x), int(CabForceB), int(prv))
+		// carry the other component forward
 		velB = pvelB
 		posB = pposB
 	} else {
 		if Params[0].ThreeD.IsTrue() {
-			forceB = Laplacian19(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+			forceB = Laplacian19(x, y, z, int32(CabAs), prv, pposA) // B driven by A
 		} else {
-			forceB = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA) // B driven by A
+			forceB = Laplacian1D(x, y, z, int32(CabAs), prv, pposA) // B driven by A
 		}
 		forceB *= Params[0].HSqOver2M + vpot*pposA // todo: not sure about this!!
 		velB = forceB                              // first order, not +=
 		posB = pposB + velB
 
-		// carry A forward
-		forceA = State.Value(int(z), int(y), int(x), int(CabForceA), int(prv))
+		// carry the other component forward
 		velA = pvelA
 		posA = pposA
 	}
 
-	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
-	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 
 	State.Set(posA*posA+posB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
 }
@@ -77,7 +73,7 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.StateVars = CabStatesN
 	ss.SchrodingerStats()
 	ss.ViewInit(func(view *View) {
-		view.SetVar(CabPosA, -1)
+		view.SetVar(CabAs, -1)
 	})
 }
 
@@ -91,14 +87,14 @@ func Cab1DViewAll(view *View) {
 	// view.SetVarMinMax(WavePos, -0.8, 0.8)
 	view.Settings.Height = 0.8
 	view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = CabPosB
+	view.Panels[2].Var = CabBs
 	view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabPosB
+	view.Panels[3].Var = CabBs
 }
 
 func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(CabMag))
 	// a matter wave: the group velocity is not the phase velocity
-	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
+	ss.AddStat(ss.StatGroupVel(math32.X, CabAs))
 }

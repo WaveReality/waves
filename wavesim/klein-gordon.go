@@ -21,29 +21,17 @@ import "cogentcore.org/core/math32"
 type CabStates EMStates //enums:enum -trim-prefix=Cab
 
 const (
-	// CabPosA is the position (height) wave state variable
-	// for the real complex component A.
-	CabPosA CabStates = CabStates(EMStatesN) + iota
+	// CabAs is the wave state variable for component A: real.
+	CabAs CabStates = CabStates(EMStatesN) + iota
 
-	// CabPosB is the position (height) wave state variable
-	// for the imaginary complex component B.
-	CabPosB
+	// CabBs is the wave state variable for component B: imaginary.
+	CabBs
 
-	// CabVelA is the velocity of wave state variable
-	// for the real complex component A.
-	CabVelA
+	// CabAv is the velocity of wave state variable A.
+	CabAv
 
-	// CabVelB is the velocity of wave state variable
-	// for the imaginary complex component B.
-	CabVelB
-
-	// CabForceA is the net force computed from neighbors
-	// for the real complex component A.
-	CabForceA
-
-	// CabForceB is the net force computed from neighbors
-	// for the imaginary complex component B.
-	CabForceB
+	// CabBv is the velocity of wave state variable B.
+	CabBv
 
 	// CabV is an external potential energy factor, that
 	// can be used to push particles around.
@@ -131,10 +119,10 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
+	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
 	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
 
 	mhsq := Params[0].MOverHSq
@@ -143,11 +131,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 
 	var forceA, forceB float32
 	if threeD {
-		forceA = Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
-		forceB = Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
+		forceA = Laplacian19(x, y, z, int32(CabAs), prv, pposA)
+		forceB = Laplacian19(x, y, z, int32(CabBs), prv, pposB)
 	} else {
-		forceA = Laplacian1D(x, y, z, int32(CabPosA), prv, pposA)
-		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
+		forceA = Laplacian1D(x, y, z, int32(CabAs), prv, pposA)
+		forceB = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
 	}
 	forceA += (vpot - mhsq) * pposA // this is the only diff from standard Wave
 	forceB += (vpot - mhsq) * pposB
@@ -157,11 +145,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	// needed for the current in any case, and for the A.grad term when coupled
 	var gA, gB math32.Vector3
 	if threeD {
-		gA = Gradient10(x, y, z, int32(CabPosA), prv)
-		gB = Gradient10(x, y, z, int32(CabPosB), prv)
+		gA = Gradient10(x, y, z, int32(CabAs), prv)
+		gB = Gradient10(x, y, z, int32(CabBs), prv)
 	} else {
-		gA = Gradient1D(x, y, z, int32(CabPosA), prv)
-		gB = Gradient1D(x, y, z, int32(CabPosB), prv)
+		gA = Gradient1D(x, y, z, int32(CabAs), prv)
+		gB = Gradient1D(x, y, z, int32(CabBs), prv)
 	}
 
 	em := Params[0].EM.IsTrue()
@@ -230,13 +218,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	// Mag a step later than Charge breaks rho = -e |chi|^2 by the amount the
 	// Laplacian moves |chi|^2 in one step.
 	State.Set(ccm, int(z), int(y), int(x), int(CabMag), int(cur))
-	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
-	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 }
 
 // KleinGordonDampKernel is the kernel for computing the KleinGordon equations,
@@ -285,19 +271,19 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	sz := ctx.SizePlus1() // exclude updating on edges
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
+	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
 
 	// mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
 
 	var forceA, forceB float32
 	if Params[0].ThreeD.IsTrue() {
-		forceA = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
-		forceB = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
+		forceA = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
+		forceB = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
 	} else {
-		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosA), prv, pposA)
-		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabPosB), prv, pposB)
+		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
+		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
 	}
 	// forceA -= mhsq * pposA // this is the only diff from standard Wave
 	velA := csq * forceA
@@ -307,13 +293,11 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	velB := csq * forceB
 	posB := pposB + velB
 
-	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
-	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 }
 
 //gosl:end
@@ -335,7 +319,7 @@ func (ss *Sim) KleinGordonCConfig() {
 	ss.InitFunc = ChargeAtRest
 	ss.KleinGordonCStats()
 	ss.ViewInit(func(view *View) {
-		view.SetVar(CabPosA, -1)
+		view.SetVar(CabAs, -1)
 	})
 }
 
@@ -446,7 +430,7 @@ func (ss *Sim) KleinGordonCStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(Charge))
 	ss.AddStat(ss.StatSum(CabMag))
-	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
+	ss.AddStat(ss.StatGroupVel(math32.X, CabAs))
 }
 
 // KGShouldDisplay determines which Parameters fields to display.

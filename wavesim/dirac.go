@@ -20,42 +20,34 @@ import (
 type DiracStates EMStates //enums:enum -trim-prefix=Dirac
 
 const (
-	// DiracPos1A is the position (height) wave state variable
-	// 1 for the real complex component A.
-	DiracPos1A DiracStates = DiracStates(EMStatesN) + iota
+	// Dirac1As is the wave state variable for value 1, component A: real
+	Dirac1As DiracStates = DiracStates(EMStatesN) + iota
 
-	// DiracPos1B is the position (height) wave state variable
-	// 1 for the imaginary complex component B.
-	DiracPos1B
+	// Dirac1Bs is the wave state variable for value 1, component B: imaginary.
+	Dirac1Bs
 
-	// DiracPos2A is the position (height) wave state variable
-	// 2 for the real complex component A.
-	DiracPos2A
+	// Dirac1As is the wave state variable for value 2, component A: real
+	Dirac2As
 
-	// DiracPos2B is the position (height) wave state variable
-	// 2 for the imaginary complex component B.
-	DiracPos2B
+	// Dirac1Bs is the wave state variable for value 2, component B: imaginary.
+	Dirac2Bs
 
-	// DiracVel1A is the velocity of wave state variable
-	// 1 for the real complex component A.
-	DiracVel1A
+	// Dirac1Av is the velocity of wave state 1A.
+	Dirac1Av
 
-	// DiracVel1B is the velocity of wave state variable
-	// 1 for the imaginary complex component B.
-	DiracVel1B
+	// Dirac1Bv is the velocity of wave state 1B.
+	Dirac1Bv
 
-	// DiracVel2A is the velocity of wave state variable
-	// 2 for the real complex component A.
-	DiracVel2A
+	// Dirac2Av is the velocity of wave state 2A.
+	Dirac2Av
 
-	// DiracVel2B is the velocity of wave state variable
-	// 2 for the imaginary complex component B.
-	DiracVel2B
+	// Dirac2Bv is the velocity of wave state 2B.
+	Dirac2Bv
 
-	// DiracCC is the complex conjugate ("squared") wave
-	// value, which represents the total probability or a conserved
-	// charge value.
-	DiracCC
+	// DiracMag is the state magnitude (state * complex conjugate),
+	// summed over both components, which represents the total
+	// probability or a conserved charge value.
+	DiracMag
 )
 
 // DiracKernel is the second-order (Feynman-Gell-Mann) Dirac equation: the
@@ -87,14 +79,14 @@ func DiracKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	p1a := State.Value(int(z), int(y), int(x), int(DiracPos1A), int(prv))
-	p1b := State.Value(int(z), int(y), int(x), int(DiracPos1B), int(prv))
-	p2a := State.Value(int(z), int(y), int(x), int(DiracPos2A), int(prv))
-	p2b := State.Value(int(z), int(y), int(x), int(DiracPos2B), int(prv))
-	v1a := State.Value(int(z), int(y), int(x), int(DiracVel1A), int(prv))
-	v1b := State.Value(int(z), int(y), int(x), int(DiracVel1B), int(prv))
-	v2a := State.Value(int(z), int(y), int(x), int(DiracVel2A), int(prv))
-	v2b := State.Value(int(z), int(y), int(x), int(DiracVel2B), int(prv))
+	p1a := State.Value(int(z), int(y), int(x), int(Dirac1As), int(prv))
+	p1b := State.Value(int(z), int(y), int(x), int(Dirac1Bs), int(prv))
+	p2a := State.Value(int(z), int(y), int(x), int(Dirac2As), int(prv))
+	p2b := State.Value(int(z), int(y), int(x), int(Dirac2Bs), int(prv))
+	v1a := State.Value(int(z), int(y), int(x), int(Dirac1Av), int(prv))
+	v1b := State.Value(int(z), int(y), int(x), int(Dirac1Bv), int(prv))
+	v2a := State.Value(int(z), int(y), int(x), int(Dirac2Av), int(prv))
+	v2b := State.Value(int(z), int(y), int(x), int(Dirac2Bv), int(prv))
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
@@ -102,15 +94,15 @@ func DiracKernel(i uint32) { //gosl:kernel
 
 	var l1a, l1b, l2a, l2b float32
 	if threeD {
-		l1a = Laplacian19(x, y, z, int32(DiracPos1A), prv, p1a)
-		l1b = Laplacian19(x, y, z, int32(DiracPos1B), prv, p1b)
-		l2a = Laplacian19(x, y, z, int32(DiracPos2A), prv, p2a)
-		l2b = Laplacian19(x, y, z, int32(DiracPos2B), prv, p2b)
+		l1a = Laplacian19(x, y, z, int32(Dirac1As), prv, p1a)
+		l1b = Laplacian19(x, y, z, int32(Dirac1Bs), prv, p1b)
+		l2a = Laplacian19(x, y, z, int32(Dirac2As), prv, p2a)
+		l2b = Laplacian19(x, y, z, int32(Dirac2Bs), prv, p2b)
 	} else {
-		l1a = Laplacian1D(x, y, z, int32(DiracPos1A), prv, p1a)
-		l1b = Laplacian1D(x, y, z, int32(DiracPos1B), prv, p1b)
-		l2a = Laplacian1D(x, y, z, int32(DiracPos2A), prv, p2a)
-		l2b = Laplacian1D(x, y, z, int32(DiracPos2B), prv, p2b)
+		l1a = Laplacian1D(x, y, z, int32(Dirac1As), prv, p1a)
+		l1b = Laplacian1D(x, y, z, int32(Dirac1Bs), prv, p1b)
+		l2a = Laplacian1D(x, y, z, int32(Dirac2As), prv, p2a)
+		l2b = Laplacian1D(x, y, z, int32(Dirac2Bs), prv, p2b)
 	}
 	a1a := csq * (l1a - mhsq*p1a)
 	a1b := csq * (l1b - mhsq*p1b)
@@ -120,15 +112,15 @@ func DiracKernel(i uint32) { //gosl:kernel
 	// gradients: needed for the current always, and for the A.grad term
 	var g1a, g1b, g2a, g2b math32.Vector3
 	if threeD {
-		g1a = Gradient10(x, y, z, int32(DiracPos1A), prv)
-		g1b = Gradient10(x, y, z, int32(DiracPos1B), prv)
-		g2a = Gradient10(x, y, z, int32(DiracPos2A), prv)
-		g2b = Gradient10(x, y, z, int32(DiracPos2B), prv)
+		g1a = Gradient10(x, y, z, int32(Dirac1As), prv)
+		g1b = Gradient10(x, y, z, int32(Dirac1Bs), prv)
+		g2a = Gradient10(x, y, z, int32(Dirac2As), prv)
+		g2b = Gradient10(x, y, z, int32(Dirac2Bs), prv)
 	} else {
-		g1a = Gradient1D(x, y, z, int32(DiracPos1A), prv)
-		g1b = Gradient1D(x, y, z, int32(DiracPos1B), prv)
-		g2a = Gradient1D(x, y, z, int32(DiracPos2A), prv)
-		g2b = Gradient1D(x, y, z, int32(DiracPos2B), prv)
+		g1a = Gradient1D(x, y, z, int32(Dirac1As), prv)
+		g1b = Gradient1D(x, y, z, int32(Dirac1Bs), prv)
+		g2a = Gradient1D(x, y, z, int32(Dirac2As), prv)
+		g2b = Gradient1D(x, y, z, int32(Dirac2Bs), prv)
 	}
 
 	em := Params[0].EM.IsTrue()
@@ -215,15 +207,15 @@ func DiracKernel(i uint32) { //gosl:kernel
 	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
 	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
 
-	State.Set(mag, int(z), int(y), int(x), int(DiracCC), int(cur))
-	State.Set(n1a, int(z), int(y), int(x), int(DiracVel1A), int(cur))
-	State.Set(n1b, int(z), int(y), int(x), int(DiracVel1B), int(cur))
-	State.Set(n2a, int(z), int(y), int(x), int(DiracVel2A), int(cur))
-	State.Set(n2b, int(z), int(y), int(x), int(DiracVel2B), int(cur))
-	State.Set(q1a, int(z), int(y), int(x), int(DiracPos1A), int(cur))
-	State.Set(q1b, int(z), int(y), int(x), int(DiracPos1B), int(cur))
-	State.Set(q2a, int(z), int(y), int(x), int(DiracPos2A), int(cur))
-	State.Set(q2b, int(z), int(y), int(x), int(DiracPos2B), int(cur))
+	State.Set(mag, int(z), int(y), int(x), int(DiracMag), int(cur))
+	State.Set(n1a, int(z), int(y), int(x), int(Dirac1Av), int(cur))
+	State.Set(n1b, int(z), int(y), int(x), int(Dirac1Bv), int(cur))
+	State.Set(n2a, int(z), int(y), int(x), int(Dirac2Av), int(cur))
+	State.Set(n2b, int(z), int(y), int(x), int(Dirac2Bv), int(cur))
+	State.Set(q1a, int(z), int(y), int(x), int(Dirac1As), int(cur))
+	State.Set(q1b, int(z), int(y), int(x), int(Dirac1Bs), int(cur))
+	State.Set(q2a, int(z), int(y), int(x), int(Dirac2As), int(cur))
+	State.Set(q2b, int(z), int(y), int(x), int(Dirac2Bs), int(cur))
 }
 
 //gosl:end
@@ -235,7 +227,7 @@ func (ss *Sim) DiracConfig() {
 	ss.InitFunc = SpinAtRest
 	ss.DiracStats()
 	ss.ViewInit(func(view *View) {
-		view.SetVar(DiracPos1A, -1)
+		view.SetVar(Dirac1As, -1)
 	})
 }
 
@@ -291,7 +283,7 @@ var DiracConfigs = []InitFunc{
 func (ss *Sim) DiracStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(Charge))
-	ss.AddStat(ss.StatSum(DiracCC))
+	ss.AddStat(ss.StatSum(DiracMag))
 	ss.AddStat(ss.StatDiracSpin())
 }
 
@@ -323,10 +315,10 @@ func (ss *Sim) StatDiracSpin() func(init bool) {
 			for c.Y = range sz.Y {
 				for c.X = range sz.X {
 					f := c.AddScalar(1)
-					a1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1A), int(cur)))
-					b1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1B), int(cur)))
-					a2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2A), int(cur)))
-					b2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2B), int(cur)))
+					a1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur)))
+					b1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur)))
+					a2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur)))
+					b2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur)))
 					sx += 2 * (a1*a2 + b1*b2)
 					sy += 2 * (a1*b2 - b1*a2)
 					sz2 += (a1*a1 + b1*b1) - (a2*a2 + b2*b2)

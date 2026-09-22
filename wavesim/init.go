@@ -403,7 +403,7 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
-// ChargedRest gives whatever is already in CabPosA the velocity that makes it
+// ChargedRest gives whatever is already in CabAs the velocity that makes it
 // a charge distribution at rest: phi_b stays zero and d phi_b turns at the
 // rest mass frequency, so that
 //
@@ -433,9 +433,9 @@ func (ss *Sim) ChargedRest(sign float32) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * State.Value(int(f.Z), int(f.Y), int(f.X), int(CabPosA), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(prv))
+				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * State.Value(int(f.Z), int(f.Y), int(f.X), int(CabAs), int(cur))
+				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(cur))
+				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(prv))
 			}
 		}
 	}
@@ -444,14 +444,14 @@ func (ss *Sim) ChargedRest(sign float32) {
 // ChargedUniform fills all of space with a charge at rest: the flat case, where
 // rho is the same everywhere and exactly constant. See [Sim.ChargedRest].
 func (ss *Sim) ChargedUniform(amp, sign float32) {
-	ss.Fill(CabPosA, Both, amp)
+	ss.Fill(CabAs, Both, amp)
 	ss.ChargedRest(sign)
 }
 
 // ChargedBlob puts a gaussian lump of charge at rest at ctr. See
 // [Sim.ChargedRest].
 func (ss *Sim) ChargedBlob(ctr math32.Vector3, width, amp, sign float32) {
-	ss.Gauss(CabPosA, Both, ctr, width, amp, 0)
+	ss.Gauss(CabAs, Both, ctr, width, amp, 0)
 	ss.ChargedRest(sign)
 }
 
@@ -466,13 +466,13 @@ func (ss *Sim) DiracBlob(ctr math32.Vector3, width, amp float32, axis math32.Dim
 	h := amp / math32.Sqrt2
 	switch axis {
 	case math32.X:
-		ss.Gauss(DiracPos1A, Both, ctr, width, h, 0)
-		ss.Gauss(DiracPos2A, Both, ctr, width, h, 0)
+		ss.Gauss(Dirac1As, Both, ctr, width, h, 0)
+		ss.Gauss(Dirac2As, Both, ctr, width, h, 0)
 	case math32.Y:
-		ss.Gauss(DiracPos1A, Both, ctr, width, h, 0)
-		ss.Gauss(DiracPos2B, Both, ctr, width, h, 0)
+		ss.Gauss(Dirac1As, Both, ctr, width, h, 0)
+		ss.Gauss(Dirac2Bs, Both, ctr, width, h, 0)
 	default:
-		ss.Gauss(DiracPos1A, Both, ctr, width, amp, 0)
+		ss.Gauss(Dirac1As, Both, ctr, width, amp, 0)
 	}
 	ss.DiracRest(sign)
 }
@@ -498,18 +498,18 @@ func (ss *Sim) DiracRest(sign float32) {
 				f := c.AddScalar(1)
 				w := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur)))
 				// d(chi) = i w chi for each component: (a, b) -> (-w b, w a)
-				v1a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1B), int(cur))
-				v1b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1A), int(cur))
-				v2a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2B), int(cur))
-				v2b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2A), int(cur))
-				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(DiracVel1A), int(cur))
-				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(DiracVel1A), int(prv))
-				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(DiracVel1B), int(cur))
-				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(DiracVel1B), int(prv))
-				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(DiracVel2A), int(cur))
-				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(DiracVel2A), int(prv))
-				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(DiracVel2B), int(cur))
-				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(DiracVel2B), int(prv))
+				v1a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur))
+				v1b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur))
+				v2a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur))
+				v2b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur))
+				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(cur))
+				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(prv))
+				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(cur))
+				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(prv))
+				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(cur))
+				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(prv))
+				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(cur))
+				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(prv))
 			}
 		}
 	}
@@ -529,8 +529,8 @@ func (ss *Sim) ChargedPacketConfig(dim math32.Dims, amp, sign float32) {
 	om := ss.LatticeFreq(wl, math32.Sqrt(ss.Params.MOverHSq))
 	ctr := float32(ss.Config.Size.Dim(dim)) * 0.5
 	wd := ss.Config.PacketWidth
-	ss.SlabPacket(CabPosA, CabVelA, dim, ctr, wl, wd, amp, 1, om, 0)
-	ss.SlabPacket(CabPosB, CabVelB, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+	ss.SlabPacket(CabAs, CabAv, dim, ctr, wl, wd, amp, 1, om, 0)
+	ss.SlabPacket(CabBs, CabBv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
 }
 
 // SmoothNoise seeds a state variable with a sum of a few long-wavelength modes
@@ -657,6 +657,6 @@ func (ss *Sim) ParticleField(c math32.Vector3i, width float32) {
 	cf := CoordToFloat(c)
 	ss.InvR(SpinfieldDist, cf, 1)
 	ss.InvRDrive(SpinfieldDrive, cf, Params[0].Decay)
-	ss.InvR(CabPosA, cf, 1)
-	// ss.InvR(CabPosB, cf, 0)
+	ss.InvR(CabAs, cf, 1)
+	// ss.InvR(CabBs, cf, 0)
 }

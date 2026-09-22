@@ -15,11 +15,11 @@ const DiracStatesN DiracStates = 27
 
 //gosl:end
 
-var _DiracStatesValueMap = map[string]DiracStates{`Pos1A`: 18, `Pos1B`: 19, `Pos2A`: 20, `Pos2B`: 21, `Vel1A`: 22, `Vel1B`: 23, `Vel2A`: 24, `Vel2B`: 25, `CC`: 26}
+var _DiracStatesValueMap = map[string]DiracStates{`1As`: 18, `1Bs`: 19, `2As`: 20, `2Bs`: 21, `1Av`: 22, `1Bv`: 23, `2Av`: 24, `2Bv`: 25, `Mag`: 26}
 
-var _DiracStatesDescMap = map[DiracStates]string{18: `DiracPos1A is the position (height) wave state variable 1 for the real complex component A.`, 19: `DiracPos1B is the position (height) wave state variable 1 for the imaginary complex component B.`, 20: `DiracPos2A is the position (height) wave state variable 2 for the real complex component A.`, 21: `DiracPos2B is the position (height) wave state variable 2 for the imaginary complex component B.`, 22: `DiracVel1A is the velocity of wave state variable 1 for the real complex component A.`, 23: `DiracVel1B is the velocity of wave state variable 1 for the imaginary complex component B.`, 24: `DiracVel2A is the velocity of wave state variable 2 for the real complex component A.`, 25: `DiracVel2B is the velocity of wave state variable 2 for the imaginary complex component B.`, 26: `DiracCC is the complex conjugate (&#34;squared&#34;) wave value, which represents the total probability or a conserved charge value.`}
+var _DiracStatesDescMap = map[DiracStates]string{18: `Dirac1As is the wave state variable for value 1, component A: real`, 19: `Dirac1Bs is the wave state variable for value 1, component B: imaginary.`, 20: `Dirac1As is the wave state variable for value 2, component A: real`, 21: `Dirac1Bs is the wave state variable for value 2, component B: imaginary.`, 22: `Dirac1Av is the velocity of wave state 1A.`, 23: `Dirac1Bv is the velocity of wave state 1B.`, 24: `Dirac2Av is the velocity of wave state 2A.`, 25: `Dirac2Bv is the velocity of wave state 2B.`, 26: `DiracMag is the state magnitude (state * complex conjugate), summed over both components, which represents the total probability or a conserved charge value.`}
 
-var _DiracStatesMap = map[DiracStates]string{18: `Pos1A`, 19: `Pos1B`, 20: `Pos2A`, 21: `Pos2B`, 22: `Vel1A`, 23: `Vel1B`, 24: `Vel2A`, 25: `Vel2B`, 26: `CC`}
+var _DiracStatesMap = map[DiracStates]string{18: `1As`, 19: `1Bs`, 20: `2As`, 21: `2Bs`, 22: `1Av`, 23: `1Bv`, 24: `2Av`, 25: `2Bv`, 26: `Mag`}
 
 // String returns the string representation of this DiracStates value.
 func (i DiracStates) String() string {
@@ -292,20 +292,20 @@ func (i GPUVars) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *GPUVars) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "GPUVars") }
 
-var _CabStatesValues = []CabStates{18, 19, 20, 21, 22, 23, 24, 25}
+var _CabStatesValues = []CabStates{18, 19, 20, 21, 22, 23}
 
 // CabStatesN is the highest valid value for type CabStates, plus one.
 //
 //gosl:start
-const CabStatesN CabStates = 26
+const CabStatesN CabStates = 24
 
 //gosl:end
 
-var _CabStatesValueMap = map[string]CabStates{`PosA`: 18, `PosB`: 19, `VelA`: 20, `VelB`: 21, `ForceA`: 22, `ForceB`: 23, `V`: 24, `Mag`: 25}
+var _CabStatesValueMap = map[string]CabStates{`As`: 18, `Bs`: 19, `Av`: 20, `Bv`: 21, `V`: 22, `Mag`: 23}
 
-var _CabStatesDescMap = map[CabStates]string{18: `CabPosA is the position (height) wave state variable for the real complex component A.`, 19: `CabPosB is the position (height) wave state variable for the imaginary complex component B.`, 20: `CabVelA is the velocity of wave state variable for the real complex component A.`, 21: `CabVelB is the velocity of wave state variable for the imaginary complex component B.`, 22: `CabForceA is the net force computed from neighbors for the real complex component A.`, 23: `CabForceB is the net force computed from neighbors for the imaginary complex component B.`, 24: `CabV is an external potential energy factor, that can be used to push particles around.`, 25: `CabMag is the state magnitude (state * complex conjugate), which represents the total probability or a conserved charge value.`}
+var _CabStatesDescMap = map[CabStates]string{18: `CabAs is the wave state variable for component A: real.`, 19: `CabBs is the wave state variable for component B: imaginary.`, 20: `CabAv is the velocity of wave state variable A.`, 21: `CabBv is the velocity of wave state variable B.`, 22: `CabV is an external potential energy factor, that can be used to push particles around.`, 23: `CabMag is the state magnitude (state * complex conjugate), which represents the total probability or a conserved charge value.`}
 
-var _CabStatesMap = map[CabStates]string{18: `PosA`, 19: `PosB`, 20: `VelA`, 21: `VelB`, 22: `ForceA`, 23: `ForceB`, 24: `V`, 25: `Mag`}
+var _CabStatesMap = map[CabStates]string{18: `As`, 19: `Bs`, 20: `Av`, 21: `Bv`, 22: `V`, 23: `Mag`}
 
 // String returns the string representation of this CabStates value.
 func (i CabStates) String() string {
@@ -670,20 +670,20 @@ func (i NPanels) MarshalText() ([]byte, error) { return []byte(i.String()), nil 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *NPanels) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "NPanels") }
 
-var _SpinfieldStatesValues = []SpinfieldStates{26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44}
+var _SpinfieldStatesValues = []SpinfieldStates{24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42}
 
 // SpinfieldStatesN is the highest valid value for type SpinfieldStates, plus one.
 //
 //gosl:start
-const SpinfieldStatesN SpinfieldStates = 45
+const SpinfieldStatesN SpinfieldStates = 43
 
 //gosl:end
 
-var _SpinfieldStatesValueMap = map[string]SpinfieldStates{`Particle`: 26, `PvelX`: 27, `PvelY`: 28, `PvelZ`: 29, `PESq`: 30, `Dist`: 31, `Drive`: 32, `Higgs0a`: 33, `Higgs0b`: 34, `Higgs1a`: 35, `Higgs1b`: 36, `0a`: 37, `0b`: 38, `Xa`: 39, `Xb`: 40, `Ya`: 41, `Yb`: 42, `Za`: 43, `Zb`: 44}
+var _SpinfieldStatesValueMap = map[string]SpinfieldStates{`Particle`: 24, `PvelX`: 25, `PvelY`: 26, `PvelZ`: 27, `PESq`: 28, `Dist`: 29, `Drive`: 30, `Higgs0a`: 31, `Higgs0b`: 32, `Higgs1a`: 33, `Higgs1b`: 34, `0a`: 35, `0b`: 36, `Xa`: 37, `Xb`: 38, `Ya`: 39, `Yb`: 40, `Za`: 41, `Zb`: 42}
 
-var _SpinfieldStatesDescMap = map[SpinfieldStates]string{26: `SpinfieldParticle indicates the type of particle present at this cell. zero indicates no particle.`, 27: `SpinfieldPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 28: `SpinfieldPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 29: `SpinfieldPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 30: `SpinfieldPESq is the square of the particle energy.`, 31: `SpinfieldDist is the 1/r distance propagated from the source particle.`, 32: `SpinfieldDrive is the coupling strength of particle field to wave fields. Computed from Dist.`, 33: `SpinfieldHiggs0a is the Higgs spin complex-valued oscillator, 0a.`, 34: `SpinfieldHiggs0b is the Higgs spin complex-valued oscillator, 0b.`, 35: `SpinfieldHiggs1a is the Higgs spin complex-valued oscillator, 1a.`, 36: `SpinfieldHiggs1b is the Higgs spin complex-valued oscillator, 1b.`, 37: `Spinfield0a is the core spin complex-valued oscillator, a.`, 38: `Spinfield0b is the core spin complex-valued oscillator, b.`, 39: `SpinfieldXa is the complex-valued oscillator for velocity along the X asis, a. Phase relative to 0 determines velocity.`, 40: `SpinfieldXb is the complex-valued oscillator for velocity along the X asis, b. Phase relative to 0 determines velocity.`, 41: `SpinfieldXa is the complex-valued oscillator for velocity along the Y asis, a. Phase relative to 0 determines velocity.`, 42: `SpinfieldXb is the complex-valued oscillator for velocity along the Y asis, b. Phase relative to 0 determines velocity.`, 43: `SpinfieldXa is the complex-valued oscillator for velocity along the Z asis, a. Phase relative to 0 determines velocity.`, 44: `SpinfieldXb is the complex-valued oscillator for velocity along the Z asis, b. Phase relative to 0 determines velocity.`}
+var _SpinfieldStatesDescMap = map[SpinfieldStates]string{24: `SpinfieldParticle indicates the type of particle present at this cell. zero indicates no particle.`, 25: `SpinfieldPvelX is the particle velocity (proportion of c, [-1..1]) along X axis`, 26: `SpinfieldPvelY is the particle velocity (proportion of c, [-1..1]) along Y axis`, 27: `SpinfieldPvelZ is the particle velocity (proportion of c, [-1..1]) along Z axis`, 28: `SpinfieldPESq is the square of the particle energy.`, 29: `SpinfieldDist is the 1/r distance propagated from the source particle.`, 30: `SpinfieldDrive is the coupling strength of particle field to wave fields. Computed from Dist.`, 31: `SpinfieldHiggs0a is the Higgs spin complex-valued oscillator, 0a.`, 32: `SpinfieldHiggs0b is the Higgs spin complex-valued oscillator, 0b.`, 33: `SpinfieldHiggs1a is the Higgs spin complex-valued oscillator, 1a.`, 34: `SpinfieldHiggs1b is the Higgs spin complex-valued oscillator, 1b.`, 35: `Spinfield0a is the core spin complex-valued oscillator, a.`, 36: `Spinfield0b is the core spin complex-valued oscillator, b.`, 37: `SpinfieldXa is the complex-valued oscillator for velocity along the X asis, a. Phase relative to 0 determines velocity.`, 38: `SpinfieldXb is the complex-valued oscillator for velocity along the X asis, b. Phase relative to 0 determines velocity.`, 39: `SpinfieldXa is the complex-valued oscillator for velocity along the Y asis, a. Phase relative to 0 determines velocity.`, 40: `SpinfieldXb is the complex-valued oscillator for velocity along the Y asis, b. Phase relative to 0 determines velocity.`, 41: `SpinfieldXa is the complex-valued oscillator for velocity along the Z asis, a. Phase relative to 0 determines velocity.`, 42: `SpinfieldXb is the complex-valued oscillator for velocity along the Z asis, b. Phase relative to 0 determines velocity.`}
 
-var _SpinfieldStatesMap = map[SpinfieldStates]string{26: `Particle`, 27: `PvelX`, 28: `PvelY`, 29: `PvelZ`, 30: `PESq`, 31: `Dist`, 32: `Drive`, 33: `Higgs0a`, 34: `Higgs0b`, 35: `Higgs1a`, 36: `Higgs1b`, 37: `0a`, 38: `0b`, 39: `Xa`, 40: `Xb`, 41: `Ya`, 42: `Yb`, 43: `Za`, 44: `Zb`}
+var _SpinfieldStatesMap = map[SpinfieldStates]string{24: `Particle`, 25: `PvelX`, 26: `PvelY`, 27: `PvelZ`, 28: `PESq`, 29: `Dist`, 30: `Drive`, 31: `Higgs0a`, 32: `Higgs0b`, 33: `Higgs1a`, 34: `Higgs1b`, 35: `0a`, 36: `0b`, 37: `Xa`, 38: `Xb`, 39: `Ya`, 40: `Yb`, 41: `Za`, 42: `Zb`}
 
 // String returns the string representation of this SpinfieldStates value.
 func (i SpinfieldStates) String() string {

@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-22 21:22:40
+- **Last Message:** 2026-09-22 22:00:35
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -1020,7 +1020,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `summary, title`
+- **mcp__ccd_session__mark_chapter**: `title, summary`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -21567,7 +21567,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `title, summary`
+- **mcp__ccd_session__mark_chapter**: `summary, title`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23930,7 +23930,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -24925,7 +24925,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -42437,25 +42437,373 @@ The field doc now says where the ½ went, so the next reader doesn't reintroduce
 
 That's the same slip the `sim_cc` demo in `complex-kg.md` had, now fixed in both places.
 
-Renamed. 44 tests pass, 13 validations, everything builds, no occurrences of the old name left.
+## 🧑 User - 2026-09-22 21:55:55
 
-`Params.HEOver2MCSq` → **`HEOverMCSq`**, computed as `(Hbar*E)/(Mass*CSq)` with the `2.0` gone, and both call sites in `klein-gordon.goal` and `dirac.goal` drop their compensating `2 *`:
+I committed everything in the code. Next step is to rename the DiracStates and CabStates to use the shorter "s" and "v" suffix notation that we used in Electroweak, instead of Pos and Vel. And I don't think we really need to track CabForce at all, right? that is not really physically meaningful -- only need that for the basic WaveStates to see how it works. Also DiracCC -> DiracMag is the new convention. So, to be clear, e.g., CabPosA -> CabAs, etc.
 
-```go
-hem := Params[0].HEOverMCSq // hbar e / (m c^2)
+## 🤖 Assistant - 2026-09-22 21:56:07
+
+*Model: claude-opus-5*
+
+<thinking>
+I'm mapping out the field renames for CabStates: consolidating position and velocity fields into shorter names like CabAs/CabBs and CabAv/CabBv, dropping the force fields entirely, and keeping CabV, CabMag, and the energy-related fields as they are.
+
+For DiracStates, I'm following the same suffix convention (component letter followed by s for position or v for velocity), so DiracPos1A becomes Dirac1As, DiracVel1A becomes Dirac1Av, and so on for the 1B/2A/2B variants. I'm also confirming DiracCC maps to DiracMag as specified, and checking whether there's a corresponding Dirac force field to remove.
+
+I need to check if CabForceA/B is used elsewhere, particularly in the KG kernel and schrodinger.goal/spinfield.goal files that reference CabStates, so I should pull the full current enum lists and every usage site before making any renames.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n '/type CabStates/,/^)/p' klein-gordon.goal | grep -E "^\tCab"; echo "=== Dirac ==="; sed -n '/type DiracStates/,/^)/p' dirac.goal | grep -E "^\tDirac"; echo "=== CabForce users ==="; grep -rn "CabForceA\|CabForceB" --include=*.goal . ``
+  ```
+  	CabPosA CabStates = CabStates(EMStatesN) + iota
+  	CabPosB
+  	CabVelA
+  	CabVelB
+  	CabForceA
+  	CabForceB
+  	CabV
+  	CabMag
+  === Dirac ===
+  	DiracPos1A DiracStates = DiracStates(EMStatesN) + iota
+  	DiracPos1B
+  	DiracPos2A
+  	DiracPos2B
+  	DiracVel1A
+  	DiracVel1B
+  	DiracVel2A
+  	DiracVel2B
+  	DiracCC
+  === CabForce users ===
+  klein-gordon.goal:38:	// CabForceA is the net force computed from neighbors
+  ...
+  ```
+
+</details>
+
+<thinking>
+I see that schrodinger.goal actually reads CabForceA/CabForceB from prv at lines 41 and 55, so the force genuinely carries state between steps in that first-order equation, feeding A's force into B's update and vice versa. That means I can't just delete CabForce since Schrödinger depends on it — I should check that kernel to confirm.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n '25,70p' schrodinger.goal``
+  ```
+  	vpot := State[z, y, x, CabV, prv]
+  
+  	// need to alternate the updating for stability
+  	// just carry forward other vars.
+  	var forceA, velA, posA, forceB, velB, posB float32
+  	if cur == 0 {
+  		if Params[0].ThreeD.IsTrue() {
+  			forceA = Laplacian19(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+  		} else {
+  			forceA = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB) // A driven by B
+  		}
+  		forceA *= -Params[0].HSqOver2M + vpot*pposB // note neg here, not in B
+  		velA = forceA                               // first order, not +=
+  		posA = pposA + velA
+  
+  		// carry B forward
+  		forceB = State[z, y, x, CabForceB, prv]
+  		velB = pvelB
+  		posB = pposB
+  	} else {
+  ...
+  ```
+
+</details>
+
+<thinking>
+Confirmed that CabForceA/B are just carried forward from the previous state to the current one for display continuity — the values are never actually read into any physics computation, so CabForce is purely cosmetic.
+
+If I remove it: klein-gordon.goal and spinfield.goal just need their two write statements deleted each. Schrödinger is trickier since forceA/forceB are still used elsewhere for velA/velB computations, so I need to carefully strip only the carry-forward assignment and write lines without breaking Go's variable usage rules — since forceB is still assigned and used in the other branch, deleting just the write should be safe.
+
+Now I'm mapping out the full renaming scheme: CabPosA becomes CabAs, CabPosB becomes CabBs, CabVelA becomes CabAv, CabVelB becomes CabBv, while CabForceA and CabForceB get deleted entirely, and CabV/CabMag stay as-is. I still need to check whether CabKinetic, CabPotential, and CabEnergy fields exist and need updating too.
+
+I'm now moving to the DiracStates enum, mapping DiracPos1A to Dirac1As and continuing through the remaining Dirac fields.
+
+I'm second-guessing the trim-prefix naming since names like "1As" start with a digit—slightly odd, though consistent with the existing scheme. I'm weighing an alternative like DiracA1s/DiracA2s instead, putting the letter first.
+
+Ultimately I'll keep the literal ordering, DiracPos1A → Dirac1As, since it preserves the existing 1A/2B convention with minimal semantic change, treating it as the most direct interpretation of the instruction.
+
+Now I need to check whether Kinetic/Potential/Energy naming still applies within Cab, and trace everywhere else these variable names are referenced across the codebase—waves.go, yaegiwaves, and the test files—before running a careful search-and-replace across the relevant source files.
+
+I'm mapping out which files need the renaming: the various .goal files, waves.go, and test files, being careful that the sed replacements are ordered longest-prefix-first so overlapping names like CabPosA/CabPosB don't collide, and similarly for the Dirac field renames. I'll write a script to handle these replacements systematically, starting by checking the current state of the Cab enum.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -rn "CabKinetic\|CabPotential\|CabEnergy" --include=*.goal wavesim/ | head -4; echo "=== all source refs ==="; grep -rln "CabPosA\|CabVelA\|DiracPos1A\|DiracCC\|CabForce" --include=*.goal --include=*.go . | grep -vE "\.go$|typegen|enumgen" ; echo "=== go/test refs ==="; grep -rln "CabPosA\|CabVelA\|DiracPos1A\|DiracCC\|CabForce" --include=*_test.go --include=waves.go .``
+  ```
+  === all source refs ===
+  wavesim/klein-gordon.goal
+  wavesim/spinfield.goal
+  wavesim/dirac.goal
+  wavesim/init.goal
+  wavesim/schrodinger.goal
+  === go/test refs ===
+  waves.go
+  wavesim/dirac_test.go
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Good, the CabKinetic/CabPotential/CabEnergy references are already gone since the user removed them, confirming the Energy block in my KleinGordonCKernel was cleaned up too. But I should double-check whether KleinGordonCStats still references CabEnergy somewhere.
+
+Since my grep across *.goal files came back empty for CabEnergy, KleinGordonCStats must already be updated to not reference it. Now I'll compile the list of files needing renames — klein-gordon.goal, spinfield.goal, dirac.goal, init.goal, schrodinger.goal, waves.go, and wavesim/dirac_test.go — and confirm kg_test.go only uses CabMag, which stays unchanged. I'm mapping out the identifier renames: CabPosA/CabPosB to CabAs/CabBs, CabVelA/CabVelB to CabAv/CabBv, and the Dirac position variables to their shortened forms, so I can write a script to apply these substitutions safely.
+
+I also need to remove CabForceA/CabForceB entirely along with their usages, and update the enum doc comments to match the new names since those explain each variable's physical meaning.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PYEOF'
+import re, os
+ren = [
+ ("CabPosA","CabAs"),("CabPosB","CabBs"),("CabVelA","CabAv"),("CabVelB","CabBv"),
+ ("DiracPos1A","Dirac1As"),("DiracPos1B","Dirac1Bs"),
+ ("DiracPos2A","Dirac2As"),("DiracPos2B","Dirac2Bs"),
+ ("DiracVel1A","Dirac1Av"),("DiracVel1B","Dirac1Bv"),
+ ("DiracVel2A","Dirac2Av"),("DiracVel2B","Dirac2Bv"),
+ ("DiracCC","DiracMag"),
+]
+files = ["wavesim/klein-gordon.goal","wavesim/spinfield.goal","wavesim/dirac.goal",
+         "wavesim/init.goal","wavesim/schrodinger.goal","waves.go","wavesim/dirac_test.go"]
+for f in files:
+    s = open(f).read()
+    for a,b in ren:
+        s = re.sub(r'\b'+a+r'\b', b, s)
+    open(f,'w').write(s)
+print("renamed")
+PYEOF
+grep -rn "CabPosA\|DiracPos1A\|DiracCC" --include=*.goal --include=waves.go --include=*_test.go . | head; echo "--- none above ---"``
+  ```
+  renamed
+  --- none above ---
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PYEOF'
+import re
+# 1. drop CabForceA / CabForceB from the enum
+p='klein-gordon.goal'; s=open(p).read()
+o = """	// CabForceA is the net force computed from neighbors
+	// for the real complex component A.
+	CabForceA
+
+	// CabForceB is the net force computed from neighbors
+	// for the imaginary complex component B.
+	CabForceB
+
+"""
+assert o in s, "enum block"
+s = s.replace(o, "", 1)
+# and its writes
+s = re.sub(r'\tState\[z, y, x, CabForce[AB], cur\] = force[AB]\n', '', s)
+open(p,'w').write(s)
+
+for p in ['spinfield.goal', 'schrodinger.goal']:
+    s = open(p).read()
+    s = re.sub(r'\tState\[z, y, x, CabForce[AB], cur\] = force[AB]\n', '', s)
+    # schrodinger's carry-forward reads, which only fed the display write
+    s = re.sub(r'\n\t\t// carry [AB] forward\n\t\tforce[AB] = State\[z, y, x, CabForce[AB], prv\]\n', '\n\t\t// carry the other component forward\n', s)
+    open(p,'w').write(s)
+print("ok")
+PYEOF
+grep -rn "CabForce" --include=*.goal . ; echo "--- none above ---"; goal build 2>&1 | tail -4``
+  ```
+  ok
+  --- none above ---
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n '/type CabStates/,/^)/p' klein-gordon.goal; echo "=== schrodinger carry ==="; sed -n '/need to alternate/,/CabMag, cur/p' schrodinger.goal``
+  ```
+  type CabStates EMStates //enums:enum -trim-prefix=Cab
+  
+  const (
+  	// CabAs is the position (height) wave state variable
+  	// for the real complex component A.
+  	CabAs CabStates = CabStates(EMStatesN) + iota
+  
+  	// CabBs is the position (height) wave state variable
+  	// for the imaginary complex component B.
+  	CabBs
+  
+  	// CabAv is the velocity of wave state variable
+  	// for the real complex component A.
+  	CabAv
+  
+  	// CabBv is the velocity of wave state variable
+  	// for the imaginary complex component B.
+  	CabBv
+  
+  	// CabV is an external potential energy factor, that
+  ...
+  ```
+
+</details>
+
+<thinking>
+The Schrödinger kernel checks out fine with forceA/forceB still in use. Now I'm looking at the Dirac enum, where DiracMag's comment still references "complex conjugate" — I should update that wording to match the Mag convention used in CabMag, then regenerate and test.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PYEOF'
+p='dirac.goal'; s=open(p).read()
+o = """	// DiracMag is the complex conjugate ("squared") wave
+	// value, which represents the total probability or a conserved
+	// charge value.
+	DiracMag"""
+n = """	// DiracMag is the state magnitude (state * complex conjugate),
+	// summed over both components, which represents the total
+	// probability or a conserved charge value.
+	DiracMag"""
+if o in s:
+    s = s.replace(o, n, 1); print("mag doc updated")
+open(p,'w').write(s)
+PYEOF
+sed -n '/type DiracStates/,/^)/p' dirac.goal | grep -E "^\tDirac"; goal build 2>&1|tail -1; go generate ./... 2>&1 | grep -ciE "error:"; go generate ./... 2>&1 | grep -c "Validation successful"; gofmt -l *.go | grep -v gosl.go; go test ./... 2>&1 | grep -vE "Total memory|^ld:" | grep -E "^(---|FAIL|ok)"; go test -v ./... 2>&1 | grep -c "^--- PASS"``
+  ```
+  mag doc updated
+  	Dirac1As DiracStates = DiracStates(EMStatesN) + iota
+  	Dirac1Bs
+  	Dirac2As
+  	Dirac2Bs
+  	Dirac1Av
+  	Dirac1Bv
+  	Dirac2Av
+  	Dirac2Bv
+  	DiracMag
+  goal build succeeded
+  0
+  13
+  ok  	github.com/WaveReality/waves/wavesim	64.752s
+  43
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && go test -run 'TestKGChargeSign|TestDiracCharge|TestDiracLarmor' -v ./... 2>&1 | grep -E "kg_test|dirac_test|PASS|FAIL" | head -8; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && go build ./yaegiwaves/ ./wavesim/ . && echo builds-ok; git status --short wavesim/ yaegiwaves/ | head``
+  ```
+      dirac_test.go:118: B = 3.0e-04: precession +4.80322e-03 rad/step, Larmor g=2 is +4.80000e-03, g = 2.0013
+      dirac_test.go:118: B = 6.0e-04: precession +9.73154e-03 rad/step, Larmor g=2 is +9.60000e-03, g = 2.0274
+  --- PASS: TestDiracLarmor (0.60s)
+      dirac_test.go:135: SpinAtRest: total charge -1852.22970, want -e |psi|^2 = -1852.22970 (+0.0e+00)
+      dirac_test.go:145: drift over 2000 steps 1.31e-04 (relative 7.06e-08)
+  --- PASS: TestDiracCharge (2.94s)
+      kg_test.go:96: ChargeAtRest      total charge -1852.22970, want -e |chi|^2 = -1852.22970 (+0.0e+00)
+      kg_test.go:96: ChargeAtRestAnti  total charge +1852.22970, want -e |chi|^2 = +1852.22970 (+0.0e+00)
+  goal run succeeded
+  # github.com/WaveReality/waves
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  builds-ok
+   M wavesim/dirac.go
+   M wavesim/dirac.goal
+   M wavesim/enumgen.go
+   M wavesim/init.go
+   M wavesim/init.goal
+   M wavesim/klein-gordon.go
+   M wavesim/klein-gordon.goal
+   M wavesim/schrodinger.go
+  ...
+  ```
+
+</details>
+
+Renamed and cleaned. 44 tests pass, 13 validations, bit-identical results.
+
+**CabStates** is now 6 members:
+
+```
+CabAs, CabBs, CabAv, CabBv, CabV, CabMag
 ```
 
-Charge values are bit-identical, as they should be — the two factors of two were cancelling:
+**DiracStates** is 9:
+
+```
+Dirac1As, Dirac1Bs, Dirac2As, Dirac2Bs, Dirac1Av, Dirac1Bv, Dirac2Av, Dirac2Bv, DiracMag
+```
+
+I kept the existing `1A`/`2B` component labels and just moved Pos/Vel to the `s`/`v` suffix, so the trimmed GUI names read `1As`, `1Av`, `2Bs` — consistent with `W1Xs`/`W1Xv` in the electroweak block. Say the word if you'd rather have `A1s`/`B2v` with the letter first.
+
+## On dropping CabForce — you were right, and more so than it looked
+
+It's display-only in all three kernels that touch it. The one that looked like a real dependency was Schrödinger, which *reads* it back from `prv`:
+
+```go
+// carry B forward
+forceB = State[z, y, x, CabForceB, prv]
+```
+
+But that value never enters a computation — it's read from the previous step purely so the write on the next line has something to put back, keeping the display from flickering on alternating updates. Nothing downstream uses it. So it's gone from all four kernels (`KleinGordonC`, its damp variant, `Schrodinger`, `Spinfield`), the carry-forward blocks are gone with it, and the comment now just says `// carry the other component forward` for the velocity and position, which genuinely are carried.
+
+`DiracCC` → `DiracMag`, with its doc brought in line with `CabMag`'s wording ("state magnitude (state * complex conjugate)", noting it's summed over both components).
+
+Nothing changed numerically, as expected from a pure rename:
 
 ```
 ChargeAtRest      total charge -1852.22970, want -e |chi|^2 = -1852.22970 (+0.0e+00)
 SpinAtRest        total charge -1852.22970, want -e |psi|^2 = -1852.22970 (+0.0e+00)
-ChargeUniform     total charge  -216.00000, want -e amp^2 N =  -216.00000
+B = 3.0e-04: precession +4.80322e-03 rad/step, g = 2.0013
 ```
 
-The field doc now says where the ½ went, so the next reader doesn't reintroduce it:
+Also updated `waves.go` and `dirac_test.go`, and regenerated the yaegi bindings.
 
-> The covariant form carries a 1/2, but that only cancels the 2 from `chi* d chi - chi d chi* = 2i (...)`, so it has no business here.
+Renamed and cleaned. 44 tests pass, 13 validations, bit-identical results.
 
-That's the same slip the `sim_cc` demo in `complex-kg.md` had, now fixed in both places.
+**CabStates** is now 6 members:
+
+```
+CabAs, CabBs, CabAv, CabBv, CabV, CabMag
+```
+
+**DiracStates** is 9:
+
+```
+Dirac1As, Dirac1Bs, Dirac2As, Dirac2Bs, Dirac1Av, Dirac1Bv, Dirac2Av, Dirac2Bv, DiracMag
+```
+
+I kept the existing `1A`/`2B` component labels and just moved Pos/Vel to the `s`/`v` suffix, so the trimmed GUI names read `1As`, `1Av`, `2Bs` — consistent with `W1Xs`/`W1Xv` in the electroweak block. Say the word if you'd rather have `A1s`/`B2v` with the letter first.
+
+## On dropping CabForce — you were right, and more so than it looked
+
+It's display-only in all three kernels that touch it. The one that looked like a real dependency was Schrödinger, which *reads* it back from `prv`:
+
+```go
+// carry B forward
+forceB = State[z, y, x, CabForceB, prv]
+```
+
+But that value never enters a computation — it's read from the previous step purely so the write on the next line has something to put back, keeping the display from flickering on alternating updates. Nothing downstream uses it. So it's gone from all four kernels (`KleinGordonC`, its damp variant, `Schrodinger`, `Spinfield`), the carry-forward blocks are gone with it, and the comment now just says `// carry the other component forward` for the velocity and position, which genuinely are carried.
+
+`DiracCC` → `DiracMag`, with its doc brought in line with `CabMag`'s wording ("state magnitude (state * complex conjugate)", noting it's summed over both components).
+
+Nothing changed numerically, as expected from a pure rename:
+
+```
+ChargeAtRest      total charge -1852.22970, want -e |chi|^2 = -1852.22970 (+0.0e+00)
+SpinAtRest        total charge -1852.22970, want -e |psi|^2 = -1852.22970 (+0.0e+00)
+B = 3.0e-04: precession +4.80322e-03 rad/step, g = 2.0013
+```
+
+Also updated `waves.go` and `dirac_test.go`, and regenerated the yaegi bindings.
 

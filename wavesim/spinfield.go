@@ -94,10 +94,10 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	sz := ctx.Size.V()
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabPosA), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabPosB), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabVelA), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabVelB), int(prv))
+	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
+	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
 
 	csq := Params[0].CSq
 	omega0 := Params[0].Omega0
@@ -144,8 +144,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	State.Set(s0a, int(z), int(y), int(x), int(Spinfield0a), int(cur))
 	State.Set(s0b, int(z), int(y), int(x), int(Spinfield0b), int(cur))
 
-	forceA := Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
-	forceB := Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
+	forceA := Laplacian19(x, y, z, int32(CabAs), prv, pposA)
+	forceB := Laplacian19(x, y, z, int32(CabBs), prv, pposB)
 	forceA += drive * (s0a - pposA)
 	forceB += drive * (s0b - pposB)
 
@@ -157,8 +157,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 
 	// todo: later, based on particle..
 	// var grAX, grAY, grAZ, grBX, grBY, grBZ float32
-	// Gradient10(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
-	// Gradient10(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+	// Gradient10(x, y, z, int32(CabAs), prv, &grAX, &grAY, &grAZ)
+	// Gradient10(x, y, z, int32(CabBs), prv, &grBX, &grBY, &grBZ)
 	//
 	// chg := pposB*pvelA - pposA*pvelB
 	//
@@ -166,13 +166,11 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	// curY := pposA*grBY - pposB*grAY
 	// curZ := pposA*grBZ - pposB*grAZ
 
-	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
+	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
-	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX
@@ -275,9 +273,9 @@ func SpinfieldViewAll(view *View) {
 	view.Panels[0].Var = Spinfield0a
 	view.Panels[1].Var = SpinfieldDrive
 	// view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = CabPosA
+	view.Panels[2].Var = CabAs
 	// view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabPosB
+	view.Panels[3].Var = CabBs
 	view.Settings.TrackParticle = 0
 }
 

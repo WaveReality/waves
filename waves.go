@@ -133,14 +133,14 @@ func main() {
 			case wavesim.KleinGordonC:
 				wavesim.ChargeAtRest(sim)
 			case wavesim.Schrodinger:
-				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
+				sim.MovingWavePacketConfig(wavesim.CabAs, wavesim.CabBs, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
 				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:
 				if threed {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 					sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
-					sim.MovingWavePacketConfig(wavesim.DiracPos1A, wavesim.DiracPos1B, math32.X, ctrPos, -1, 0, 1)
+					sim.MovingWavePacketConfig(wavesim.Dirac1As, wavesim.Dirac1Bs, math32.X, ctrPos, -1, 0, 1)
 				} else {
 					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
 				}

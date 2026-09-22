@@ -92,10 +92,10 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	sz := ctx.Size.V()
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State[z, y, x, CabPosA, prv]
-	pposB := State[z, y, x, CabPosB, prv]
-	pvelA := State[z, y, x, CabVelA, prv]
-	pvelB := State[z, y, x, CabVelB, prv]
+	pposA := State[z, y, x, CabAs, prv]
+	pposB := State[z, y, x, CabBs, prv]
+	pvelA := State[z, y, x, CabAv, prv]
+	pvelB := State[z, y, x, CabBv, prv]
 
 	csq := Params[0].CSq
 	omega0 := Params[0].Omega0
@@ -142,8 +142,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	State[z, y, x, Spinfield0a, cur] = s0a
 	State[z, y, x, Spinfield0b, cur] = s0b
 
-	forceA := Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
-	forceB := Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
+	forceA := Laplacian19(x, y, z, int32(CabAs), prv, pposA)
+	forceB := Laplacian19(x, y, z, int32(CabBs), prv, pposB)
 	forceA += drive * (s0a - pposA)
 	forceB += drive * (s0b - pposB)
 
@@ -155,8 +155,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 
 	// todo: later, based on particle..
 	// var grAX, grAY, grAZ, grBX, grBY, grBZ float32
-	// Gradient10(x, y, z, int32(CabPosA), prv, &grAX, &grAY, &grAZ)
-	// Gradient10(x, y, z, int32(CabPosB), prv, &grBX, &grBY, &grBZ)
+	// Gradient10(x, y, z, int32(CabAs), prv, &grAX, &grAY, &grAZ)
+	// Gradient10(x, y, z, int32(CabBs), prv, &grBX, &grBY, &grBZ)
 	//
 	// chg := pposB*pvelA - pposA*pvelB
 	//
@@ -164,13 +164,11 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	// curY := pposA*grBY - pposB*grAY
 	// curZ := pposA*grBZ - pposB*grAZ
 
-	State[z, y, x, CabForceA, cur] = forceA
-	State[z, y, x, CabVelA, cur] = velA
-	State[z, y, x, CabPosA, cur] = posA
+	State[z, y, x, CabAv, cur] = velA
+	State[z, y, x, CabAs, cur] = posA
 
-	State[z, y, x, CabForceB, cur] = forceB
-	State[z, y, x, CabVelB, cur] = velB
-	State[z, y, x, CabPosB, cur] = posB
+	State[z, y, x, CabBv, cur] = velB
+	State[z, y, x, CabBs, cur] = posB
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX
@@ -273,9 +271,9 @@ func SpinfieldViewAll(view *View) {
 	view.Panels[0].Var = Spinfield0a
 	view.Panels[1].Var = SpinfieldDrive
 	// view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = CabPosA
+	view.Panels[2].Var = CabAs
 	// view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabPosB
+	view.Panels[3].Var = CabBs
 	view.Settings.TrackParticle = 0
 }
 
