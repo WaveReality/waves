@@ -29,7 +29,7 @@ func (ss *Sim) RunStats(init bool) {
 	if !init {
 		tensorfs.DirTable(ss.Stats, nil).WriteToLog()
 		if ss.GUI.Tabs != nil {
-			ss.GUI.Tabs.AsLab().GoUpdatePlot("Stats Plot")
+			ss.GUI.Tabs.AsLab().GoUpdatePlot("Root Stats Plot")
 		}
 	} else {
 		if ss.GUI.Tabs != nil {
