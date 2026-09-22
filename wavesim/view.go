@@ -399,6 +399,8 @@ func (vw *View) makeVars(frame *core.Frame) {
 		vw.varsFrame = w
 		w.Styler(func(s *styles.Style) {
 			s.Direction = styles.Column
+			s.Display = styles.Grid
+			s.Columns = 2
 			s.Grow.Set(0, 1)
 			s.Min.X.Em(10)
 			s.Overflow.Y = styles.OverflowAuto
