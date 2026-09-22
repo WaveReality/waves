@@ -225,6 +225,11 @@ func (ss *Sim) DiracConfig() {
 	ss.StateVars = DiracStatesN
 	ss.initFuncs = DiracConfigs
 	ss.InitFunc = SpinAtRest
+	// wrapped: these configs are free waves, and a torus loses no charge, so
+	// the conservation the equation promises is the one you actually see. A
+	// config that couples to its own field wants damped edges instead, for the
+	// reason in ChargeSelfField, and should set that itself.
+	ss.Params.Edges = EdgesWrap
 	ss.DiracStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(Dirac1As, -1)
@@ -232,7 +237,7 @@ func (ss *Sim) DiracConfig() {
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
 
 //////// configurations
 
@@ -263,10 +268,44 @@ func SpinAtRest(ss *Sim) {
 // field, so leave Params.EM on but do not expect the field to evolve.
 func SpinPrecession(ss *Sim) {
 	ss.Params.EM.SetBool(true)
+	ss.Params.SelfField.SetBool(false) // BZ below is external and must stay put
 	ss.Params.Update()
 	ss.Fill(BZ, Both, DiracDemoB)
 	ss.DiracBlob(math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, math32.X, 1)
 }
+
+// SpinInPotential puts an electron in a Coulomb well: a Dirac lump at rest,
+// offset from a fixed 1/r scalar potential, which pulls it in.
+//
+// The potential is EXTERNAL: Params.SelfField is off, so MaxwellKernel does
+// not run and A0 stays exactly as set here. That matters, because the Dirac
+// kernel overwrites Charge every step with the wave's own charge, so a nucleus
+// left in that variable would be erased on the first step. Putting the
+
+// The well depth is scaled to a fraction of the rest energy, for the reason in
+// kgSelfScale: once e A0 approaches m c^2 the single-particle equation is in
+// the Klein regime and stops describing one particle.
+//
+// Edges are damped, so the parts of the lump that are not held by the well can
+// leave rather than wrapping round and coming back.
+func SpinInPotential(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(true)
+	p.SelfField.SetBool(false)
+	p.Edges = EdgesDamp
+	p.Update()
+	a0 := DiracWellDepth * (p.Omega0 * p.Hbar) / p.E
+	ss.InvR(A0s, math32.Vec3(-1, -1, -1), a0)
+	ss.CopyCurToPrev()
+	w := ss.Config.PacketWidth
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w
+	ss.DiracBlob(ctr, w, ss.Config.Amplitude, math32.Z, 1)
+}
+
+// DiracWellDepth is the peak of the SpinInPotential well, as a fraction of the
+// rest energy m c^2 / e.
+const DiracWellDepth = 0.2
 
 // DiracDemoB is the uniform field for SpinPrecession, small enough that the
 // Larmor rate stays well under the rest mass frequency, which is where the
@@ -276,6 +315,7 @@ const DiracDemoB = 3.0e-4
 // DiracConfigs are the initialization options offered in the GUI.
 var DiracConfigs = []InitFunc{
 	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
+	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
 	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
 }
 

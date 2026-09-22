@@ -90,7 +90,6 @@ func main() {
 				}
 				sim.ViewInit(wavesim.MaxwellViewAll)
 			case wavesim.Dirac:
-				sim.Params.Edges = wavesim.EdgesDamp
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(100, 100, 100)
 			case wavesim.Electroweak:
@@ -133,17 +132,11 @@ func main() {
 			case wavesim.KleinGordonC:
 				wavesim.ChargeAtRest(sim)
 			case wavesim.Schrodinger:
-				sim.MovingWavePacketConfig(wavesim.CabAs, wavesim.CabBs, math32.X, ctrPos, -1, 0, 1)
+				sim.ComplexPacketConfig(wavesim.CabAs, wavesim.CabBs, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:
 				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:
-				if threed {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-					sim.InvR(wavesim.A0s, ctrPos, sim.Params.Mu0)
-					sim.MovingWavePacketConfig(wavesim.Dirac1As, wavesim.Dirac1Bs, math32.X, ctrPos, -1, 0, 1)
-				} else {
-					sim.Point(wavesim.Charge, wavesim.Both, ctrInt, 1)
-				}
+				wavesim.SpinAtRest(sim)
 			case wavesim.Electroweak:
 				wavesim.HiggsBroken(sim)
 			case wavesim.Spinfield:

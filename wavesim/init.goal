@@ -279,57 +279,96 @@ func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Ve
 	ss.PosWavePacket(vr, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, ss.Config.Amplitude*amp)
 }
 
-// MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
-// with given parameters, to both the position and velocity variables in current
-// and previous states, which results in a single wave packet moving in given direction.
+// PacketFreq returns the lattice angular frequency for a packet of the given
+// wavelength under the equation being simulated: massless for the pure wave
+// and electromagnetic cases, the Klein-Gordon dispersion where there is a mass.
+func (ss *Sim) PacketFreq(wavelength float32) float32 {
+	mass := float32(0)
+	switch ss.Config.Equation {
+	case KleinGordon, KleinGordonC, Dirac, Spinfield:
+		mass = math32.Sqrt(ss.Params.MOverHSq)
+	}
+	return ss.LatticeFreq(wavelength, mass)
+}
+
+// MovingWavePacket adds a gaussian * cosine wave packet along given dimension
+// to the position variable, and the time derivative that actually belongs with
+// it to the velocity variable, so the packet travels one way.
+//
+// For psi = env cos(k x + phase - dir w t) the initial time derivative is
+// dir w env sin(k x + phase), and a quarter cycle of the carrier turns the
+// cosine into the sine, so the velocity is the same packet shifted by -1/4 and
+// scaled by dir w. The frequency comes from [Sim.PacketFreq], which is the
+// LATTICE dispersion for this equation: using the continuum k instead mistunes
+// the packet and leaves a counter-propagating remnant.
+//
+// A gaussian envelope is a spread of wavenumbers, not one, so a narrow packet
+// still disperses and sheds a little backwards -- that is physics, not the
+// discretization. Wide packets are clean.
 func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
 	posI := int(posVar.Int64())
 	velI := int(velVar.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	// these values are fit from small 8 wide, 8 wavelength packets:
-	vamp := amp * 2 * math32.Sqrt(1.0/wavelength)
-	vwavelength := wavelength * 0.94
-	vwidth := width * 0.92
-	vphase := phase + .06
-	veloff := 1 + wavelength/8
-	if wavelength > 20 { // these are for bigger wave packets
-		vphase = phase + 0.5
-		vamp = amp * 0.0746 // 0.0746
-		veloff = 1 + 2*math32.Sqrt(wavelength)
-	}
+	om := ss.PacketFreq(wavelength)
 	ctrf := CenterF(ctr)
-	var diroff math32.Vector3
-	diroff.SetDim(dim, dir*ss.Params.C)
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := CoordToFloat(c)
-				d := ff.Sub(ctrf)
-				cp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
-				State[f.Z, f.Y, f.X, posI, cur] += cp
-
-				ff.SetAdd(diroff)
-				d = ff.Sub(ctrf)
-				pp := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
-				State[f.Z, f.Y, f.X, posI, prv] += pp
-
-				ff.SetAdd(diroff.MulScalar(-veloff))
-				d = ff.Sub(ctrf)
-				cv := WavePacket(d.Dim(dim), d.Length(), vwavelength, vwidth, vphase, vamp)
-				State[f.Z, f.Y, f.X, velI, cur] += cv
-
-				ff.SetAdd(diroff)
-				d = ff.Sub(ctrf)
-				pv := WavePacket(d.Dim(dim), d.Length(), 0.996*vwavelength, 0.997*vwidth, vphase, vamp)
-				State[f.Z, f.Y, f.X, velI, prv] += pv
+				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := d.Length()
+				pv := WavePacket(dd, dl, wavelength, width, phase, amp)
+				vv := dir * om * WavePacket(dd, dl, wavelength, width, phase-0.25, amp)
+				State[f.Z, f.Y, f.X, posI, cur] += pv
+				State[f.Z, f.Y, f.X, posI, prv] += pv
+				State[f.Z, f.Y, f.X, velI, cur] += vv
+				State[f.Z, f.Y, f.X, velI, prv] += vv
 			}
 		}
 	}
+}
+
+// ComplexPacket adds a travelling packet to a FIRST-ORDER complex wave, such
+// as Schrodinger's, where the two variables are the real and imaginary parts
+// rather than a position and its velocity. Both get the same envelope and
+// amplitude, a quarter cycle of the carrier apart, which is what makes
+// chi = env e^i(k x) run one way.
+func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+	ai := int(posA.Int64())
+	bi := int(posB.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctrf := CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := d.Length()
+				av := WavePacket(dd, dl, wavelength, width, phase, amp)
+				bv := dir * WavePacket(dd, dl, wavelength, width, phase-0.25, amp)
+				State[f.Z, f.Y, f.X, ai, cur] += av
+				State[f.Z, f.Y, f.X, ai, prv] += av
+				State[f.Z, f.Y, f.X, bi, cur] += bv
+				State[f.Z, f.Y, f.X, bi, prv] += bv
+			}
+		}
+	}
+}
+
+// ComplexPacketConfig is [Sim.ComplexPacket] with wavelength and width from
+// [Config], and amp relative to [Config.Amplitude].
+func (ss *Sim) ComplexPacketConfig(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+	ss.ComplexPacket(posA, posB, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, ss.Config.Amplitude*amp)
 }
 
 // MovingWavePacketConfig is a version of [MovingWavePacket] that takes its

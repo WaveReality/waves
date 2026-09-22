@@ -22,7 +22,6 @@ func drSim(sz int32, init func(*Sim)) *Sim {
 	ss.Config.Size.Set(sz, sz, sz)
 	ss.ConfigSim()
 	ss.Params.ThreeD.SetBool(true)
-	ss.Params.Edges = EdgesWrap
 	ss.Params.Update()
 	ss.StateVars = DiracStatesN
 	ss.ConfigState()
@@ -169,5 +168,96 @@ func TestDiracFreeNoSpin(t *testing.T) {
 	t.Logf("free: spin direction dot product after 1000 steps = %.8f (|S| %.4g -> %.4g)", dot, n0, n)
 	if dot < 1-1e-6 {
 		t.Errorf("a free particle has no spin term: direction moved, dot = %g", dot)
+	}
+}
+
+// TestMovingWavePacket: the rewritten packet must actually travel, at the
+// lattice group velocity, instead of splitting into two halves going opposite
+// ways. A split packet has a centroid that barely moves, so the speed is a
+// decisive test of it.
+func TestMovingWavePacket(t *testing.T) {
+	const sz = 64
+	ss := drSim(sz, func(s *Sim) {
+		s.Config.Wavelength = 16
+		s.Config.PacketWidth = 16
+		s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+	})
+	p := ss.Params
+	k := 2 * math.Pi / float64(ss.Config.Wavelength)
+	kh := 2 * math.Sin(k/2)
+	m := math.Sqrt(float64(p.MOverHSq))
+	want := kh * math.Cos(k/2) / math.Sqrt(kh*kh+m*m) // in units of c
+	ctr := func() float64 {
+		var num, den float64
+		cur := int(GetCtx(0).CurState)
+		c := int(sz / 2)
+		for x := int32(1); x <= sz; x++ {
+			v := float64(State.Value(c, c, int(x), int(Dirac1As), cur))
+			num += v * v * float64(x)
+			den += v * v
+		}
+		return num / den
+	}
+	drStepExt(ss)
+	c0 := ctr()
+	nst := 30 // short enough that the packet cannot reach the wrapped edge
+	for range nst {
+		drStepExt(ss)
+	}
+	got := (ctr() - c0) / float64(nst) / float64(p.C)
+	t.Logf("packet centroid %.2f -> %.2f over %d steps: v = %.4f c, group velocity %.4f c",
+		c0, ctr(), nst, got, want)
+	if math.Abs(got/want-1) > 0.15 {
+		t.Errorf("packet speed %g c, want %g c: a split packet barely moves", got, want)
+	}
+}
+
+// TestSpinInPotential: the well must actually pull the lump toward it, and the
+// run must survive. An external field, so A0 stays exactly as set.
+func TestSpinInPotential(t *testing.T) {
+	const sz = 32
+	ss := drSim(sz, func(s *Sim) {
+		s.Config.PacketWidth = 4
+		SpinInPotential(s)
+	})
+	if ss.Params.SelfField.IsTrue() {
+		t.Errorf("SpinInPotential must leave SelfField off: the field is external")
+	}
+	ctr := func() float64 {
+		var num, den float64
+		cur := int(GetCtx(0).CurState)
+		c := int(sz / 2)
+		for x := int32(1); x <= sz; x++ {
+			v := float64(State.Value(c, c, int(x), int(DiracMag), cur))
+			num += v * float64(x)
+			den += v
+		}
+		return num / den
+	}
+	drStep := func() {
+		ctx := GetCtx(0)
+		ctx.StepInc()
+		RunDiracKernel(int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z))
+		RunMaxwellDampKernel(int(ctx.EdgesN()))
+		ss.RunStats(false)
+	}
+	drStep()
+	c0 := ctr()
+	a00 := float64(State.Value(int(sz/2), int(sz/2), int(sz/2)+3, int(A0s), int(GetCtx(0).CurState)))
+	for range 1500 {
+		drStep()
+	}
+	c1 := ctr()
+	a01 := float64(State.Value(int(sz/2), int(sz/2), int(sz/2)+3, int(A0s), int(GetCtx(0).CurState)))
+	well := float64(sz) / 2
+	t.Logf("lump centroid %.2f -> %.2f (well at %.1f), A0 probe %.5f -> %.5f", c0, c1, well, a00, a01)
+	if math.IsNaN(c1) {
+		t.Fatalf("blew up")
+	}
+	if math.Abs(a01-a00) > 1e-9 {
+		t.Errorf("the external field moved: %g -> %g", a00, a01)
+	}
+	if c1 >= c0 {
+		t.Errorf("the well should pull the lump in: centroid %g -> %g, well at %g", c0, c1, well)
 	}
 }

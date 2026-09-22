@@ -536,6 +536,7 @@ struct Parameters {
 	Hbar: f32,
 	Mass: f32,
 	VPotential: f32,
+	SelfField: i32,
 	EM: i32,
 	A0NoWave: i32,
 	E: f32,

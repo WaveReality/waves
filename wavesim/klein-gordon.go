@@ -405,6 +405,7 @@ func kgSelfScale(ss *Sim, frac float32) {
 // rather than a limitation of the simulation.
 func ChargeSelfField(ss *Sim) {
 	ss.Params.EM.SetBool(true)
+	ss.Params.SelfField.SetBool(true)
 	ss.Params.Edges = EdgesDamp
 	kgSelfScale(ss, 0.05)
 	ChargeAtRest(ss)
@@ -438,4 +439,4 @@ var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Waveleng
 
 // KGCShouldDisplay determines which Parameters fields to display for the
 // complex, optionally EM-coupled version.
-var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}

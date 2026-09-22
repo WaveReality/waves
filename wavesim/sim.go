@@ -274,8 +274,8 @@ func (ss *Sim) StepRun() {
 	case KleinGordon:
 		RunKleinGordonKernel(ns)
 	case KleinGordonC:
-		if ss.Params.EM.IsTrue() {
-			RunMaxwellKernel(ns) // reads the Charge / Current the KG wave wrote
+		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunKleinGordonCKernel(ns)
 	case Schrodinger:
@@ -283,7 +283,9 @@ func (ss *Sim) StepRun() {
 	case Maxwell:
 		RunMaxwellKernel(ns)
 	case Dirac:
-		RunMaxwellKernel(ns)
+		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
+		}
 		RunDiracKernel(ns)
 	case Electroweak:
 		// No MaxwellKernel here: ElectroweakKernel writes A0s..AZs itself, as

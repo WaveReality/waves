@@ -97,6 +97,13 @@ type Parameters struct {
 	// ensure stability with larger potential values.
 	VPotential float32
 
+	// SelfField determines whether the wave sources its own electromagnetic
+	// field, which runs MaxwellKernel from the Charge and Current it writes.
+	// Off, the field is whatever was put there at init and stays fixed: an
+	// EXTERNAL potential, which is the right setup for watching a wave be
+	// pushed around by something. Requires EM.
+	SelfField slbool.Bool
+
 	// EM determines if EM field coupling is activated.
 	EM slbool.Bool
 
