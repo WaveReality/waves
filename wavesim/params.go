@@ -186,13 +186,10 @@ type Parameters struct {
 
 	// MOverHSq = (Mass * C / Hbar)^2 is the mass drag factor in KleinGordon
 	// and related equations: the INVERSE REDUCED COMPTON WAVELENGTH squared,
-	// in units of 1/cube^2. The update applies it as
-	//	vel += CSq * (Laplacian + ... - MOverHSq*psi)
-	// which matches Klein-Gordon written as
-	//	d2psi/dt2 = c^2 [ Laplacian(psi) - (m c / hbar)^2 psi ]
-	// so the C^2 inside MOverHSq is required and is NOT the same as the outer
-	// CSq factor -- one converts mass to inverse length, the other converts
-	// the whole bracket to an acceleration.
+	// in 1/cube^2. Applied as vel += CSq * (Laplacian + ... - MOverHSq*psi),
+	// matching d2psi/dt2 = c^2 [Laplacian(psi) - (m c / hbar)^2 psi]. The C^2
+	// inside is NOT the outer CSq: one converts mass to inverse length, the
+	// other the bracket to an acceleration.
 	MOverHSq float32 `display:"-"`
 
 	// HSqOver2M = Hbar^2 / 2 Mass is the factor for Schrodinger's equation.
@@ -253,12 +250,10 @@ type Parameters struct {
 	MZ float32 `edit:"-"`
 
 	// SinThetaW, CosThetaW are sin and cos of the weak mixing angle,
-	//	tan(theta_W) = g'/g
-	// which rotates the (W^3, B) pair into the physical (Z, photon) pair:
+	// tan(theta_W) = g'/g, rotating (W^3, B) into the physical (Z, photon):
 	//	A_mu = sin(theta_W) W^3_mu + cos(theta_W) B_mu   (massless)
 	//	Z_mu = cos(theta_W) W^3_mu - sin(theta_W) B_mu   (mass m_Z)
-	// The photon direction is exactly the one that Q = T^3 + Y annihilates,
-	// which is why it stays massless.
+	// The photon direction is the one Q = T^3 + Y annihilates.
 	SinThetaW float32 `display:"-"`
 	CosThetaW float32 `display:"-"`
 

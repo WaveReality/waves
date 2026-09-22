@@ -12,9 +12,9 @@ import (
 	"cogentcore.org/core/math32"
 )
 
-// vwSim builds a state tensor of the given interior size and fills the chosen
-// variable with a value that encodes its own coordinates, so that any sampling
-// mistake shows up as the wrong cell rather than the wrong number.
+// vwSim builds a state tensor of given size, filling the chosen variable with
+// a value encoding its own coordinates, so a sampling mistake shows up as the
+// wrong cell rather than the wrong number.
 func vwSim(size math32.Vector3i, vr EWStates) *Sim {
 	ss := &Sim{}
 	ss.Config = &Config{}
@@ -39,10 +39,9 @@ func vwSim(size math32.Vector3i, vr EWStates) *Sim {
 	return ss
 }
 
-// vwCode packs a coordinate into one value, distinct per cell and small enough
-// that ValColor's fallback (clamp to +-1) leaves it untouched. The digits are
-// kept well separated because the color pipeline rescales through
-// 0.5*(v+1) and back, which costs a float32 several digits.
+// vwCode packs a coordinate into one value, distinct per cell and within
+// ValColor's +-1 clamp. Digits are well separated because the color pipeline
+// rescales through 0.5*(v+1) and back, costing a float32 several digits.
 func vwCode(x, y, z int32) float32 {
 	return float32(x*100+y*10+z) / 1000
 }
@@ -63,10 +62,9 @@ func vwView(ss *Sim, vr EWStates, depth math32.Dims, slice int32) *View {
 	return vw
 }
 
-// TestViewSliceMapping renders the height field directly and checks that every
-// vertex carries the value of the state cell it is supposed to: display X is
-// always state X, display depth is View.Depth, and the remaining dimension is
-// pinned at the slice level.
+// TestViewSliceMapping renders the height field and checks every vertex
+// carries its intended state cell: display X is state X, display depth is
+// View.Depth, and the rest is pinned at the slice level.
 func TestViewSliceMapping(t *testing.T) {
 	// deliberately unequal, so a swapped axis cannot pass by coincidence
 	size := math32.Vec3i(7, 5, 3)
@@ -124,7 +122,7 @@ func TestViewSliceMapping(t *testing.T) {
 }
 
 // TestViewDisplayVector: a state vector must point along the axis its own
-// dimension is drawn on, in either view.
+// dimension is drawn on.
 func TestViewDisplayVector(t *testing.T) {
 	v := math32.Vec3(1, 2, 3)
 	xz := (&View{Depth: math32.Z}).DisplayVector(v)

@@ -30,8 +30,7 @@ func ewSim(sz int32) *Sim {
 	State.SetZeros()
 	HiggsBroken(ss)
 	// Sim.Init does this for EdgesWrap; these tests drive the pieces directly.
-	// Fill and friends only touch interior cells, so any perturbation must be
-	// followed by a wrap -- otherwise the edges keep the old value and
+	// Fill only touches interior cells, so any perturbation needs a wrap or
 	// Laplacian19 sees a step at the boundary.
 	WrapEdges()
 	return ss

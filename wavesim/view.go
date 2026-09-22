@@ -60,12 +60,11 @@ type View struct {
 	// Size of planes
 	Size math32.Vector3i
 
-	// Depth is the state dimension drawn going back into the screen. Display X
-	// is always state X and the height is the value, so this picks the plane.
-	// [math32.Z] is the standard orientation and the default: the X-Z plane,
-	// sliced at a Y level. [math32.Y] gives X-Y sliced at a Z level, only
-	// useful for a flat sim with a single Z. The leftover dimension is
-	// [View.SliceDim], positioned by [View.Start].
+	// Depth is the state dimension drawn going back into the screen, which
+	// picks the plane: display X is always state X and height is the value.
+	// [math32.Z] is the standard orientation and default (X-Z sliced at a Y
+	// level); [math32.Y] gives X-Y sliced at Z, for a flat sim with a single
+	// Z. The leftover dimension is [View.SliceDim], positioned by Start.
 	Depth math32.Dims `set:"-"`
 
 	// parameters for the list of variables to view
@@ -277,7 +276,7 @@ func (vw *View) UpdateImpl() {
 		if pos != (math32.Vector3i{}) {
 			szh := vw.Size.DivScalar(2)
 			vw.Start = pos.Sub(szh)
-			// the slice dimension is not a corner: follow the particle exactly.
+			// the slice is not a corner: follow the particle exactly.
 			vw.Start.SetDim(vw.SliceDim(), pos.Dim(vw.SliceDim()))
 		}
 	}
@@ -517,8 +516,8 @@ func (vw *View) PlaneAtNumber(no int) *xyz.Group {
 	return pl.(*xyz.Group)
 }
 
-// SliceDim returns the state dimension held fixed by the current view: the
-// one that is neither horizontal (always X) nor [View.Depth].
+// SliceDim returns the state dimension held fixed: neither horizontal
+// (always X) nor [View.Depth].
 func (vw *View) SliceDim() math32.Dims {
 	if vw.Depth == math32.Z {
 		return math32.Y
@@ -531,10 +530,8 @@ func (vw *View) DepthSize() int32 {
 	return vw.Size.Dim(vw.Depth)
 }
 
-// SetDepth sets the state dimension drawn going back into the screen, which
-// selects the display plane, and re-centers the slice level on the dimension
-// that is now off screen. Only [math32.Y] and [math32.Z] are meaningful:
-// the horizontal axis is always state X.
+// SetDepth sets [View.Depth], selecting the display plane, and re-centers the
+// slice on the dimension now off screen. Only Y and Z are meaningful.
 func (vw *View) SetDepth(dim math32.Dims) {
 	if dim != math32.Y && dim != math32.Z {
 		return
@@ -548,10 +545,9 @@ func (vw *View) SetDepth(dim math32.Dims) {
 	vw.RebuildView()
 }
 
-// DisplayVector maps a state-space vector into display space, where X is
-// across, Y is up and Z goes back into the screen. In an X-Z view the two
-// already agree; in an X-Y view the state Y and Z components swap, so that a
-// vector always points along the axis its own dimension is drawn on.
+// DisplayVector maps a state vector into display space: X across, Y up, Z back
+// into the screen. X-Z views already agree; X-Y views swap Y and Z, so a vector
+// always points along the axis its own dimension is drawn on.
 func (vw *View) DisplayVector(v math32.Vector3) math32.Vector3 {
 	if vw.Depth == math32.Z {
 		return v
@@ -559,8 +555,8 @@ func (vw *View) DisplayVector(v math32.Vector3) math32.Vector3 {
 	return math32.Vec3(v.X, v.Z, v.Y)
 }
 
-// StateCoord returns the state coordinate sampled by the display cell xi
-// across and di back into the screen, given the already offset start corner.
+// StateCoord returns the state coordinate sampled by display cell xi across
+// and di back into the screen, from the already offset start corner.
 func (vw *View) StateCoord(st math32.Vector3i, xi, di int32) math32.Vector3i {
 	c := st
 	c.X = st.X + xi
@@ -613,8 +609,8 @@ func (vw *View) ZoomOutSize(n int32) {
 	vw.UpdateView()
 }
 
-// MoveSlice moves the slice plane by n along [View.SliceDim]: the one state
-// dimension that is not on screen.
+// MoveSlice moves the slice plane by n along [View.SliceDim], the one state
+// dimension not on screen.
 func (vw *View) MoveSlice(n int32) {
 	sd := vw.SliceDim()
 	sz := GetCtx(0).Size.V()
@@ -625,8 +621,8 @@ func (vw *View) MoveSlice(n int32) {
 	vw.UpdateView()
 }
 
-// MoveStart moves the displayed region within the slice plane, by mv.X across
-// and mv.Y back into the screen. Use [View.MoveSlice] to change which slice.
+// MoveStart pans within the slice plane: mv.X across, mv.Y back into the
+// screen. Use [View.MoveSlice] to change which slice.
 func (vw *View) MoveStart(mv math32.Vector3i) {
 	fs := GetCtx(0).SizeFull()
 	dd := vw.Depth

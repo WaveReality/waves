@@ -19,19 +19,19 @@ import "cogentcore.org/core/math32"
 //
 //	F^a_jk = d_j W^a_k - d_k W^a_j + g eps^abc W^b_j W^c_k
 //
-// The gauge-fixing term is the xi = 1 (Feynman) choice that the kernel's
-// equations of motion assume; together with the magnetic term it is what makes
-// the abelian part of -dU/dW come out as the plain Laplacian.
+// The gauge-fixing term is the xi = 1 (Feynman) choice the kernel assumes;
+// with the magnetic term it makes the abelian part of -dU/dW the plain
+// Laplacian.
 //
-// This is a host-side diagnostic, used by the tests to check that the kernel's
-// force really is -dU/dphi. It is NOT exact at finite lattice spacing, because
-// Laplacian19 and Gradient10 are not adjoint-compatible (their Fourier symbols
-// differ by O(k^2)); the agreement is a continuum-limit statement, which is
-// what TestElectroweakForceIsEnergyGradient measures.
+// A host-side diagnostic for checking the kernel's force is -dU/dphi. NOT
+// exact at finite spacing: Laplacian19 and Gradient10 are not adjoint
+// compatible (Fourier symbols differ by O(k^2)), so the agreement is a
+// continuum-limit statement, which TestElectroweakForceIsEnergyGradient
+// measures.
 //
-// Only W_0 = B_0 = 0 configurations are covered: with a time component present
-// the conserved functional is the indefinite Feynman-gauge one, whose cubic
-// term mixes kinetic and potential pieces.
+// Only W_0 = B_0 = 0 is covered: with a time component the conserved
+// functional is the indefinite Feynman-gauge one, whose cubic term mixes
+// kinetic and potential pieces.
 func ElectroweakStaticEnergy() float64 {
 	ctx := GetCtx(0)
 	p := &Params[0]
@@ -48,11 +48,10 @@ func ElectroweakStaticEnergy() float64 {
 }
 
 // ElectroweakStaticEnergyNear sums the energy over the 27 sites centred on
-// (x,y,z). Every stencil here reaches at most one cube, so the energy at a site
-// depends on the field only within +-1 of it: the derivative of the TOTAL
-// energy with respect to one site's value therefore lives entirely inside this
-// block. Summing locally makes the numerical-gradient check independent of the
-// boundary, so the test field does not have to be lattice-periodic.
+// (x,y,z). Every stencil reaches at most one cube, so the derivative of the
+// TOTAL energy w.r.t. one site lives entirely in this block. That makes the
+// numerical-gradient check boundary-independent, so the test field need not be
+// lattice-periodic.
 func ElectroweakStaticEnergyNear(x, y, z int32) float64 {
 	p := &Params[0]
 	tot := 0.0

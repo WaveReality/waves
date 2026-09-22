@@ -209,21 +209,13 @@ const InvSqrt2 = 0.70710678118654752440
 //	du = (g/2) W3 + g' Y B      or = (g/2) W1
 //	dd = -(g/2) W3 + g' Y B     oi = -(g/2) W2
 //
-// The opposite sign of W3 on the two diagonal entries is T^3 = +-1/2, and it
-// is the whole reason the upper and lower doublet components feel W3
-// oppositely while feeling B identically. Solving for the combination that
-// annihilates the vacuum is what picks out Q = T^3 + Y and leaves one
-// massless direction.
+// The opposite sign of W3 on the diagonal is T^3 = +-1/2: why the upper and
+// lower components feel W3 oppositely but B identically. The combination
+// annihilating the vacuum is Q = T^3 + Y, the one massless direction.
 //
-// This single operation is the entire content of the gauge coupling. The
-// covariant derivative is
-//
-//	D_mu Psi = d_mu Psi + EWGaugeAct(W_mu, B_mu, Psi)
-//
-// and the covariant Laplacian composes out of it (see the kernel).
-//
-// Psi is the doublet written as four real fields,
-// Psi = (X + iY, Z + iW) = sqrt(2) Phi, so Phi^dag Phi = |Psi|^2 / 2.
+// This one operation is the entire gauge coupling: D_mu Psi = d_mu Psi +
+// EWGaugeAct(W_mu, B_mu, Psi), and the covariant Laplacian composes from it.
+// Psi is the doublet as four reals, (X + iY, Z + iW) = sqrt(2) Phi.
 func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
 	hg := 0.5 * Params[0].GW
 	gy := Params[0].GpW * YPhi
@@ -325,8 +317,8 @@ func EWBorisRot3(v, om math32.Vector3) math32.Vector3 {
 //
 //	exp(i theta alpha) * (cos(theta |m|) I + i sin(theta |m|) mhat.sigma)
 //
-// The SU(2) part turns the doublet and the U(1) part is an overall phase --
-// exactly the parallel transport the connection generates.
+// The SU(2) part turns the doublet, the U(1) part is an overall phase: the
+// parallel transport the connection generates.
 func EWBorisPhase(w1, w2, w3, b, theta float32, v math32.Vector4) math32.Vector4 {
 	hg := 0.5 * Params[0].GW
 	m := math32.Vec3(hg*w1, hg*w2, hg*w3)
@@ -362,26 +354,24 @@ func EWBorisPhase(w1, w2, w3, b, theta float32, v math32.Vector4) math32.Vector4
 //
 // # Fields
 //
-// The Higgs doublet is carried as four real fields,
+// The Higgs doublet is four real fields,
 //
 //	Phi = (1/sqrt2) ( hsCa + i hsCb , hs0a + i hs0b )^T
 //
 // so mag = hsCa^2 + hsCb^2 + hs0a^2 + hs0b^2 = 2 Phi^dag Phi. The vacuum
-// <Phi> = (0, v/sqrt2)^T is hs0a = v with the other three zero. It MUST be the
-// neutral (lower) component: that is what makes Q = T^3 + Y annihilate the
-// vacuum and leaves the photon massless.
+// <Phi> = (0, v/sqrt2)^T is hs0a = v, rest zero. It MUST be the neutral
+// (lower) component, or Q = T^3 + Y does not annihilate the vacuum and the
+// photon gains mass.
 //
-// Each gauge field is a four-potential (0, X, Y, Z) with its own velocity,
-// exactly as in MaxwellKernel, and is evolved in Lorenz gauge where the
-// equation of motion is simply
+// Each gauge field is a four-potential (0, X, Y, Z) with its own velocity, as
+// in MaxwellKernel, evolved in Lorenz gauge:
 //
 //	box W^a_mu = j^a_mu,    box B_mu = j^Y_mu
 //
 // # Units
 //
-// Everything is in inverse cube units (1/cube). That is what makes g, g' and
-// lambda the bare dimensionless Standard Model numbers, needing no conversion
-// (see Units.Update).
+// Inverse cube units (1/cube) throughout, which is what makes g, g' and lambda
+// the bare dimensionless SM numbers (see Units.Update).
 //
 // # Yang-Mills self-coupling
 //
@@ -394,21 +384,19 @@ func EWBorisPhase(w1, w2, w3, b, theta float32, v math32.Vector4) math32.Vector4
 //	             - g eps^abc W^b_mu d^nu W^{c mu}            [transpose]
 //	             - g^2 eps^abc eps^cde (W^b.W^d) W^e_nu      [quartic]
 //
-// The three CUBIC signs are fixed by requiring the force to be -dU/dphi for the
-// standard energy with F^a_jk = d_j W^a_k - d_k W^a_j + g eps^abc W^b_j W^c_k;
-// see TestElectroweakForceIsEnergyGradient. They cannot be fixed by the
-// pure-gauge test alone, because flipping them also reverses the rotation sense
-// it predicts, so that test passes either way. The quartic sign is independent
-// and is checked exactly on uniform fields.
+// The three CUBIC signs are fixed by requiring force = -dU/dphi for the energy
+// with F^a_jk = d_j W^a_k - d_k W^a_j + g eps^abc W^b_j W^c_k; see
+// TestElectroweakForceIsEnergyGradient. The pure-gauge test cannot fix them:
+// flipping the signs also reverses the rotation sense it predicts, so it
+// passes either way. The quartic sign is independent, checked on uniform
+// fields.
 //
-// Note the divergence term is kept rather than dropped: unlike the abelian
-// case, d.W^a = 0 is NOT preserved by the non-abelian evolution, so it cannot
-// simply be imposed.
+// The divergence term is kept, not dropped: unlike the abelian case d.W^a = 0
+// is NOT preserved by the non-abelian evolution, so it cannot be imposed.
 //
-// Every term is quadratic or cubic in W, so all four vanish identically at
-// linear order and the boson spectrum is unchanged -- TestGaugeBosonMasses
-// passes with this on or off. What they add is the W self-interaction, i.e.
-// the difference between genuine SU(2) and three independent copies of U(1).
+// All four terms are quadratic or cubic in W, so they vanish at linear order
+// and leave the spectrum unchanged. What they add is the W self-interaction:
+// the difference between SU(2) and three copies of U(1).
 func ElectroweakKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -836,33 +824,31 @@ var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoW
 
 //////// initialization helpers
 
-// ewFreq returns the lattice angular frequency, in radians per step, for a
-// gauge wave of the given carrier wavelength and mass, both in cube units:
+// ewFreq returns the lattice angular frequency in radians per step, for a
+// gauge wave of given carrier wavelength and mass, both in cube units:
 //
 //	omega = c sqrt(khat^2 + m^2),  khat = 2 sin(k/2)
 //
-// khat rather than k because that is the wavenumber the discrete Laplacian
-// actually sees. Using k instead mistunes the packet by a few percent and
-// leaves a backward-moving remnant.
+// khat, not k: that is what the discrete Laplacian sees. Using k mistunes the
+// packet and leaves a backward-moving remnant.
 func ewFreq(ss *Sim, wavelength, mass float32) float32 {
 	k := TwoPi / wavelength
 	khat := 2 * math32.Sin(k/2)
 	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
 }
 
-// ewDemoScale raises the electroweak scale so m_W and m_Z are comparable to the
-// wavenumber of a packet a few tens of cubes long. At the Standard Model scale
-// the boson Compton wavelengths are about 22 cubes, so any visible packet is far
-// above threshold and a Z would travel at 0.97 c, which nobody can see. Raising
-// the scale is the only way to put the mass on screen. The couplings g and g'
-// are untouched, so the mixing angle and the m_W to m_Z ratio stay physical.
+// ewDemoScale raises the electroweak scale so m_W and m_Z are comparable to a
+// packet a few tens of cubes long. At the SM scale the boson Compton
+// wavelengths are ~22 cubes, so a visible packet is far above threshold and the
+// Z would run at 0.97 c. g and g' are untouched, so the mixing angle and
+// m_W / m_Z stay physical.
 func ewDemoScale(ss *Sim, mu float32) {
 	ss.Params.HiggsMu = mu
 	ss.Params.Update()
 }
 
-// ewVZero returns the zero-temperature vacuum value, mu/sqrt(lambda), which
-// stays the natural amplitude scale even when Temp has driven HiggsV to zero.
+// ewVZero returns the zero-temperature vacuum value, mu/sqrt(lambda): still
+// the natural amplitude scale when Temp has driven HiggsV to zero.
 func ewVZero(ss *Sim) float32 {
 	p := ss.Params
 	if p.HiggsLambda <= 0 {
@@ -942,36 +928,25 @@ func ZPulse(ss *Sim) {
 	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om)
 }
 
-// WCollision fires two W packets at each other and shows them interact.
+// WCollision fires two W packets at each other. They do not bounce -- gauge
+// fields pass through each other -- but the Yang-Mills eps^abc W^b W^c term
+// means a W^1 and a W^2 generate W^3 where they overlap, out of nothing. Turn
+// off Params.YangMills and they cross without a trace: that is the whole
+// difference between SU(2) and three copies of U(1).
 //
-// They do not bounce like billiard balls; gauge fields pass through each other.
-// What happens instead is the signature of the NON-ABELIAN coupling. The
-// Yang-Mills term carries eps^abc W^b W^c, so a W^1 packet and a W^2 packet
-// overlapping generate W^3 where they meet, out of nothing. Turn off
-// Params.YangMills and the two cross without a trace, which is exactly the
-// difference between SU(2) and three separate copies of U(1).
+// Watch W3Xs, and ZX built from it. X, not Y: both packets are polarised along
+// Y and travel along X, so W^{b mu} d_mu vanishes and the transport term is
+// silent. The surviving transpose term sources the LONGITUDINAL W^3_x, which
+// for a massive vector is physical -- the eaten Goldstone. A single packet
+// generates exactly zero. With wrapped edges the pair re-collides every lap,
+// so the signal accumulates rather than peaking.
 //
-// Watch EWW3Xs, and EWZX which is built from it. Note X, not Y: both packets
-// are transversely polarised along Y and travel along X, so W^{b mu} d_mu
-// vanishes identically -- nothing varies along the polarisation -- and the
-// transport term is silent. What survives is the transpose term, which sources
-// the LONGITUDINAL W^3_x. For a massive vector that mode is physical: it is
-// the eaten Goldstone.
-//
-// A single packet on its own generates exactly zero, so what appears really is
-// the two fields coupling and not one of them self-interacting. With wrapped
-// edges the pair re-collides every lap, so the signal accumulates rather than
-// peaking once.
-//
-// It sets its own envelope width instead of taking Config.PacketWidth: the
-// packets start 40% of the box apart, and the shared default of 1.5 wl leaves
-// them already overlapping at half amplitude before the first step. Measured
-// on a 100-wide box, 1.5 wl gives 50% overlap at t=0, 1.2 wl gives 34%, and
-// 0.75 wl gives 6% -- the first that looks like a collision.
-//
-// The amplitude is large because the source is quadratic in W. That is also
-// what pays for the narrow envelope: 1.5 wl -> 0.75 wl costs 260x, and 0.1 v
-// -> 0.25 v wins back 6x.
+// The envelope width is set here rather than from Config.PacketWidth: the
+// packets start 40% of the box apart, and the 1.5 wl default has them already
+// overlapping at half amplitude. On a 100-wide box 1.5 wl gives 50% overlap at
+// t=0, 1.2 wl 34%, 0.75 wl 6% -- the first that looks like a collision. The
+// large amplitude pays for that: the source is quadratic in W, so 0.1 v ->
+// 0.25 v wins back 6x of the 260x the narrower envelope costs.
 func WCollision(ss *Sim) {
 	ewDemoScale(ss, 0.388)
 	HiggsBroken(ss)

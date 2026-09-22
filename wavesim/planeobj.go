@@ -23,10 +23,9 @@ type PlaneObj struct {
 	view    *View
 }
 
-// planeScale returns the extent of the plane grid and the scale factors that
-// fit it into the view box. sz.X is the horizontal extent and sz.Y the extent
-// going back into the screen ([View.DepthSize], not necessarily state Y);
-// correspondingly nsc.X and nsc.Y are the horizontal and depth scales.
+// planeScale returns the plane grid extent and the scale factors fitting it
+// into the view box. sz.X is horizontal, sz.Y is depth into the screen
+// ([View.DepthSize], not necessarily state Y); nsc.X and nsc.Y match.
 func (vw *View) planeScale() (sz math32.Vector3i, nsc math32.Vector3) {
 	npanels := vw.Settings.NPanels.N()
 	sz = vw.Size

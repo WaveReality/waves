@@ -341,18 +341,15 @@ func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims
 
 // SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
 // its velocity: a cosine carrier under a Gaussian envelope along dim, centered
-// at ctr and uniform across the other two dimensions. A slab rather than a
-// blob, so it does not diffract and the propagation speed stays unambiguous to
-// the eye.
+// at ctr and uniform across the other two dims. A slab, not a blob, so it does
+// not diffract and the speed stays unambiguous to the eye.
 //
-// The velocity is the point. For psi = env(d) cos(k d - om t) the initial time
-// derivative is om env sin(k d), and dir flips it for the other direction.
-// Setting only the position would split the packet into two halves running
-// opposite ways at half amplitude each.
+// The velocity is the point: for psi = env(d) cos(k d - om t) the initial time
+// derivative is om env sin(k d), with dir flipping the direction. Setting only
+// the position splits it into two halves running opposite ways.
 //
-// dim is normally [math32.X], the horizontal display axis, so the packet runs
-// across the screen; pos should then be a TRANSVERSE component, normally Y,
-// which the X-Z view draws along the vertical.
+// dim is normally [math32.X], the horizontal display axis; pos should then be
+// a TRANSVERSE component, normally Y, which the X-Z view draws vertically.
 func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, width, amp, dir, om float32) {
 	pi := int(pos.Int64())
 	vi := int(vel.Int64())
@@ -388,8 +385,9 @@ func (ss *Sim) SlabPacketConfig(pos, vel EWStates, dim math32.Dims, ctr, amp, di
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om)
 }
 
-// SmoothNoise seeds a state variable with smooth random fluctuation: a sum of a few
-// long-wavelength modes rather than per-site white noise.
+// SmoothNoise seeds a state variable with a sum of a few long-wavelength modes
+// rather than per-site white noise, which would put power at the lattice
+// cutoff and destabilize a nonlinear solver.
 func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)

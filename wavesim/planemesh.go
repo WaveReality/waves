@@ -10,15 +10,11 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
-// PlaneMesh is a xyz.Mesh that represents one slice plane through the state,
-// as either a Heightfield or bars.
-// It is dynamically updated using the Set method.
-// The geometry is literal in the size:
-// 0,0,0 lower-left corner, increasing display X to the right and increasing
-// display -Z going back into the screen. Which state dimensions those are is
-// [View.Depth]: display X is always state X, and display depth is state Z for
-// an X-Z view or state Y for an X-Y view.
-// Display applies an overall scaling to make it fit within the larger view.
+// PlaneMesh is a xyz.Mesh for one slice plane through the state, as either a
+// Heightfield or bars, dynamically updated via Set.
+// The geometry is literal in the size: 0,0,0 lower-left corner, display X to
+// the right and display -Z going back into the screen. [View.Depth] says which
+// state dimensions those are. Display scales it to fit the larger view.
 type PlaneMesh struct {
 	xyz.MeshBase
 
@@ -312,8 +308,7 @@ func (pm *PlaneMesh) SetVectors(vtxAry, normAry, texAry, clrAry math32.ArrayF32,
 			vx := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri, tidx)
 			vy := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri+1, tidx)
 			vz := State.Value(int(sc.Z), int(sc.Y), int(sc.X), vri+2, tidx)
-			// the arrow is drawn in DISPLAY space, so the components have to be
-			// permuted the same way the positions are.
+			// drawn in DISPLAY space: permute like the positions.
 			ed := pm.view.DisplayVector(math32.Vec3(vx, vy, vz))
 			d := ed.Length()
 			ned := ed

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// cfgSim builds a sim big enough for a travelling packet, then runs one of the
+// cfgSim builds a sim big enough for a travelling packet and runs one of the
 // ElectroweakConfigs init functions on it.
 func cfgSim(sz int32, init func(*Sim)) *Sim {
 	ss := &Sim{}
@@ -24,8 +24,8 @@ func cfgSim(sz int32, init func(*Sim)) *Sim {
 	return ss
 }
 
-// cfgCentroid returns the energy-weighted X centroid of a state variable,
-// which tracks the packet even as it disperses.
+// cfgCentroid is the energy-weighted X centroid of a state variable, which
+// tracks the packet as it disperses.
 func cfgCentroid(sz int32, vr int32) float64 {
 	var num, den float64
 	cur := int(GetCtx(0).CurState)
@@ -84,9 +84,9 @@ func TestConfigHiggsSymmetric(t *testing.T) {
 	}
 }
 
-// cfgSpeed runs one of the pulse configs at a given Config.Amplitude and
-// returns the packet speed in units of c, plus the lowest fraction of the
-// vacuum |Phi|^2 found under the packet along the way.
+// cfgSpeed runs a pulse config at a given Config.Amplitude, returning the
+// packet speed in units of c and the lowest fraction of vacuum |Phi|^2 seen
+// under the packet.
 func cfgSpeed(sz int32, init func(*Sim), probe int, amp float32, nst int) (vc, hfrac float64) {
 	ss := cfgSim(sz, func(s *Sim) {
 		s.Config.Amplitude = amp
@@ -94,14 +94,12 @@ func cfgSpeed(sz int32, init func(*Sim), probe int, amp float32, nst int) (vc, h
 	})
 	v2 := float64(ss.Params.HiggsV) * float64(ss.Params.HiggsV)
 	hfrac = math.Inf(1)
-	// the probe variables are written BY the kernel, so they are still zero
-	// before the first step: take the baseline after one step, not before.
+	// probes are kernel-written: baseline after one step, not before.
 	ewStep(ss)
 	c0 := cfgCentroid(sz, int32(probe))
 	for range nst {
 		ewStep(ss)
-		// |Phi|^2 weighted by the local packet intensity: what the packet
-		// itself sits in, not the box average.
+		// weighted by local packet intensity: what the packet sits in.
 		var num, den float64
 		cur := int(GetCtx(0).CurState)
 		for x := int32(1); x <= sz; x++ {
@@ -118,24 +116,19 @@ func cfgSpeed(sz int32, init func(*Sim), probe int, amp float32, nst int) (vc, h
 	return (c1 - c0) / float64(nst) / float64(ss.Params.C), hfrac
 }
 
-// cfgGroupVel is the lattice group velocity in units of c, for a carrier of
-// the given wavelength and a field of the given mass. omega = c sqrt(khat^2 +
-// m^2) with khat = 2 sin(k/2), so dom/dk = c khat cos(k/2) / sqrt(khat^2+m^2).
-// The cos(k/2) is why even a massless packet comes out slightly subluminal.
+// cfgGroupVel is the lattice group velocity in units of c: from omega =
+// c sqrt(khat^2 + m^2) with khat = 2 sin(k/2), dom/dk = c khat cos(k/2) /
+// sqrt(khat^2+m^2). The cos(k/2) is why even a massless packet is subluminal.
 func cfgGroupVel(wavelength, mass float64) float64 {
 	k := 2 * math.Pi / wavelength
 	kh := 2 * math.Sin(k/2)
 	return kh * math.Cos(k/2) / math.Sqrt(kh*kh+mass*mass)
 }
 
-// TestConfigPulseSpeeds: the photon packet must travel at c and the Z packet
-// measurably slower, at its group velocity.
-//
-// This runs at a small Config.Amplitude, because the tree-level group velocity
-// is a statement about a LINEAR wave on an undisturbed vacuum. The configs
-// themselves default to amplitude 1 so they read at the GUI's display scale,
-// and there the Z is large enough to move the condensate it travels through;
-// TestPulseCondensateBackReaction covers that regime.
+// TestConfigPulseSpeeds: the photon must travel at c and the Z measurably
+// slower, at its group velocity. Runs at small Config.Amplitude, since the
+// tree-level velocity describes a LINEAR wave on an undisturbed vacuum; the
+// configs default to 1, covered by TestPulseCondensateBackReaction.
 func TestConfigPulseSpeeds(t *testing.T) {
 	const sz = 96
 	const amp = 0.02
@@ -149,8 +142,7 @@ func TestConfigPulseSpeeds(t *testing.T) {
 		{"photon", PhotonPulse, int(AYs), func(p *Parameters) float64 { return 0 }},
 		{"Z", ZPulse, int(EWZY), func(p *Parameters) float64 { return float64(p.MZ) }},
 	} {
-		// the carrier comes from Config, which ElectroweakConfig sets, so the
-		// prediction tracks whatever the config chooses rather than a literal.
+		// carrier from Config, so the prediction tracks it, not a literal.
 		ss := cfgSim(sz, func(s *Sim) {})
 		wl := float64(ss.Config.Wavelength)
 		m := tc.mass(ss.Params)
@@ -167,9 +159,8 @@ func TestConfigPulseSpeeds(t *testing.T) {
 		if math.Abs(got/wantV-1) > 0.08 {
 			t.Errorf("%s speed %g c, want %g c", tc.name, got, wantV)
 		}
-		// The lattice already puts a massless packet at cos(k/2) = 0.98 c, and
-		// the finite packet loses a few percent more to dispersion; the point
-		// is that it is near c and far above the Z.
+		// the lattice alone puts a massless packet at cos(k/2) = 0.98 c, and
+		// the finite packet loses a few percent more to dispersion.
 		if m == 0 && got < 0.9 {
 			t.Errorf("photon should move at essentially c: %g c", got)
 		}
@@ -177,24 +168,20 @@ func TestConfigPulseSpeeds(t *testing.T) {
 			t.Errorf("Z should be visibly subluminal, got %g c", got)
 		}
 	}
-	// the claim the demo makes, and the one that holds at any amplitude
+	// the demo's claim, and the one that holds at any amplitude
 	if speed[1] > speed[0]-0.1 {
 		t.Errorf("Z at %.4f c should lag the photon at %.4f c by a clear margin",
 			speed[1], speed[0])
 	}
 }
 
-// TestPulseCondensateBackReaction measures what the pulses do to the condensate
-// they travel through.
-//
-// Q annihilates the photon direction, so a photon packet costs the condensate
-// nothing however large: at amplitude 1 it is many times v, |Phi|^2 does not
-// move, and its speed matches the linear regime. That is exact masslessness
-// shown directly rather than inferred from a speed.
-//
-// The Z direction does not, so a packet comparable to v partially restores the
-// symmetry under itself, loses mass and speeds up -- which is why the
-// tree-level group velocity only applies to a small Z.
+// TestPulseCondensateBackReaction measures what the pulses do to the
+// condensate they travel through. Q annihilates the photon direction, so a
+// photon packet costs it nothing however large: at amplitude 1 the packet is
+// many times v, |Phi|^2 does not move and the speed matches the linear regime
+// -- exact masslessness shown directly rather than inferred. The Z direction
+// does not, so a packet comparable to v partially restores the symmetry under
+// itself, loses mass and speeds up.
 func TestPulseCondensateBackReaction(t *testing.T) {
 	const sz = 96
 	for _, tc := range []struct {
@@ -237,11 +224,9 @@ func TestConfigWCollision(t *testing.T) {
 			s.Params.Update()
 			WCollision(s)
 		})
-		// Sum over ALL FOUR W^3 components. Both packets are transversely
-		// polarised along y and travel along x, so W^{b mu} d_mu vanishes
-		// identically (nothing varies along the polarisation) and the transport
-		// term is silent. What survives is the transpose term, which sources the
-		// LONGITUDINAL W^3_x -- probing only W^3_y finds nothing.
+		// all FOUR W^3 components: the packets are polarised along y and
+		// travel along x, so the transport term is silent and what survives
+		// sources the LONGITUDINAL W^3_x. Probing W^3_y alone finds nothing.
 		w3 := func() float64 {
 			t := 0.0
 			for c := int32(0); c < 4; c++ {
