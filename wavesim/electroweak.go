@@ -884,42 +884,16 @@ func HiggsBroken(ss *Sim) {
 
 // HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,
 // and lets the field fall off the top of the Mexican hat into the broken vacuum.
+// Any deviation of \Phi off of 0 is enough to knock it off of the unstable maximum.
 //
-// Phi = 0 is an exact equilibrium: the force is (mu^2 - lambda |Phi|^2) Phi,
-// which vanishes there. It is also the MAXIMUM of the potential, hence unstable,
-// so without a seed the simulation would sit on it forever. The noise is what
-// lets it fall.
+// Adjusting Temp around TempCrit changes the shape of the potential: if above
+// TempCrit then it is symmetric and the zero remains stable, not unstable.
 //
-// Watch EWHmag climb from 0 to v^2. It overshoots and rings rather than settling,
-// because nothing here dissipates: the potential energy released on the way
-// down, lambda v^4 / 4 per site, has nowhere to go. In the early universe Hubble
-// expansion drained it, and there is no equivalent in a fixed box. Different
-// regions also fall in different internal directions, so phase domains form and
-// their boundaries stay visible.
-//
-// Needs Params.A0NoWave on, which is the default. The rolling Higgs sources the
-// gauge scalar potentials, and that sector carries a secular gauge branch that
-// otherwise drifts without bound and takes the run with it.
+// EWHmag climbs from 0 to v^2, but overshoots and rings rather than settling,
+// because nothing here dissipates. In the early universe Hubble
+// expansion drained it, and there is no equivalent in a fixed box.
+// Note: it takes a while, around 700 time steps at default params.
 func HiggsSymmetric(ss *Sim) {
-	amp := 0.02 * ewVZero(ss)
-	ss.SmoothNoise(EWHsCa, amp, 6)
-	ss.SmoothNoise(EWHsCb, amp, 6)
-	ss.SmoothNoise(EWHs0a, amp, 6)
-	ss.SmoothNoise(EWHs0b, amp, 6)
-}
-
-// ThermalQuench starts above TempCrit, in the symmetric phase, and waits for
-// you to cool it. Above TempCrit the origin is a genuine minimum, not the top
-// of a hat, so unlike HiggsSymmetric this sits still until you act.
-//
-// Drag Temp down through TempCrit and watch HiggsV, MW and MZ come off zero
-// together. Regions pick different internal directions, leaving domain walls.
-// Dropping straight to zero quenches instead, with more ringing and more
-// surviving domains. The noise is what the transition amplifies.
-func ThermalQuench(ss *Sim) {
-	p := ss.Params
-	p.Temp = 1.25 * p.TempCrit
-	p.Update()
 	amp := 0.02 * ewVZero(ss)
 	ss.SmoothNoise(EWHsCa, amp, 6)
 	ss.SmoothNoise(EWHsCb, amp, 6)
@@ -932,11 +906,7 @@ func ThermalQuench(ss *Sim) {
 //
 // The packet is written in the PHYSICAL basis: the photon is the combination
 // sin(theta_W) W^3 + cos(theta_W) B, the direction that Q = T^3 + Y annihilates,
-// so the condensate gives it no mass and it moves at c. Watch AYs, which the
-// kernel reconstructs from the gauge fields every step.
-//
-// Along X because X is horizontal in every view, polarized along Y because the
-// X-Z view draws that as the vertical: a transverse wave then looks like one.
+// so the condensate gives it no mass and it moves at c. Watch AYs.
 func PhotonPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
@@ -949,24 +919,15 @@ func PhotonPulse(ss *Sim) {
 }
 
 // ZPulse sends a Z boson pulse along X, which travels SLOWER than light.
-//
-// Same construction as PhotonPulse but in the orthogonal combination,
-// cos(theta_W) W^3 - sin(theta_W) B. That direction does not annihilate the
-// vacuum, so it takes mass m_Z from the condensate and the packet moves at the
-// group velocity
+// Because Z is cos(theta_W) W^3 - sin(theta_W) B, that direction does not
+// annihilate the vacuum, so it takes mass m_Z from the condensate and the
+// packet moves at the group velocity:
 //
 //	v_g = c khat / sqrt(khat^2 + m_Z^2)
 //
-// which would be about 0.70 c here, against 0.98 c for the photon at the same
-// carrier wavelength (the lattice makes even a massless packet slightly
-// subluminal). Run this and PhotonPulse back to back and the lag is obvious.
-// Watch EWZY.
-//
-// The measured speed is nearer 0.75 c at the default [Config.Amplitude] of 1,
-// because there the packet is comparable to v: it melts the condensate it
+// which would be about 0.70 c here, vs 0.98 c for the photon. Watch ZY.
+// With the default [Config.Amplitude] of 1, it melts the condensate it
 // passes through to about a third of vacuum, and a lighter Z travels faster.
-// At Amplitude 0.02 it sits on the tree-level velocity to within 1%. The
-// photon is immune at any amplitude, since Q annihilates the vacuum.
 //
 // Note this raises the Higgs scale, for the reason given in ewDemoScale.
 func ZPulse(ss *Sim) {
@@ -1026,7 +987,6 @@ func WCollision(ss *Sim) {
 var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
-	InitFunc{Name: "Thermal Quench", Doc: "Starts above the critical temperature where the symmetry is unbroken and the field is stable at zero; lower Temp through TempCrit to watch the electroweak phase transition happen", Func: ThermalQuench},
 	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
 	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
