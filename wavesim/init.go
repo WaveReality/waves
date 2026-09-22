@@ -24,6 +24,13 @@ type InitFunc struct {
 	Func func(sim *Sim)
 }
 
+// WrapEdges re-wraps the edges. This is called automatically in Init for
+// EdgesWrap case.
+func WrapEdges() {
+	ctx := GetCtx(0)
+	RunEdgesWrapKernel(int(ctx.EdgesN()))
+}
+
 // CopyCurToPrev copies the current values to previous values
 // for all variables.
 func (ss *Sim) CopyCurToPrev() {
@@ -328,6 +335,48 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 // wavelength and width variables from [Config]
 func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
 	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
+}
+
+// SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
+// its velocity: a cosine carrier under a Gaussian envelope along Z, uniform
+// across X and Y. A slab rather than a blob, so it does not diffract and the
+// propagation speed stays unambiguous to the eye.
+//
+// The velocity is the point. For psi = env(z) cos(k z - om t) the initial time
+// derivative is om env sin(k z), and dir flips it for the other direction.
+// Setting only the position would split the packet into two halves running
+// opposite ways at half amplitude each.
+func (ss *Sim) SlabPacket(pos, vel EWStates, ctrZ, wavelength, width, amp, dir, om float32) {
+	pi := int(pos.Int64())
+	vi := int(vel.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	k := TwoPi / wavelength
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		dz := float32(c.Z) - ctrZ
+		g := dz / width
+		env := amp * math32.FastExp(-g*g)
+		pv := env * math32.Cos(k*dz)
+		vv := dir * om * env * math32.Sin(k*dz)
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(cur))
+				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(prv))
+				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(cur))
+				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
+			}
+		}
+	}
+}
+
+// SlabPacketConfig is a version of [SlabPacket] that takes its
+// wavelength and width variables from [Config]
+func (ss *Sim) SlabPacketConfig(pos, vel EWStates, ctrZ, amp, dir, om float32) {
+	ss.SlabPacket(pos, vel, ctrZ, ss.Config.Wavelength, ss.Config.PacketWidth, amp, dir, om)
 }
 
 // InvR adds 1/r values radiating from given center point,

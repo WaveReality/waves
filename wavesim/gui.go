@@ -173,7 +173,7 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	gui.Files.Tabber = tabs
 
 	split.SetTiles(core.TileSplit, core.TileSpan)
-	split.SetSplits(.2, .5, .8)
+	split.SetSplits(.2, .2, .8)
 }
 
 // AddView adds View in tab with given name
@@ -201,9 +201,10 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 	})
 	tree.AddAt(p, "Init", func(w *core.Button) {
 		w.SetText("Init").SetIcon(icons.Update).
-			SetTooltip("Run simulation until Stop").OnClick(func(e events.Event) {
+			SetTooltip("Initialize simulation, using current configuration").OnClick(func(e events.Event) {
 			if !gui.IsRunning() {
 				gui.sim.Init()
+				gui.SimForm.Update()
 				go gui.sim.UpdateView()
 			}
 		})

@@ -212,15 +212,15 @@ func (ss *Sim) FromUnits() { //types:add
 // Init initializes the state and prepares everything for running.
 func (ss *Sim) Init() {
 	ss.InitRandSeed(0) // todo: run param
-	// The GUI Form calls Params.Update itself after an edit, but programmatic
-	// paths (RunNoGUI, tests, anything setting Params directly) have no such
-	// hook, and InitFunc below reads derived values such as HiggsV.
 	ss.Params.Update()
 	ctx := GetCtx(0)
 	ctx.Init()
 	State.SetZeros()
 	if ss.InitFunc != nil {
 		ss.InitFunc(ss)
+	}
+	if ss.Params.Edges == EdgesWrap {
+		WrapEdges()
 	}
 	ToGPUTensorStrides()
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, ParticlesVar, StateVar)

@@ -132,6 +132,11 @@ type Parameters struct {
 	// value 0.6533. Sets m_W = g v / 2.
 	GW float32
 
+	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
+	// the B field to the Higgs doublet. Dimensionless. Standard Model value
+	// 0.3500. Together with g it sets the weak mixing angle and m_Z.
+	GpW float32
+
 	// YangMills enables the Yang-Mills self-coupling of the W fields: the
 	// terms that make SU(2) genuinely non-abelian rather than three
 	// independent copies of U(1). They are quadratic and cubic in W, so they
@@ -147,11 +152,6 @@ type Parameters struct {
 	// is norm-preserving by construction. Second-order accurate, and costs one
 	// extra force split (no extra neighbor reads).
 	Boris slbool.Bool
-
-	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
-	// the B field to the Higgs doublet. Dimensionless. Standard Model value
-	// 0.3500. Together with g it sets the weak mixing angle and m_Z.
-	GpW float32
 
 	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
 	Diff float32

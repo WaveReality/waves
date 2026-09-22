@@ -29,7 +29,7 @@ func ewSim(sz int32) *Sim {
 	ctx := GetCtx(0)
 	ctx.Init()
 	State.SetZeros()
-	ss.ElectroweakInit()
+	HiggsBroken(ss)
 	return ss
 }
 
@@ -716,7 +716,7 @@ func TestMixedBasisPropagation(t *testing.T) {
 		p.Update()
 		State.SetZeros()
 		GetCtx(0).Init()
-		ss.ElectroweakInit()
+		HiggsBroken(ss)
 		tc.setup(p, eps)
 		ewWrap()
 

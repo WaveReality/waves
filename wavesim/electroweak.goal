@@ -5,6 +5,8 @@
 package wavesim
 
 import (
+	"math/rand/v2"
+
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/gosl/slmath"
 )
@@ -644,11 +646,12 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	// Omega for the Boris rotation of the W velocities: the transport term is
 	// dv/dt = v x Omega with Omega = -2 g c W_0.
 	omW := math32.Vec3(w10, w20, w30).MulScalar(-2 * Params[0].GW * Params[0].C)
-	EWWStep(x, y, z, cur, prv, 0, csq, omW, math32.Vec3(j0.X+ym0.X, j0.Y+ym0.Y, j0.Z+ym0.Z), boris)
-	EWWStep(x, y, z, cur, prv, 1, csq, omW, math32.Vec3(jx.X+ymx.X, jx.Y+ymx.Y, jx.Z+ymx.Z), boris)
-	EWWStep(x, y, z, cur, prv, 2, csq, omW, math32.Vec3(jy.X+ymy.X, jy.Y+ymy.Y, jy.Z+ymy.Z), boris)
-	EWWStep(x, y, z, cur, prv, 3, csq, omW, math32.Vec3(jz.X+ymz.X, jz.Y+ymz.Y, jz.Z+ymz.Z), boris)
-	EWGaugeStep(x, y, z, cur, prv, int32(EWB0s), csq, j0.W, jx.W, jy.W, jz.W)
+	nw := Params[0].A0NoWave.IsTrue()
+	EWWStep(x, y, z, cur, prv, 0, csq, omW, math32.Vec3(j0.X+ym0.X, j0.Y+ym0.Y, j0.Z+ym0.Z), boris, nw)
+	EWWStep(x, y, z, cur, prv, 1, csq, omW, math32.Vec3(jx.X+ymx.X, jx.Y+ymx.Y, jx.Z+ymx.Z), boris, nw)
+	EWWStep(x, y, z, cur, prv, 2, csq, omW, math32.Vec3(jy.X+ymy.X, jy.Y+ymy.Y, jy.Z+ymy.Z), boris, nw)
+	EWWStep(x, y, z, cur, prv, 3, csq, omW, math32.Vec3(jz.X+ymz.X, jz.Y+ymz.Y, jz.Z+ymz.Z), boris, nw)
+	EWGaugeStep(x, y, z, cur, prv, int32(EWB0s), csq, j0.W, jx.W, jy.W, jz.W, nw)
 
 	// ---- Higgs update ------------------------------------------------------
 	var hvN math32.Vector4
@@ -716,7 +719,7 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 // With Boris on, the velocity-dependent transport term -- which is exactly
 // dv/dt = v x Omega with Omega = -2 g c W_0 -- is applied as a true rotation
 // between two half kicks, instead of being lumped into the explicit force.
-func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, boris bool) {
+func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, boris, noWave bool) {
 	vs := int32(EWW10s) + nu
 	vv := int32(EWW10v) + nu
 	p1 := State[z, y, x, vs, prv]
@@ -731,7 +734,15 @@ func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, b
 	q3 := State[z, y, x, vv+16, prv]
 	v := math32.Vec3(q1, q2, q3)
 	var vn math32.Vector3
-	if boris {
+	if noWave && nu == 0 {
+		// Params.A0NoWave: drive the SCALAR potential straight from the force
+		// rather than accumulating it into a velocity. The nu = 0 sector is the
+		// gauge direction, whose linearised system has a degenerate eigenvalue
+		// and so carries a secular (A + B t) branch -- it drifts without bound
+		// even though the physics does not. Dropping its wave dynamics is the
+		// same Sommerfeld-style fix MaxwellKernel already uses for A0.
+		vn = f
+	} else if boris {
 		h := f.MulScalar(0.5)
 		vn = EWBorisRot3(v.Add(h), om).Add(h)
 	} else {
@@ -753,7 +764,7 @@ func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, b
 // which is box A_mu = j_mu in Lorenz gauge -- the same equation MaxwellKernel
 // solves for the photon, with the electroweak current in place of the
 // electromagnetic one. No mass term appears here or anywhere else.
-func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32) {
+func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32, noWave bool) {
 	for ki := range 4 {
 		k := int32(ki)
 		vs := v0 + k
@@ -773,6 +784,9 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32) {
 		vp := State[z, y, x, vv, prv]
 		f := csq * (Laplacian19(x, y, z, vs, prv, ps) + jc)
 		vc := vp + f
+		if noWave && ki == 0 {
+			vc = f // see EWWStep: the scalar potential is the gauge direction
+		}
 		State[z, y, x, vv, cur] = vc
 		State[z, y, x, vs, cur] = ps + vc
 	}
@@ -825,8 +839,189 @@ func HiggsBroken(ss *Sim) {
 }
 
 // ElectroweakDisplay determines which Parameters fields to display.
-var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "EM", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda"}
+var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "GW", "GpW", "YangMills", "Boris"}
+//////// initialization helpers
+
+// ewFreq returns the lattice angular frequency, in radians per step, for a
+// gauge wave of the given carrier wavelength and mass, both in cube units:
+//
+//	omega = c sqrt(khat^2 + m^2),  khat = 2 sin(k/2)
+//
+// khat rather than k because that is the wavenumber the discrete Laplacian
+// actually sees. Using k instead mistunes the packet by a few percent and
+// leaves a backward-moving remnant.
+func ewFreq(ss *Sim, wavelength, mass float32) float32 {
+	k := TwoPi / wavelength
+	khat := 2 * math32.Sin(k/2)
+	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
+}
+
+// ewNoise seeds a state variable with smooth random fluctuation: a sum of a few
+// long-wavelength modes rather than per-site white noise.
+//
+// White noise would be the obvious choice and is the wrong one. It carries equal
+// power at every wavenumber including the lattice cutoff, which is both
+// unphysical -- nothing in the continuum theory excites the grid scale -- and
+// the fastest way to destabilise a nonlinear solver. Using whole numbers of
+// wavelengths per box also keeps the seed periodic, which matters with wrapped
+// edges.
+func ewNoise(ss *Sim, vr EWStates, amp float32, nmodes int, rnd *rand.Rand) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	ma := amp / math32.Sqrt(float32(nmodes))
+	for range nmodes {
+		nx := float32(rnd.IntN(3) + 1)
+		ny := float32(rnd.IntN(3) + 1)
+		nz := float32(rnd.IntN(3) + 1)
+		ph := TwoPi * rnd.Float32()
+		kx := TwoPi * nx / float32(sz.X)
+		ky := TwoPi * ny / float32(sz.Y)
+		kz := TwoPi * nz / float32(sz.Z)
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					v := ma * math32.Sin(kx*float32(c.X)+ky*float32(c.Y)+kz*float32(c.Z)+ph)
+					State[f.Z, f.Y, f.X, vri, cur] += v
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
+// ewDemoScale raises the electroweak scale so m_W and m_Z are comparable to the
+// wavenumber of a packet a few tens of cubes long. At the Standard Model scale
+// the boson Compton wavelengths are about 22 cubes, so any visible packet is far
+// above threshold and a Z would travel at 0.97 c, which nobody can see. Raising
+// the scale is the only way to put the mass on screen. The couplings g and g'
+// are untouched, so the mixing angle and the m_W to m_Z ratio stay physical.
+func ewDemoScale(ss *Sim, mu float32) {
+	ss.Params.HiggsMu = mu
+	ss.Params.Update()
+}
+
+//////// configurations
+
+// HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,
+// and lets the field fall off the top of the Mexican hat into the broken vacuum.
+//
+// Phi = 0 is an exact equilibrium: the force is (mu^2 - lambda |Phi|^2) Phi,
+// which vanishes there. It is also the MAXIMUM of the potential, hence unstable,
+// so without a seed the simulation would sit on it forever. The noise is what
+// lets it fall.
+//
+// Watch EWHmag climb from 0 to v^2. It overshoots and rings rather than settling,
+// because nothing here dissipates: the potential energy released on the way
+// down, lambda v^4 / 4 per site, has nowhere to go. In the early universe Hubble
+// expansion drained it, and there is no equivalent in a fixed box. Different
+// regions also fall in different internal directions, so phase domains form and
+// their boundaries stay visible.
+//
+// Needs Params.A0NoWave on, which is the default. The rolling Higgs sources the
+// gauge scalar potentials, and that sector carries a secular gauge branch that
+// otherwise drifts without bound and takes the run with it.
+func HiggsSymmetric(ss *Sim) {
+	rnd := rand.New(rand.NewPCG(42, 1))
+	amp := 0.02 * ss.Params.HiggsV
+	ewNoise(ss, EWHsCa, amp, 6, rnd)
+	ewNoise(ss, EWHsCb, amp, 6, rnd)
+	ewNoise(ss, EWHs0a, amp, 6, rnd)
+	ewNoise(ss, EWHs0b, amp, 6, rnd)
+}
+
+// PhotonPulse sends a transverse electromagnetic pulse along Z at exactly the
+// speed of light.
+//
+// The packet is written in the PHYSICAL basis: the photon is the combination
+// sin(theta_W) W^3 + cos(theta_W) B, the direction that Q = T^3 + Y annihilates,
+// so the condensate gives it no mass and it moves at c. Watch AXs, which the
+// kernel reconstructs from the gauge fields every step.
+func PhotonPulse(ss *Sim) {
+	HiggsBroken(ss)
+	p := ss.Params
+	wl := float32(16)
+	om := ewFreq(ss, wl, 0) // massless
+	amp := float32(0.02)
+	cz := float32(ss.Config.Size.Z) * 0.2
+	ss.Config.Wavelength = wl
+	ss.Config.PacketWidth = 1.5 * wl
+	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.SinThetaW*amp, 1, om)
+	ss.SlabPacketConfig(EWBXs, EWBXv, cz, p.CosThetaW*amp, 1, om)
+}
+
+// ZPulse sends a Z boson pulse along Z, which travels SLOWER than light.
+//
+// Same construction as PhotonPulse but in the orthogonal combination,
+// cos(theta_W) W^3 - sin(theta_W) B. That direction does not annihilate the
+// vacuum, so it takes mass m_Z from the condensate and the packet moves at the
+// group velocity
+//
+//	v_g = c khat / sqrt(khat^2 + m_Z^2)
+//
+// which is about 0.70 c here, against 0.98 c for the photon at the same carrier
+// wavelength (the lattice makes even a massless packet slightly subluminal). Run this and PhotonPulse back to back and the lag
+// is obvious. Watch EWZX.
+//
+// Note this raises the Higgs scale, for the reason given in ewDemoScale.
+func ZPulse(ss *Sim) {
+	ewDemoScale(ss, 0.388)
+	HiggsBroken(ss)
+	p := ss.Params
+	wl := float32(16) // same carrier as PhotonPulse, so the two are comparable
+	om := ewFreq(ss, wl, p.MZ)
+	amp := float32(0.02)
+	cz := float32(ss.Config.Size.Z) * 0.2
+	ss.Config.Wavelength = wl
+	ss.Config.PacketWidth = 1.5 * wl
+	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.CosThetaW*amp, 1, om)
+	ss.SlabPacketConfig(EWBXs, EWBXv, cz, -p.SinThetaW*amp, 1, om)
+}
+
+// WCollision fires two W packets at each other and shows them interact.
+//
+// They do not bounce like billiard balls; gauge fields pass through each other.
+// What happens instead is the signature of the NON-ABELIAN coupling. The
+// Yang-Mills term carries eps^abc W^b W^c, so a W^1 packet and a W^2 packet
+// overlapping generate W^3 where they meet, out of nothing. Turn off
+// Params.YangMills and the two cross without a trace, which is exactly the
+// difference between SU(2) and three separate copies of U(1).
+//
+// Watch EWW3Zs, and EWZZ which is built from it. Note Z, not X: both packets are
+// transversely polarised along X and travel along Z, so W^{b mu} d_mu vanishes
+// identically -- nothing varies along the polarisation -- and the transport term
+// is silent. What survives is the transpose term, which sources the LONGITUDINAL
+// W^3_z. For a massive vector that mode is physical: it is the eaten Goldstone.
+//
+// A single packet on its own generates exactly zero, so what appears really is
+// the two fields coupling and not one of them self-interacting. With wrapped
+// edges the pair re-collides every lap, so the signal accumulates rather than
+// peaking once.
+//
+// The amplitude is deliberately large, a tenth of the vacuum value, because the
+// effect is quadratic in W and vanishes for small packets.
+func WCollision(ss *Sim) {
+	ewDemoScale(ss, 0.388)
+	HiggsBroken(ss)
+	p := ss.Params
+	wl := float32(16)
+	om := ewFreq(ss, wl, p.MW)
+	amp := 0.1 * p.HiggsV
+	zl := float32(ss.Config.Size.Z)
+	ss.Config.Wavelength = wl
+	ss.Config.PacketWidth = 1.2 * wl
+	ss.SlabPacketConfig(EWW1Xs, EWW1Xv, zl*0.3, amp, 1, om)
+	ss.SlabPacketConfig(EWW2Xs, EWW2Xv, zl*0.7, amp, -1, om)
+}
 
 var ElectroweakConfigs = []InitFunc{
-	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value",	Func: HiggsBroken},
+	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken},
+	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
+	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along Z at exactly c; watch AXs", Func: PhotonPulse},
+	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along Z at about 0.7 c, slower than light because the condensate gives it mass; watch ZX", Func: ZPulse},
+	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Zs and ZZ", Func: WCollision},
 }

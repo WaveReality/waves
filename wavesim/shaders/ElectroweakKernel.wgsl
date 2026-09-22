@@ -622,11 +622,12 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 		ymz = ymz+(Cross3(dv, wz)*(gw));
 	}
 	var omW = vec3<f32>(w10, w20, w30)*(-2 * Params[0].GW * Params[0].C);
-	EWWStep(x, y, z, cur, prv, i32(i32(0)), csq, omW, vec3<f32>(j0.x+ym0.x, j0.y+ym0.y, j0.z+ym0.z), boris);
-	EWWStep(x, y, z, cur, prv, i32(i32(1)), csq, omW, vec3<f32>(jx.x+ymx.x, jx.y+ymx.y, jx.z+ymx.z), boris);
-	EWWStep(x, y, z, cur, prv, i32(i32(2)), csq, omW, vec3<f32>(jy.x+ymy.x, jy.y+ymy.y, jy.z+ymy.z), boris);
-	EWWStep(x, y, z, cur, prv, i32(i32(3)), csq, omW, vec3<f32>(jz.x+ymz.x, jz.y+ymz.y, jz.z+ymz.z), boris);
-	EWGaugeStep(x, y, z, cur, prv, i32(EWB0s), csq, j0.w, jx.w, jy.w, jz.w);
+	var nw = Params[0].A0NoWave == 1;
+	EWWStep(x, y, z, cur, prv, i32(i32(0)), csq, omW, vec3<f32>(j0.x+ym0.x, j0.y+ym0.y, j0.z+ym0.z), boris, nw);
+	EWWStep(x, y, z, cur, prv, i32(i32(1)), csq, omW, vec3<f32>(jx.x+ymx.x, jx.y+ymx.y, jx.z+ymx.z), boris, nw);
+	EWWStep(x, y, z, cur, prv, i32(i32(2)), csq, omW, vec3<f32>(jy.x+ymy.x, jy.y+ymy.y, jy.z+ymy.z), boris, nw);
+	EWWStep(x, y, z, cur, prv, i32(i32(3)), csq, omW, vec3<f32>(jz.x+ymz.x, jz.y+ymz.y, jz.z+ymz.z), boris, nw);
+	EWGaugeStep(x, y, z, cur, prv, i32(EWB0s), csq, j0.w, jx.w, jy.w, jz.w, nw);
 	var hvN: vec4<f32>;
 	if (boris) {
 		var hh = hf*(0.5);
@@ -675,7 +676,7 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	StateSet(-0.5*musq*mag + 0.25*lambda*mag*mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWHV), u32(cur)));
 }
-fn EWWStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,nu: i32, csq: f32, om: vec3<f32>,src: vec3<f32>, boris: bool) {
+fn EWWStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,nu: i32, csq: f32, om: vec3<f32>,src: vec3<f32>, boris: bool,noWave: bool) {
 	var vs = i32(EWW10s) + nu;
 	var vv = i32(EWW10v) + nu;
 	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(prv)));
@@ -690,7 +691,9 @@ fn EWWStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,nu: i32, csq: f32, om: vec3<f3
 	var q3 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv + 16), u32(prv)));
 	var v = vec3<f32>(q1, q2, q3);
 	var vn: vec3<f32>;
-	if (boris) {
+	if (noWave && nu == 0) {
+		vn = f;
+	} else if (boris) {
 		var h = f*(0.5);
 		vn = EWBorisRot3(v+(h), om)+(h);
 	} else {
@@ -704,7 +707,7 @@ fn EWWStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,nu: i32, csq: f32, om: vec3<f3
 	StateSet(p3 + vn.z, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs + 16), u32(cur)));
 }
-fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,jx: f32,jy: f32,jz: f32) {
+fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,jx: f32,jy: f32,jz: f32, noWave: bool) {
 	for (var ki=0; ki<4; ki++) {
 		var k = i32(ki);
 		var vs = v0 + k;
@@ -728,6 +731,9 @@ fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,
 		var vp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(prv)));
 		var f = csq * (Laplacian19(x, y, z, vs, prv, ps) + jc);
 		var vc = vp + f;
+		if (noWave && ki == 0) {
+			vc = f; // see EWWStep: the scalar potential is the gauge direction
+		}
 		StateSet(vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(cur)));
 		StateSet(ps + vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
 	}
@@ -874,9 +880,9 @@ struct Parameters {
 	HiggsMu: f32,
 	HiggsLambda: f32,
 	GW: f32,
+	GpW: f32,
 	YangMills: i32,
 	Boris: i32,
-	GpW: f32,
 	Diff: f32,
 	Decay: f32,
 	CSq: f32,
