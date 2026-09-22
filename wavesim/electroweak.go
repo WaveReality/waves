@@ -817,9 +817,9 @@ func ElectroweakViewAll(view *View) {
 	view.Panels[0].Var = EWHs0a
 	view.Panels[1].Var = AYs // the transverse component: A0s is zero for a pulse
 	// view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = EWHmag
+	view.Panels[2].Var = EWBYs
 	// view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = EWHV
+	view.Panels[3].Var = EWW3Ys
 	// view.Settings.TrackParticle = 0
 }
 

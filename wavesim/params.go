@@ -135,6 +135,10 @@ type Parameters struct {
 	// and unbroken symmetry, as a function of HiggsV, MW and MZ.
 	Temp float32
 
+	// TempCrit = HiggsMu / sqrt(ThermalC) is where the thermal mass cancels
+	// mu^2: above it the symmetry is restored and the gauge bosons massless.
+	TempCrit float32 `edit:"-"`
+
 	// ThermalC is the coefficient c in the thermal mass mu^2 -> mu^2 - c T^2.
 	// In the Standard Model it comes from the particles in the bath:
 	//	c = (3 g^2 + g'^2 + 4 y_t^2 + 8 lambda) / 16
@@ -231,10 +235,6 @@ type Parameters struct {
 	// occupying the same slot in the update. Negative above TempCrit, where
 	// the origin becomes the minimum.
 	HiggsMuSq float32 `display:"-"`
-
-	// TempCrit = HiggsMu / sqrt(ThermalC) is where the thermal mass cancels
-	// mu^2: above it the symmetry is restored and the gauge bosons massless.
-	TempCrit float32 `edit:"-"`
 
 	// HiggsV = sqrt(HiggsMuSq / HiggsLambda) is the Higgs vacuum expectation
 	// value: the radius of the minimum of the potential, in 1/cube. The
