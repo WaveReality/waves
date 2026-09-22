@@ -271,9 +271,9 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3,
 }
 
 // PosWavePacketConfig is a version of [PosWavePacket] that gets parameters from
-// [Config]
+// [Config]. amp is relative to [Config.Amplitude].
 func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
-	ss.PosWavePacket(vr, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
+	ss.PosWavePacket(vr, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, ss.Config.Amplitude*amp)
 }
 
 // MovingWavePacket adds a gaussian * cosine wave packet along given dimension,
@@ -330,9 +330,10 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 }
 
 // MovingWavePacketConfig is a version of [MovingWavePacket] that takes its
-// wavelength and width variables from [Config]
+// wavelength and width variables from [Config]. amp is relative to
+// [Config.Amplitude].
 func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
-	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, amp)
+	ss.MovingWavePacket(posVar, velVar, dim, ctr, dir, ss.Config.Wavelength, ss.Config.PacketWidth, phase, ss.Config.Amplitude*amp)
 }
 
 // SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
@@ -378,10 +379,12 @@ func (ss *Sim) SlabPacket(pos, vel EWStates, dim math32.Dims, ctr, wavelength, w
 	}
 }
 
-// SlabPacketConfig is a version of [SlabPacket] that takes its
-// wavelength and width variables from [Config]
+// SlabPacketConfig is a version of [SlabPacket] that takes its wavelength and
+// width variables from [Config]. amp is relative to [Config.Amplitude], so a
+// caller can keep a mixing weight such as cos(theta_W) in amp and leave the
+// overall size to the user.
 func (ss *Sim) SlabPacketConfig(pos, vel EWStates, dim math32.Dims, ctr, amp, dir, om float32) {
-	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, amp, dir, om)
+	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om)
 }
 
 // SmoothNoise seeds a state variable with smooth random fluctuation: a sum of a few

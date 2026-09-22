@@ -84,56 +84,147 @@ func TestConfigHiggsSymmetric(t *testing.T) {
 	}
 }
 
+// cfgSpeed runs one of the pulse configs at a given Config.Amplitude and
+// returns the packet speed in units of c, plus the lowest fraction of the
+// vacuum |Phi|^2 found under the packet along the way.
+func cfgSpeed(sz int32, init func(*Sim), probe int, amp float32, nst int) (vc, hfrac float64) {
+	ss := cfgSim(sz, func(s *Sim) {
+		s.Config.Amplitude = amp
+		init(s)
+	})
+	v2 := float64(ss.Params.HiggsV) * float64(ss.Params.HiggsV)
+	hfrac = math.Inf(1)
+	// the probe variables are written BY the kernel, so they are still zero
+	// before the first step: take the baseline after one step, not before.
+	ewStep(ss)
+	c0 := cfgCentroid(sz, int32(probe))
+	for range nst {
+		ewStep(ss)
+		// |Phi|^2 weighted by the local packet intensity: what the packet
+		// itself sits in, not the box average.
+		var num, den float64
+		cur := int(GetCtx(0).CurState)
+		for x := int32(1); x <= sz; x++ {
+			a := float64(State.Value(2, 2, int(x), probe, cur))
+			h := float64(State.Value(2, 2, int(x), int(EWHmag), cur))
+			num += a * a * h
+			den += a * a
+		}
+		if den > 0 {
+			hfrac = math.Min(hfrac, num/den/v2)
+		}
+	}
+	c1 := cfgCentroid(sz, int32(probe))
+	return (c1 - c0) / float64(nst) / float64(ss.Params.C), hfrac
+}
+
+// cfgGroupVel is the lattice group velocity in units of c, for a carrier of
+// the given wavelength and a field of the given mass. omega = c sqrt(khat^2 +
+// m^2) with khat = 2 sin(k/2), so dom/dk = c khat cos(k/2) / sqrt(khat^2+m^2).
+// The cos(k/2) is why even a massless packet comes out slightly subluminal.
+func cfgGroupVel(wavelength, mass float64) float64 {
+	k := 2 * math.Pi / wavelength
+	kh := 2 * math.Sin(k/2)
+	return kh * math.Cos(k/2) / math.Sqrt(kh*kh+mass*mass)
+}
+
 // TestConfigPulseSpeeds: the photon packet must travel at c and the Z packet
 // measurably slower, at its group velocity.
+//
+// This runs at a small Config.Amplitude, because the tree-level group velocity
+// is a statement about a LINEAR wave on an undisturbed vacuum. The configs
+// themselves default to amplitude 1 so they read at the GUI's display scale,
+// and there the Z is large enough to move the condensate it travels through;
+// TestPulseCondensateBackReaction covers that regime.
 func TestConfigPulseSpeeds(t *testing.T) {
 	const sz = 96
-	for _, tc := range []struct {
+	const amp = 0.02
+	var speed [2]float64
+	for ti, tc := range []struct {
 		name  string
 		init  func(*Sim)
-		probe int32
+		probe int
 		mass  func(p *Parameters) float64
 	}{
-		{"photon", PhotonPulse, int32(AYs), func(p *Parameters) float64 { return 0 }},
-		{"Z", ZPulse, int32(EWZY), func(p *Parameters) float64 { return float64(p.MZ) }},
+		{"photon", PhotonPulse, int(AYs), func(p *Parameters) float64 { return 0 }},
+		{"Z", ZPulse, int(EWZY), func(p *Parameters) float64 { return float64(p.MZ) }},
 	} {
-		ss := cfgSim(sz, tc.init)
-		p := ss.Params
-		c := float64(p.C)
-		m := tc.mass(p)
-		// lattice group velocity: omega = c sqrt(khat^2 + m^2) with
-		// khat = 2 sin(k/2), so dom/dk = c khat cos(k/2) / sqrt(khat^2 + m^2).
-		// The cos(k/2) is why even a massless packet is slightly subluminal.
 		// the carrier comes from Config, which ElectroweakConfig sets, so the
 		// prediction tracks whatever the config chooses rather than a literal.
-		k := 2 * math.Pi / float64(ss.Config.Wavelength)
-		khat := 2 * math.Sin(k/2)
-		wantV := c * khat * math.Cos(k/2) / math.Sqrt(khat*khat+m*m)
-
-		// AYs / EWZY are written BY the kernel, so they are still zero before
-		// the first step: measure the baseline after one step, not before.
-		// And keep the run short enough that the packet cannot wrap the box.
-		ewStep(ss)
-		nst := 100
-		c0 := cfgCentroid(sz, tc.probe)
-		for range nst {
-			ewStep(ss)
+		ss := cfgSim(sz, func(s *Sim) {})
+		wl := float64(ss.Config.Wavelength)
+		m := tc.mass(ss.Params)
+		if tc.name == "Z" { // ZPulse raises the scale, so take m_Z from there
+			ss = cfgSim(sz, func(s *Sim) { ewDemoScale(s, 0.388) })
+			m = tc.mass(ss.Params)
 		}
-		c1 := cfgCentroid(sz, tc.probe)
-		got := (c1 - c0) / float64(nst)
-		t.Logf("%-7s centroid %.2f -> %.2f over %d steps: v = %.5f  want %.5f  (v/c = %.4f)",
-			tc.name, c0, c1, nst, got, wantV, got/c)
+		wantV := cfgGroupVel(wl, m)
+
+		got, hfrac := cfgSpeed(sz, tc.init, tc.probe, amp, 100)
+		speed[ti] = got
+		t.Logf("%-7s amp %.2f: v = %.5f c, want %.5f c (%+.1f%%), condensate %.0f%% of vacuum",
+			tc.name, amp, got, wantV, 100*(got/wantV-1), 100*hfrac)
 		if math.Abs(got/wantV-1) > 0.08 {
-			t.Errorf("%s speed %g, want %g", tc.name, got, wantV)
+			t.Errorf("%s speed %g c, want %g c", tc.name, got, wantV)
 		}
 		// The lattice already puts a massless packet at cos(k/2) = 0.98 c, and
-		// the finite packet loses a few percent more to dispersion; the point is
-		// that it is near c and far above the Z.
-		if m == 0 && got/c < 0.9 {
-			t.Errorf("photon should move at essentially c: %g vs %g", got, c)
+		// the finite packet loses a few percent more to dispersion; the point
+		// is that it is near c and far above the Z.
+		if m == 0 && got < 0.9 {
+			t.Errorf("photon should move at essentially c: %g c", got)
 		}
-		if m > 0 && got/c > 0.85 {
-			t.Errorf("Z should be visibly subluminal, got %g c", got/c)
+		if m > 0 && got > 0.85 {
+			t.Errorf("Z should be visibly subluminal, got %g c", got)
+		}
+	}
+	// the claim the demo makes, and the one that holds at any amplitude
+	if speed[1] > speed[0]-0.1 {
+		t.Errorf("Z at %.4f c should lag the photon at %.4f c by a clear margin",
+			speed[1], speed[0])
+	}
+}
+
+// TestPulseCondensateBackReaction measures what the pulses do to the Higgs
+// condensate they travel through, which at the default amplitude is the
+// difference between a linear wave and a strongly nonlinear one.
+//
+// The photon direction is the combination that Q = T^3 + Y annihilates, so it
+// costs the condensate nothing no matter how large it gets -- at amplitude 1
+// the packet is many times v and |Phi|^2 does not move, and its speed is the
+// same as in the linear regime. That is exact masslessness shown directly,
+// rather than inferred from a propagation speed.
+//
+// The Z direction does not annihilate the vacuum, so a packet comparable to v
+// partially restores the symmetry underneath itself. The local mass falls with
+// the condensate and the packet speeds up, which is why the tree-level group
+// velocity only applies to a small Z.
+func TestPulseCondensateBackReaction(t *testing.T) {
+	const sz = 96
+	for _, tc := range []struct {
+		name    string
+		init    func(*Sim)
+		probe   int
+		minDrop float64 // how far below vacuum the condensate must go at amp 1
+		maxDrop float64
+	}{
+		{"photon", PhotonPulse, int(AYs), 0.99, 1.01},
+		{"Z", ZPulse, int(EWZY), 0.0, 0.70},
+	} {
+		vLin, hLin := cfgSpeed(sz, tc.init, tc.probe, 0.02, 100)
+		vBig, hBig := cfgSpeed(sz, tc.init, tc.probe, 1, 100)
+		t.Logf("%-7s amp 0.02: v = %.5f c, condensate %3.0f%%   |   amp 1: v = %.5f c, condensate %3.0f%%  (%+.1f%% faster)",
+			tc.name, vLin, 100*hLin, vBig, 100*hBig, 100*(vBig/vLin-1))
+		if hBig < tc.minDrop || hBig > tc.maxDrop {
+			t.Errorf("%s left the condensate at %.0f%% of vacuum, want %.0f-%.0f%%",
+				tc.name, 100*hBig, 100*tc.minDrop, 100*tc.maxDrop)
+		}
+		if tc.name == "photon" && math.Abs(vBig/vLin-1) > 0.01 {
+			t.Errorf("photon speed moved %.1f%% between amplitudes: it should not "+
+				"care, since it does not couple to the condensate", 100*(vBig/vLin-1))
+		}
+		if tc.name == "Z" && vBig <= vLin {
+			t.Errorf("Z at amplitude 1 (%g c) should outrun the linear Z (%g c): "+
+				"it has melted its own mass down", vBig, vLin)
 		}
 	}
 }

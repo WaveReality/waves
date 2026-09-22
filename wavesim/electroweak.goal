@@ -908,10 +908,10 @@ func PhotonPulse(ss *Sim) {
 	p := ss.Params
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, 0) // massless
-	amp := float32(1)
 	cx := float32(ss.Config.Size.X) * 0.2
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW*amp, 1, om)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW*amp, 1, om)
+	// the weights are the photon direction itself; Config.Amplitude sets the size
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om)
 }
 
 // ZPulse sends a Z boson pulse along X, which travels SLOWER than light.
@@ -923,9 +923,19 @@ func PhotonPulse(ss *Sim) {
 //
 //	v_g = c khat / sqrt(khat^2 + m_Z^2)
 //
-// which is about 0.70 c here, against 0.98 c for the photon at the same carrier
-// wavelength (the lattice makes even a massless packet slightly subluminal).
-// Run this and PhotonPulse back to back and the lag is obvious. Watch EWZY.
+// which would be about 0.70 c here, against 0.98 c for the photon at the same
+// carrier wavelength (the lattice makes even a massless packet slightly
+// subluminal). Run this and PhotonPulse back to back and the lag is obvious.
+// Watch EWZY.
+//
+// The measured speed is nearer 0.75 c at the default [Config.Amplitude] of 1,
+// because there the packet is comparable to v and is NOT a small perturbation:
+// it melts the condensate it is passing through down to about a third of the
+// vacuum value, and a lighter Z travels faster. Turn Amplitude down to 0.02
+// and it sits on the tree-level group velocity to within 1%; the whole
+// crossover is worth sweeping interactively. The photon is immune to this at
+// any amplitude, since Q annihilates the vacuum and its packet costs the
+// condensate nothing.
 //
 // Note this raises the Higgs scale, for the reason given in ewDemoScale.
 func ZPulse(ss *Sim) {
@@ -934,10 +944,10 @@ func ZPulse(ss *Sim) {
 	p := ss.Params
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MZ)
-	amp := float32(1)
 	cx := float32(ss.Config.Size.X) * 0.2
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW*amp, 1, om)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW*amp, 1, om)
+	// the weights are the Z direction itself; Config.Amplitude sets the size
+	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om)
+	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om)
 }
 
 // WCollision fires two W packets at each other and shows them interact.
@@ -980,7 +990,7 @@ func WCollision(ss *Sim) {
 	p := ss.Params
 	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MW)
-	amp := 0.25 * p.HiggsV
+	amp := 0.25 * p.HiggsV * ss.Config.Amplitude
 	xl := float32(ss.Config.Size.X)
 	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om)
 	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om)
@@ -990,6 +1000,6 @@ var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
 	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
-	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.7 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
 }
