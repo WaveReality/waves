@@ -65,14 +65,11 @@ type Sim struct {
 	// StateVars points the current state variables in effect.
 	StateVars enums.Enum `display:"-"`
 
-	// Rand is the random number generator for the network.
-	// all random calls must use this.
-	// Set seed here for weight initialization values.
+	// Rand is the random number generator: all random calls must use this.
 	Rand randx.Rand `display:"-"`
 
 	// Random seed to be set at the start of configuring
-	// the network and initializing the weights.
-	// Set this to get a different set of weights.
+	// Set this to get a different set of initial values.
 	RandSeed int64 `display:"-"`
 
 	// RandSeeds is a list of random seeds to use for each run.
@@ -130,7 +127,7 @@ func (ss *Sim) ConfigSim() {
 	tensorfs.CurRoot = ss.Root
 	ss.Stats = ss.Root.Dir("Stats")
 	ss.RandSeeds.Init(100) // max 100 runs
-	ss.InitRandSeed(0)
+	randx.InitSysRand(&ss.Rand, ss.RandSeeds[0])
 	ss.ConfigVars()
 	if ss.ConfigFunc != nil {
 		ss.ConfigFunc(ss)
@@ -190,7 +187,7 @@ func (ss *Sim) ConfigState() {
 }
 
 func (ss *Sim) InitRandSeed(run int) {
-	ss.RandSeeds.Set(run)
+	ss.RandSeeds.Set(run, ss.Rand)
 }
 
 // FromUnits sets active Params from values computed in Units, which

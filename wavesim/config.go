@@ -46,7 +46,7 @@ func (cfg *Config) Defaults() {
 	cfg.MaxSteps = 100000
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
-	cfg.PacketWidth = 8
+	cfg.PacketWidth = 12
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {

@@ -20,7 +20,6 @@ func ewSim(sz int32) *Sim {
 	ss.Config.Equation = Electroweak
 	ss.Config.Size.Set(sz, sz, sz)
 	ss.ConfigVars()
-	ss.Params = &Params[0] // ConfigVars early-returns if the globals already exist
 	ss.Units.Defaults()
 	ss.Params.Edges = EdgesWrap
 	ss.StateVars = EWStatesN
@@ -30,15 +29,12 @@ func ewSim(sz int32) *Sim {
 	ctx.Init()
 	State.SetZeros()
 	HiggsBroken(ss)
+	// Sim.Init does this for EdgesWrap; these tests drive the pieces directly.
+	// Fill and friends only touch interior cells, so any perturbation must be
+	// followed by a wrap -- otherwise the edges keep the old value and
+	// Laplacian19 sees a step at the boundary.
+	WrapEdges()
 	return ss
-}
-
-// ewWrap re-wraps the edge ring. Fill and friends only touch interior cells,
-// so any perturbation must be followed by this -- otherwise the edges keep the
-// old value and Laplacian19 sees a step at the boundary.
-func ewWrap() {
-	ctx := GetCtx(0)
-	RunEdgesWrapKernel(int(ctx.EdgesN()))
 }
 
 // ewStep runs just the Higgs kernel plus edge wrapping.
@@ -130,7 +126,7 @@ func TestHiggsRadialMass(t *testing.T) {
 	// --- radial: perturb hs0a, the component holding the VEV ---------------
 	eps := float32(0.002)
 	ss.Fill(EWHs0a, Both, eps)
-	ewWrap()
+	WrapEdges()
 	radial := make([]float64, nsteps)
 	for i := range nsteps {
 		ewStep(ss)
@@ -146,7 +142,7 @@ func TestHiggsRadialMass(t *testing.T) {
 	// --- Goldstone: perturb a charged component at k=0 ---------------------
 	ss2 := ewSim(4)
 	ss2.Fill(EWHsCa, Both, eps)
-	ewWrap()
+	WrapEdges()
 	gold := make([]float64, nsteps)
 	for i := range nsteps {
 		ewStep(ss2)
@@ -177,7 +173,7 @@ func ewSpectrum(t *testing.T, eps float32, nsteps int,
 	kick func(ss *Sim), probe func() float32) (float64, float64) {
 	ss := ewSim(4)
 	kick(ss)
-	ewWrap()
+	WrapEdges()
 	y := make([]float64, nsteps)
 	peak := 0.0
 	for i := range nsteps {
@@ -295,7 +291,7 @@ func TestGaugeTimeComponent(t *testing.T) {
 
 		ss.Fill(EWB0s, Both, b)
 		ss.Fill(EWHv0b, Both, float32(om)*v) // the velocity making D_0 Psi = 0
-		ewWrap()
+		WrapEdges()
 
 		// Read the rotation rate as a phase ADVANCE between two early times.
 		// Differencing cancels the integrator's constant phase offset, and
@@ -410,7 +406,7 @@ func TestYangMillsPureGauge(t *testing.T) {
 		ss.Fill(EWW30s, Both, b)
 		ss.Fill(EWW1Xs, Both, r)
 		ss.Fill(EWW2Xv, Both, float32(om)*r)
-		ewWrap()
+		WrapEdges()
 
 		n1 := int(0.4 / math.Abs(om))
 		nrun := 2 * n1
@@ -508,7 +504,7 @@ func TestYangMillsCovariance(t *testing.T) {
 	// plain evolution
 	ss := ymSim(sz)
 	fill(ss)
-	ewWrap()
+	WrapEdges()
 	for range nst {
 		ewStep(ss)
 	}
@@ -531,7 +527,7 @@ func TestYangMillsCovariance(t *testing.T) {
 	ss2 := ymSim(sz)
 	fill(ss2)
 	rot(false)
-	ewWrap()
+	WrapEdges()
 	for range nst {
 		ewStep(ss2)
 	}
@@ -574,7 +570,7 @@ func TestYangMillsSpectrumUnchanged(t *testing.T) {
 		ss.Params.YangMills.SetBool(on)
 		ss.Params.Update()
 		ss.Fill(EWW1Xs, Both, eps)
-		ewWrap()
+		WrapEdges()
 		y := make([]float64, nsteps)
 		for j := range nsteps {
 			ewStep(ss)
@@ -625,7 +621,7 @@ func TestBorisStability(t *testing.T) {
 		ss.Fill(EWW30s, Both, b)
 		ss.Fill(EWW1Xs, Both, r)
 		ss.Fill(EWW2Xv, Both, float32(om)*r)
-		ewWrap()
+		WrapEdges()
 		r0 := float64(r) * float64(r)
 		worst := 1.0
 		for range nst {
@@ -718,7 +714,7 @@ func TestMixedBasisPropagation(t *testing.T) {
 		GetCtx(0).Init()
 		HiggsBroken(ss)
 		tc.setup(p, eps)
-		ewWrap()
+		WrapEdges()
 
 		m := tc.mass(p)
 		want := discFreq(float64(p.C) * math.Sqrt(khat*khat+m*m))

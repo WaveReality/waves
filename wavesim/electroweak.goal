@@ -5,8 +5,6 @@
 package wavesim
 
 import (
-	"math/rand/v2"
-
 	"cogentcore.org/core/math32"
 	"cogentcore.org/lab/gosl/slmath"
 )
@@ -799,6 +797,8 @@ func (ss *Sim) ElectroweakConfig() {
 	ss.StateVars = EWStatesN
 	ss.initFuncs = ElectroweakConfigs
 	ss.InitFunc = HiggsBroken
+	ss.Config.Wavelength = 16
+	ss.Config.PacketWidth = 1.5 * ss.Config.Wavelength
 	ss.ViewInit(func(view *View) {
 		view.SetVar(EWHs0a, -1)
 	})
@@ -826,18 +826,6 @@ func (ss *Sim) ElectroweakStats() {
 	// ss.AddStat(ss.StatParticle(0))
 }
 
-// HiggsBroken initializes the vacuum is <Phi> = (0, v/sqrt2)^T, i.e.
-// the NEUTRAL (lower) component holds the VEV, with magnitude
-// v = mu/sqrt(lambda) -- not mu. Putting it
-// in the charged component instead would leave Q = T^3 + Y broken
-// and give the photon a mass.
-func HiggsBroken(ss *Sim) {
-	ss.Fill(EWHs0a, Both, ss.Params.HiggsV)
-	ctx := GetCtx(0)
-	ne := int(ctx.EdgesN())
-	RunEdgesWrapKernel(ne)
-}
-
 // ElectroweakDisplay determines which Parameters fields to display.
 var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "GW", "GpW", "YangMills", "Boris"}
 //////// initialization helpers
@@ -856,44 +844,6 @@ func ewFreq(ss *Sim, wavelength, mass float32) float32 {
 	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
 }
 
-// ewNoise seeds a state variable with smooth random fluctuation: a sum of a few
-// long-wavelength modes rather than per-site white noise.
-//
-// White noise would be the obvious choice and is the wrong one. It carries equal
-// power at every wavenumber including the lattice cutoff, which is both
-// unphysical -- nothing in the continuum theory excites the grid scale -- and
-// the fastest way to destabilise a nonlinear solver. Using whole numbers of
-// wavelengths per box also keeps the seed periodic, which matters with wrapped
-// edges.
-func ewNoise(ss *Sim, vr EWStates, amp float32, nmodes int, rnd *rand.Rand) {
-	vri := int(vr.Int64())
-	ctx := GetCtx(0)
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	sz := ss.Config.Size
-	ma := amp / math32.Sqrt(float32(nmodes))
-	for range nmodes {
-		nx := float32(rnd.IntN(3) + 1)
-		ny := float32(rnd.IntN(3) + 1)
-		nz := float32(rnd.IntN(3) + 1)
-		ph := TwoPi * rnd.Float32()
-		kx := TwoPi * nx / float32(sz.X)
-		ky := TwoPi * ny / float32(sz.Y)
-		kz := TwoPi * nz / float32(sz.Z)
-		var c math32.Vector3i
-		for c.Z = range sz.Z {
-			for c.Y = range sz.Y {
-				for c.X = range sz.X {
-					f := c.AddScalar(1)
-					v := ma * math32.Sin(kx*float32(c.X)+ky*float32(c.Y)+kz*float32(c.Z)+ph)
-					State[f.Z, f.Y, f.X, vri, cur] += v
-					State[f.Z, f.Y, f.X, vri, prv] += v
-				}
-			}
-		}
-	}
-}
-
 // ewDemoScale raises the electroweak scale so m_W and m_Z are comparable to the
 // wavenumber of a packet a few tens of cubes long. At the Standard Model scale
 // the boson Compton wavelengths are about 22 cubes, so any visible packet is far
@@ -906,6 +856,15 @@ func ewDemoScale(ss *Sim, mu float32) {
 }
 
 //////// configurations
+
+// HiggsBroken initializes the vacuum is <Phi> = (0, v/sqrt2)^T, i.e.
+// the NEUTRAL (lower) component holds the VEV, with magnitude
+// v = mu/sqrt(lambda) -- not mu. Putting it
+// in the charged component instead would leave Q = T^3 + Y broken
+// and give the photon a mass.
+func HiggsBroken(ss *Sim) {
+	ss.Fill(EWHs0a, Both, ss.Params.HiggsV)
+}
 
 // HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,
 // and lets the field fall off the top of the Mexican hat into the broken vacuum.
@@ -926,12 +885,11 @@ func ewDemoScale(ss *Sim, mu float32) {
 // gauge scalar potentials, and that sector carries a secular gauge branch that
 // otherwise drifts without bound and takes the run with it.
 func HiggsSymmetric(ss *Sim) {
-	rnd := rand.New(rand.NewPCG(42, 1))
 	amp := 0.02 * ss.Params.HiggsV
-	ewNoise(ss, EWHsCa, amp, 6, rnd)
-	ewNoise(ss, EWHsCb, amp, 6, rnd)
-	ewNoise(ss, EWHs0a, amp, 6, rnd)
-	ewNoise(ss, EWHs0b, amp, 6, rnd)
+	ss.SmoothNoise(EWHsCa, amp, 6)
+	ss.SmoothNoise(EWHsCb, amp, 6)
+	ss.SmoothNoise(EWHs0a, amp, 6)
+	ss.SmoothNoise(EWHs0b, amp, 6)
 }
 
 // PhotonPulse sends a transverse electromagnetic pulse along Z at exactly the
@@ -944,12 +902,10 @@ func HiggsSymmetric(ss *Sim) {
 func PhotonPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
-	wl := float32(16)
+	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, 0) // massless
 	amp := float32(0.02)
 	cz := float32(ss.Config.Size.Z) * 0.2
-	ss.Config.Wavelength = wl
-	ss.Config.PacketWidth = 1.5 * wl
 	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.SinThetaW*amp, 1, om)
 	ss.SlabPacketConfig(EWBXs, EWBXv, cz, p.CosThetaW*amp, 1, om)
 }
@@ -972,12 +928,10 @@ func ZPulse(ss *Sim) {
 	ewDemoScale(ss, 0.388)
 	HiggsBroken(ss)
 	p := ss.Params
-	wl := float32(16) // same carrier as PhotonPulse, so the two are comparable
+	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MZ)
 	amp := float32(0.02)
 	cz := float32(ss.Config.Size.Z) * 0.2
-	ss.Config.Wavelength = wl
-	ss.Config.PacketWidth = 1.5 * wl
 	ss.SlabPacketConfig(EWW3Xs, EWW3Xv, cz, p.CosThetaW*amp, 1, om)
 	ss.SlabPacketConfig(EWBXs, EWBXv, cz, -p.SinThetaW*amp, 1, om)
 }
@@ -1002,20 +956,29 @@ func ZPulse(ss *Sim) {
 // edges the pair re-collides every lap, so the signal accumulates rather than
 // peaking once.
 //
-// The amplitude is deliberately large, a tenth of the vacuum value, because the
-// effect is quadratic in W and vanishes for small packets.
+// This one sets its own envelope width rather than taking Config.PacketWidth,
+// because the shared default of 1.5 wavelengths is too wide here. The packets
+// start 40% of the box apart, so at 1.5 wl the two Gaussians already overlap at
+// half their peak amplitude before the first step -- one broad blob, not two
+// packets that meet. Measured on a 100-deep box: width 1.5 wl leaves 50% overlap
+// at t=0, 1.2 wl leaves 34%, and 0.75 wl leaves 6%, which is the first value
+// that looks like a collision.
+//
+// The amplitude is deliberately large, a quarter of the vacuum value, because
+// the source is quadratic in W and vanishes for small packets. Amplitude, not
+// overlap, is what sets the signal: narrowing the envelope from 1.5 wl to
+// 0.75 wl costs a factor of 260, and raising the amplitude from 0.1 v to 0.25 v
+// wins back a factor of 6 for free, since the effect goes as amp^2.
 func WCollision(ss *Sim) {
 	ewDemoScale(ss, 0.388)
 	HiggsBroken(ss)
 	p := ss.Params
-	wl := float32(16)
+	wl := ss.Config.Wavelength
 	om := ewFreq(ss, wl, p.MW)
-	amp := 0.1 * p.HiggsV
+	amp := 0.25 * p.HiggsV
 	zl := float32(ss.Config.Size.Z)
-	ss.Config.Wavelength = wl
-	ss.Config.PacketWidth = 1.2 * wl
-	ss.SlabPacketConfig(EWW1Xs, EWW1Xv, zl*0.3, amp, 1, om)
-	ss.SlabPacketConfig(EWW2Xs, EWW2Xv, zl*0.7, amp, -1, om)
+	ss.SlabPacket(EWW1Xs, EWW1Xv, zl*0.3, wl, 0.75*wl, amp, 1, om)
+	ss.SlabPacket(EWW2Xs, EWW2Xv, zl*0.7, wl, 0.75*wl, amp, -1, om)
 }
 
 var ElectroweakConfigs = []InitFunc{

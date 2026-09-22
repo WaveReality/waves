@@ -377,6 +377,37 @@ func (ss *Sim) SlabPacketConfig(pos, vel EWStates, ctrZ, amp, dir, om float32) {
 	ss.SlabPacket(pos, vel, ctrZ, ss.Config.Wavelength, ss.Config.PacketWidth, amp, dir, om)
 }
 
+// SmoothNoise seeds a state variable with smooth random fluctuation: a sum of a few
+// long-wavelength modes rather than per-site white noise.
+func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	ma := amp / math32.Sqrt(float32(nmodes))
+	for range nmodes {
+		nx := float32(ss.Rand.Intn(3) + 1)
+		ny := float32(ss.Rand.Intn(3) + 1)
+		nz := float32(ss.Rand.Intn(3) + 1)
+		ph := TwoPi * ss.Rand.Float32()
+		kx := TwoPi * nx / float32(sz.X)
+		ky := TwoPi * ny / float32(sz.Y)
+		kz := TwoPi * nz / float32(sz.Z)
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					v := ma * math32.Sin(kx*float32(c.X)+ky*float32(c.Y)+kz*float32(c.Z)+ph)
+					State[f.Z, f.Y, f.X, vri, cur] += v
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
 // InvR adds 1/r values radiating from given center point,
 // with peak point as given value.
 func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3, val float32) {

@@ -15,9 +15,6 @@ import (
 )
 
 func (ss *Sim) ConfigVars() {
-	if Params != nil {
-		return
-	}
 	Params = make([]Parameters, 1)
 	Params[0].Defaults()
 	ss.Params = &Params[0]
