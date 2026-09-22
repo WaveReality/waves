@@ -373,6 +373,57 @@ func ChargeUniform(ss *Sim) {
 	ss.ChargedUniform(ss.Config.Amplitude, 1)
 }
 
+// kgSelfScale sets Mu0 so the potential a charge blob makes for itself is the
+// given fraction of its own rest energy.
+//
+// A gaussian charge density of peak rho0 = e amp^2 and width w sits at the
+// centre of its own potential
+//
+//	A0(0) = Mu0 rho0 w^2 / 2
+//
+// and the coupling only means anything while e A0 is well under m c^2. Past
+// that the potential exceeds the rest energy, which is the Klein regime: the
+// single-particle equation stops describing one particle and the numbers stop
+// making sense soon after.
+//
+// At the defaults that bound is tight. m c^2 = 0.031 while Mu0 = e = 1 and a
+// blob of amp 0.05 and width 12 reaches e A0 = m c^2 within five steps. There
+// is no amplitude that is both visible and stable, because rho goes as amp^2
+// while the display range does not -- Mu0 is the knob, not the amplitude.
+// Reducing it is not a fudge: the real coupling is weak too, which is what the
+// fine structure constant being 1/137 says.
+func kgSelfScale(ss *Sim, frac float32) {
+	p := ss.Params
+	a := ss.Config.Amplitude
+	w := ss.Config.PacketWidth
+	p.Mu0 = 2 * frac * (p.Omega0 * p.Hbar) / (p.E * p.E * a * a * w * w)
+	p.Update()
+}
+
+// ChargeSelfField is [ChargeAtRest] with the back-reaction on: the charge
+// makes its own electromagnetic potential, and is pushed by it.
+//
+// Mu0 is set from [kgSelfScale] so the self-potential is a twentieth of the
+// rest energy, which is the regime where this is a charge with a field rather
+// than a numerical accident. Raise the fraction and it goes sooner.
+//
+// Edges are damped, not wrapped. A net charge in a periodic box has no
+// solution to Poisson's equation at all -- every copy of the box adds another
+// charge -- so A0 climbs without bound and takes the run with it eventually,
+// however small the amplitude.
+//
+// The blob is not bound and is not supposed to be: like charge repels itself,
+// so it spreads faster than free dispersion alone and eventually leaves
+// through the walls, taking its charge with it. There is nothing in this
+// equation that could hold a charge together, which is a real feature of it
+// rather than a limitation of the simulation.
+func ChargeSelfField(ss *Sim) {
+	ss.Params.EM.SetBool(true)
+	ss.Params.Edges = EdgesDamp
+	kgSelfScale(ss, 0.05)
+	ChargeAtRest(ss)
+}
+
 // ChargedPacket is a moving charge: a wave packet in the two components a
 // quarter wavelength apart, travelling along X.
 func ChargedPacket(ss *Sim) {
@@ -384,6 +435,7 @@ var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charge At Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
 	InitFunc{Name: "Charge At Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
 	InitFunc{Name: "Charge Uniform", Doc: "Charge at rest filling all of space: flat, but rho is then exactly constant and equal to -e |chi|^2", Func: ChargeUniform},
+	InitFunc{Name: "Charge Self Field", Doc: "The charge makes its own potential and is pushed back by it: Mu0 is scaled so the self-field is a twentieth of the rest energy, which is the only regime where this is stable", Func: ChargeSelfField},
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
 }
 

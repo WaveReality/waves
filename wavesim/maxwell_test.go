@@ -25,7 +25,6 @@ func emSim(sz int32, init func(*Sim)) *Sim {
 	ss.Params.Update()
 	ss.StateVars = EMStatesN
 	ss.ConfigState()
-	ss.MaxwellStats()
 	ss.InitFunc = init
 	ss.Init()
 	return ss

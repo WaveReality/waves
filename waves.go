@@ -89,7 +89,6 @@ func main() {
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
-				sim.MaxwellStats()
 				sim.ViewInit(wavesim.MaxwellViewAll)
 			case wavesim.Dirac:
 				if threed {

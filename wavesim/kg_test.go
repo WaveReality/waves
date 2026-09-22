@@ -195,7 +195,7 @@ func kgStepExt(ss *Sim) {
 	ctx := GetCtx(0)
 	ctx.StepInc()
 	RunKleinGordonCKernel(int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z))
-	if ss.Params.Edges == EdgesWrap {
+	if ss.Params.Edges == EdgeWrap {
 		RunEdgesWrapKernel(int(ctx.EdgesN()))
 	}
 	ss.RunStats(false)

@@ -49,6 +49,7 @@ func init() {
 		"ChargeAtRest":                 reflect.ValueOf(wavesim.ChargeAtRest),
 		"ChargeAtRestAnti":             reflect.ValueOf(wavesim.ChargeAtRestAnti),
 		"ChargeDipole":                 reflect.ValueOf(wavesim.ChargeDipole),
+		"ChargeSelfField":              reflect.ValueOf(wavesim.ChargeSelfField),
 		"ChargeUniform":                reflect.ValueOf(wavesim.ChargeUniform),
 		"ChargedPacket":                reflect.ValueOf(wavesim.ChargedPacket),
 		"CircularPolarization":         reflect.ValueOf(wavesim.CircularPolarization),

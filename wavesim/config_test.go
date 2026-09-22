@@ -22,7 +22,6 @@ func cfgSim(sz int32, init func(*Sim), probes ...enums.Enum) *Sim {
 	ss.Params.Edges = EdgesWrap
 	ss.StateVars = EWStatesN
 	ss.ConfigState()
-	ss.ElectroweakStats()
 	for _, pv := range probes {
 		ss.AddStat(ss.StatWeightedMean(cfgHmagName(pv), EWHmag, pv))
 	}

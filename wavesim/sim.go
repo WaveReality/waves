@@ -130,6 +130,9 @@ func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi
 }
 
 func (ss *Sim) ConfigSim() {
+	// the equation Config methods below add their own stats, so start clean:
+	// registering the same stat twice appends two rows per step, silently.
+	ss.StatFuncs = nil
 	ss.Root, _ = tensorfs.NewDir("Root")
 	tensorfs.CurRoot = ss.Root
 	ss.Stats = ss.Root.Dir("Stats")
