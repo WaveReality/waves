@@ -380,6 +380,14 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.St
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateSum", Doc: "StateSum computes the sum of given variable at given cur vs. prev state\nwith given non-edge size.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMean", Doc: "StateMean computes the mean of given variable over the non-edge interior.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateCentroids", Doc: "StateCentroids computes the intensity-weighted (value squared) centroid\nalong dim for each of the given variables, in cube coordinates, along with\nthe total intensity, in ONE pass over the state. Variables that are\neverywhere zero get the box center.\nOne pass because a full scan is the expensive part of any stat: at 100^3\nthat is a million cells, so do not add more passes than you need.", Args: []string{"sz", "dim", "curPrv", "vrs", "ctrs", "wts"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StatCentroidName", Doc: "StatCentroidName is the stat name for the centroid of vr along dim.", Args: []string{"vr", "dim"}, Returns: []string{"string"}})
+
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StatGroupVelName", Doc: "StatGroupVelName is the stat name for the group velocity of vr along dim.", Args: []string{"vr", "dim"}, Returns: []string{"string"}})
+
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WaveKernel", Doc: "WaveKernel is the kernel for computing the Wave equations.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.WaveDampKernel", Doc: "WaveDampKernel is the kernel for computing the Wave equations\nat damped edges. Does Sommerfield damping where velocity = force.", Directives: []types.Directive{{Tool: "gosl", Directive: "kernel"}}, Args: []string{"i"}})

@@ -4,6 +4,8 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 //gosl:start
 
 // SchrodingerKernel is the kernel for computing the Schrodinger equations.
@@ -102,4 +104,6 @@ func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(CabCC))
 	ss.AddStat(ss.StatSum(CabEnergy))
+	// a matter wave: the group velocity is not the phase velocity
+	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
 }

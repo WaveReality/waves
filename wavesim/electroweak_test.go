@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"math"
 	"testing"
+
+	"cogentcore.org/lab/tensorfs"
 )
 
 // ewSim builds a minimal native-Go Electroweak sim (no GPU, no GUI).
@@ -25,6 +27,9 @@ func ewSim(sz int32) *Sim {
 	ss.StateVars = EWStatesN
 	ss.ConfigState()
 	ss.FromUnits()
+	ss.Root, _ = tensorfs.NewDir("Root")
+	ss.Stats = ss.Root.Dir("Stats")
+	ss.ElectroweakStats()
 	ctx := GetCtx(0)
 	ctx.Init()
 	State.SetZeros()
@@ -33,16 +38,19 @@ func ewSim(sz int32) *Sim {
 	// Fill only touches interior cells, so any perturbation needs a wrap or
 	// Laplacian19 sees a step at the boundary.
 	WrapEdges()
+	ss.RunStats(true)
 	return ss
 }
 
-// ewStep runs just the Higgs kernel plus edge wrapping.
+// ewStep runs the kernel, wraps the edges and records the stats, so tests can
+// read the same numbers the GUI plots.
 func ewStep(ss *Sim) {
 	ctx := GetCtx(0)
 	ctx.StepInc()
 	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
 	RunElectroweakKernel(ns)
 	RunEdgesWrapKernel(int(ctx.EdgesN()))
+	ss.RunStats(false)
 }
 
 func ewGet(v EWStates) float32 {

@@ -15,22 +15,32 @@ func thSetTemp(ss *Sim, t float32) {
 	ss.Params.Update()
 }
 
-// thMag returns mean |Phi|^2 over the interior, for a box of any shape.
-// EWHmag is kernel-written, so it reads zero until the first step.
-func thMag() float64 {
-	sz := GetCtx(0).Size.V()
-	var s float64
-	var n int
-	cur := int(GetCtx(0).CurState)
-	for z := int32(1); z <= sz.Z; z++ {
-		for y := int32(1); y <= sz.Y; y++ {
-			for x := int32(1); x <= sz.X; x++ {
-				s += float64(State.Value(int(z), int(y), int(x), int(EWHmag), cur))
-				n++
-			}
-		}
+// thMag is the stat holding the mean |Phi|^2 over the interior.
+var thMag = "Mean" + EWHmag.String()
+
+// thTail returns the values of the named stat recorded since index from.
+func thTail(ss *Sim, name string, from int) []float64 {
+	v := ss.StatVals(name)
+	if from >= len(v) {
+		return nil
 	}
-	return s / float64(n)
+	return v[from:]
+}
+
+func thMin(v []float64) float64 {
+	m := math.Inf(1)
+	for _, x := range v {
+		m = math.Min(m, x)
+	}
+	return m
+}
+
+func thMax(v []float64) float64 {
+	m := math.Inf(-1)
+	for _, x := range v {
+		m = math.Max(m, x)
+	}
+	return m
 }
 
 // TestThermalVEV checks the params against the algebra: mu^2 -> mu^2 - c T^2,
@@ -97,7 +107,7 @@ func TestThermalRestoration(t *testing.T) {
 	defer thSetTemp(ss, 0)
 	v0 := ss.Params.HiggsV // the cold VEV, where ewSim leaves the field
 	ewStep(ss)             // EWHmag is kernel-written: step once to fill it
-	start := thMag()
+	start := ss.StatVals(thMag)[0]
 	thSetTemp(ss, 1.5*ss.Params.TempCrit)
 	if ss.Params.HiggsV != 0 {
 		t.Fatalf("above TempCrit the VEV should be zero, got %g", ss.Params.HiggsV)
@@ -106,11 +116,11 @@ func TestThermalRestoration(t *testing.T) {
 		t.Errorf("above TempCrit the gauge bosons should be massless, got m_W %g m_Z %g",
 			ss.Params.MW, ss.Params.MZ)
 	}
-	var low float64 = math.Inf(1)
+	from := len(ss.StatVals(thMag))
 	for range 4000 {
 		ewStep(ss)
-		low = math.Min(low, thMag())
 	}
+	low := thMin(thTail(ss, thMag, from))
 	t.Logf("heated to 1.5 Tc from v = %.5f: |Phi|^2 %.3e -> %.3e at its lowest (started %.3e)",
 		v0, start, low, float64(v0)*float64(v0))
 	if low > 0.05*start {
@@ -129,25 +139,26 @@ func TestThermalQuench(t *testing.T) {
 	})
 	defer thSetTemp(ss, 0)
 	ewStep(ss) // EWHmag is kernel-written: step once to fill it
-	hot := thMag()
+	hot := ss.StatVals(thMag)[0]
 	for range 1000 { // above TempCrit this is a real minimum: must stay put
 		ewStep(ss)
 	}
-	held := thMag()
+	held := ss.StatVals(thMag)
 	t.Logf("hot at %.2f Tc: |Phi|^2 %.3e -> %.3e after 1000 steps",
-		ss.Params.Temp/ss.Params.TempCrit, hot, held)
-	if held > 4*hot+1e-12 {
-		t.Errorf("symmetric phase should be stable above TempCrit: %g -> %g", hot, held)
+		ss.Params.Temp/ss.Params.TempCrit, hot, held[len(held)-1])
+	if held[len(held)-1] > 4*hot+1e-12 {
+		t.Errorf("symmetric phase should be stable above TempCrit: %g -> %g",
+			hot, held[len(held)-1])
 	}
 
 	thSetTemp(ss, 0) // quench
 	v2 := float64(ss.Params.HiggsV) * float64(ss.Params.HiggsV)
-	var peak float64
+	from := len(held)
 	for range 4000 {
 		ewStep(ss)
-		peak = math.Max(peak, thMag())
 	}
-	final := thMag()
+	cold := thTail(ss, thMag, from)
+	peak, final := thMax(cold), cold[len(cold)-1]
 	t.Logf("quenched to T = 0: |Phi|^2 peak %.5f, final %.5f  (v^2 = %.5f)", peak, final, v2)
 	if peak < 0.5*v2 {
 		t.Errorf("quench did not reach the broken vacuum: peak %g vs v^2 %g", peak, v2)

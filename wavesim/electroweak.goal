@@ -806,13 +806,31 @@ func ElectroweakViewAll(view *View) {
 	// view.Settings.TrackParticle = 0
 }
 
+// ElectroweakStats adds the stats plotted over time in the GUI. Each one is a
+// full pass over the state, so at 100^3 they are not free: raise
+// Config.ViewInterval if the run drags.
 func (ss *Sim) ElectroweakStats() {
 	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(EWHmag))
+	ss.AddStat(ss.StatMean(EWHmag)) // directly comparable to v^2
 	ss.AddStat(ss.StatSum(EWHV))
-	// ss.AddStat(ss.StatParticle(0))
-	// ss.AddStat(ss.StatParticle(0))
+	// the pulse configs: photon vs Z, and the two fields they are mixed from.
+	// The photon runs at ~c and the Z visibly slower, while W^3 and B each show
+	// whichever of the two they currently carry.
+	ss.AddStat(ss.StatGroupVel(math32.X, AYs, EWZY, EWBYs, EWW3Ys))
+	// W collision: W^3 generated out of nothing by the non-abelian coupling.
+	ss.AddStat(ss.StatSumSq(EWW3SqStat, EWW30s, EWW3Xs, EWW3Ys, EWW3Zs))
+	// what a Z packet does to the condensate it travels through.
+	ss.AddStat(ss.StatWeightedMean(EWHmagZStat, EWHmag, EWZY))
 }
+
+// Stat names that are not built from a variable and a dimension.
+const (
+	// EWW3SqStat is the summed squares of all four W^3 components.
+	EWW3SqStat = "W3Sq"
+
+	// EWHmagZStat is |Phi|^2 weighted by the local Z intensity.
+	EWHmagZStat = "HmagZ"
+)
 
 // ElectroweakDisplay determines which Parameters fields to display.
 var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ"}

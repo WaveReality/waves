@@ -6,6 +6,8 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 //gosl:start
 
 // WaveStates are the state variables for Wave equations.
@@ -139,4 +141,6 @@ func (ss *Sim) WaveStats() {
 	ss.AddStat(ss.StatSum(WaveKinetic))
 	ss.AddStat(ss.StatSum(WavePotential))
 	ss.AddStat(ss.StatSum(WaveEnergy))
+	// a massless packet: should sit at c, up to the lattice cos(k/2)
+	ss.AddStat(ss.StatGroupVel(math32.X, WavePos))
 }

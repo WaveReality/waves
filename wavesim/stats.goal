@@ -117,3 +117,255 @@ func (ss *Sim) StatParticle(idx int) func(init bool) {
 		}
 	}
 }
+
+// StateMean computes the mean of given variable over the non-edge interior.
+func StateMean(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	n := int(sz.X) * int(sz.Y) * int(sz.Z)
+	if n == 0 {
+		return 0
+	}
+	return StateSum(sz, vr, curPrv) / float64(n)
+}
+
+// StateCentroids computes the intensity-weighted (value squared) centroid
+// along dim for each of the given variables, in cube coordinates, along with
+// the total intensity, in ONE pass over the state. Variables that are
+// everywhere zero get the box center.
+// One pass because a full scan is the expensive part of any stat: at 100^3
+// that is a million cells, so do not add more passes than you need.
+func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, vrs []enums.Enum, ctrs, wts []float64) {
+	nv := len(vrs)
+	vris := make([]int, nv)
+	num := make([]float64, nv)
+	den := make([]float64, nv)
+	for i, vr := range vrs {
+		vris[i] = int(vr.Int64())
+	}
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := float64(c.Dim(dim))
+				for i := range nv {
+					v := float64(State[f.Z, f.Y, f.X, vris[i], curPrv])
+					w := v * v
+					num[i] += w * d
+					den[i] += w
+				}
+			}
+		}
+	}
+	for i := range nv {
+		wts[i] = den[i]
+		if den[i] == 0 {
+			ctrs[i] = float64(sz.Dim(dim)) / 2
+		} else {
+			ctrs[i] = num[i] / den[i]
+		}
+	}
+}
+
+// StatGroupVelWindow is how many recorded samples [Sim.StatGroupVel] measures
+// the centroid shift over. The centroid of a carrier under an envelope wobbles
+// at twice the carrier frequency, so a one-sample difference is dominated by
+// that wobble; a window long enough to cover a couple of periods averages it
+// out without smearing a real change of speed.
+var StatGroupVelWindow = 20
+
+// StatCentroidName is the stat name for the centroid of vr along dim.
+func StatCentroidName(vr enums.Enum, dim math32.Dims) string {
+	return "Ctr" + vr.String() + dim.String()
+}
+
+// StatGroupVelName is the stat name for the group velocity of vr along dim.
+func StatGroupVelName(vr enums.Enum, dim math32.Dims) string {
+	return "Vg" + vr.String() + dim.String()
+}
+
+// StatGroupVel records, for each of the given variables, the intensity
+// centroid along dim and the speed of that centroid in units of C: the group
+// velocity of a wave packet. Both are recorded; only the velocity is plotted
+// by default.
+//
+// The shift is measured over [StatGroupVelWindow] samples, so the first that
+// many read zero. A packet crossing a wrapped edge is taken the short way
+// round the box, so it does not register as a jump.
+//
+// A variable carrying a negligible share of the intensity in the group reads
+// zero rather than the centroid of its own roundoff, which would otherwise be
+// pure noise: in a Z pulse, for instance, the photon field is not excited at
+// all. That is why these belong in one call rather than several -- besides
+// sharing the one pass over the state, they calibrate each other.
+func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	nv := len(vrs)
+	ctrs := make([]float64, nv)
+	wts := make([]float64, nv)
+	var hist []float64
+	var steps []int
+	var n, win int
+	return func(init bool) {
+		ctx := GetCtx(0)
+		if init {
+			win = max(StatGroupVelWindow, 1)
+			hist = make([]float64, win*nv)
+			steps = make([]int, win)
+			n = 0
+			for _, vr := range vrs {
+				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
+				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
+				ct.SetNumRows(0)
+				vt.SetNumRows(0)
+				plot.SetFirstStyler(ct, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(vt, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
+				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
+			}
+			return
+		}
+		sz := ss.Config.Size
+		ln := float64(sz.Dim(dim))
+		StateCentroids(sz, dim, ctx.CurState, vrs, ctrs, wts)
+		mx := 0.0
+		for i := range nv {
+			if wts[i] > mx {
+				mx = wts[i]
+			}
+		}
+		// the window slot about to be overwritten holds the oldest sample
+		old := n % win
+		have := n >= win
+		ds := float64(int(ctx.Step) - steps[old])
+		for i, vr := range vrs {
+			vg := 0.0
+			if have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx {
+				d := ctrs[i] - hist[old*nv+i]
+				if d > ln/2 {
+					d -= ln
+				} else if d < -ln/2 {
+					d += ln
+				}
+				vg = d / ds / float64(ss.Params.C)
+			}
+			hist[old*nv+i] = ctrs[i]
+			ss.Stats.Float64(StatCentroidName(vr, dim)).AppendRowFloat(ctrs[i])
+			ss.Stats.Float64(StatGroupVelName(vr, dim)).AppendRowFloat(vg)
+		}
+		steps[old] = int(ctx.Step)
+		n++
+	}
+}
+
+// StatMean is a stats function that records the mean of given variable over
+// the interior, which for |Phi|^2 is directly comparable to v^2.
+func (ss *Sim) StatMean(vr enums.Enum) func(init bool) {
+	return func(init bool) {
+		name := "Mean" + vr.String()
+		tsr := ss.Stats.Float64(name)
+		if init {
+			tsr.SetNumRows(0)
+			plot.SetFirstStyler(tsr, func(s *plot.Style) {
+				s.On = true
+			})
+			metadata.SetDoc(tsr, "Mean of "+vr.String()+" over the interior")
+			return
+		}
+		ctx := GetCtx(0)
+		tsr.AppendRowFloat(StateMean(ss.Config.Size, vr, ctx.CurState))
+	}
+}
+
+// StatSumSq records the summed squares of the given variables under the given
+// name: the total power in a multi-component field.
+func (ss *Sim) StatSumSq(name string, vrs ...enums.Enum) func(init bool) {
+	return func(init bool) {
+		tsr := ss.Stats.Float64(name)
+		if init {
+			tsr.SetNumRows(0)
+			plot.SetFirstStyler(tsr, func(s *plot.Style) {
+				s.On = false
+			})
+			metadata.SetDoc(tsr, "Summed squares of "+name)
+			return
+		}
+		ctx := GetCtx(0)
+		cur := ctx.CurState
+		sz := ss.Config.Size
+		vris := make([]int, len(vrs))
+		for i, vr := range vrs {
+			vris[i] = int(vr.Int64())
+		}
+		sum := 0.0
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					for i := range vris {
+						v := float64(State[f.Z, f.Y, f.X, vris[i], cur])
+						sum += v * v
+					}
+				}
+			}
+		}
+		tsr.AppendRowFloat(sum)
+	}
+}
+
+// StatWeightedMean records the mean of vr weighted by the intensity of wtVr:
+// what a wtVr wave packet sees as it passes, rather than the box average.
+func (ss *Sim) StatWeightedMean(name string, vr, wtVr enums.Enum) func(init bool) {
+	return func(init bool) {
+		tsr := ss.Stats.Float64(name)
+		if init {
+			tsr.SetNumRows(0)
+			plot.SetFirstStyler(tsr, func(s *plot.Style) {
+				s.On = false
+			})
+			metadata.SetDoc(tsr, "Mean of "+vr.String()+" weighted by the intensity of "+wtVr.String())
+			return
+		}
+		ctx := GetCtx(0)
+		cur := ctx.CurState
+		sz := ss.Config.Size
+		vri := int(vr.Int64())
+		wti := int(wtVr.Int64())
+		num, den := 0.0, 0.0
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					w := float64(State[f.Z, f.Y, f.X, wti, cur])
+					w *= w
+					num += w * float64(State[f.Z, f.Y, f.X, vri, cur])
+					den += w
+				}
+			}
+		}
+		if den > 0 {
+			num /= den
+		}
+		tsr.AppendRowFloat(num)
+	}
+}
+
+// StatVals returns the values recorded so far for the named stat,
+// nil if there is no such stat.
+func (ss *Sim) StatVals(name string) []float64 {
+	tsrs, err := ss.Stats.Values(name)
+	if err != nil || len(tsrs) != 1 {
+		return nil
+	}
+	tsr := tsrs[0]
+	n := tsr.Len()
+	vals := make([]float64, n)
+	for i := range n {
+		vals[i] = tsr.Float1D(i)
+	}
+	return vals
+}
