@@ -102,9 +102,22 @@ type Parameters struct {
 
 	// A0NoWave applies the neighborhood force directly as a velocity, instead
 	// of as a force that adds to the velocity, for the scalar potential, A0.
-	// This prevents non-physical longitudinal wave propagation.
-	// It increases the sensitivity, such that C must be less than 1.
-	// This is the same as Sommerfield edge damping.
+	// Same form as Sommerfield edge damping. It increases the sensitivity, so
+	// C must be less than 1.
+	//
+	// This is the COULOMB gauge condition, not the Lorenz one: the update
+	// becomes Jacobi relaxation toward Laplacian(A0) = -rho/eps0, so A0 is
+	// slaved to the charge instead of propagating. Off, A0 obeys the Lorenz
+	// wave equation and a bump in it travels at c -- which is the unphysical
+	// scalar mode, cancelled in the continuum by the longitudinal one but free
+	// to run away on a lattice. Turning this on deletes that sector rather
+	// than relying on the cancellation, which is why it is the default.
+	//
+	// The cost is that the A sector still assumes Lorenz: Laplacian-wave A
+	// driven by the full current gives Ampere-Maxwell only when
+	// div A + dA0/dt / c^2 = 0. Coulomb for A0 and Lorenz for A agree only
+	// where A0 is static and div A constant -- static sources, or a
+	// divergence-free current. Outside that the fields are approximate.
 	A0NoWave slbool.Bool
 
 	// E is the electric charge constant, which determines the

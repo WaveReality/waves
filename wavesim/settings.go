@@ -104,7 +104,7 @@ type Settings struct {
 	BarSize float32 `min:"0.1" max:"1" step:"0.1" default:"0.9"`
 
 	// VectorSize is how wide the vector arrows are, in proportion of one cell (1 = full cell).
-	VectorSize float32 `min:"0.01" max:"1" step:"0.05" default:"0.2"`
+	VectorSize float32 `min:"0.01" max:"1" step:"0.05" default:"0.1"`
 
 	// name of color map to use
 	ColorMap core.ColorMapName `display:"-"`
@@ -122,7 +122,7 @@ func (nv *Settings) Defaults() {
 	nv.TrackParticle = -1
 	nv.Height = 0.2
 	nv.BarSize = 0.9
-	nv.VectorSize = 0.2
+	nv.VectorSize = 0.1
 	nv.LabelSize = 0.05
 	nv.ZeroAlpha = 0.5
 	nv.ColorMap = core.ColorMapName("ColdHot")

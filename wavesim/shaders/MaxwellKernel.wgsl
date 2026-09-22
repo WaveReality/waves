@@ -598,7 +598,7 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	f0 = csq*f0 + Params[0].OneoEps0*c0;
 	var a0vc: f32;
 	if (Params[0].A0NoWave == 1) {
-		a0vc = f0; // no wave dynamics in a0! Lorentz gauge -- note: requires C < 1
+		a0vc = f0; // Coulomb gauge: relaxes to Poisson, no waves. Requires C < 1.
 	} else {
 		a0vc = a0vp + f0;
 	}
