@@ -399,6 +399,7 @@ func init() {
 		"StdZ0":                        reflect.ValueOf(wavesim.StdZ0),
 		"SyncFromGPU":                  reflect.ValueOf(wavesim.SyncFromGPU),
 		"TensorStrides":                reflect.ValueOf(&wavesim.TensorStrides).Elem(),
+		"ThermalQuench":                reflect.ValueOf(wavesim.ThermalQuench),
 		"ToGPU":                        reflect.ValueOf(wavesim.ToGPU),
 		"ToGPUTensorStrides":           reflect.ValueOf(wavesim.ToGPUTensorStrides),
 		"Tp":                           reflect.ValueOf(constant.MakeFromLiteral("5.3912400000000000000000000000000000000000000000005929439314997313172938242616760599740094088111085475421327427369819033529611439646473085470059408557713630891739e-44", token.FLOAT, 0)),

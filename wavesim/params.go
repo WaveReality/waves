@@ -121,11 +121,25 @@ type Parameters struct {
 
 	// HiggsMu is the Higgs potential target mass (mu_H), which determines the
 	// expected value of the symmetry-broken higgs field squared complex magnitude.
-	HiggsMu float32
+	HiggsMu float32 `default:"0.0441942"`
 
 	// HiggsLambda is the Higgs potential weight factor that determines
 	// effectively how strongly the complex magnitude minus mu_H contributes.
-	HiggsLambda float32
+	HiggsLambda float32 `default:"0.1291"`
+
+	// Temp is the temperature T of the thermal bath the Higgs sits in, in the
+	// same 1/cube units as HiggsMu. This is added externally to the potential.
+	//	mu^2 -> mu^2 - ThermalC * Temp^2
+	//
+	// Transitioning Temp through TempCrit moves the system between broken
+	// and unbroken symmetry, as a function of HiggsV, MW and MZ.
+	Temp float32
+
+	// ThermalC is the coefficient c in the thermal mass mu^2 -> mu^2 - c T^2.
+	// In the Standard Model it comes from the particles in the bath:
+	//	c = (3 g^2 + g'^2 + 4 y_t^2 + 8 lambda) / 16
+	// which is about 0.397, dominated by the top Yukawa y_t.
+	ThermalC float32 `default:"0.3973"`
 
 	// GW is g, the SU(2)_L weak isospin gauge coupling, which couples the
 	// three W^a fields to the Higgs doublet. Dimensionless. Standard Model
@@ -212,23 +226,33 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
-	// HiggsMuSq = HiggsMu*HiggsMu, in 1/cube^2 -- the Higgs equivalent of
-	// MOverHSq, occupying the same slot in the update.
+	// HiggsMuSq is the EFFECTIVE mu^2 that the kernel actually uses, in
+	// 1/cube^2: HiggsMu^2 - ThermalC * Temp^2. The Higgs equivalent of
+	// MOverHSq, occupying the same slot in the update. It goes negative
+	// above TempCrit, at which point the origin becomes the minimum.
 	HiggsMuSq float32 `display:"-"`
 
-	// HiggsV = HiggsMu / sqrt(HiggsLambda) is the Higgs vacuum expectation
+	// TempCrit is the critical temperature, HiggsMu / sqrt(ThermalC), where
+	// the thermal mass exactly cancels mu^2 and the broken minimum closes up.
+	// Above it the symmetry is restored and the gauge bosons are massless.
+	TempCrit float32 `edit:"-"`
+
+	// HiggsV = sqrt(HiggsMuSq / HiggsLambda) is the Higgs vacuum expectation
 	// value: the radius of the minimum of the potential, in 1/cube. The
-	// neutral (lower) doublet component is initialized to this.
-	HiggsV float32 `display:"-"`
+	// neutral (lower) doublet component is initialized to this. It is the
+	// THERMAL VEV v(T), equal to HiggsMu/sqrt(HiggsLambda) at Temp = 0 and
+	// falling to zero at TempCrit.
+	HiggsV float32 `edit:"-"`
 
 	// MW = GW * HiggsV / 2 is the W boson mass in 1/cube. Nothing in the
 	// kernel uses it -- the mass is generated dynamically by the Higgs
-	// current. It is here to check that against.
-	MW float32 `display:"-"`
+	// current. It is here to check that against. Since it follows HiggsV it
+	// is likewise the thermal mass, and vanishes above TempCrit.
+	MW float32 `edit:"-"`
 
 	// MZ = HiggsV * sqrt(GW^2 + GpW^2) / 2 is the Z boson mass in 1/cube,
-	// likewise for reference only. The photon mass is zero.
-	MZ float32 `display:"-"`
+	// likewise for reference only. The photon mass is zero at any temperature.
+	MZ float32 `edit:"-"`
 
 	// SinThetaW, CosThetaW are sin and cos of the weak mixing angle,
 	//	tan(theta_W) = g'/g
@@ -239,6 +263,8 @@ type Parameters struct {
 	// which is why it stays massless.
 	SinThetaW float32 `display:"-"`
 	CosThetaW float32 `display:"-"`
+
+	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -260,9 +286,17 @@ func (pr *Parameters) Update() {
 	pr.OneoEps0 = 1.0 / pr.Eps0
 	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
 	pr.EOverHSq = (pr.E * pr.E) / hsq
-	pr.HiggsMuSq = pr.HiggsMu * pr.HiggsMu
-	if pr.HiggsLambda > 0 {
-		pr.HiggsV = pr.HiggsMu / math32.Sqrt(pr.HiggsLambda)
+	// the thermal mass adds to mu^2 with the opposite sign, so raising Temp
+	// closes the broken minimum; above TempCrit it is negative and the only
+	// minimum is the origin, where v(T) = 0.
+	pr.HiggsMuSq = pr.HiggsMu*pr.HiggsMu - pr.ThermalC*pr.Temp*pr.Temp
+	pr.TempCrit = 0
+	if pr.ThermalC > 0 {
+		pr.TempCrit = pr.HiggsMu / math32.Sqrt(pr.ThermalC)
+	}
+	pr.HiggsV = 0
+	if pr.HiggsLambda > 0 && pr.HiggsMuSq > 0 {
+		pr.HiggsV = math32.Sqrt(pr.HiggsMuSq / pr.HiggsLambda)
 	}
 	pr.MW = pr.GW * pr.HiggsV / 2.0
 	pr.MZ = pr.HiggsV * math32.Sqrt(pr.GW*pr.GW+pr.GpW*pr.GpW) / 2.0
@@ -289,6 +323,8 @@ func (pr *Parameters) Defaults() {
 	// Gives v = 0.1230, m_W Compton 24.9 cubes, m_Z Compton 21.9 cubes.
 	pr.HiggsMu = 0.0441942
 	pr.HiggsLambda = 0.1291
+	pr.Temp = 0
+	pr.ThermalC = 0.3973 // (3g^2 + g'^2 + 4y_t^2 + 8lambda)/16, SM values
 	pr.GW = 0.6533
 	pr.GpW = 0.3500
 	pr.YangMills.SetBool(true)

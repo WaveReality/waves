@@ -21,6 +21,9 @@ import (
 
 //go:generate core generate -add-types -add-funcs -gosl
 
+// MemoryReport prints out the memory used -- in case there are GPU memory usage issues.
+var MemoryReport = false
+
 // Sim contains everything for the simulation.
 type Sim struct {
 	// Params contains the current simulation parameters.
@@ -178,9 +181,12 @@ func (ss *Sim) ConfigState() {
 	// fmt.Println(fs)
 	bufcap := 10 * (1 << 31)
 	totsz := int(fs.X) * int(fs.Y) * int(fs.Z) * nvar * 2
-	p := message.NewPrinter(language.English)
-	p.Println("Total memory size in floats:", totsz, "GB:", totsz*4, "num vars:", nvar, "buf cap:", bufcap)
-	if totsz*4 > bufcap {
+	memError := totsz*4 > bufcap
+	if MemoryReport || memError {
+		p := message.NewPrinter(language.English)
+		p.Println("Total memory size in floats:", totsz, "GB:", totsz*4, "num vars:", nvar, "buf cap:", bufcap)
+	}
+	if memError {
 		panic("memory exceeds buffer capacity")
 	}
 	State.SetShapeSizes(int(fs.Z), int(fs.Y), int(fs.X), nvar, 2)

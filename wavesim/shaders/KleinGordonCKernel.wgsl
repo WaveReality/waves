@@ -566,6 +566,8 @@ struct Parameters {
 	Move: i32,
 	HiggsMu: f32,
 	HiggsLambda: f32,
+	Temp: f32,
+	ThermalC: f32,
 	GW: f32,
 	GpW: f32,
 	YangMills: i32,
@@ -587,11 +589,13 @@ struct Parameters {
 	E2OverH: f32,
 	EOverHSq: f32,
 	HiggsMuSq: f32,
+	TempCrit: f32,
 	HiggsV: f32,
 	MW: f32,
 	MZ: f32,
 	SinThetaW: f32,
 	CosThetaW: f32,
+	pad: f32,
 }
 
 //////// import: "particle.go"

@@ -832,7 +832,7 @@ func (ss *Sim) ElectroweakStats() {
 }
 
 // ElectroweakDisplay determines which Parameters fields to display.
-var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "GW", "GpW", "YangMills", "Boris"}
+var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ"}
 
 //////// initialization helpers
 
@@ -859,6 +859,18 @@ func ewFreq(ss *Sim, wavelength, mass float32) float32 {
 func ewDemoScale(ss *Sim, mu float32) {
 	ss.Params.HiggsMu = mu
 	ss.Params.Update()
+}
+
+// ewVZero returns the ZERO-temperature vacuum value, mu/sqrt(lambda). That
+// stays the natural scale for field amplitudes even when Params.Temp has driven
+// the actual HiggsV to zero, which is why the configs size their noise and
+// their packets against it rather than against HiggsV.
+func ewVZero(ss *Sim) float32 {
+	p := ss.Params
+	if p.HiggsLambda <= 0 {
+		return 0
+	}
+	return p.HiggsMu / math32.Sqrt(p.HiggsLambda)
 }
 
 //////// configurations
@@ -891,7 +903,38 @@ func HiggsBroken(ss *Sim) {
 // gauge scalar potentials, and that sector carries a secular gauge branch that
 // otherwise drifts without bound and takes the run with it.
 func HiggsSymmetric(ss *Sim) {
-	amp := 0.02 * ss.Params.HiggsV
+	amp := 0.02 * ewVZero(ss)
+	ss.SmoothNoise(EWHsCa, amp, 6)
+	ss.SmoothNoise(EWHsCb, amp, 6)
+	ss.SmoothNoise(EWHs0a, amp, 6)
+	ss.SmoothNoise(EWHs0b, amp, 6)
+}
+
+// ThermalQuench starts ABOVE the critical temperature, in the symmetric phase,
+// and waits for you to cool it.
+//
+// Params.Temp adds -ThermalC*Temp^2 to mu^2, so above Params.TempCrit the
+// coefficient is negative and the origin is a genuine minimum rather than the
+// top of a hat: the field sits at zero and stays there, the W and Z are
+// massless, and the whole electroweak symmetry is intact. That is the state of
+// the universe before about a picosecond.
+//
+// The demonstration is interactive. Run it, then drag Temp down through
+// TempCrit in the parameters and watch the transition happen: HiggsV, MW and
+// MZ come off zero together, the field rolls out to v(T), and different
+// regions pick different directions in the internal space, leaving domain
+// walls behind. Drop Temp to zero in one jump instead and you get a quench,
+// with far more violent ringing and more domains that survive.
+//
+// Unlike HiggsSymmetric, which sits on an unstable maximum at Temp = 0 and
+// falls the moment it is nudged, this one is genuinely stable until you cool
+// it. The noise is here so there is something for the transition to amplify
+// once you do.
+func ThermalQuench(ss *Sim) {
+	p := ss.Params
+	p.Temp = 1.25 * p.TempCrit
+	p.Update()
+	amp := 0.02 * ewVZero(ss)
 	ss.SmoothNoise(EWHsCa, amp, 6)
 	ss.SmoothNoise(EWHsCb, amp, 6)
 	ss.SmoothNoise(EWHs0a, amp, 6)
@@ -1005,6 +1048,7 @@ func WCollision(ss *Sim) {
 var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
+	InitFunc{Name: "Thermal Quench", Doc: "Starts above the critical temperature where the symmetry is unbroken and the field is stable at zero; lower Temp through TempCrit to watch the electroweak phase transition happen", Func: ThermalQuench},
 	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
 	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
