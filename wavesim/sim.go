@@ -6,8 +6,11 @@ package wavesim
 
 import (
 	"fmt"
+	"io"
 
+	"cogentcore.org/core/base/errors"
 	"cogentcore.org/core/base/fsx"
+	"cogentcore.org/core/base/iox/gzipx"
 	"cogentcore.org/core/cli"
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/math32"
@@ -383,21 +386,19 @@ func (ss *Sim) UpdateView() {
 // SaveState saves the state to given file.
 // If filename ends in .gz, it is gzipped.
 func (ss *Sim) SaveState(filename fsx.Filename) error { //types:add
-	// err := gzipx.Save(string(filename), func(w io.Writer) error {
-	// 	return tensor.WriteCSV(State, w, tensor.Tab)
-	// })
-	// return errors.Log(err)
-	return nil
+	err := gzipx.Save(string(filename), func(w io.Writer) error {
+		return tensor.WriteCSV(State, w, tensor.Tab)
+	})
+	return errors.Log(err)
 }
 
 // OpenState opens the state from given file.
 // If filename ends in .gz, it is un-gzipped.
 func (ss *Sim) OpenState(filename fsx.Filename) error { //types:add
-	// err := gzipx.Open(string(filename), func(r io.Reader) error {
-	// 	return tensor.ReadCSV(State, r, tensor.Tab)
-	// })
-	// return errors.Log(err)
-	return nil
+	err := gzipx.Open(string(filename), func(r io.Reader) error {
+		return tensor.ReadCSV(State, r, tensor.Tab)
+	})
+	return errors.Log(err)
 }
 
 func (ss *Sim) RunNoGUI() {
