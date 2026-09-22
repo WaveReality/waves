@@ -205,7 +205,7 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	midA := 0.5 * (pvelA + velA)
 	midB := 0.5 * (pvelB + velB)
 	ccm := pposA*pposA + pposB*pposB
-	hem := 2 * Params[0].HEOver2MCSq // hbar e / (m c^2)
+	hem := Params[0].HEOverMCSq // hbar e / (m c^2)
 	rho := hem * (pposB*midA - pposA*midB)
 	if em {
 		rho -= Params[0].EsqOverMCSq * a0 * ccm

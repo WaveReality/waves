@@ -107,6 +107,7 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/DiracKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")

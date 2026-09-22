@@ -6,6 +6,12 @@
 
 package wavesim
 
+import (
+	"cogentcore.org/core/base/metadata"
+	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/plot"
+)
+
 //gosl:start
 
 // DiracStates are the state variables for wave equations on
@@ -52,8 +58,26 @@ const (
 	DiracCC
 )
 
-// DiracKernel is the kernel for computing the Dirac equations,
-// on scalar state values (WaveStates).
+// DiracKernel is the second-order (Feynman-Gell-Mann) Dirac equation: the
+// complex Klein-Gordon equation on TWO complex components, plus one term.
+//
+//	[(i hbar d_mu - (e/c) A_mu)^2 + (e/c) sigma . (B + iE)] psi = m^2 c^2 psi
+//
+// Everything but the last term acts on the two components separately, exactly
+// as KleinGordonCKernel acts on one. The sigma term is what makes this Dirac
+// rather than two copies of KG: it mixes components 1 and 2, and that mixing
+// is spin.
+//
+// Two things about it are worth knowing. The free equation has NO spin term at
+// all -- a free particle here is four uncoupled KG waves, and spin only shows
+// up through the field. That is not a defect: spin is not observable on a free
+// particle either, it takes a field gradient to see one. And the strength of
+// the term is fixed, not free: it is what makes the magnetic moment come out
+// at g = 2, which is the second-order equation's best-known prediction.
+//
+// In c = 1 units the combination is B + iE. Here it is cB + iE, because E and
+// B differ by a factor of c in these units -- E = -grad A0 - dA/dt is per step
+// where B = curl A is per cube. [Sim.MaxwellStats] measures exactly that ratio.
 func DiracKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -63,35 +87,143 @@ func DiracKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
-	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	var force float32
-	if Params[0].ThreeD.IsTrue() {
-		force = Laplacian19(x, y, z, int32(WavePos), prv, ppos)
+	p1a := State.Value(int(z), int(y), int(x), int(DiracPos1A), int(prv))
+	p1b := State.Value(int(z), int(y), int(x), int(DiracPos1B), int(prv))
+	p2a := State.Value(int(z), int(y), int(x), int(DiracPos2A), int(prv))
+	p2b := State.Value(int(z), int(y), int(x), int(DiracPos2B), int(prv))
+	v1a := State.Value(int(z), int(y), int(x), int(DiracVel1A), int(prv))
+	v1b := State.Value(int(z), int(y), int(x), int(DiracVel1B), int(prv))
+	v2a := State.Value(int(z), int(y), int(x), int(DiracVel2A), int(prv))
+	v2b := State.Value(int(z), int(y), int(x), int(DiracVel2B), int(prv))
+
+	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+	threeD := Params[0].ThreeD.IsTrue()
+
+	var l1a, l1b, l2a, l2b float32
+	if threeD {
+		l1a = Laplacian19(x, y, z, int32(DiracPos1A), prv, p1a)
+		l1b = Laplacian19(x, y, z, int32(DiracPos1B), prv, p1b)
+		l2a = Laplacian19(x, y, z, int32(DiracPos2A), prv, p2a)
+		l2b = Laplacian19(x, y, z, int32(DiracPos2B), prv, p2b)
 	} else {
-		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
+		l1a = Laplacian1D(x, y, z, int32(DiracPos1A), prv, p1a)
+		l1b = Laplacian1D(x, y, z, int32(DiracPos1B), prv, p1b)
+		l2a = Laplacian1D(x, y, z, int32(DiracPos2A), prv, p2a)
+		l2b = Laplacian1D(x, y, z, int32(DiracPos2B), prv, p2b)
 	}
-	force -= Params[0].MOverHSq * ppos // this is the only diff from standard Wave
-	vel := pvel + Params[0].CSq*force
-	pos := ppos + vel
+	a1a := csq * (l1a - mhsq*p1a)
+	a1b := csq * (l1b - mhsq*p1b)
+	a2a := csq * (l2a - mhsq*p2a)
+	a2b := csq * (l2b - mhsq*p2b)
 
-	if Params[0].Energy.IsTrue() {
-		midVel := 0.5 * (pvel + vel)
-		kinetic := Params[0].Inv2CSq * midVel * midVel
-		var potential float32
-		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy19(x, y, z, int32(WavePos), prv, ppos)
-		} else {
-			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
-		}
-
-		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
-		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
-		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
+	// gradients: needed for the current always, and for the A.grad term
+	var g1a, g1b, g2a, g2b math32.Vector3
+	if threeD {
+		g1a = Gradient10(x, y, z, int32(DiracPos1A), prv)
+		g1b = Gradient10(x, y, z, int32(DiracPos1B), prv)
+		g2a = Gradient10(x, y, z, int32(DiracPos2A), prv)
+		g2b = Gradient10(x, y, z, int32(DiracPos2B), prv)
+	} else {
+		g1a = Gradient1D(x, y, z, int32(DiracPos1A), prv)
+		g1b = Gradient1D(x, y, z, int32(DiracPos1B), prv)
+		g2a = Gradient1D(x, y, z, int32(DiracPos2A), prv)
+		g2b = Gradient1D(x, y, z, int32(DiracPos2B), prv)
 	}
-	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
-	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
-	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+
+	em := Params[0].EM.IsTrue()
+	var a0, omega float32
+	if em {
+		a0 = State.Value(int(z), int(y), int(x), int(A0s), int(prv))
+		ax := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
+		ay := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
+		az := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		e2h := Params[0].E2OverH
+		cc := Params[0].C
+		asq := a0*a0 - (ax*ax + ay*ay + az*az)
+		eh2 := Params[0].EOverHSq * asq
+		a1a += e2h*cc*(ax*g1b.X+ay*g1b.Y+az*g1b.Z) + eh2*p1a
+		a1b += -e2h*cc*(ax*g1a.X+ay*g1a.Y+az*g1a.Z) + eh2*p1b
+		a2a += e2h*cc*(ax*g2b.X+ay*g2b.Y+az*g2b.Z) + eh2*p2a
+		a2b += -e2h*cc*(ax*g2a.X+ay*g2a.Y+az*g2a.Z) + eh2*p2b
+		omega = e2h * a0
+
+		// the spin term: sigma . (cB + iE), mixing the two components.
+		// Params.SigmaF carries the sign and strength.
+		sf := Params[0].SigmaF
+		bx := cc * State.Value(int(z), int(y), int(x), int(BX), int(prv))
+		by := cc * State.Value(int(z), int(y), int(x), int(BY), int(prv))
+		bz := cc * State.Value(int(z), int(y), int(x), int(BZ), int(prv))
+		ex := State.Value(int(z), int(y), int(x), int(EX), int(prv))
+		ey := State.Value(int(z), int(y), int(x), int(EY), int(prv))
+		ez := State.Value(int(z), int(y), int(x), int(EZ), int(prv))
+		a1a += sf * (p1a*bz - p1b*ez + p2a*(bx+ey) - p2b*(ex-by))
+		a1b += sf * (p1b*bz + p1a*ez + p2b*(bx+ey) + p2a*(ex-by))
+		a2a += sf * (-p2a*bz + p2b*ez + p1a*(bx-ey) - p1b*(ex+by))
+		a2b += sf * (-p2b*bz - p2a*ez + p1b*(bx-ey) + p1a*(ex+by))
+	}
+
+	var n1a, n1b, n2a, n2b float32
+	if em && Params[0].Boris.IsTrue() {
+		cs := math32.Cos(omega)
+		sn := math32.Sin(omega)
+		h1a := 0.5 * a1a
+		h1b := 0.5 * a1b
+		h2a := 0.5 * a2a
+		h2b := 0.5 * a2b
+		m1a := v1a + h1a
+		m1b := v1b + h1b
+		m2a := v2a + h2a
+		m2b := v2b + h2b
+		n1a = cs*m1a + sn*m1b + h1a
+		n1b = -sn*m1a + cs*m1b + h1b
+		n2a = cs*m2a + sn*m2b + h2a
+		n2b = -sn*m2a + cs*m2b + h2b
+	} else {
+		n1a = v1a + a1a + omega*v1b
+		n1b = v1b + a1b - omega*v1a
+		n2a = v2a + a2a + omega*v2b
+		n2b = v2b + a2b - omega*v2a
+	}
+	q1a := p1a + n1a
+	q1b := p1b + n1b
+	q2a := p2a + n2a
+	q2b := p2b + n2b
+
+	// charge and current, summed over both components, at the time the
+	// previous position and the midpoint velocity share
+	m1a := 0.5 * (v1a + n1a)
+	m1b := 0.5 * (v1b + n1b)
+	m2a := 0.5 * (v2a + n2a)
+	m2b := 0.5 * (v2b + n2b)
+	mag := p1a*p1a + p1b*p1b + p2a*p2a + p2b*p2b
+	hem := Params[0].HEOverMCSq // hbar e / (m c^2)
+	rho := hem * ((p1b*m1a - p1a*m1b) + (p2b*m2a - p2a*m2b))
+	jf := hem * csq // hbar e / m
+	jx := jf * ((p1a*g1b.X - p1b*g1a.X) + (p2a*g2b.X - p2b*g2a.X))
+	jy := jf * ((p1a*g1b.Y - p1b*g1a.Y) + (p2a*g2b.Y - p2b*g2a.Y))
+	jz := jf * ((p1a*g1b.Z - p1b*g1a.Z) + (p2a*g2b.Z - p2b*g2a.Z))
+	if em {
+		rho -= Params[0].EsqOverMCSq * a0 * mag
+		ja := Params[0].EsqOverMCSq * Params[0].C * mag
+		jx -= ja * State.Value(int(z), int(y), int(x), int(AXs), int(prv))
+		jy -= ja * State.Value(int(z), int(y), int(x), int(AYs), int(prv))
+		jz -= ja * State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+	}
+	State.Set(rho, int(z), int(y), int(x), int(Charge), int(cur))
+	State.Set(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
+	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
+	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
+
+	State.Set(mag, int(z), int(y), int(x), int(DiracCC), int(cur))
+	State.Set(n1a, int(z), int(y), int(x), int(DiracVel1A), int(cur))
+	State.Set(n1b, int(z), int(y), int(x), int(DiracVel1B), int(cur))
+	State.Set(n2a, int(z), int(y), int(x), int(DiracVel2A), int(cur))
+	State.Set(n2b, int(z), int(y), int(x), int(DiracVel2B), int(cur))
+	State.Set(q1a, int(z), int(y), int(x), int(DiracPos1A), int(cur))
+	State.Set(q1b, int(z), int(y), int(x), int(DiracPos1B), int(cur))
+	State.Set(q2a, int(z), int(y), int(x), int(DiracPos2A), int(cur))
+	State.Set(q2b, int(z), int(y), int(x), int(DiracPos2B), int(cur))
 }
 
 //gosl:end
@@ -99,10 +231,110 @@ func DiracKernel(i uint32) { //gosl:kernel
 func (ss *Sim) DiracConfig() {
 	ParamsShouldDisplay = DiracShouldDisplay
 	ss.StateVars = DiracStatesN
+	ss.initFuncs = DiracConfigs
+	ss.InitFunc = SpinAtRest
+	ss.DiracStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(DiracPos1A, -1)
 	})
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
+var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+
+//////// configurations
+
+// SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the
+// electron, as far as this equation has one.
+//
+// Nothing visibly happens to the spin, and that is the equation being honest.
+// The free second-order equation has no spin term at all -- it is four
+// uncoupled Klein-Gordon waves -- so a free particle does not precess, wobble
+// or do anything else you could point at. Spin is not observable on a free
+// particle in the real world either; it takes a field. Run SpinPrecession for
+// that, and watch the charge here instead, which is conserved exactly.
+func SpinAtRest(ss *Sim) {
+	ss.DiracBlob(math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, math32.Z, 1)
+}
+
+// SpinPrecession puts the spin along +X in a uniform magnetic field along Z,
+// where it turns about the field at the Larmor frequency
+//
+//	omega = g e B / (2 m c),  with g = 2
+//
+// That g = 2 is the whole reason for the sigma . F term, and it is not tuned:
+// it comes out of the coefficient the equation already has. Watch SigX and
+// SigY in the stats trade off against each other while SigZ stays flat.
+//
+// BZ is set directly rather than built from a vector potential, which isolates
+// the spin term from the orbital ones. It is not a self-consistent Maxwell
+// field, so leave Params.EM on but do not expect the field to evolve.
+func SpinPrecession(ss *Sim) {
+	ss.Params.EM.SetBool(true)
+	ss.Params.Update()
+	ss.Fill(BZ, Both, DiracDemoB)
+	ss.DiracBlob(math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, math32.X, 1)
+}
+
+// DiracDemoB is the uniform field for SpinPrecession, small enough that the
+// Larmor rate stays well under the rest mass frequency, which is where the
+// linear g = 2 relation holds.
+const DiracDemoB = 3.0e-4
+
+// DiracConfigs are the initialization options offered in the GUI.
+var DiracConfigs = []InitFunc{
+	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
+	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
+}
+
+// DiracStats adds the stats plotted over time in the GUI.
+func (ss *Sim) DiracStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(Charge))
+	ss.AddStat(ss.StatSum(DiracCC))
+	ss.AddStat(ss.StatDiracSpin())
+}
+
+// StatDiracSpin records the three spin components summed over the box:
+//
+//	SigX = 2 Re(chi1* chi2), SigY = 2 Im(chi1* chi2), SigZ = |chi1|^2 - |chi2|^2
+//
+// which is <psi|sigma|psi>, the direction the spin points.
+func (ss *Sim) StatDiracSpin() func(init bool) {
+	names := []string{"SigX", "SigY", "SigZ"}
+	return func(init bool) {
+		if init {
+			for _, nm := range names {
+				tsr := ss.Stats.Float64(nm)
+				tsr.SetNumRows(0)
+				plot.SetFirstStyler(tsr, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(tsr, "Total spin component "+nm)
+			}
+			return
+		}
+		ctx := GetCtx(0)
+		cur := ctx.CurState
+		sz := ss.Config.Size
+		var sx, sy, sz2 float64
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					a1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1A), int(cur)))
+					b1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1B), int(cur)))
+					a2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2A), int(cur)))
+					b2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2B), int(cur)))
+					sx += 2 * (a1*a2 + b1*b2)
+					sy += 2 * (a1*b2 - b1*a2)
+					sz2 += (a1*a1 + b1*b1) - (a2*a2 + b2*b2)
+				}
+			}
+		}
+		ss.Stats.Float64("SigX").AppendRowFloat(sx)
+		ss.Stats.Float64("SigY").AppendRowFloat(sy)
+		ss.Stats.Float64("SigZ").AppendRowFloat(sz2)
+	}
+}

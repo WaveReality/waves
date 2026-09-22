@@ -455,6 +455,66 @@ func (ss *Sim) ChargedBlob(ctr math32.Vector3, width, amp, sign float32) {
 	ss.ChargedRest(sign)
 }
 
+// DiracBlob puts a gaussian lump of Dirac charge at rest at ctr, with its spin
+// along the given axis. sign picks the sense of the complex rotation, and so
+// the sign of the charge, exactly as in [Sim.ChargedRest].
+//
+// Spin along Z is the component-1 state on its own; along X or Y it is the
+// equal superposition of the two, which is what a spin pointing sideways IS in
+// this basis -- there is no third pair of variables for it to live in.
+func (ss *Sim) DiracBlob(ctr math32.Vector3, width, amp float32, axis math32.Dims, sign float32) {
+	h := amp / math32.Sqrt2
+	switch axis {
+	case math32.X:
+		ss.Gauss(DiracPos1A, Both, ctr, width, h, 0)
+		ss.Gauss(DiracPos2A, Both, ctr, width, h, 0)
+	case math32.Y:
+		ss.Gauss(DiracPos1A, Both, ctr, width, h, 0)
+		ss.Gauss(DiracPos2B, Both, ctr, width, h, 0)
+	default:
+		ss.Gauss(DiracPos1A, Both, ctr, width, amp, 0)
+	}
+	ss.DiracRest(sign)
+}
+
+// DiracRest gives whatever is already in the Dirac position variables the
+// velocity that makes it a charge at rest, as [Sim.ChargedRest] does for the
+// single complex component: each component turns at the rest mass frequency,
+// so rho = -sign e |psi|^2 pointwise.
+func (ss *Sim) DiracRest(sign float32) {
+	om := ss.Params.Omega0
+	eoh := float32(0)
+	if ss.Params.EM.IsTrue() {
+		eoh = ss.Params.E / ss.Params.Hbar
+	}
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				w := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur)))
+				// d(chi) = i w chi for each component: (a, b) -> (-w b, w a)
+				v1a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1B), int(cur))
+				v1b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos1A), int(cur))
+				v2a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2B), int(cur))
+				v2b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(DiracPos2A), int(cur))
+				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(DiracVel1A), int(cur))
+				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(DiracVel1A), int(prv))
+				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(DiracVel1B), int(cur))
+				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(DiracVel1B), int(prv))
+				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(DiracVel2A), int(cur))
+				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(DiracVel2A), int(prv))
+				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(DiracVel2B), int(cur))
+				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(DiracVel2B), int(prv))
+			}
+		}
+	}
+}
+
 // ChargedPacketConfig adds a travelling complex wave packet along dim, with
 // the two components a quarter cycle apart so it carries charge. Takes its
 // wavelength and width from [Config]. sign picks the sign of the charge.

@@ -208,8 +208,12 @@ type Parameters struct {
 	// HSqOver2M = Hbar^2 / 2 Mass is the factor for Schrodinger's equation.
 	HSqOver2M float32 `display:"-"`
 
-	// HEOver2MCSq = (Hbar*e) / (2 Mass * CSq) for computing charge.
-	HEOver2MCSq float32 `display:"-"`
+	// HEOverMCSq = (Hbar*e) / (Mass * CSq) is the charge density coefficient,
+	// as it appears in the COMPONENT form
+	//	rho = HEOverMCSq (phi_b d phi_a - phi_a d phi_b)
+	// The covariant form carries a 1/2, but that only cancels the 2 from
+	// chi* d chi - chi d chi* = 2i (...), so it has no business here.
+	HEOverMCSq float32 `display:"-"`
 
 	// Omega0 is (Mass * Csq) / Hbar -- the angular velocity for
 	// complex-valued oscillator corresponding to the rest mass energy only.
@@ -239,6 +243,11 @@ type Parameters struct {
 
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
+
+	// SigmaF is the strength (and sign) of the Dirac spin term,
+	// sigma . (cB + iE), as e / hbar. It is not free: it is what makes the
+	// magnetic moment come out at g = 2.
+	SigmaF float32 `display:"-"`
 
 	// EsqOverMCSq = e^2 / (Mass * C^2) is the coefficient of the A0 term in
 	// the charge density of the EM-coupled complex KG wave, and with one
@@ -285,7 +294,7 @@ func (pr *Parameters) Update() {
 	}
 	hsq := (pr.Hbar * pr.Hbar)
 	pr.HSqOver2M = hsq / (2.0 * pr.Mass)
-	pr.HEOver2MCSq = (pr.Hbar * pr.E) / (2.0 * pr.Mass * pr.CSq)
+	pr.HEOverMCSq = (pr.Hbar * pr.E) / (pr.Mass * pr.CSq)
 	pr.Omega0 = (pr.Mass * pr.CSq) / pr.Hbar
 	pr.HOverMC = (0.5 * pr.Hbar) / (pr.Mass * pr.C * math32.Cos(math32.DegToRad(45)))
 	pr.MOver2 = pr.Mass / 2.0
@@ -296,6 +305,7 @@ func (pr *Parameters) Update() {
 	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
 	pr.EOverHSq = (pr.E * pr.E) / hsq
 	pr.EsqOverMCSq = (pr.E * pr.E) / (pr.Mass * pr.CSq)
+	pr.SigmaF = pr.E / pr.Hbar
 	// the thermal mass adds to mu^2 with the opposite sign, so raising Temp
 	// closes the broken minimum; above TempCrit it is negative and the only
 	// minimum is the origin, where v(T) = 0.

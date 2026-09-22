@@ -553,7 +553,7 @@ fn KleinGordonCKernel(i: u32) { //gosl:kernel
 	var midA = 0.5 * (pvelA + velA);
 	var midB = 0.5 * (pvelB + velB);
 	var ccm = pposA*pposA + pposB*pposB;
-	var hem = 2 * Params[0].HEOver2MCSq; // hbar e / (m c^2)
+	var hem = Params[0].HEOverMCSq; // hbar e / (m c^2)
 	var rho = hem * (pposB*midA - pposA*midB);
 	if (em) {
 		rho -= Params[0].EsqOverMCSq * a0 * ccm;
@@ -646,7 +646,7 @@ struct Parameters {
 	Inv2CSq: f32,
 	MOverHSq: f32,
 	HSqOver2M: f32,
-	HEOver2MCSq: f32,
+	HEOverMCSq: f32,
 	Omega0: f32,
 	HOverMC: f32,
 	MOver2: f32,
@@ -656,6 +656,7 @@ struct Parameters {
 	OneoEps0: f32,
 	E2OverH: f32,
 	EOverHSq: f32,
+	SigmaF: f32,
 	EsqOverMCSq: f32,
 	HiggsMuSq: f32,
 	HiggsV: f32,

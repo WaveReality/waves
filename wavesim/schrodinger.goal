@@ -73,6 +73,7 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 func (ss *Sim) SchrodingerConfig() {
 	ParamsShouldDisplay = SchrodShouldDisplay
 	ss.StateVars = CabStatesN
+	ss.SchrodingerStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabPosA, -1)
 	})
