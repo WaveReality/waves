@@ -234,6 +234,7 @@ func (ss *Sim) MaxwellConfig() {
 	ss.StateVars = EMStatesN
 	ss.initFuncs = MaxwellConfigs
 	ss.InitFunc = ElectricPotential
+	ss.MaxwellStats()
 	ss.Config.Wavelength = 16
 	ss.Config.PacketWidth = 2 * ss.Config.Wavelength
 	ss.Config.Velocity.X = 0.5 * ss.Params.C

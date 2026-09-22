@@ -225,7 +225,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
 	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
 
-	State.Set(posA*posA+posB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
+	// ccm, not the new position: Charge, Current and Mag are all diagnostics
+	// of the same instant, the one the midpoint velocity belongs to. Reading
+	// Mag a step later than Charge breaks rho = -e |chi|^2 by the amount the
+	// Laplacian moves |chi|^2 in one step.
+	State.Set(ccm, int(z), int(y), int(x), int(CabMag), int(cur))
 	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
 	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
 	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
@@ -317,6 +321,7 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 func (ss *Sim) KleinGordonConfig() {
 	ParamsShouldDisplay = KGShouldDisplay
 	ss.StateVars = WaveStatesN
+	ss.WaveStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
 	})
@@ -328,6 +333,7 @@ func (ss *Sim) KleinGordonCConfig() {
 	ss.StateVars = CabStatesN
 	ss.initFuncs = KGCConfigs
 	ss.InitFunc = ChargeAtRest
+	ss.KleinGordonCStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabPosA, -1)
 	})
@@ -335,29 +341,38 @@ func (ss *Sim) KleinGordonCConfig() {
 
 //////// configurations
 
-// ChargeAtRest fills space with a uniform complex wave turning at the rest
-// mass frequency: a charge density with no motion.
+// ChargeAtRest is a gaussian lump of charge sitting still: a particle, as far
+// as this equation has one.
 //
-// Uniform means the Laplacian vanishes, so each component is a plain harmonic
-// oscillator at Omega0 = m c^2 / hbar, and the two of them a quarter cycle
-// apart are a complex number rotating at that rate. The charge
+// The two components a quarter cycle apart are a complex number turning at the
+// rest mass frequency Omega0 = m c^2 / hbar, and that turning IS the charge:
 //
-//	rho = (hbar e / m c^2) (phi_b d phi_a - phi_a d phi_b)
+//	rho = (hbar e / m c^2) (phi_b d phi_a - phi_a d phi_b) = -e |chi|^2
 //
-// is then exactly -e |chi|^2 and does not change, which is the whole point of
-// going complex: no single real field has a conserved quantity like this.
+// exactly, at every cell. Watch the total charge stat while the blob spreads:
+// a lump at rest is a spread of momenta, so it disperses as any massive wave
+// packet must, and the charge is conserved through all of it while |chi|^2
+// moves around. No single real field has a quantity like that, which is the
+// reason for going complex in the first place.
 //
 // Reverse the sense of rotation and the charge changes sign, with nothing else
 // about the wave any different. That is antimatter, in the only sense this
 // equation knows about it.
 func ChargeAtRest(ss *Sim) {
-	ss.ChargedUniform(ss.Config.Amplitude, 1)
+	ss.ChargedBlob(math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, 1)
 }
 
 // ChargeAtRestAnti is [ChargeAtRest] turning the other way: the same wave with
 // the opposite charge.
 func ChargeAtRestAnti(ss *Sim) {
-	ss.ChargedUniform(ss.Config.Amplitude, -1)
+	ss.ChargedBlob(math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, -1)
+}
+
+// ChargeUniform fills all of space with charge at rest: flat and dull to look
+// at, but rho is then exactly constant in space and time, which makes it the
+// clean case for checking the charge against its analytic value.
+func ChargeUniform(ss *Sim) {
+	ss.ChargedUniform(ss.Config.Amplitude, 1)
 }
 
 // ChargedPacket is a moving charge: a wave packet in the two components a
@@ -368,8 +383,9 @@ func ChargedPacket(ss *Sim) {
 
 // KGCConfigs are the initialization options offered in the GUI.
 var KGCConfigs = []InitFunc{
-	InitFunc{Name: "Charge At Rest", Doc: "Uniform complex wave turning at the rest mass frequency: constant negative charge density, exactly conserved", Func: ChargeAtRest, Current: true},
-	InitFunc{Name: "Charge At Rest Anti", Doc: "The same wave turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
+	InitFunc{Name: "Charge At Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
+	InitFunc{Name: "Charge At Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
+	InitFunc{Name: "Charge Uniform", Doc: "Charge at rest filling all of space: flat, but rho is then exactly constant and equal to -e |chi|^2", Func: ChargeUniform},
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
 }
 

@@ -403,24 +403,27 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
-// ChargedUniform fills space with a uniform complex wave turning at the rest
-// mass frequency Omega0, which is a constant charge density of -sign e amp^2.
-// The two components are a quarter cycle apart, as complex numbers always are;
-// sign picks which way it turns, and so the sign of the charge.
+// ChargedRest gives whatever is already in CabPosA the velocity that makes it
+// a charge distribution at rest: phi_b stays zero and d phi_b turns at the
+// rest mass frequency, so that
+//
+//	rho = -sign e |chi|^2
+//
+// pointwise, whatever shape phi_a has. sign picks which way the complex phase
+// turns, and so the sign of the charge -- the only difference between a
+// particle and its antiparticle at this level.
 //
 // With Params.EM on, the local A0 is subtracted from the turning rate. A
 // potential shifts the phase rate by -e A0 / hbar, so a wave genuinely at rest
 // in that potential turns at Omega0 - e A0 / hbar. Leaving it out starts the
 // wave in a superposition of the two frequencies present, and |chi|^2 beats
 // instead of sitting still.
-func (ss *Sim) ChargedUniform(amp, sign float32) {
-	ss.Fill(CabPosA, Both, amp)
+func (ss *Sim) ChargedRest(sign float32) {
 	om := ss.Params.Omega0
-	if ss.Params.EM.IsFalse() {
-		ss.Fill(CabVelB, Both, sign*om*amp)
-		return
+	eoh := float32(0)
+	if ss.Params.EM.IsTrue() {
+		eoh = ss.Params.E / ss.Params.Hbar
 	}
-	eoh := ss.Params.E / ss.Params.Hbar
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
@@ -430,12 +433,26 @@ func (ss *Sim) ChargedUniform(amp, sign float32) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * amp
+				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * State.Value(int(f.Z), int(f.Y), int(f.X), int(CabPosA), int(cur))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(cur))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(prv))
 			}
 		}
 	}
+}
+
+// ChargedUniform fills all of space with a charge at rest: the flat case, where
+// rho is the same everywhere and exactly constant. See [Sim.ChargedRest].
+func (ss *Sim) ChargedUniform(amp, sign float32) {
+	ss.Fill(CabPosA, Both, amp)
+	ss.ChargedRest(sign)
+}
+
+// ChargedBlob puts a gaussian lump of charge at rest at ctr. See
+// [Sim.ChargedRest].
+func (ss *Sim) ChargedBlob(ctr math32.Vector3, width, amp, sign float32) {
+	ss.Gauss(CabPosA, Both, ctr, width, amp, 0)
+	ss.ChargedRest(sign)
 }
 
 // ChargedPacketConfig adds a travelling complex wave packet along dim, with

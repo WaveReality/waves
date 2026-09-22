@@ -70,11 +70,9 @@ func main() {
 					sim.Config.Size.Set(500, 1, 1)
 					sim.ViewInit(wavesim.Wave1DViewAll)
 				}
-				sim.WaveStats()
 			case wavesim.KleinGordonC:
 				sim.Params.ThreeD.SetBool(true) // only 3D
 				sim.Config.Size.Set(100, 100, 100)
-				sim.KleinGordonCStats()
 			case wavesim.Schrodinger:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
@@ -105,8 +103,6 @@ func main() {
 				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(100, 100, 100)
-				sim.Params.Edges = wavesim.EdgesWrap
-				sim.ElectroweakStats()
 				sim.ViewInit(wavesim.ElectroweakViewAll)
 			case wavesim.Spinfield:
 				sim.Params.Edges = wavesim.EdgesDamp
