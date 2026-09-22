@@ -169,6 +169,7 @@ func GPUInit() {
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/KleinGordonCKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
@@ -280,8 +281,6 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
-		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/StandardKernel.wgsl", sy)
-		pl.AddVarUsed(0, "TensorStrides")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -793,48 +792,6 @@ func RunOneSpinfieldKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunSpinfieldKernelCPU(n)
-	}
-}
-// RunStandardKernel runs the StandardKernel kernel with given number of elements,
-// on either the CPU or GPU depending on the UseGPU variable.
-// Can call multiple Run* kernels in a row, which are then all launched
-// in the same command submission on the GPU, which is by far the most efficient.
-// MUST call RunDone (with optional vars to sync) after all Run calls.
-// Alternatively, a single-shot RunOneStandardKernel call does Run and Done for a
-// single run-and-sync case.
-func RunStandardKernel(n int) {
-	if UseGPU {
-		RunStandardKernelGPU(n)
-	} else {
-		RunStandardKernelCPU(n)
-	}
-}
-
-// RunStandardKernelGPU runs the StandardKernel kernel on the GPU. See [RunStandardKernel] for more info.
-func RunStandardKernelGPU(n int) {
-	sy := GPUSystem
-	pl := sy.ComputePipelines["StandardKernel"]
-	ce, _ := sy.BeginComputePass()
-	pl.Dispatch1D(ce, n, 64)
-}
-
-// RunStandardKernelCPU runs the StandardKernel kernel on the CPU.
-func RunStandardKernelCPU(n int) {
-	gpu.VectorizeFunc(0, n, StandardKernel)
-}
-
-// RunOneStandardKernel runs the StandardKernel kernel with given number of elements,
-// on either the CPU or GPU depending on the UseGPU variable.
-// This version then calls RunDone with the given variables to sync
-// after the Run, for a single-shot Run-and-Done call. If multiple kernels
-// can be run in sequence, it is much more efficient to do multiple Run*
-// calls followed by a RunDone call.
-func RunOneStandardKernel(n int, syncVars ...GPUVars) {
-	if UseGPU {
-		RunStandardKernelGPU(n)
-		RunDone(syncVars...)
-	} else {
-		RunStandardKernelCPU(n)
 	}
 }
 // RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,

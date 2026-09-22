@@ -1,0 +1,288 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import (
+	"math"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+// kgSim builds a 3D complex Klein-Gordon sim.
+func kgSim(sz int32, init func(*Sim)) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU = false
+	ss.Config.GUI = false
+	ss.Config.Equation = KleinGordonC
+	ss.Config.Size.Set(sz, sz, sz)
+	ss.ConfigSim()
+	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	ss.StateVars = CabStatesN
+	ss.ConfigState()
+	ss.KleinGordonCStats()
+	ss.InitFunc = init
+	ss.Init()
+	return ss
+}
+
+func kgStep(ss *Sim) {
+	ctx := GetCtx(0)
+	ctx.StepInc()
+	ns := int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z)
+	if ss.Params.EM.IsTrue() {
+		RunMaxwellKernel(ns)
+	}
+	RunKleinGordonCKernel(ns)
+	if ss.Params.Edges == EdgesWrap {
+		RunEdgesWrapKernel(int(ctx.EdgesN()))
+	}
+	ss.RunStats(false)
+}
+
+func kgSum(sz int32, vr enums.Enum) float64 {
+	return StateSum(GetCtx(0).Size.V(), vr, GetCtx(0).CurState)
+}
+
+// TestKGChargeConserved: with no field, the total charge must not change at
+// all. This is the property the complex version exists to have -- the real
+// scalar KG equation has nothing like it.
+func TestKGChargeConserved(t *testing.T) {
+	const sz = 8
+	ss := kgSim(sz, ChargedPacket)
+	kgStep(ss)
+	q0 := kgSum(sz, Charge)
+	var lo, hi float64 = q0, q0
+	for range 2000 {
+		kgStep(ss)
+		q := kgSum(sz, Charge)
+		lo, hi = math.Min(lo, q), math.Max(hi, q)
+	}
+	t.Logf("free packet: total charge %.6e, drift over 2000 steps %.2e (relative %.2e)",
+		q0, hi-lo, (hi-lo)/math.Abs(q0))
+	if math.Abs(q0) < 1e-9 {
+		t.Fatalf("packet carries no charge at all: %g", q0)
+	}
+	if (hi-lo)/math.Abs(q0) > 1e-5 {
+		t.Errorf("charge not conserved: range %g on %g", hi-lo, q0)
+	}
+}
+
+// TestKGChargeSign: the sign of the charge is the direction the complex phase
+// turns, and nothing else. Same |chi|^2, opposite charge -- which is the only
+// difference between a particle and its antiparticle here.
+func TestKGChargeSign(t *testing.T) {
+	const sz = 6
+	var q [2]float64
+	var cc [2]float64
+	for i, init := range []func(*Sim){ChargeAtRest, ChargeAtRestAnti} {
+		ss := kgSim(sz, init)
+		kgStep(ss)
+		q[i] = kgSum(sz, Charge)
+		cc[i] = kgSum(sz, CabMag)
+		// the analytic value: rho = -sign e amp^2 per cell
+		amp := float64(ss.Config.Amplitude)
+		n := float64(sz * sz * sz)
+		want := -float64(ss.Params.E) * amp * amp * n
+		if i == 1 {
+			want = -want
+		}
+		t.Logf("%-20s total charge %+.5f (want %+.5f), |chi|^2 %.5f",
+			[]string{"ChargeAtRest", "ChargeAtRestAnti"}[i], q[i], want, cc[i])
+		if math.Abs(q[i]/want-1) > 0.02 {
+			t.Errorf("charge %g, want %g", q[i], want)
+		}
+	}
+	if q[0]*q[1] >= 0 {
+		t.Errorf("the two rotation senses should have opposite charge: %g and %g", q[0], q[1])
+	}
+	if math.Abs(cc[0]/cc[1]-1) > 1e-6 {
+		t.Errorf("they should be the same wave: |chi|^2 %g vs %g", cc[0], cc[1])
+	}
+}
+
+// TestKGContinuity: charge is conserved locally, not just globally --
+// d(rho)/dt + div J = 0. A convergence statement, since the discrete
+// derivatives only agree to order h^2.
+//
+// The time derivative is CENTERED: rho is recorded a step either side of the
+// J sample, since a forward difference sits half a step later than J and the
+// mismatch is first order, which swamps what is being measured.
+func TestKGContinuity(t *testing.T) {
+	const sz = 64
+	snap := func() []float64 {
+		v := make([]float64, 0, sz*sz*sz)
+		cur := int(GetCtx(0).CurState)
+		for z := int32(1); z <= sz; z++ {
+			for y := int32(1); y <= sz; y++ {
+				for x := int32(1); x <= sz; x++ {
+					v = append(v, float64(State.Value(int(z), int(y), int(x), int(Charge), cur)))
+				}
+			}
+		}
+		return v
+	}
+	var res [3]float64
+	wls := []float32{4, 8, 16}
+	for i, wl := range wls {
+		ss := kgSim(sz, func(s *Sim) {
+			s.Config.Wavelength = wl
+			s.Config.PacketWidth = wl // must fit in the box: edges wrap
+			ChargedPacket(s)
+		})
+		kgStep(ss)
+		before := snap()
+		kgStep(ss)
+		mid := int(GetCtx(0).CurState)
+		var resid, scale float64
+		k := 0
+		for z := int32(1); z <= sz; z++ {
+			for y := int32(1); y <= sz; y++ {
+				for x := int32(1); x <= sz; x++ {
+					var dx, dy, dz float32
+					div := float64(Divergence10(x, y, z, int32(CurrentX), int32(mid), &dx, &dy, &dz))
+					scale += div * div
+					_ = before[k]
+					k++
+				}
+			}
+		}
+		kgStep(ss)
+		after := snap()
+		k = 0
+		for z := int32(1); z <= sz; z++ {
+			for y := int32(1); y <= sz; y++ {
+				for x := int32(1); x <= sz; x++ {
+					var dx, dy, dz float32
+					div := float64(Divergence10(x, y, z, int32(CurrentX), int32(mid), &dx, &dy, &dz))
+					drho := 0.5 * (after[k] - before[k])
+					r := drho + div
+					resid += r * r
+					k++
+				}
+			}
+		}
+		res[i] = math.Sqrt(resid / scale)
+		t.Logf("wavelength %2.0f: RMS(d rho/dt + div J) / RMS(div J) = %.4f", wl, res[i])
+	}
+	for i := 1; i < len(wls); i++ {
+		if res[i] > 0.5*res[i-1] {
+			t.Errorf("continuity residual %.4f -> %.4f from wavelength %g to %g, want ~4x better",
+				res[i-1], res[i], wls[i-1], wls[i])
+		}
+	}
+}
+
+// kgStepExt advances the wave in a FIXED external field: no Maxwell kernel, so
+// A0 and A stay exactly as initialized.
+func kgStepExt(ss *Sim) {
+	ctx := GetCtx(0)
+	ctx.StepInc()
+	RunKleinGordonCKernel(int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z))
+	if ss.Params.Edges == EdgesWrap {
+		RunEdgesWrapKernel(int(ctx.EdgesN()))
+	}
+	ss.RunStats(false)
+}
+
+// TestKGGaugeUniform: a uniform constant A0 is pure gauge -- it multiplies chi
+// by a phase and changes no observable. Both |chi|^2 and the total charge must
+// come out the same as with no field at all.
+//
+// The charge is the sharper half. Its free part alone is NOT invariant: the
+// phase rotation adds to phi_b d(phi_a) - phi_a d(phi_b). The -e^2 A0 |chi|^2
+// term in rho is exactly what cancels that, so this checks that the coupling
+// term in the CHARGE matches the coupling term in the EQUATION.
+//
+// The field has to be set BEFORE the wave, because ChargedUniform reads A0 to
+// get the turning rate right; start it at the free rate and the state is a
+// superposition of the two frequencies, which beats and is not a gauge
+// transform of anything.
+func TestKGGaugeUniform(t *testing.T) {
+	const sz = 6
+	run := func(a0 float32) (q, cc float64) {
+		ss := kgSim(sz, func(s *Sim) {
+			if a0 != 0 {
+				s.Params.EM.SetBool(true)
+				s.Params.Update()
+			}
+			s.Fill(A0s, Both, a0)
+			ChargeAtRest(s)
+		})
+		for range 200 {
+			kgStepExt(ss)
+		}
+		return kgSum(sz, Charge), kgSum(sz, CabMag)
+	}
+	q0, cc0 := run(0)
+	for _, a0 := range []float32{0.001, 0.005, 0.01} {
+		q, cc := run(a0)
+		t.Logf("A0 = %.3f (e A0 / hbar is %.2f of Omega0): charge %+.5f (%+.1e)   |chi|^2 %.5f (%+.1e)",
+			a0, float64(a0)/float64(Params[0].Omega0), q, q/q0-1, cc, cc/cc0-1)
+		if math.Abs(q/q0-1) > 1e-3 {
+			t.Errorf("A0 = %g changed the charge by %.2e: a uniform A0 is pure gauge", a0, q/q0-1)
+		}
+		if math.Abs(cc/cc0-1) > 1e-3 {
+			t.Errorf("A0 = %g changed |chi|^2 by %.2e", a0, cc/cc0-1)
+		}
+	}
+}
+
+// TestKGBorisStability: the A0 coupling turns the velocity (d phi_a, d phi_b)
+// at rate 2 e A0 / hbar. An explicit step does not turn it, it spirals out, and
+// the wave grows without bound -- the instability web/content/complex-kg.md
+// describes and works around by updating the two components in sequence.
+// Params.Boris applies the rotation exactly instead.
+//
+// A packet in a 1/r potential, which is the case the write-up reports. A
+// uniform A0 does NOT show it: started in the right eigenstate the explicit
+// step survives that quite happily, so the runaway needs a field the wave is
+// actually being pushed around by.
+func TestKGBorisStability(t *testing.T) {
+	const sz = 16
+	run := func(a0amp float32, boris bool) (first, last, qrange, q float64) {
+		ss := kgSim(sz, func(s *Sim) {
+			s.Params.EM.SetBool(true)
+			s.Params.Boris.SetBool(boris)
+			s.Params.Update()
+			s.InvR(A0s, math32.Vec3(-1, -1, -1), a0amp)
+			s.CopyCurToPrev()
+			ChargedPacket(s)
+		})
+		kgStepExt(ss)
+		first = kgSum(sz, CabMag)
+		q = kgSum(sz, Charge)
+		lo, hi := q, q
+		for range 3000 {
+			kgStepExt(ss)
+			c := kgSum(sz, Charge)
+			lo, hi = math.Min(lo, c), math.Max(hi, c)
+		}
+		return first, kgSum(sz, CabMag), hi - lo, q
+	}
+	for _, a0amp := range []float32{0.05, 0.2} {
+		f0, l0, _, _ := run(a0amp, false)
+		f1, l1, qr, q := run(a0amp, true)
+		t.Logf("1/r potential peak %.2f:  explicit |chi|^2 %.4g -> %.4g (x%.3g)", a0amp, f0, l0, l0/f0)
+		t.Logf("                          Boris    |chi|^2 %.4g -> %.4g (x%.3g), charge %.4g varies by %.2g (%.2f%%)",
+			f1, l1, l1/f1, q, qr, 100*qr/math.Abs(q))
+		if !(l0 > 100*f0 || math.IsNaN(l0)) {
+			t.Errorf("expected the explicit step to run away at %v: %g -> %g", a0amp, f0, l0)
+		}
+		if l1 > 2*f1 || math.IsNaN(l1) {
+			t.Errorf("Boris should stay bounded at %v: %g -> %g", a0amp, f1, l1)
+		}
+		// the write-up notes the total charge is not conserved instant to
+		// instant in a field, only on average. It should still stay close.
+		if qr/math.Abs(q) > 0.01 {
+			t.Errorf("charge varies by %.1f%% in the field, expected under 1%%", 100*qr/math.Abs(q))
+		}
+	}
+}

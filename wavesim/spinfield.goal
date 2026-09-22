@@ -281,8 +281,8 @@ func SpinfieldViewAll(view *View) {
 
 func (ss *Sim) SpinfieldStats() {
 	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(CabCC))
-	ss.AddStat(ss.StatSum(CabCharge))
+	ss.AddStat(ss.StatSum(CabMag))
+	// ss.AddStat(ss.StatSum(CabCharge))
 	ss.AddStat(ss.StatParticle(0))
 }
 

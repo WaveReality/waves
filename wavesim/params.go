@@ -240,6 +240,11 @@ type Parameters struct {
 	// EOverHSq = E^2 / Hbar^2
 	EOverHSq float32 `display:"-"`
 
+	// EsqOverMCSq = e^2 / (Mass * C^2) is the coefficient of the A0 term in
+	// the charge density of the EM-coupled complex KG wave, and with one
+	// factor of C removed, of the A term in its current.
+	EsqOverMCSq float32 `display:"-"`
+
 	// HiggsMuSq is the EFFECTIVE mu^2 the kernel uses, in 1/cube^2:
 	// HiggsMu^2 - ThermalC * Temp^2. The Higgs equivalent of MOverHSq,
 	// occupying the same slot in the update. Negative above TempCrit, where
@@ -269,8 +274,6 @@ type Parameters struct {
 	// The photon direction is the one Q = T^3 + Y annihilates.
 	SinThetaW float32 `display:"-"`
 	CosThetaW float32 `display:"-"`
-
-	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -292,6 +295,7 @@ func (pr *Parameters) Update() {
 	pr.OneoEps0 = 1.0 / pr.Eps0
 	pr.E2OverH = (2.0 * pr.E) / pr.Hbar
 	pr.EOverHSq = (pr.E * pr.E) / hsq
+	pr.EsqOverMCSq = (pr.E * pr.E) / (pr.Mass * pr.CSq)
 	// the thermal mass adds to mu^2 with the opposite sign, so raising Temp
 	// closes the broken minimum; above TempCrit it is negative and the only
 	// minimum is the origin, where v(T) = 0.

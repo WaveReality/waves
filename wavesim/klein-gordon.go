@@ -6,17 +6,24 @@
 
 package wavesim
 
+import "cogentcore.org/core/math32"
+
 //gosl:start
 
 // CabStates are the state variables for wave equations on
 // a wave state with a single complex value,
 // where A = real and B = complex components.
-type CabStates int32 //enums:enum -trim-prefix=Cab
+//
+// Based on [EMStates] so the complex KG wave can be coupled to the
+// electromagnetic field: the A0 / A potentials it is pushed by, and the
+// Charge / Current it drives them with, are the same variables MaxwellKernel
+// uses. Params.EM switches the coupling on.
+type CabStates EMStates //enums:enum -trim-prefix=Cab
 
 const (
 	// CabPosA is the position (height) wave state variable
 	// for the real complex component A.
-	CabPosA CabStates = iota
+	CabPosA CabStates = CabStates(EMStatesN) + iota
 
 	// CabPosB is the position (height) wave state variable
 	// for the imaginary complex component B.
@@ -42,31 +49,10 @@ const (
 	// can be used to push particles around.
 	CabV
 
-	// CabCC is the complex conjugate ("squared") wave
+	// CabMag is the complex conjugate ("squared") wave
 	// value, which represents the total probability or a conserved
 	// charge value.
-	CabCC
-
-	// CabCharge is the charge density.
-	CabCharge
-
-	// CabCurrentX is the current density.
-	CabCurrentX
-
-	// CabCurrentY is the current density.
-	CabCurrentY
-
-	// CabCurrentZ is the current density.
-	CabCurrentZ
-
-	// CabKinetic is the total kinetic energy across components.
-	CabKinetic
-
-	// CabPotential is the total potential energy across components (only for KGC).
-	CabPotential
-
-	// CabEnergy is the total kinetic + potential energy.
-	CabEnergy
+	CabMag
 )
 
 // KleinGordonKernel is the kernel for computing the KleinGordon equations,
@@ -116,8 +102,26 @@ func KleinGordonKernel(i uint32) { //gosl:kernel
 	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
-// KleinGordonCKernel is the kernel for computing the KleinGordonC equations,
-// on complex wave state.
+// KleinGordonCKernel is the kernel for the complex Klein-Gordon equation, with
+// optional minimal coupling to the electromagnetic field (Params.EM).
+//
+// Uncoupled, the two components evolve as two independent real KG waves: the
+// complex structure only shows up in the conserved charge, which needs both.
+//
+// Coupled, the covariant derivative D = d - i(e/hbar)A adds three terms:
+//
+//	dd(phi_a) = c^2 (Lap - mhsq) phi_a + (2e/hbar)(A0 d(phi_b) + c A.grad phi_b) + (e^2/hbar^2)(A0^2 - A^2) phi_a
+//	dd(phi_b) = c^2 (Lap - mhsq) phi_b - (2e/hbar)(A0 d(phi_a) + c A.grad phi_a) + (e^2/hbar^2)(A0^2 - A^2) phi_b
+//
+// The A0 term acts on the VELOCITY with opposite signs on the two components,
+// which is a rotation of (d phi_a, d phi_b) at rate 2 e A0 / hbar. An explicit
+// integrator does not rotate, it spirals, and the charge runs away -- which is
+// the instability described in web/content/complex-kg.md. Params.Boris applies
+// the rotation exactly instead. See EWBorisPhase for the same problem in the
+// electroweak kernel.
+//
+// It also writes the [Charge] and [Current] that MaxwellKernel reads, so the
+// wave and the field drive each other.
 func KleinGordonCKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -135,9 +139,10 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
+	threeD := Params[0].ThreeD.IsTrue()
 
 	var forceA, forceB float32
-	if Params[0].ThreeD.IsTrue() {
+	if threeD {
 		forceA = Laplacian19(x, y, z, int32(CabPosA), prv, pposA)
 		forceB = Laplacian19(x, y, z, int32(CabPosB), prv, pposB)
 	} else {
@@ -145,29 +150,82 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		forceB = Laplacian1D(x, y, z, int32(CabPosB), prv, pposB)
 	}
 	forceA += (vpot - mhsq) * pposA // this is the only diff from standard Wave
-	velA := pvelA + csq*forceA
-	posA := pposA + velA
+	forceB += (vpot - mhsq) * pposB
+	accA := csq * forceA
+	accB := csq * forceB
 
-	forceB += (vpot - mhsq) * pposB // this is the only diff from standard Wave
-	velB := pvelB + csq*forceB
+	// needed for the current in any case, and for the A.grad term when coupled
+	var gA, gB math32.Vector3
+	if threeD {
+		gA = Gradient10(x, y, z, int32(CabPosA), prv)
+		gB = Gradient10(x, y, z, int32(CabPosB), prv)
+	} else {
+		gA = Gradient1D(x, y, z, int32(CabPosA), prv)
+		gB = Gradient1D(x, y, z, int32(CabPosB), prv)
+	}
+
+	em := Params[0].EM.IsTrue()
+	var a0, ax, ay, az, omega float32
+	if em {
+		a0 = State.Value(int(z), int(y), int(x), int(A0s), int(prv))
+		ax = State.Value(int(z), int(y), int(x), int(AXs), int(prv))
+		ay = State.Value(int(z), int(y), int(x), int(AYs), int(prv))
+		az = State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		e2h := Params[0].E2OverH
+		cc := Params[0].C
+		asq := a0*a0 - (ax*ax + ay*ay + az*az)
+		eh2 := Params[0].EOverHSq * asq
+		accA += e2h*cc*(ax*gB.X+ay*gB.Y+az*gB.Z) + eh2*pposA
+		accB += -e2h*cc*(ax*gA.X+ay*gA.Y+az*gA.Z) + eh2*pposB
+		omega = e2h * a0 // the A0 rotation rate
+	}
+
+	var velA, velB float32
+	if em && Params[0].Boris.IsTrue() {
+		// half kick, exact rotation, half kick. d(v_a + i v_b)/dt =
+		// -i omega (v_a + i v_b), so the velocity turns by -omega per step.
+		haA := 0.5 * accA
+		haB := 0.5 * accB
+		mA := pvelA + haA
+		mB := pvelB + haB
+		cs := math32.Cos(omega)
+		sn := math32.Sin(omega)
+		velA = cs*mA + sn*mB + haA
+		velB = -sn*mA + cs*mB + haB
+	} else {
+		velA = pvelA + accA + omega*pvelB
+		velB = pvelB + accB - omega*pvelA
+	}
+	posA := pposA + velA
 	posB := pposB + velB
 
-	if Params[0].Energy.IsTrue() {
-		cc := posA*posA + posB*posB
-		midVel := 0.25 * (pvelA + velA + pvelB + velB)
-		kinetic := Params[0].Inv2CSq * midVel * midVel
-		var potential float32
-		if Params[0].ThreeD.IsTrue() {
-			potential = PotentialEnergy19(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy19(x, y, z, int32(CabPosB), prv, pposB)
-		} else {
-			potential = PotentialEnergy1D(x, y, z, int32(CabPosA), prv, pposA) + PotentialEnergy1D(x, y, z, int32(CabPosB), prv, pposB)
-		}
-
-		State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
-		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
-		State.Set(potential, int(z), int(y), int(x), int(CabPotential), int(cur))
-		State.Set(kinetic+potential, int(z), int(y), int(x), int(CabEnergy), int(cur))
+	// charge and current, at the same time as the position they use: the
+	// midpoint velocity is the one that belongs with the previous position in
+	// a leapfrog, and the gradients are of the previous position too.
+	midA := 0.5 * (pvelA + velA)
+	midB := 0.5 * (pvelB + velB)
+	ccm := pposA*pposA + pposB*pposB
+	hem := 2 * Params[0].HEOver2MCSq // hbar e / (m c^2)
+	rho := hem * (pposB*midA - pposA*midB)
+	if em {
+		rho -= Params[0].EsqOverMCSq * a0 * ccm
 	}
+	jf := hem * csq // hbar e / m
+	jx := jf * (pposA*gB.X - pposB*gA.X)
+	jy := jf * (pposA*gB.Y - pposB*gA.Y)
+	jz := jf * (pposA*gB.Z - pposB*gA.Z)
+	if em {
+		ja := Params[0].EsqOverMCSq * Params[0].C * ccm
+		jx -= ja * ax
+		jy -= ja * ay
+		jz -= ja * az
+	}
+	State.Set(rho, int(z), int(y), int(x), int(Charge), int(cur))
+	State.Set(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
+	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
+	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
+
+	State.Set(posA*posA+posB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
 	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
 	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
 	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
@@ -265,12 +323,67 @@ func (ss *Sim) KleinGordonConfig() {
 }
 
 func (ss *Sim) KleinGordonCConfig() {
-	ParamsShouldDisplay = KGShouldDisplay
+	ParamsShouldDisplay = KGCShouldDisplay
+	ss.Params.Edges = EdgesWrap
 	ss.StateVars = CabStatesN
+	ss.initFuncs = KGCConfigs
+	ss.InitFunc = ChargeAtRest
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabPosA, -1)
 	})
 }
 
+//////// configurations
+
+// ChargeAtRest fills space with a uniform complex wave turning at the rest
+// mass frequency: a charge density with no motion.
+//
+// Uniform means the Laplacian vanishes, so each component is a plain harmonic
+// oscillator at Omega0 = m c^2 / hbar, and the two of them a quarter cycle
+// apart are a complex number rotating at that rate. The charge
+//
+//	rho = (hbar e / m c^2) (phi_b d phi_a - phi_a d phi_b)
+//
+// is then exactly -e |chi|^2 and does not change, which is the whole point of
+// going complex: no single real field has a conserved quantity like this.
+//
+// Reverse the sense of rotation and the charge changes sign, with nothing else
+// about the wave any different. That is antimatter, in the only sense this
+// equation knows about it.
+func ChargeAtRest(ss *Sim) {
+	ss.ChargedUniform(ss.Config.Amplitude, 1)
+}
+
+// ChargeAtRestAnti is [ChargeAtRest] turning the other way: the same wave with
+// the opposite charge.
+func ChargeAtRestAnti(ss *Sim) {
+	ss.ChargedUniform(ss.Config.Amplitude, -1)
+}
+
+// ChargedPacket is a moving charge: a wave packet in the two components a
+// quarter wavelength apart, travelling along X.
+func ChargedPacket(ss *Sim) {
+	ss.ChargedPacketConfig(math32.X, ss.Config.Amplitude, 1)
+}
+
+// KGCConfigs are the initialization options offered in the GUI.
+var KGCConfigs = []InitFunc{
+	InitFunc{Name: "Charge At Rest", Doc: "Uniform complex wave turning at the rest mass frequency: constant negative charge density, exactly conserved", Func: ChargeAtRest, Current: true},
+	InitFunc{Name: "Charge At Rest Anti", Doc: "The same wave turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
+	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
+}
+
+// KGCConfigs stats plotted over time in the GUI.
+func (ss *Sim) KleinGordonCStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(Charge))
+	ss.AddStat(ss.StatSum(CabMag))
+	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
+}
+
 // KGShouldDisplay determines which Parameters fields to display.
 var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
+
+// KGCShouldDisplay determines which Parameters fields to display for the
+// complex, optionally EM-coupled version.
+var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}

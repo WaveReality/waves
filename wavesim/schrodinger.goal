@@ -57,15 +57,6 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 		posA = pposA
 	}
 
-	if Params[0].Energy.IsTrue() {
-		cc := posA*posA + posB*posB
-		midVel := 0.25 * (pvelA + velA + pvelB + velB)
-		kinetic := Params[0].MOver2 * midVel * midVel
-
-		State[z, y, x, CabCC, cur] = cc
-		State[z, y, x, CabKinetic, cur] = kinetic
-		State[z, y, x, CabEnergy, cur] = kinetic + vpot
-	}
 	State[z, y, x, CabForceA, cur] = forceA
 	State[z, y, x, CabVelA, cur] = velA
 	State[z, y, x, CabPosA, cur] = posA
@@ -73,6 +64,8 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	State[z, y, x, CabForceB, cur] = forceB
 	State[z, y, x, CabVelB, cur] = velB
 	State[z, y, x, CabPosB, cur] = posB
+
+	State[z, y, x, CabMag, cur] = posA*posA + posB*posB
 }
 
 //gosl:end
@@ -102,8 +95,7 @@ func Cab1DViewAll(view *View) {
 
 func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(CabCC))
-	ss.AddStat(ss.StatSum(CabEnergy))
+	ss.AddStat(ss.StatSum(CabMag))
 	// a matter wave: the group velocity is not the phase velocity
 	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
 }

@@ -59,15 +59,6 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 		posA = pposA
 	}
 
-	if Params[0].Energy.IsTrue() {
-		cc := posA*posA + posB*posB
-		midVel := 0.25 * (pvelA + velA + pvelB + velB)
-		kinetic := Params[0].MOver2 * midVel * midVel
-
-		State.Set(cc, int(z), int(y), int(x), int(CabCC), int(cur))
-		State.Set(kinetic, int(z), int(y), int(x), int(CabKinetic), int(cur))
-		State.Set(kinetic+vpot, int(z), int(y), int(x), int(CabEnergy), int(cur))
-	}
 	State.Set(forceA, int(z), int(y), int(x), int(CabForceA), int(cur))
 	State.Set(velA, int(z), int(y), int(x), int(CabVelA), int(cur))
 	State.Set(posA, int(z), int(y), int(x), int(CabPosA), int(cur))
@@ -75,6 +66,8 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	State.Set(forceB, int(z), int(y), int(x), int(CabForceB), int(cur))
 	State.Set(velB, int(z), int(y), int(x), int(CabVelB), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabPosB), int(cur))
+
+	State.Set(posA*posA+posB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
 }
 
 //gosl:end
@@ -104,8 +97,7 @@ func Cab1DViewAll(view *View) {
 
 func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(CabCC))
-	ss.AddStat(ss.StatSum(CabEnergy))
+	ss.AddStat(ss.StatSum(CabMag))
 	// a matter wave: the group velocity is not the phase velocity
 	ss.AddStat(ss.StatGroupVel(math32.X, CabPosA))
 }

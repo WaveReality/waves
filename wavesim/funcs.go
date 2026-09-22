@@ -254,6 +254,14 @@ func NeighValue(nidx, x, y, z, vidx, tidx int32) float32 {
 // Gradient10 computes the 3D gradient from 5 antipodal pairs (10 points),
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx.
+// Gradient1D computes the gradient along X only, as a centered difference:
+// the 1D counterpart of [Gradient10], for non-ThreeD runs.
+func Gradient1D(x, y, z, vidx, tidx int32) math32.Vector3 {
+	var g math32.Vector3
+	g.X = 0.5 * (State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx)) - State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx)))
+	return g
+}
+
 func Gradient10(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var g math32.Vector3
 	for xyz := range 3 {

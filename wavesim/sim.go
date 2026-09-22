@@ -271,6 +271,9 @@ func (ss *Sim) StepRun() {
 	case KleinGordon:
 		RunKleinGordonKernel(ns)
 	case KleinGordonC:
+		if ss.Params.EM.IsTrue() {
+			RunMaxwellKernel(ns) // reads the Charge / Current the KG wave wrote
+		}
 		RunKleinGordonCKernel(ns)
 	case Schrodinger:
 		RunSchrodingerKernel(ns)

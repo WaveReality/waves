@@ -24,9 +24,9 @@ func main() {
 	// threed := false
 	threed := true
 	// eqs := wavesim.Wave
-	// eqs := wavesim.KleinGordon
+	eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
-	eqs := wavesim.Maxwell
+	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
@@ -72,14 +72,9 @@ func main() {
 				}
 				sim.WaveStats()
 			case wavesim.KleinGordonC:
-				if threed {
-					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 100)
-				} else {
-					sim.Config.Size.Set(500, 1, 1)
-					sim.ViewInit(wavesim.Cab1DViewAll)
-				}
-				sim.SchrodingerStats()
+				sim.Params.ThreeD.SetBool(true) // only 3D
+				sim.Config.Size.Set(100, 100, 100)
+				sim.KleinGordonCStats()
 			case wavesim.Schrodinger:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
@@ -146,7 +141,7 @@ func main() {
 				sim.Gauss(wavesim.WaveV, wavesim.Both, ctrPos, 32, sim.Params.VPotential, -sim.Params.VPotential)
 				// sim.Step(wavesim.WaveV, wavesim.Both, math32.Vec3(10, 0, 0), math32.X, sim.Params.VPotential, -sim.Params.VPotential)
 			case wavesim.KleinGordonC:
-				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
+				wavesim.ChargeAtRest(sim)
 			case wavesim.Schrodinger:
 				sim.MovingWavePacketConfig(wavesim.CabPosA, wavesim.CabPosB, math32.X, ctrPos, -1, 0, 1)
 			case wavesim.Maxwell:

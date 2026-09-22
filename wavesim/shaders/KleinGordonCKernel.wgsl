@@ -8,6 +8,8 @@ var<storage, read> TensorStrides: array<u32>;
 var<storage, read> Params: array<Parameters>;
 @group(0) @binding(2)
 var<storage, read_write> NeighOffs: array<i32>;
+@group(0) @binding(3)
+var<storage, read_write> FaceOffs: array<i32>;
 @group(0) @binding(4)
 var<storage, read_write> NeighWts: array<f32>;
 // // Ctx has the Context state values. 
@@ -44,6 +46,10 @@ fn main(@builtin(workgroup_id) wgid: vec3<u32>, @builtin(num_workgroups) nwg: ve
 
 fn Index2D(s0: u32, s1: u32, i0: u32, i1: u32) -> u32 {
 	return s0 * i0 + s1 * i1;
+}
+
+fn Index4D(s0: u32, s1: u32, s2: u32, s3: u32, i0: u32, i1: u32, i2: u32, i3: u32) -> u32 {
+	return s0 * i0 + s1 * i1 + s2 * i2 + s3 * i3;
 }
 
 fn StateGet(ix: u32) -> f32 {
@@ -382,7 +388,7 @@ const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
-const CabStatesN: CabStates = 15;
+const CabStatesN: CabStates = 26;
 const EMStatesN: EMStates = 18;
 const EquationsN: Equations = 9;
 const ParticleVarsN: ParticleVars = 10;
@@ -390,8 +396,7 @@ const ViewModesN: ViewModes = 3;
 const CurPrevN: CurPrev = 2;
 const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
-const SpinfieldStatesN: SpinfieldStates = 34;
-const StdStatesN: StdStates = 37;
+const SpinfieldStatesN: SpinfieldStates = 45;
 const WaveStatesN: WaveStates = 7;
 
 //////// import: "funcs.go"
@@ -423,42 +428,51 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
-fn PotentialEnergy1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
-	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
-	var pm1d = m1 - ctr;
-	var pp1d = p1 - ctr;
-return 0.5 * (pm1d*pm1d + pp1d*pp1d);
+fn Gradient1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
+	var g: vec3<f32>;
+	g.x = 0.5 * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))));
+return g;
 }
-fn PotentialEnergy19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var avg = f32(0);
-	for (var j=0; j<NLapNeigh; j++) {
-		var xo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(0))];
-		var yo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(1))];
-		var zo = NeighOffs[Index2D(TensorStrides[0], TensorStrides[1], u32(j), u32(2))];
-		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
-		var dv = (nv - ctr);
-		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * dv * dv;
-	}return avg;
+fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
+	var g: vec3<f32>;
+	for (var xyz=0; xyz<3; xyz++) {
+		var sum = f32(0);
+		for (var j=0; j<NGradPair; j++) {
+			var xp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(0))];
+			var xm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(0))];
+			var yp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(1))];
+			var ym = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(1))];
+			var zp = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Plus1), u32(j), u32(2))];
+			var zm = FaceOffs[Index4D(TensorStrides[10], TensorStrides[11], TensorStrides[12], TensorStrides[13], u32(xyz), u32(Minus1), u32(j), u32(2))];
+			var grad = NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(Grad10Wts), u32(j))] * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zp), u32(y + yp), u32(x + xp), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zm), u32(y + ym), u32(x + xm), u32(vidx), u32(tidx))));
+			sum += grad;
+		}
+		switch (xyz) {
+		case 0: {
+			g.x = sum;
+		}
+		case 1: {
+			g.y = sum;
+		}
+		case 2: {
+			g.z = sum;
+		}
+		default: {
+		}
+		}
+	}return g;
 }
 
 //////// import: "klein-gordon.go"
-alias CabStates = i32; //enums:enum -trim-prefix=Cab
-const  CabPosA: CabStates = 0;
-const  CabPosB: CabStates = 1;
-const  CabVelA: CabStates = 2;
-const  CabVelB: CabStates = 3;
-const  CabForceA: CabStates = 4;
-const  CabForceB: CabStates = 5;
-const  CabV: CabStates = 6;
-const  CabCC: CabStates = 7;
-const  CabCharge: CabStates = 8;
-const  CabCurrentX: CabStates = 9;
-const  CabCurrentY: CabStates = 10;
-const  CabCurrentZ: CabStates = 11;
-const  CabKinetic: CabStates = 12;
-const  CabPotential: CabStates = 13;
-const  CabEnergy: CabStates = 14;
+alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
+const  CabPosA: CabStates = 18;
+const  CabPosB: CabStates = 19;
+const  CabVelA: CabStates = 20;
+const  CabVelB: CabStates = 21;
+const  CabForceA: CabStates = 22;
+const  CabForceB: CabStates = 23;
+const  CabV: CabStates = 24;
+const  CabMag: CabStates = 25;
 fn KleinGordonCKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -477,9 +491,10 @@ fn KleinGordonCKernel(i: u32) { //gosl:kernel
 	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabV), u32(prv)));
 	var mhsq = Params[0].MOverHSq;
 	var csq = Params[0].CSq;
+	var threeD = Params[0].ThreeD == 1;
 	var forceA: f32;
 	var forceB: f32;
-	if (Params[0].ThreeD == 1) {
+	if (threeD) {
 		forceA = Laplacian19(x, y, z, i32(CabPosA), prv, pposA);
 		forceB = Laplacian19(x, y, z, i32(CabPosB), prv, pposB);
 	} else {
@@ -487,26 +502,77 @@ fn KleinGordonCKernel(i: u32) { //gosl:kernel
 		forceB = Laplacian1D(x, y, z, i32(CabPosB), prv, pposB);
 	}
 	forceA += (vpot - mhsq) * pposA; // this is the only diff from standard Wave
-	var velA = pvelA + csq*forceA;
-	var posA = pposA + velA;
-	forceB += (vpot - mhsq) * pposB; // this is the only diff from standard Wave
-	var velB = pvelB + csq*forceB;
-	var posB = pposB + velB;
-	if (Params[0].Energy == 1) {
-		var cc = posA*posA + posB*posB;
-		var midVel = 0.25 * (pvelA + velA + pvelB + velB);
-		var kinetic = Params[0].Inv2CSq * midVel * midVel;
-		var potential: f32;
-		if (Params[0].ThreeD == 1) {
-			potential = PotentialEnergy19(x, y, z, i32(CabPosA), prv, pposA) + PotentialEnergy19(x, y, z, i32(CabPosB), prv, pposB);
-		} else {
-			potential = PotentialEnergy1D(x, y, z, i32(CabPosA), prv, pposA) + PotentialEnergy1D(x, y, z, i32(CabPosB), prv, pposB);
-		}
-		StateSet(cc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabCC), u32(cur)));
-		StateSet(kinetic, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabKinetic), u32(cur)));
-		StateSet(potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPotential), u32(cur)));
-		StateSet(kinetic + potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabEnergy), u32(cur)));
+	forceB += (vpot - mhsq) * pposB;
+	var accA = csq * forceA;
+	var accB = csq * forceB;
+	var gA: vec3<f32>;
+	var gB: vec3<f32>;
+	if (threeD) {
+		gA = Gradient10(x, y, z, i32(CabPosA), prv);
+		gB = Gradient10(x, y, z, i32(CabPosB), prv);
+	} else {
+		gA = Gradient1D(x, y, z, i32(CabPosA), prv);
+		gB = Gradient1D(x, y, z, i32(CabPosB), prv);
 	}
+	var em = Params[0].EM == 1;
+	var a0: f32;
+	var ax: f32;
+	var ay: f32;
+	var az: f32;
+	var omega: f32;
+	if (em) {
+		a0 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0s), u32(prv)));
+		ax = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXs), u32(prv)));
+		ay = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYs), u32(prv)));
+		az = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZs), u32(prv)));
+		var e2h = Params[0].E2OverH;
+		var cc = Params[0].C;
+		var asq = a0*a0 - (ax*ax + ay*ay + az*az);
+		var eh2 = Params[0].EOverHSq * asq;
+		accA += e2h*cc*(ax*gB.x+ay*gB.y+az*gB.z) + eh2*pposA;
+		accB += -e2h*cc*(ax*gA.x+ay*gA.y+az*gA.z) + eh2*pposB;
+		omega = e2h * a0; // the A0 rotation rate
+	}
+	var velA: f32;
+	var velB: f32;
+	if (em && Params[0].Boris == 1) {
+		var haA = 0.5 * accA;
+		var haB = 0.5 * accB;
+		var mA = pvelA + haA;
+		var mB = pvelB + haB;
+		var cs = cos(omega);
+		var sn = sin(omega);
+		velA = cs*mA + sn*mB + haA;
+		velB = -sn*mA + cs*mB + haB;
+	} else {
+		velA = pvelA + accA + omega*pvelB;
+		velB = pvelB + accB - omega*pvelA;
+	}
+	var posA = pposA + velA;
+	var posB = pposB + velB;
+	var midA = 0.5 * (pvelA + velA);
+	var midB = 0.5 * (pvelB + velB);
+	var ccm = pposA*pposA + pposB*pposB;
+	var hem = 2 * Params[0].HEOver2MCSq; // hbar e / (m c^2)
+	var rho = hem * (pposB*midA - pposA*midB);
+	if (em) {
+		rho -= Params[0].EsqOverMCSq * a0 * ccm;
+	}
+	var jf = hem * csq; // hbar e / m
+	var jx = jf * (pposA*gB.x - pposB*gA.x);
+	var jy = jf * (pposA*gB.y - pposB*gA.y);
+	var jz = jf * (pposA*gB.z - pposB*gA.z);
+	if (em) {
+		var ja = Params[0].EsqOverMCSq * Params[0].C * ccm;
+		jx -= ja * ax;
+		jy -= ja * ay;
+		jz -= ja * az;
+	}
+	StateSet(rho, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Charge), u32(cur)));
+	StateSet(jx, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentX), u32(cur)));
+	StateSet(jy, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentY), u32(cur)));
+	StateSet(jz, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentZ), u32(cur)));
+	StateSet(posA*posA + posB*posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabMag), u32(cur)));
 	StateSet(forceA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabForceA), u32(cur)));
 	StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabVelA), u32(cur)));
 	StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabPosA), u32(cur)));
@@ -589,13 +655,13 @@ struct Parameters {
 	OneoEps0: f32,
 	E2OverH: f32,
 	EOverHSq: f32,
+	EsqOverMCSq: f32,
 	HiggsMuSq: f32,
 	HiggsV: f32,
 	MW: f32,
 	MZ: f32,
 	SinThetaW: f32,
 	CosThetaW: f32,
-	pad: f32,
 }
 
 //////// import: "particle.go"
@@ -644,47 +710,25 @@ const SLPi = 3.141592653589793;
 
 //////// import: "spinfield.go"
 alias SpinfieldStates = CabStates; //enums:enum -trim-prefix=Spinfield
-const  SpinfieldParticle: SpinfieldStates = 15;
-const  SpinfieldPvelX: SpinfieldStates = 16;
-const  SpinfieldPvelY: SpinfieldStates = 17;
-const  SpinfieldPvelZ: SpinfieldStates = 18;
-const  SpinfieldPESq: SpinfieldStates = 19;
-const  SpinfieldDist: SpinfieldStates = 20;
-const  SpinfieldDrive: SpinfieldStates = 21;
-const  SpinfieldHiggs0a: SpinfieldStates = 22;
-const  SpinfieldHiggs0b: SpinfieldStates = 23;
-const  SpinfieldHiggs1a: SpinfieldStates = 24;
-const  SpinfieldHiggs1b: SpinfieldStates = 25;
-const  Spinfield0a: SpinfieldStates = 26;
-const  Spinfield0b: SpinfieldStates = 27;
-const  SpinfieldXa: SpinfieldStates = 28;
-const  SpinfieldXb: SpinfieldStates = 29;
-const  SpinfieldYa: SpinfieldStates = 30;
-const  SpinfieldYb: SpinfieldStates = 31;
-const  SpinfieldZa: SpinfieldStates = 32;
-const  SpinfieldZb: SpinfieldStates = 33;
-
-//////// import: "standard.go"
-alias StdStates = EMStates; //enums:enum -trim-prefix=Std
-const  StdCs0a: StdStates = 18;
-const  StdCs0b: StdStates = 19;
-const  StdCs1a: StdStates = 20;
-const  StdCs1b: StdStates = 21;
-const  StdCv0a: StdStates = 22;
-const  StdCv0b: StdStates = 23;
-const  StdCv1a: StdStates = 24;
-const  StdCv1b: StdStates = 25;
-const  StdHs0a: StdStates = 26;
-const  StdHs0b: StdStates = 27;
-const  StdHs1a: StdStates = 28;
-const  StdH1b: StdStates = 29;
-const  StdHv0a: StdStates = 30;
-const  StdHv0b: StdStates = 31;
-const  StdHv1a: StdStates = 32;
-const  StdHv1b: StdStates = 33;
-const  StdWp: StdStates = 34;
-const  StdWn: StdStates = 35;
-const  StdZ0: StdStates = 36;
+const  SpinfieldParticle: SpinfieldStates = 26;
+const  SpinfieldPvelX: SpinfieldStates = 27;
+const  SpinfieldPvelY: SpinfieldStates = 28;
+const  SpinfieldPvelZ: SpinfieldStates = 29;
+const  SpinfieldPESq: SpinfieldStates = 30;
+const  SpinfieldDist: SpinfieldStates = 31;
+const  SpinfieldDrive: SpinfieldStates = 32;
+const  SpinfieldHiggs0a: SpinfieldStates = 33;
+const  SpinfieldHiggs0b: SpinfieldStates = 34;
+const  SpinfieldHiggs1a: SpinfieldStates = 35;
+const  SpinfieldHiggs1b: SpinfieldStates = 36;
+const  Spinfield0a: SpinfieldStates = 37;
+const  Spinfield0b: SpinfieldStates = 38;
+const  SpinfieldXa: SpinfieldStates = 39;
+const  SpinfieldXb: SpinfieldStates = 40;
+const  SpinfieldYa: SpinfieldStates = 41;
+const  SpinfieldYb: SpinfieldStates = 42;
+const  SpinfieldZa: SpinfieldStates = 43;
+const  SpinfieldZb: SpinfieldStates = 44;
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum -trim-prefix=Wave

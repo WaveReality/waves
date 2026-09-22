@@ -403,6 +403,59 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
+// ChargedUniform fills space with a uniform complex wave turning at the rest
+// mass frequency Omega0, which is a constant charge density of -sign e amp^2.
+// The two components are a quarter cycle apart, as complex numbers always are;
+// sign picks which way it turns, and so the sign of the charge.
+//
+// With Params.EM on, the local A0 is subtracted from the turning rate. A
+// potential shifts the phase rate by -e A0 / hbar, so a wave genuinely at rest
+// in that potential turns at Omega0 - e A0 / hbar. Leaving it out starts the
+// wave in a superposition of the two frequencies present, and |chi|^2 beats
+// instead of sitting still.
+func (ss *Sim) ChargedUniform(amp, sign float32) {
+	ss.Fill(CabPosA, Both, amp)
+	om := ss.Params.Omega0
+	if ss.Params.EM.IsFalse() {
+		ss.Fill(CabVelB, Both, sign*om*amp)
+		return
+	}
+	eoh := ss.Params.E / ss.Params.Hbar
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * amp
+				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(cur))
+				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabVelB), int(prv))
+			}
+		}
+	}
+}
+
+// ChargedPacketConfig adds a travelling complex wave packet along dim, with
+// the two components a quarter cycle apart so it carries charge. Takes its
+// wavelength and width from [Config]. sign picks the sign of the charge.
+//
+// Built from [Sim.SlabPacket] at the exact lattice frequency for this mass, so
+// it is a clean positive-frequency packet running one way: chi = env e^i(kx -
+// wt), for which rho is env^2 times a constant. [Sim.MovingWavePacket] would
+// be the obvious choice but its velocity comes from fitted constants tuned for
+// massless waves, so the packet it makes is not a KG eigenstate and splits.
+func (ss *Sim) ChargedPacketConfig(dim math32.Dims, amp, sign float32) {
+	wl := ss.Config.Wavelength
+	om := ss.LatticeFreq(wl, math32.Sqrt(ss.Params.MOverHSq))
+	ctr := float32(ss.Config.Size.Dim(dim)) * 0.5
+	wd := ss.Config.PacketWidth
+	ss.SlabPacket(CabPosA, CabVelA, dim, ctr, wl, wd, amp, 1, om, 0)
+	ss.SlabPacket(CabPosB, CabVelB, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+}
+
 // SmoothNoise seeds a state variable with a sum of a few long-wavelength modes
 // rather than per-site white noise, which would put power at the lattice
 // cutoff and destabilize a nonlinear solver.
