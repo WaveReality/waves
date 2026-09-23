@@ -205,3 +205,38 @@ func TestSchrodingerBigBox(t *testing.T) {
 	t.Logf("uncapped corner V would be %.3f, clamped to %.3f; norm %.5f varies by %.2e (%.3f%%)",
 		corner, vmax, n0, hi-lo, 100*(hi-lo)/n0)
 }
+
+// TestSchrodingerHydrogenP: the 2p orbital is two lobes of opposite phase with
+// a node between them. The node is fixed by symmetry rather than by getting
+// the radial function right, so it must stay exact even though the lobes
+// breathe against the softened 1/r core.
+func TestSchrodingerHydrogenP(t *testing.T) {
+	const sz = 48
+	const ctr = sz/2 + 1 // interior index of the center cell
+	ss := scSim(sz, HydrogenP)
+	scStep(ss)
+	mag := func(dz int) float64 {
+		return float64(State.Value(ctr+dz, ctr, ctr, int(CabMag), int(GetCtx(0).CurState)))
+	}
+	as := func(dz int) float64 {
+		return float64(State.Value(ctr+dz, ctr, ctr, int(CabAs), int(GetCtx(0).CurState)))
+	}
+	// the lobes peak at the n = 2 decay length, and are mirror images
+	peak := mag(int(HydrogenRadius))
+	if d := math.Abs(mag(-int(HydrogenRadius)) - peak); d > 1e-6*peak {
+		t.Errorf("lobes differ by %.2e, should be mirror images", d)
+	}
+	if up, dn := as(int(HydrogenRadius)), as(-int(HydrogenRadius)); up*dn >= 0 {
+		t.Errorf("lobes have the same sign (%+.4f, %+.4f), so this is not a p orbital", up, dn)
+	}
+	worst := mag(0)
+	for range 1000 {
+		scStep(ss)
+		worst = math.Max(worst, mag(0))
+	}
+	if worst > 0.01*peak {
+		t.Errorf("node reaches %.3g, %.2f%% of the lobe peak %.3g", worst, 100*worst/peak, peak)
+	}
+	t.Logf("lobe peak %.5f at dz = +-%g, node stays under %.3g (%.3f%% of peak) over 1000 steps",
+		peak, HydrogenRadius, worst, 100*worst/peak)
+}

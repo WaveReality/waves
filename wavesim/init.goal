@@ -440,6 +440,74 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
+// HydrogenRadius is the size of the orbitals in the hydrogen configs, in
+// cubes: the Bohr radius a for the n = 1 states, and the decay length 2a for
+// the n = 2 ones, whose well is four times deeper so that both come out the
+// same size and fit the same box. Binding is hbar^2 / 2 m R^2 either way.
+const HydrogenRadius float32 = 5
+
+// HydrogenMass is the mass the relativistic hydrogen configs set. It has to be
+// this heavy: a = Compton / Z alpha, so a light particle makes an atom far too
+// big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube,
+// and HydrogenRadius then means Z alpha = 0.2 for n = 1, 0.4 for the deeper
+// n = 2 well. Both are real atoms -- 0.2 is around iron -- so the relativistic
+// corrections here are not small, which is the point of running them at all.
+const HydrogenMass float32 = 2
+
+// HydrogenWell puts a 1/r Coulomb well into A0, deep enough that its n = 1
+// orbital decays over the Bohr radius a, and returns the frequency of level n:
+//
+//	omega = E / hbar,  E = m c^2 - hbar^2 / (2 m a^2 n^2)
+//
+// This charge has V = -e A0, so an attractive well is a POSITIVE A0, giving
+// V = -k/r with k = hbar^2 / m a. Params.SelfField must be off, or
+// MaxwellKernel overwrites A0 on the first step.
+func (ss *Sim) HydrogenWell(a, n float32) float32 {
+	p := ss.Params
+	k := p.Hbar * p.Hbar / (p.Mass * a)
+	ss.InvR(A0s, math32.Vec3(-1, -1, -1), k/p.E)
+	ss.EFromA0()
+	ss.CopyCurToPrev() // InvR and EFromA0 write cur only
+	return p.Omega0 - p.Hbar/(2*p.Mass*a*a*n*n)
+}
+
+// EFromA0 fills E from the static potential already in A0, E = -grad A0,
+// using the same stencil MaxwellKernel does.
+//
+// An external field needs this. MaxwellKernel is what normally derives E and B
+// from the potentials, and it does not run when Params.SelfField is off -- so
+// a potential written straight into A0 otherwise carries no E field at all,
+// and every term that reads one is silently zero. That includes the Dirac
+// sigma . (cB + iE) term, which is the entire difference between the Dirac
+// equation and a pair of Klein-Gordon ones.
+func (ss *Sim) EFromA0() {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	threeD := ss.Params.ThreeD.IsTrue()
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				var g math32.Vector3
+				if threeD {
+					g = Gradient10(f.X, f.Y, f.Z, int32(A0s), cur)
+				} else {
+					g = Gradient1D(f.X, f.Y, f.Z, int32(A0s), cur)
+				}
+				State[f.Z, f.Y, f.X, EX, cur] += -g.X
+				State[f.Z, f.Y, f.X, EY, cur] += -g.Y
+				State[f.Z, f.Y, f.X, EZ, cur] += -g.Z
+				State[f.Z, f.Y, f.X, EX, prv] += -g.X
+				State[f.Z, f.Y, f.X, EY, prv] += -g.Y
+				State[f.Z, f.Y, f.X, EZ, prv] += -g.Z
+			}
+		}
+	}
+}
+
 // ChargedRest gives whatever is already in CabAs the velocity that makes it
 // a charge distribution at rest: phi_b stays zero and d phi_b turns at the
 // rest mass frequency, so that
@@ -456,9 +524,23 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 // wave in a superposition of the two frequencies present, and |chi|^2 beats
 // instead of sitting still.
 func (ss *Sim) ChargedRest(sign float32) {
-	om := ss.Params.Omega0
+	ss.chargedPhase(sign, ss.Params.Omega0, true)
+}
+
+// ChargedBound gives whatever is in CabAs the UNIFORM phase rate of a
+// stationary state, d chi / dt = i sign omega chi. A bound state turns at one
+// frequency everywhere, E = hbar omega. [Sim.ChargedRest] uses the LOCAL rate
+// instead, which is what a lump merely sitting in a potential does, but is not
+// an eigenstate -- |chi|^2 then beats rather than sitting still.
+func (ss *Sim) ChargedBound(sign, omega float32) {
+	ss.chargedPhase(sign, omega, false)
+}
+
+// chargedPhase does the work of both: local reduces omega by the potential at
+// each point, uniform leaves it alone.
+func (ss *Sim) chargedPhase(sign, om float32, local bool) {
 	eoh := float32(0)
-	if ss.Params.EM.IsTrue() {
+	if local && ss.Params.EM.IsTrue() {
 		eoh = ss.Params.E / ss.Params.Hbar
 	}
 	ctx := GetCtx(0)
@@ -519,9 +601,18 @@ func (ss *Sim) DiracBlob(ctr math32.Vector3, width, amp float32, axis math32.Dim
 // single complex component: each component turns at the rest mass frequency,
 // so rho = -sign e |psi|^2 pointwise.
 func (ss *Sim) DiracRest(sign float32) {
-	om := ss.Params.Omega0
+	ss.diracPhase(sign, ss.Params.Omega0, true)
+}
+
+// DiracBound gives the Dirac position variables the uniform phase rate of a
+// stationary state, as [Sim.ChargedBound] does for the single component.
+func (ss *Sim) DiracBound(sign, omega float32) {
+	ss.diracPhase(sign, omega, false)
+}
+
+func (ss *Sim) diracPhase(sign, om float32, local bool) {
 	eoh := float32(0)
-	if ss.Params.EM.IsTrue() {
+	if local && ss.Params.EM.IsTrue() {
 		eoh = ss.Params.E / ss.Params.Hbar
 	}
 	ctx := GetCtx(0)
@@ -647,6 +738,34 @@ func (ss *Sim) Expo(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, deca
 				f := c.AddScalar(1)
 				d := CoordToFloat(c).Sub(ctr).Length()
 				v := amp * math32.FastExp(-d/decay)
+				if curPrev == CurOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
+// ExpoP adds amp * (d / decay) * exp(-r / decay) along dim, centered at ctr:
+// the 2p orbital, two lobes of opposite sign with a node through the center.
+// The n = 2 Coulomb state has decay 2a for Bohr radius a.
+func (ss *Sim) ExpoP(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, dim math32.Dims, decay, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr = CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Sub(ctr)
+				v := amp * (d.Dim(dim) / decay) * math32.FastExp(-d.Length()/decay)
 				if curPrev == CurOnly || curPrev == Both {
 					State[f.Z, f.Y, f.X, vri, cur] += v
 				}

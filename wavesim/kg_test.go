@@ -27,7 +27,6 @@ func kgSim(sz int32, init func(*Sim)) *Sim {
 	ss.Params.Update()
 	ss.StateVars = CabStatesN
 	ss.ConfigState()
-	ss.KleinGordonCStats()
 	ss.InitFunc = init
 	ss.Init()
 	return ss
@@ -296,5 +295,69 @@ func TestKGBorisStability(t *testing.T) {
 		if qr/math.Abs(q) > 0.01 {
 			t.Errorf("charge varies by %.1f%% in the field, expected under 1%%", 100*qr/math.Abs(q))
 		}
+	}
+}
+
+// atomRMS is the |wave|^2 weighted rms radius about the center, in cubes: how
+// spread out the state is, which is what says whether it is bound.
+func atomRMS(sz int32, mag enums.Enum) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	mid := float64(sz) / 2
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(mag.Int64()), cur))
+				dx, dy, dz := float64(x-1)-mid, float64(y-1)-mid, float64(z-1)-mid
+				num += v * (dx*dx + dy*dy + dz*dz)
+				den += v
+			}
+		}
+	}
+	return math.Sqrt(num / den)
+}
+
+// scalarUnbound is ScalarHydrogen with the well removed: the control that says
+// the binding in TestScalarHydrogenBound is doing the work, not the damping.
+func scalarUnbound(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.SelfField.SetBool(false)
+	p.Mass = HydrogenMass
+	p.Edges = EdgesDamp
+	p.Update()
+	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), HydrogenRadius, ss.Config.Amplitude)
+	ss.ChargedBound(1, p.Omega0)
+}
+
+// TestScalarHydrogenBound: a spin-0 particle in a Coulomb well stays put. The
+// initial shape is the nonrelativistic exp(-r/a), an eigenstate only to order
+// (Z alpha)^2, so it breathes -- but it must stay the size of an atom, while
+// the same wave with no well to hold it runs away.
+func TestScalarHydrogenBound(t *testing.T) {
+	const sz = 64
+	for _, tc := range []struct {
+		name  string
+		init  func(*Sim)
+		bound bool
+	}{
+		{"ScalarHydrogen", ScalarHydrogen, true},
+		{"ScalarHydrogenP", ScalarHydrogenP, true},
+		{"unbound control", scalarUnbound, false},
+	} {
+		ss := kgSim(sz, tc.init)
+		kgStepExt(ss)
+		r0 := atomRMS(sz, CabMag)
+		for range 200 {
+			kgStepExt(ss)
+		}
+		grow := atomRMS(sz, CabMag)/r0 - 1
+		if tc.bound && grow > 0.15 {
+			t.Errorf("%s spread by %.1f%%, not bound", tc.name, 100*grow)
+		}
+		if !tc.bound && grow < 0.5 {
+			t.Errorf("%s spread by only %.1f%%, so the control is not a control", tc.name, 100*grow)
+		}
+		t.Logf("%-16s rms %6.3f -> %6.3f (%+.1f%%)", tc.name, r0, r0*(1+grow), 100*grow)
 	}
 }

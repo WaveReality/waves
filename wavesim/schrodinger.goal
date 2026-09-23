@@ -199,14 +199,16 @@ func BoxTwoStates(ss *Sim) {
 // what makes the state actually stationary. Watch Mag sit still.
 //
 // Two caveats worth knowing. The 1/r singularity is softened to its value one
-// cube out, since a lattice cannot hold an infinity; that shifts the true
-// ground state slightly, so the wave breathes a little rather than sitting
-// perfectly still. And this is one electron in a fixed external potential, not
-// a nucleus and an electron finding each other -- there is no back-reaction,
-// and no second electron, so no chemistry.
+// cube out, since a lattice cannot hold an infinity, and exp(-r/a) has its
+// cusp exactly there -- so the peak is not the lattice eigenstate and relaxes
+// at once, after which |chi|^2 at the center swings over about 40% of its
+// starting value. The shape away from the core barely moves; it is the cusp
+// that is wrong. And this is one electron in a fixed external potential, not a
+// nucleus and an electron finding each other -- there is no back-reaction, and
+// no second electron, so no chemistry.
 func HydrogenGround(ss *Sim) {
 	p := ss.Params
-	a := SchrodingerBohr
+	a := HydrogenRadius
 	k := p.Hbar * p.Hbar / (p.Mass * a)
 	ss.InvR(CabV, math32.Vec3(-1, -1, -1), -k)
 	ss.CopyCurToPrev() // InvR writes cur only, and a potential that is there on
@@ -214,8 +216,30 @@ func HydrogenGround(ss *Sim) {
 	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
 }
 
-// SchrodingerBohr is the Bohr radius of HydrogenGround, in cubes.
-const SchrodingerBohr float32 = 5
+// HydrogenP is the 2p orbital: two lobes of opposite phase, one above and one
+// below a node through the center, which is the l = 1 state everyone draws.
+//
+// The well here is four times deeper than HydrogenGround's, so that the n = 2
+// orbital, which decays over 2a rather than a, comes out the same size and
+// fits the same box. The sign flip between the lobes is invisible in |chi|^2,
+// and is what stops them from merging into one lump.
+//
+// The node is exact and stays exact: it is fixed by symmetry, not by getting
+// the radial function right, so it holds to a fraction of a percent while the
+// lobes breathe by about as much as the ground state does, and for the same
+// lattice reason.
+//
+// The node is why a p electron feels the nucleus less than an s one, and the
+// lobes are why bonds built from them point in particular directions.
+func HydrogenP(ss *Sim) {
+	p := ss.Params
+	a := HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
+	k := p.Hbar * p.Hbar / (p.Mass * a)
+	ctr := math32.Vec3(-1, -1, -1)
+	ss.InvR(CabV, ctr, -k)
+	ss.CopyCurToPrev()
+	ss.ExpoP(CabAs, Both, ctr, math32.Z, 2*a, ss.Config.Amplitude)
+}
 
 // FreePacket is a gaussian wave packet moving along X with nothing to push it:
 // it travels at the group velocity and spreads, which is the one thing a free
@@ -233,6 +257,7 @@ var SchrodingerConfigs = []InitFunc{
 	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
 	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
 	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
+	InitFunc{Name: "Hydrogen P", Doc: "The 2p orbital: two lobes of opposite phase with a node between them, stationary in the same 1/r well", Func: HydrogenP},
 }
 
 // SchrodingerShouldDisplay determines which Parameters fields to display.

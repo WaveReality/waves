@@ -416,12 +416,62 @@ func ChargedPacket(ss *Sim) {
 }
 
 // KGCConfigs are the initialization options offered in the GUI.
+// scalarAtom is the shared setup for the two bound-state configs: an external
+// Coulomb well, no self-field, damped edges so whatever is not held can leave.
+func scalarAtom(ss *Sim, a, n float32) float32 {
+	p := ss.Params
+	p.EM.SetBool(true)
+	p.SelfField.SetBool(false) // the well is EXTERNAL and must stay as set
+	p.Mass = HydrogenMass
+	p.Edges = EdgesDamp
+	p.Update()
+	return ss.HydrogenWell(a, n)
+}
+
+// ScalarHydrogen is the same atom as HydrogenGround, but from the relativistic
+// wave equation: a spin-0 particle bound in a Coulomb well, which is what a
+// pionic atom actually is.
+//
+// The shape is the nonrelativistic exp(-r/a), which is an eigenstate only to
+// order (Z alpha)^2 -- the true Klein-Gordon Coulomb state carries an extra
+// r^s with s = -(Z alpha)^2 near the origin. At Z alpha = 0.2 that is a few
+// percent, so the state stays put but breathes slightly rather than sitting
+// perfectly still. The breathing IS the relativistic correction.
+//
+// The uniform phase rate is what makes it a bound state at all: one frequency
+// everywhere, E = m c^2 + binding. Compare Charge At Rest, which uses the local
+// rate and is not an eigenstate of anything.
+func ScalarHydrogen(ss *Sim) {
+	a := HydrogenRadius
+	om := scalarAtom(ss, a, 1)
+	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
+	ss.ChargedBound(1, om)
+}
+
+// ScalarHydrogenP is the 2p orbital of the same equation: two lobes of
+// opposite phase with a node between them, held by a well four times deeper so
+// that it comes out the size of the ground state above.
+//
+// A spin-0 particle can sit in an l = 1 orbital and this is what it looks like.
+// The deeper well puts it at Z alpha = 0.4, which for l = 0 would be close to
+// the Z alpha = 1/2 where the Klein-Gordon Coulomb ground state stops existing
+// at all; l = 1 is safe until 3/2, so the p state tolerates a far heavier
+// nucleus than the s state does.
+func ScalarHydrogenP(ss *Sim) {
+	a := HydrogenRadius / 2
+	om := scalarAtom(ss, a, 2)
+	ss.ExpoP(CabAs, Both, math32.Vec3(-1, -1, -1), math32.Z, 2*a, ss.Config.Amplitude)
+	ss.ChargedBound(1, om)
+}
+
 var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charge At Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
 	InitFunc{Name: "Charge At Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
 	InitFunc{Name: "Charge Uniform", Doc: "Charge at rest filling all of space: flat, but rho is then exactly constant and equal to -e |chi|^2", Func: ChargeUniform},
 	InitFunc{Name: "Charge Self Field", Doc: "The charge makes its own potential and is pushed back by it: Mu0 is scaled so the self-field is a twentieth of the rest energy, which is the only regime where this is stable", Func: ChargeSelfField},
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
+	InitFunc{Name: "Scalar Hydrogen", Doc: "A spin-0 particle bound in a Coulomb well in its exp(-r/a) ground state: a pionic atom, turning at one frequency everywhere", Func: ScalarHydrogen},
+	InitFunc{Name: "Scalar Hydrogen P", Doc: "The 2p orbital of the same: two lobes of opposite phase with a node between them", Func: ScalarHydrogenP},
 }
 
 // KGCConfigs stats plotted over time in the GUI.

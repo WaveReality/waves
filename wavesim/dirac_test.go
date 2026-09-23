@@ -261,3 +261,39 @@ func TestSpinInPotential(t *testing.T) {
 		t.Errorf("the well should pull the lump in: centroid %g -> %g, well at %g", c0, c1, well)
 	}
 }
+
+// TestDiracHydrogenBound: an electron in a Coulomb well stays bound, and the
+// spin term is actually live while it does.
+//
+// That second half is the point of the test. The kernel reads E and B as
+// state, and MaxwellKernel is what fills them -- but it does not run with
+// SelfField off, so a well written straight into A0 carries no E field unless
+// something puts one there. Without it sigma . (cB + iE) is identically zero
+// and the Dirac equation collapses into two independent Klein-Gordon ones.
+func TestDiracHydrogenBound(t *testing.T) {
+	const sz = 64
+	for _, tc := range []struct {
+		name string
+		init func(*Sim)
+	}{{"DiracHydrogen", DiracHydrogen}, {"DiracHydrogenP", DiracHydrogenP}} {
+		ss := drSim(sz, tc.init)
+		drStepExt(ss)
+		cur := GetCtx(0).CurState
+		ez := StateMax(GetCtx(0).Size.V(), EZ, cur)
+		if ez <= 0 {
+			t.Errorf("%s: E field is zero, so the spin term does nothing", tc.name)
+		}
+		r0 := atomRMS(sz, DiracMag)
+		worst := 0.0
+		for i := range 200 {
+			drStepExt(ss)
+			if (i+1)%20 == 0 { // sampling: the rms sweep costs more than a step
+				worst = math.Max(worst, atomRMS(sz, DiracMag)/r0-1)
+			}
+		}
+		if worst > 0.4 {
+			t.Errorf("%s spread by %.1f%%, not bound", tc.name, 100*worst)
+		}
+		t.Logf("%-15s rms %6.3f, spreads at most %+.1f%%, max E %.4g", tc.name, r0, 100*worst, ez)
+	}
+}
