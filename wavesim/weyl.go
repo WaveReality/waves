@@ -219,7 +219,7 @@ func WeylViewAll(view *View) {
 	view.Panels[0].Var = WeylL1a
 	view.Panels[1].Var = WeylL1b
 	view.Panels[2].Var = WeylR1a
-	view.Panels[3].Var = WeylR2b
+	view.Panels[3].Var = WeylR1b
 }
 
 // WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
