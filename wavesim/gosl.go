@@ -298,6 +298,54 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveCAKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveCBKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveCDirKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/WaveDampKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -867,6 +915,132 @@ func RunOneSpinfieldKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunSpinfieldKernelCPU(n)
+	}
+}
+// RunWaveCAKernel runs the WaveCAKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneWaveCAKernel call does Run and Done for a
+// single run-and-sync case.
+func RunWaveCAKernel(n int) {
+	if UseGPU {
+		RunWaveCAKernelGPU(n)
+	} else {
+		RunWaveCAKernelCPU(n)
+	}
+}
+
+// RunWaveCAKernelGPU runs the WaveCAKernel kernel on the GPU. See [RunWaveCAKernel] for more info.
+func RunWaveCAKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["WaveCAKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunWaveCAKernelCPU runs the WaveCAKernel kernel on the CPU.
+func RunWaveCAKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, WaveCAKernel)
+}
+
+// RunOneWaveCAKernel runs the WaveCAKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneWaveCAKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunWaveCAKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunWaveCAKernelCPU(n)
+	}
+}
+// RunWaveCBKernel runs the WaveCBKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneWaveCBKernel call does Run and Done for a
+// single run-and-sync case.
+func RunWaveCBKernel(n int) {
+	if UseGPU {
+		RunWaveCBKernelGPU(n)
+	} else {
+		RunWaveCBKernelCPU(n)
+	}
+}
+
+// RunWaveCBKernelGPU runs the WaveCBKernel kernel on the GPU. See [RunWaveCBKernel] for more info.
+func RunWaveCBKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["WaveCBKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunWaveCBKernelCPU runs the WaveCBKernel kernel on the CPU.
+func RunWaveCBKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, WaveCBKernel)
+}
+
+// RunOneWaveCBKernel runs the WaveCBKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneWaveCBKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunWaveCBKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunWaveCBKernelCPU(n)
+	}
+}
+// RunWaveCDirKernel runs the WaveCDirKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneWaveCDirKernel call does Run and Done for a
+// single run-and-sync case.
+func RunWaveCDirKernel(n int) {
+	if UseGPU {
+		RunWaveCDirKernelGPU(n)
+	} else {
+		RunWaveCDirKernelCPU(n)
+	}
+}
+
+// RunWaveCDirKernelGPU runs the WaveCDirKernel kernel on the GPU. See [RunWaveCDirKernel] for more info.
+func RunWaveCDirKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["WaveCDirKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunWaveCDirKernelCPU runs the WaveCDirKernel kernel on the CPU.
+func RunWaveCDirKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, WaveCDirKernel)
+}
+
+// RunOneWaveCDirKernel runs the WaveCDirKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneWaveCDirKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunWaveCDirKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunWaveCDirKernelCPU(n)
 	}
 }
 // RunWaveDampKernel runs the WaveDampKernel kernel with given number of elements,

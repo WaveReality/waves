@@ -26,6 +26,15 @@ const (
 	// Wave is the basic wave equation in one dimension (X).
 	Wave Equations = iota
 
+	// WaveC is the first-order COMPLEX wave equation, using the Laplacian, to
+	// set against the second-order Wave: two real numbers per point either
+	// way, and direction carried by the phase rather than by a velocity.
+	WaveC
+
+	// WaveCDir is the first-order DIRECTIONAL version, using the gradient:
+	// the factor of the second-order operator that goes one way.
+	WaveCDir
+
 	// KleinGordon is the Klein-Gordon massive particle wave function,
 	// on a scalar wave state.
 	KleinGordon
@@ -309,8 +318,10 @@ type Parameters struct {
 	// chirality although the weak force does.
 	WeylQ float32 `default:"1"`
 
-	// gosl requires the total struct size to be a multiple of 16 bytes.
-	pad float32
+	// WaveDir is which way the first-order wave equation carries things, +1
+	// or -1. A first-order equation has to be told; a second-order one does
+	// not, because it does both.
+	WaveDir float32 `default:"1"`
 }
 
 func (pr *Parameters) Update() {
@@ -365,6 +376,7 @@ func (pr *Parameters) Defaults() {
 	pr.A0NoWave.SetBool(true)
 	pr.E = 1.0
 	pr.WeylQ = 1
+	pr.WaveDir = 1
 	pr.Mu0 = 1.0
 	pr.Move.SetBool(true)
 	// Standard Model values at HiggsCompton = 16 cubes (see Units.Update):

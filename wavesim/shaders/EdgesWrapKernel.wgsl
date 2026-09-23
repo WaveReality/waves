@@ -458,7 +458,8 @@ fn EdgesWrapKernel(i: u32) { //gosl:kernel
 	var nvars = ctx.NVars;
 	for (var vi=0; vi<nvars; vi++) {
 		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(sz), u32(sy), u32(sx), u32(vi), u32(cur))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vi), u32(cur)));
-		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(sz), u32(sy), u32(sx), u32(vi), u32(prv))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vi), u32(prv)));
+		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(sz), u32(sy), u32(sx), u32(vi), u32(prv))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+		TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vi), u32(prv)));
 	}
 }
 
@@ -531,7 +532,7 @@ const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 24;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 10;
+const EquationsN: Equations = 12;
 const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 3;
 const CurPrevN: CurPrev = 2;
@@ -539,6 +540,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 43;
 const WaveStatesN: WaveStates = 7;
+const WaveCStatesN: WaveCStates = 3;
 const WeylStatesN: WeylStates = 29;
 
 //////// import: "funcs.go"
@@ -588,15 +590,17 @@ const  CurrentZ: EMStates = 17;
 //////// import: "params.go"
 alias Equations = i32; //enums:enum
 const  Wave: Equations = 0;
-const  KleinGordon: Equations = 1;
-const  KleinGordonC: Equations = 2;
-const  Schrodinger: Equations = 3;
-const  Maxwell: Equations = 4;
-const  Dirac: Equations = 5;
-const  Weyl: Equations = 6;
-const  Electroweak: Equations = 7;
-const  Spinfield: Equations = 8;
-const  ParticleMove: Equations = 9;
+const  WaveC: Equations = 1;
+const  WaveCDir: Equations = 2;
+const  KleinGordon: Equations = 3;
+const  KleinGordonC: Equations = 4;
+const  Schrodinger: Equations = 5;
+const  Maxwell: Equations = 6;
+const  Dirac: Equations = 7;
+const  Weyl: Equations = 8;
+const  Electroweak: Equations = 9;
+const  Spinfield: Equations = 10;
+const  ParticleMove: Equations = 11;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -648,7 +652,7 @@ struct Parameters {
 	SinThetaW: f32,
 	CosThetaW: f32,
 	WeylQ: f32,
-	pad: f32,
+	WaveDir: f32,
 }
 
 //////// import: "particle.go"
@@ -726,6 +730,10 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
+const  WaveCa: WaveCStates = 0;
+const  WaveCb: WaveCStates = 1;
+const  WaveCMag: WaveCStates = 2;
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl

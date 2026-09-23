@@ -23,12 +23,13 @@ func main() {
 
 	// threed := false
 	threed := true
-	// eqs := wavesim.Wave
+	// eqs := wavesim.WaveC
+	eqs := wavesim.WaveCDir
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	eqs := wavesim.Weyl
+	// eqs := wavesim.Weyl
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
@@ -53,8 +54,8 @@ func main() {
 					// vw.Settings.NPanels = wavesim.PanelsTwo
 					// vw.SetMode(wavesim.Bars, -1)
 				})
+				sim.Params.ThreeD.SetBool(threed)
 				if threed {
-					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					// sim.Config.Size.Set(80, 1, 1)
@@ -62,9 +63,25 @@ func main() {
 					sim.ViewInit(wavesim.Wave1DViewAll)
 				}
 				sim.WaveStats()
-			case wavesim.KleinGordon:
+			case wavesim.WaveC:
+				sim.Params.ThreeD.SetBool(threed)
 				if threed {
-					sim.Params.ThreeD.SetBool(true)
+					sim.Config.Size.Set(64, 64, 64)
+				} else {
+					sim.Config.Size.Set(500, 1, 1)
+				}
+				sim.ViewInit(wavesim.WaveCViewAll)
+			case wavesim.WaveCDir:
+				sim.Params.ThreeD.SetBool(threed)
+				if threed {
+					sim.Config.Size.Set(64, 64, 64)
+				} else {
+					sim.Config.Size.Set(500, 1, 1)
+				}
+				sim.ViewInit(wavesim.WaveCDirViewAll)
+			case wavesim.KleinGordon:
+				sim.Params.ThreeD.SetBool(threed)
+				if threed {
 					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
@@ -74,8 +91,8 @@ func main() {
 				sim.Params.ThreeD.SetBool(true) // only 3D
 				sim.Config.Size.Set(64, 64, 64)
 			case wavesim.Schrodinger:
+				sim.Params.ThreeD.SetBool(threed)
 				if threed {
-					sim.Params.ThreeD.SetBool(true)
 					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
@@ -138,6 +155,10 @@ func main() {
 				wavesim.ChargeAtRest(sim)
 			case wavesim.Schrodinger:
 				wavesim.HarmonicOscillator(sim)
+			case wavesim.WaveC:
+				wavesim.WaveCPacket(sim)
+			case wavesim.WaveCDir:
+				wavesim.WaveCDirPacket(sim)
 			case wavesim.Maxwell:
 				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:

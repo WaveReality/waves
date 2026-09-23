@@ -104,10 +104,12 @@ func SchrodingerBKernel(i uint32) { //gosl:kernel
 
 //gosl:end
 
-// RunSchrodinger runs one whole step of Schrodinger's equation: the a kernel
-// then the b kernel, with CurState held fixed across both.
-func RunSchrodinger(n int) {
+// RunSchrodinger runs one whole step of Schrodinger's equation: the a kernel,
+// the edges, then the b kernel, with CurState held fixed across all three.
+// See [Sim.RunWaveC] for why the edge pass has to be in the middle.
+func (ss *Sim) RunSchrodinger(n int) {
 	RunSchrodingerAKernel(n)
+	ss.RunWrapEdges()
 	RunSchrodingerBKernel(n)
 }
 

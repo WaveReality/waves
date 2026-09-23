@@ -152,6 +152,10 @@ func (ss *Sim) ConfigSim() {
 	switch ss.Config.Equation {
 	case Wave:
 		ss.WaveConfig()
+	case WaveC:
+		ss.WaveCConfig()
+	case WaveCDir:
+		ss.WaveCDirConfig()
 	case KleinGordon:
 		ss.KleinGordonConfig()
 	case KleinGordonC:
@@ -231,9 +235,7 @@ func (ss *Sim) Init() {
 	if ss.InitFunc != nil {
 		ss.InitFunc(ss)
 	}
-	if ss.Params.Edges == EdgesWrap {
-		WrapEdges()
-	}
+	ss.RunWrapEdges()
 	ToGPUTensorStrides()
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, ParticlesVar, StateVar)
 	ss.RunStats(true)
@@ -273,6 +275,10 @@ func (ss *Sim) StepRun() {
 	switch ss.Config.Equation {
 	case Wave:
 		RunWaveKernel(ns)
+	case WaveC:
+		ss.RunWaveC(ns)
+	case WaveCDir:
+		RunWaveCDirKernel(ns)
 	case KleinGordon:
 		RunKleinGordonKernel(ns)
 	case KleinGordonC:
@@ -281,7 +287,7 @@ func (ss *Sim) StepRun() {
 		}
 		RunKleinGordonCKernel(ns)
 	case Schrodinger:
-		RunSchrodinger(ns)
+		ss.RunSchrodinger(ns)
 	case Maxwell:
 		RunMaxwellKernel(ns)
 	case Dirac:

@@ -283,6 +283,10 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 func (ss *Sim) KleinGordonConfig() {
 	ParamsShouldDisplay = KGShouldDisplay
 	ss.StateVars = WaveStatesN
+	// the SAME configs Wave uses, on the same state: switch equation and the
+	// only thing that changes is the mass term
+	ss.initFuncs = WaveConfigs
+	ss.InitFunc = WavePacket
 	ss.WaveStats()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)

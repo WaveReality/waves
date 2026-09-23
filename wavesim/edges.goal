@@ -326,4 +326,19 @@ func EdgesWrapKernel(i uint32) { //gosl:kernel
 	}
 }
 
+// WrapEdges re-wraps the edges. This is called automatically in Init for
+// EdgesWrap case.
+func WrapEdges() {
+	RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
+}
+
+// RunWrapEdges runs the EdgesWrap wrapping copy of edges if that
+// is the current Edges setting. Otherwise does nothing.
+func (ss *Sim) RunWrapEdges() {
+	if ss.Params.Edges != EdgesWrap {
+		return
+	}
+	WrapEdges()
+}
+
 //gosl:end

@@ -392,20 +392,20 @@ func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 10
+const EquationsN Equations = 12
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Weyl`: 6, `Electroweak`: 7, `Spinfield`: 8, `ParticleMove`: 9}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `WaveC`: 1, `WaveCDir`: 2, `KleinGordon`: 3, `KleinGordonC`: 4, `Schrodinger`: 5, `Maxwell`: 6, `Dirac`: 7, `Weyl`: 8, `Electroweak`: 9, `Spinfield`: 10, `ParticleMove`: 11}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Weyl is the first-order chiral equation on a left- and a right-handed 2-spinor: a massless neutrino in one of them, and an electron when the mass term binds the two together.`, 7: `Electroweak simulates the electroweak system, including the Higgs`, 8: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 9: `ParticleMove is just particle motion without any wave field.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `WaveC is the first-order COMPLEX wave equation, using the Laplacian, to set against the second-order Wave: two real numbers per point either way, and direction carried by the phase rather than by a velocity.`, 2: `WaveCDir is the first-order DIRECTIONAL version, using the gradient: the factor of the second-order operator that goes one way.`, 3: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 4: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 5: `Schrodinger is the Schrodinger wave function on complex state.`, 6: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 7: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 8: `Weyl is the first-order chiral equation on a left- and a right-handed 2-spinor: a massless neutrino in one of them, and an electron when the mass term binds the two together.`, 9: `Electroweak simulates the electroweak system, including the Higgs`, 10: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 11: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Weyl`, 7: `Electroweak`, 8: `Spinfield`, 9: `ParticleMove`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `WaveC`, 2: `WaveCDir`, 3: `KleinGordon`, 4: `KleinGordonC`, 5: `Schrodinger`, 6: `Maxwell`, 7: `Dirac`, 8: `Weyl`, 9: `Electroweak`, 10: `Spinfield`, 11: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -770,6 +770,53 @@ func (i WaveStates) MarshalText() ([]byte, error) { return []byte(i.String()), n
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *WaveStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "WaveStates")
+}
+
+var _WaveCStatesValues = []WaveCStates{0, 1, 2}
+
+// WaveCStatesN is the highest valid value for type WaveCStates, plus one.
+//
+//gosl:start
+const WaveCStatesN WaveCStates = 3
+
+//gosl:end
+
+var _WaveCStatesValueMap = map[string]WaveCStates{`Ca`: 0, `Cb`: 1, `CMag`: 2}
+
+var _WaveCStatesDescMap = map[WaveCStates]string{0: `WaveCa is the real part of the complex wave.`, 1: `WaveCb is the imaginary part.`, 2: `WaveCMag is |psi|^2, which for a travelling complex wave is the smooth envelope alone -- no nodes, unlike the real second-order field.`}
+
+var _WaveCStatesMap = map[WaveCStates]string{0: `Ca`, 1: `Cb`, 2: `CMag`}
+
+// String returns the string representation of this WaveCStates value.
+func (i WaveCStates) String() string { return enums.String(i, _WaveCStatesMap) }
+
+// SetString sets the WaveCStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *WaveCStates) SetString(s string) error {
+	return enums.SetString(i, s, _WaveCStatesValueMap, "WaveCStates")
+}
+
+// Int64 returns the WaveCStates value as an int64.
+func (i WaveCStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the WaveCStates value from an int64.
+func (i *WaveCStates) SetInt64(in int64) { *i = WaveCStates(in) }
+
+// Desc returns the description of the WaveCStates value.
+func (i WaveCStates) Desc() string { return enums.Desc(i, _WaveCStatesDescMap) }
+
+// WaveCStatesValues returns all possible values for the type WaveCStates.
+func WaveCStatesValues() []WaveCStates { return _WaveCStatesValues }
+
+// Values returns all possible values for the type WaveCStates.
+func (i WaveCStates) Values() []enums.Enum { return enums.Values(_WaveCStatesValues) }
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i WaveCStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *WaveCStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "WaveCStates")
 }
 
 var _WeylStatesValues = []WeylStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28}

@@ -27,13 +27,6 @@ type InitFunc struct {
 	Current bool
 }
 
-// WrapEdges re-wraps the edges. This is called automatically in Init for
-// EdgesWrap case.
-func WrapEdges() {
-	ctx := GetCtx(0)
-	RunEdgesWrapKernel(int(ctx.EdgesN()))
-}
-
 // CopyCurToPrev copies the current values to previous values
 // for all variables.
 func (ss *Sim) CopyCurToPrev() {
@@ -121,9 +114,9 @@ func CenterFull(c math32.Vector3i) math32.Vector3i {
 	return c
 }
 
-// WavePacket returns value for a gaussian * cosine wave packet for given
+// GaussWave returns value for a gaussian * cosine wave packet for given
 // linear dimension value x and 3D distance d.
-func WavePacket(x, d, wavelength, width, phase, amp float32) float32 {
+func GaussWave(x, d, wavelength, width, phase, amp float32) float32 {
 	cos := amp * math32.Cos(TwoPi*((x/wavelength)+phase))
 	d /= width
 	gauss := math32.FastExp(-d * d)
@@ -266,12 +259,12 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3,
 				f := c.AddScalar(1)
 				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf)
-				cv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
+				cv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
-				pv := WavePacket(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
+				pv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
@@ -327,8 +320,8 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 				d := CoordToFloat(c).Sub(ctrf)
 				dd := d.Dim(dim)
 				dl := d.Length()
-				pv := WavePacket(dd, dl, wavelength, width, phase, amp)
-				vv := dir * om * WavePacket(dd, dl, wavelength, width, phase-0.25, amp)
+				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
+				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
 				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(prv))
 				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(velI), int(cur))
@@ -359,8 +352,8 @@ func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.
 				d := CoordToFloat(c).Sub(ctrf)
 				dd := d.Dim(dim)
 				dl := d.Length()
-				av := WavePacket(dd, dl, wavelength, width, phase, amp)
-				bv := dir * WavePacket(dd, dl, wavelength, width, phase-0.25, amp)
+				av := GaussWave(dd, dl, wavelength, width, phase, amp)
+				bv := dir * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
 				State.SetAdd(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(cur))
 				State.SetAdd(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(prv))
 				State.SetAdd(bv, int(f.Z), int(f.Y), int(f.X), int(bi), int(cur))

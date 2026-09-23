@@ -30,7 +30,7 @@ func scSim(sz int32, init func(*Sim)) *Sim {
 func scStep(ss *Sim) {
 	ctx := GetCtx(0)
 	ctx.StepInc()
-	RunSchrodinger(int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z))
+	ss.RunSchrodinger(int(ctx.Size.X * ctx.Size.Y * ctx.Size.Z))
 	ss.RunStats(false)
 }
 
