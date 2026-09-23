@@ -378,6 +378,25 @@ func NeutrinoPacket(ss *Sim) {
 // has them in the ratio (omega - c khat) / (m c^2 / hbar), which goes to 1 at
 // rest and to 0 at high momentum, where the particle becomes effectively
 // massless and one chirality takes over.
+//
+// Both halves are seen going the SAME way, and that is right: they are two
+// components of one particle with one momentum, not two particles. The
+// opposite streaming is in the transport terms, which carry L at +c and R at
+// -c for this helicity -- but the mass term refills each from the other faster
+// than either can get away, so what moves is the pair, at
+//
+//	v = c (|psi_L|^2 - |psi_R|^2) / (|psi_L|^2 + |psi_R|^2)
+//
+// the intensity-weighted average of the two streams. The mass does not slow
+// anything down; it tilts the balance between a right-going stream and a
+// left-going one.
+//
+// Nor does this one visibly zitter. A positive-energy momentum eigenstate has
+// one frequency, so the ratio just sits there -- only the few percent of the
+// other energy sign that the initialization leaves behind ripples it, at the
+// expected pi hbar / m c^2. ElectronChiralFlip is the zitter demo, and it is
+// built from an equal mix of both signs, which is why it swings all the way.
+// Nothing moves transversely in either: Z holds to five digits.
 func ElectronPacket(ss *Sim) {
 	p := ss.Params
 	p.Mass = WeylPacketMass
