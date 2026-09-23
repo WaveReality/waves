@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 16:19:47
+- **Last Message:** 2026-09-23 16:35:50
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23930,7 +23930,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -56603,38 +56603,626 @@ One honest note: the neutral packet isn't perfectly steady at +3.8%. It spreads,
 
 If the edge artifacts persist for you, the thing to check is whether `Edges` is genuinely `Wrap` in your run. Adding a real `WeylDampKernel` would be the proper fix for wanting damped edges here — worth doing if you want `FreePacket`-style configs where waves leave rather than come round.
 
-Two real bugs, and the second one explains why you saw it at Q=0 too.
+## 🧑 User - 2026-09-23 16:23:50
 
-## 1. The ramp is discontinuous under wrap — yes
+Yep all better! So would it not be possible to do a hydrogen atom case with Weyl? would that be informative? what about the oscillator? the idea would be to have these for every wave, as a point of comparison.
 
-A linear ramp doesn't meet itself. With `EdgesWrap` the two ends differ by the ramp's entire range, and the edge cells see that whole drop across **one cube** — an enormous spurious E field pinned to the boundary. That's a real defect in `Ramp`, now documented on the function: use it only with damped or fixed edges.
+## 🤖 Assistant - 2026-09-23 16:24:48
 
-## 2. But Weyl has no damping at all — which is the Q=0 artifact
+*Model: claude-opus-5*
 
-`ElectronInField` was setting `EdgesDamp`, and there is **no `case Weyl:`** in `StepRun`'s damp switch. So it ran *no edge kernel whatsoever*: the halo cells kept whatever they were initialized to, and the gradient stencil read that stale data every single step. Nothing to do with charge — which is exactly why you saw it at Q=0 as well.
+<thinking>
+I'm considering adding hydrogen and oscillator configs for Weyl as a comparison point. Since the Weyl kernel now has EM coupling with A₀ and A, a Coulomb well would actually bind it in a way that mirrors the real first-order Dirac equation for hydrogen.
 
-Worse than wrapping, and silent. I've added a comment at that switch so the gap is visible rather than something you rediscover.
+For initialization, I can reuse the uniform phase-advance trick from the other bound-state configs for the leapfrog's past state, but the L/R relative structure for an s-state is trickier since the lower component in Dirac hydrogen has different angular character. My pragmatic approach: seed L and R equally with the non-relativistic wavefunction using the at-rest phase rate — correct to O(Zα) and consistent with how the other hydrogen configs breathe over time. I still need to check the stability condition on the total frequency for the first-order leapfrog scheme.
 
-## The fix
+For an oscillator in the Weyl formalism, I realize the mass term itself is the scalar potential — a position-dependent mass is literally a position-dependent L↔R conversion rate, so a harmonic scalar well just means the mass grows quadratically with radius. That reframes confinement nicely: the particle gets flipped between chiralities more often the farther out it goes.
 
-`ElectronInField` now uses `EdgesWrap` with a **periodic** field — one full sine over the box length, via the existing `Sine` helper:
+This also connects directly to the Higgs picture, since a spatially-varying mass is exactly what a Yukawa coupling to a scalar field would produce — a nice bridge toward the electroweak fermion sector. With plenty of token budget left, I want to scope the remaining work carefully rather than sprawl.
+
+I'll tackle this in pieces: add the WeylV state variable and its kernel term (a one-line shift adding WeylV to Omega0), then build out a WeylOscillator config using a quadratic WeylV potential, a WeylHydrogen config with Coulomb A₀ and uniform phase rate, and finally stability bounds and tests. The non-relativistic limit with a scalar potential S gives E ≈ mc² + S, which is the physical basis for the oscillator confinement.
+
+I'm double-checking that the coefficient for the quadratic WeylV term correctly maps to ½mω₀²/ħ, verifying the resulting ground-state width matches the standard harmonic oscillator result, while being careful about how mass enters differently in the Weyl/Dirac formulation.
+
+For stability I need the total magnitude to stay under 1, so Omega0 plus WeylV has to satisfy that arcsin domain constraint, which means I need a clamp based on the maximum k-value across the Brillouin zone for the gradient stencil.
+
+Writing the clamp function...
+
+With C=0.35, this gives WeylVMax ≈ 0.795 minus Omega0. Using Mass=0.5 gives Omega0≈0.06125, so WeylVMax comes out around 0.734, which is comfortably large. Now I'm figuring out what oscillator period to use with this.
+
+Checking the oscillator width and coefficient at the box's edges (r=32 and r=55), the values stay well under the max, so no clamping issue there, though I'll still pass the max through for safety. Next I'm working out the Coulomb potential for WeylHydrogen, setting V_eff = qA₀ with A₀ = val/r.
+
+I realize this matches the KG/Dirac case exactly, so I can reuse `HydrogenWell` from init.goal — it already computes the right phase rate formula and calls `EFromA0()`, which is harmless extra for Weyl since it doesn't read those state vars. So WeylHydrogen can just call `ss.HydrogenWell(a, 1)` and fill the spinor with a uniform phase rate, though I need to think through how WeylPacket handles phase for a bound state versus a traveling wave.
+
+I'm designing a `WeylPast(omega)` helper that, once a spatial profile is written to both the current and previous time levels, rotates the previous copy's phase backward by omega — representing what a stationary state of energy ħω looked like earlier. This keeps the oscillator and hydrogen configs clean: write the profile once, then call this helper to set up the time evolution.
+
+For WeylOscillator and WeylHydrogen I'm applying the phase rotation equally across both L and R components, treating the hydrogen phase rate as coming from HydrogenWell but needing to check the mass parameter carefully—since the Compton wavelength depends on it, and I want the resulting Zα value to stay reasonable given the chosen binding radius.
+
+Checking stability empirically: at r=1 the A₀ contribution comes out to about 0.1, comfortably under the 1.0 bound, so I'm confident implementing this piece now. I want to confirm the oscillator uses the scalar mass potential while hydrogen uses the vector A₀ potential, since 1/r stays bounded appropriately for that choice.
+
+This contrast is actually the key teaching insight — in the Weyl formulation, the oscillator's confinement shows up as a position-dependent L↔R conversion rate, while hydrogen's shows up as a phase shift. That's worth highlighting clearly in the writeup.
+
+Now I'm adding a WeylV state variable to the enum, placing it between WeylR2b and WeylLMag, and moving on to implement the rest of the code.
+
+
+</thinking>
+
+Both are possible, and the oscillator one is genuinely illuminating — in Weyl a scalar potential *is* a position-dependent L↔R rate.
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/weyl.goal'; s=open(p).read()
+old = """	// WeylLMag is |psi_L|^2."""
+new = """	// WeylV is an external SCALAR potential, as a shift in the L-R conversion
+	// rate. In this equation the mass IS that rate, so a scalar potential is
+	// literally a position-dependent mass, and confining something means
+	// making it flip more often the further out it goes. Compare A0, which
+	// shifts the phase instead and cannot confine at all: see WeylOscillator.
+	WeylV
+
+	// WeylLMag is |psi_L|^2."""
+assert old in s; s=s.replace(old,new,1)
+old = """	cc := Params[0].C
+	om := Params[0].Omega0 // m c^2 / hbar: the rate L and R turn into each other"""
+new = """	cc := Params[0].C
+	// m c^2 / hbar, the rate L and R turn into each other, plus whatever the
+	// scalar potential adds to it locally
+	om := Params[0].Omega0 + State[z, y, x, WeylV, prv]"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("WeylV added")
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./wavesim/ 2>&1|grep -ci error``
+  ```
+  WeylV added
+  go build
+  goal build succeeded
+  0
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/weyl.goal'; s=open(p).read()
+anchor = "var WeylConfigs = []InitFunc{"
+blk = '''// WeylVMax is the largest mass shift the leapfrog can carry. The scheme needs
+// sqrt(c^2 khat^2 + om^2) under 1, and the gradient stencil reaches sqrt(3)
+// along a diagonal, so c sqrt(3) of that is already spent before the potential
+// gets any.
+func (ss *Sim) WeylVMax() float32 {
+	c := ss.Params.C
+	r := 1 - 3*c*c
+	if r <= 0 {
+		return 0
+	}
+	return math32.Sqrt(r) - ss.Params.Omega0
+}
+
+// WeylPast sets the earlier time level by rotating the present one forward by
+// omega: what a stationary state of energy hbar omega looked like one step
+// ago. Call it after the profile has been written to BOTH levels.
+//
+// Bound states need this for the same reason moving ones do. The leapfrog
+// reads its own past, and a state handed an identical past is an equal mix of
+// the two signs of energy, which beats at 2 omega instead of sitting still.
+func (ss *Sim) WeylPast(omega float32) {
+	cs := math32.Cos(omega)
+	sn := math32.Sin(omega)
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				for _, base := range []WeylStates{WeylL1a, WeylL2a, WeylR1a, WeylR2a} {
+					b := int(base.Int64())
+					a := State[f.Z, f.Y, f.X, b, cur]
+					v := State[f.Z, f.Y, f.X, b+1, cur]
+					State[f.Z, f.Y, f.X, b, cur] = cs*a - sn*v
+					State[f.Z, f.Y, f.X, b+1, cur] = sn*a + cs*v
+				}
+			}
+		}
+	}
+}
+
+// WeylOscillator is the harmonic oscillator, and the one place where what a
+// scalar potential actually IS becomes visible.
+//
+// The well goes into WeylV, which shifts the L-R conversion rate. So confining
+// the particle means making it flip FASTER the further out it goes, and a
+// thing that flips faster gets less far per step. There is no force in this
+// picture at all -- the wave is held in by a gradient in how often it turns
+// around.
+//
+// It has to be the scalar potential and not A0. A well that grows without
+// bound in the ENERGY runs past 2 m c^2, where the bound states dissolve into
+// pairs; a well that grows in the MASS has no such ceiling. Compare
+// WeylHydrogen, whose 1/r well goes into A0 and can, because it dies away.
+func WeylOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = WeylMass
+	p.Update()
+	om := TwoPi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	d := 2 * w
+	ss.Quadratic(WeylV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om/p.Hbar, ss.WeylVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	a := ss.Config.Amplitude
+	// at rest is an equal mix of the two chiralities
+	ss.Gauss(WeylL1a, Both, ctr, w, a, 0)
+	ss.Gauss(WeylR1a, Both, ctr, w, a, 0)
+	e := 1.5*p.Hbar*om + 0.5*p.Mass*om*om*d*d // mean energy of a coherent state
+	ss.WeylPast(p.Omega0 + e/p.Hbar)
+}
+
+// WeylHydrogen is an electron bound in a Coulomb well, from the first-order
+// chiral equation rather than the second-order one DiracHydrogen uses. Same
+// atom, and worth setting the two against each other.
+//
+// The well is in A0, not WeylV, and that is the right choice here precisely
+// because 1/r dies away: there is no runaway to a Klein regime far from the
+// nucleus, only near it, which is the usual caveat. A harmonic well could not
+// be done this way, which is why WeylOscillator uses the other slot.
+//
+// Both chiralities are filled equally, which is the at-rest structure and is
+// right to order Z alpha. The true Dirac 1s has a small component with
+// different angular structure, so this breathes rather than sitting perfectly
+// still -- the same caveat as every other hydrogen config here, on top of the
+// softened 1/r core.
+func WeylHydrogen(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(true)
+	p.SelfField.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Update()
+	a := ss.Config.HydrogenRadius
+	om := ss.HydrogenWell(a, 1) // returns the bound-state frequency
+	amp := ss.Config.Amplitude
+	ctr := math32.Vec3(-1, -1, -1)
+	ss.Expo(WeylL1a, Both, ctr, a, amp)
+	ss.Expo(WeylR1a, Both, ctr, a, amp)
+	ss.WeylPast(om)
+}
+
+'''
+assert anchor in s; s=s.replace(anchor, blk+anchor, 1)
+old = '''	InitFunc{Name: "Electron In Field", Doc: "A charged packet in a uniform electric field: it picks up momentum, and with WeylQ at 0 it is a neutrino and ignores the field", Func: ElectronInField},'''
+new = old + '''
+	InitFunc{Name: "Weyl Oscillator", Doc: "A coherent state in a harmonic well made of MASS: confinement here is flipping faster the further out you go", Func: WeylOscillator},
+	InitFunc{Name: "Weyl Hydrogen", Doc: "An electron bound in a Coulomb well, from the first-order chiral equation rather than the second-order one", Func: WeylHydrogen},'''
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("ok")
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./wavesim/ 2>&1|grep -ci error``
+  ```
+  ok
+  go build
+  goal build succeeded
+  0
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func wyRMS(sz int32) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	mid := float64(sz) / 2
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(WeylLMag), cur)) +
+					float64(State.Value(int(z), int(y), int(x), int(WeylRMag), cur))
+				dx, dy, dz := float64(x-1)-mid, float64(y-1)-mid, float64(z-1)-mid
+				num += v * (dx*dx + dy*dy + dz*dz)
+				den += v
+			}
+		}
+	}
+	return math.Sqrt(num / den)
+}
+
+func TestScratchWeylBound(t *testing.T) {
+	const sz = 64
+	// oscillator: should swing, not escape
+	ss := wySim(sz, WeylOscillator)
+	wyStep(ss)
+	mid := float64(sz)/2 + 1
+	om := 2 * math.Pi / float64(ss.Config.OscillatorPeriod)
+	mc2 := float64(ss.Params.Mass) * float64(ss.Params.C*ss.Params.C)
+	w := math.Sqrt(1 / (float64(ss.Params.Mass) * om))
+	e := 1.5*om + 0.5*float64(ss.Params.Mass)*om*om*4*w*w
+	fmt.Printf("WeylOscillator: width %.2f, VMax %.3f, want period %.0f x E/mc^2 %.3f = %.0f\n",
+		w, ss.WeylVMax(), ss.Config.OscillatorPeriod, (mc2+e)/mc2, float64(ss.Config.OscillatorPeriod)*(mc2+e)/mc2)
+	var first, last, n int
+	prev := wyCtr(sz, WeylLMag, math32.X) - mid
+	l0, r0 := wySums()
+	for i := range 900 {
+		wyStep(ss)
+		d := wyCtr(sz, WeylLMag, math32.X) - mid
+		if prev > 0 && d <= 0 {
+			if n == 0 {
+				first = i
+			}
+			last, n = i, n+1
+		}
+		prev = d
+	}
+	l, r := wySums()
+	if n >= 2 {
+		fmt.Printf("   measured period %.1f steps, %d swings; sum %.4g -> %.4g\n",
+			float64(last-first)/float64(n-1), n, l0+r0, l+r)
+	} else {
+		fmt.Printf("   only %d crossings -- not swinging; sum %.4g -> %.4g\n", n, l0+r0, l+r)
+	}
+
+	// hydrogen: should stay the size of an atom
+	hs := wySim(sz, WeylHydrogen)
+	wyStep(hs)
+	rms0 := wyRMS(sz)
+	hl0, hr0 := wySums()
+	for range 300 {
+		wyStep(hs)
+	}
+	hl, hr := wySums()
+	fmt.Printf("WeylHydrogen: rms %.3f -> %.3f (%+.1f%%); L/R %.4f -> %.4f; sum %.4g -> %.4g\n",
+		rms0, wyRMS(sz), 100*(wyRMS(sz)-rms0)/rms0, hr0/hl0, hr/hl, hl0+hr0, hl+hr)
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchWeylBound -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  WeylOscillator: width 10.09, VMax 0.734, want period 320 x E/mc^2 2.122 = 679
+     measured period 500.0 steps, 2 swings; sum 3964 -> 3964
+  WeylHydrogen: rms 8.654 -> 9.421 (+8.9%); L/R 1.0000 -> 1.0000; sum 764 -> 764
+  --- PASS: TestScratchWeylBound (133.80s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	133.819s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+WeylHydrogen checks out nicely: rms rises from 8.654 to 9.421 (+8.9%), L/R stays fixed at 1.0000 throughout, and the sum is exactly conserved—consistent with the bound KG/Dirac hydrogen behavior. Now looking at WeylOscillator, it does oscillate as expected (2 swings over 500 steps) with exact sum conservation, but the measured period of 500 doesn't match my predicted 679.
+
+The mismatch stems from the binding energy exceeding the rest mass energy — with WeylMass = 0.5, e/mc² comes out to 2.122, meaning the state is ultra-relativistic and my non-relativistic prediction formula doesn't hold. To fix this I'd need a much heavier mass so mc² dominates over the binding energy; trying Mass = 4 gives e/mc² ≈ 0.14 and a predicted period of 365, though I need to check whether the resulting ground-state width and potential well depth stay consistent at that mass.
+
+Clamping around r ≈ 20 turns out to be harmless since the packet only swings to about ±7. I'm now leaning toward using Mass = 4 for the WeylOscillator via a new constant, and shifting the test to just verify boundedness and oscillatory motion rather than an exact period match, since at the current relativistic regime the "oscillator" behavior isn't really recognizable as one.
+
+Given the 134s runtime is too slow for the suite, I'll trim the final test to fewer steps and a smaller box, do one more measurement with Mass=4, then write a compact version of the test.
+
+
+</thinking>
+
+Hydrogen works. The oscillator swings but is deeply relativistic (E/mc² = 2.1) — it needs a heavier mass to look like an oscillator.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/weyl.goal'; s=open(p).read()
+old = """const WeylPacketMass float32 = 2"""
+new = """const WeylPacketMass float32 = 2
+
+// WeylOscMass is the mass WeylOscillator sets. Heavier again, and for a third
+// reason: a coherent state in this well carries 3.5 hbar omega, and unless
+// m c^2 is well above that the thing is relativistic enough that calling it a
+// harmonic oscillator is a stretch. At 4 the binding is 14% of the rest
+// energy, which still shows as a lengthened period but is recognisably the
+// Newtonian picture.
+const WeylOscMass float32 = 4"""
+assert old in s; s=s.replace(old,new,1)
+old = """	p.EM.SetBool(false)
+	p.Mass = WeylMass
+	p.Update()
+	om := TwoPi / ss.Config.OscillatorPeriod"""
+new = """	p.EM.SetBool(false)
+	p.Mass = WeylOscMass
+	p.Update()
+	om := TwoPi / ss.Config.OscillatorPeriod"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+p='/Users/oreilly/wavereality/waves/wavesim/zz_scratch_test.go'; t=open(p).read()
+t=t.replace("for i := range 900 {","for i := range 600 {").replace("const sz = 64","const sz = 48")
+t=t.replace("for range 300 {","for range 150 {")
+open(p,'w').write(t)
+PY
+cd wavesim && goal build 2>&1|tail -1 && cd .. && go generate ./wavesim/ 2>&1|grep -ci error; go test ./wavesim/ -run TestScratchWeylBound -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  goal build succeeded
+  0
+  # github.com/WaveReality/waves/wavesim.test
+  WeylOscillator: width 3.57, VMax 0.305, want period 320 x E/mc^2 1.140 = 365
+     measured period 353.0 steps, 2 swings; sum 151.7 -> 151.7
+  WeylHydrogen: rms 8.605 -> 8.959 (+4.1%); L/R 1.0000 -> 1.0000; sum 763.1 -> 763.1
+  --- PASS: TestScratchWeylBound (35.00s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	35.024s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+WeylOscillator shows a measured period of 353 versus predicted 365, within 3.3% and matching the relativistic harmonic oscillator's slowdown pattern, with sum exactly conserved. WeylHydrogen comes in at +4.1% rms with L/R exactly 1.0000 and conservation holding exactly—both systems appear bound.
+
+Now I'm designing a compact test: oscillator at 48³ over 400 steps checking the period stays within 10% of prediction with conservation intact, and hydrogen at 48³ over 100 steps checking rms stays within 15% and L/R holds at 1, skipping a control run to keep timing reasonable given the suite's already substantial runtime.
+
+
+</thinking>
+
+Both work. Writing the test.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && rm -f wavesim/zz_scratch_test.go && cat >> wavesim/weyl_test.go <<'EOF'
+
+// wyRMS is the rms radius of the whole wave, both chiralities.
+func wyRMS(sz int32) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	mid := float64(sz) / 2
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(WeylLMag), cur)) +
+					float64(State.Value(int(z), int(y), int(x), int(WeylRMag), cur))
+				dx, dy, dz := float64(x-1)-mid, float64(y-1)-mid, float64(z-1)-mid
+				num += v * (dx*dx + dy*dy + dz*dz)
+				den += v
+			}
+		}
+	}
+	return math.Sqrt(num / den)
+}
+
+// TestWeylBound: the two bound-state configs, which exist so the chiral
+// equation can be set beside the others on the same problems.
+//
+// The oscillator is held by WeylV, a gradient in the L-R conversion rate, and
+// swings at the well frequency slowed by E / m c^2 as the relativistic ones
+// all do. Hydrogen is held by A0 instead, which works only because 1/r dies
+// away, and must stay the size of an atom.
+func TestWeylBound(t *testing.T) {
+	const sz = 48
+	osc := wySim(sz, WeylOscillator)
+	wyStep(osc)
+	l0, r0 := wySums()
+	p := osc.Params
+	om := 2 * math.Pi / float64(osc.Config.OscillatorPeriod)
+	w2 := 1 / (float64(p.Mass) * om) // squared ground state width
+	mc2 := float64(p.Mass) * float64(p.CSq)
+	e := 1.5*om + 0.5*float64(p.Mass)*om*om*4*w2
+	want := float64(osc.Config.OscillatorPeriod) * (mc2 + e) / mc2
+	mid := float64(sz)/2 + 1
+	var first, last, n int
+	prev := wyCtr(sz, WeylLMag, math32.X) - mid
+	for i := range 420 {
+		wyStep(osc)
+		d := wyCtr(sz, WeylLMag, math32.X) - mid
+		if prev > 0 && d <= 0 {
+			if n == 0 {
+				first = i
+			}
+			last, n = i, n+1
+		}
+		prev = d
+	}
+	l, r := wySums()
+	if math.Abs((l+r)/(l0+r0)-1) > 1e-4 {
+		t.Errorf("oscillator: total changed, it must be conserved")
+	}
+	if n < 2 {
+		t.Fatalf("oscillator: only %d crossings, it is not swinging", n)
+	}
+	got := float64(last-first) / float64(n-1)
+	if math.Abs(got-want)/want > 0.1 {
+		t.Errorf("oscillator period %.1f steps, want %.1f (well period x E / m c^2)", got, want)
+	}
+	t.Logf("oscillator period %.1f steps, want %.1f (well says %.0f, slowed by E / m c^2 = %.3f)",
+		got, want, osc.Config.OscillatorPeriod, (mc2+e)/mc2)
+
+	hyd := wySim(sz, WeylHydrogen)
+	wyStep(hyd)
+	rms0 := wyRMS(sz)
+	hl0, hr0 := wySums()
+	for range 100 {
+		wyStep(hyd)
+	}
+	hl, hr := wySums()
+	grow := wyRMS(sz)/rms0 - 1
+	if grow > 0.15 {
+		t.Errorf("hydrogen spread by %.1f%%, it is not bound", 100*grow)
+	}
+	if math.Abs(hr/hl-1) > 0.01 {
+		t.Errorf("hydrogen L/R is %.4f, want 1: at rest it is half of each", hr/hl)
+	}
+	if math.Abs((hl+hr)/(hl0+hr0)-1) > 1e-4 {
+		t.Errorf("hydrogen: total changed, it must be conserved")
+	}
+	t.Logf("hydrogen rms %.3f -> %.3f (%+.1f%%), L/R %.4f, total held", rms0, wyRMS(sz), 100*grow, hr/hl)
+}
+EOF
+gofmt -w wavesim/weyl_test.go && cd wavesim && goal build 2>&1|tail -1 && cd .. && go generate ./... 2>&1|grep -icE "error"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -run TestWeylBound -v 2>&1|grep -vE "ld: warning|^=== RUN"``
+  ```
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  # github.com/WaveReality/waves/wavesim.test
+      weyl_test.go:368: oscillator: only 1 crossings, it is not swinging
+  --- FAIL: TestWeylBound (19.49s)
+  FAIL
+  FAIL	github.com/WaveReality/waves/wavesim	19.508s
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With only 1 crossing in 420 steps, I realize the period is around 353, so I'd need roughly 800 steps for two full crossings, which is too slow. Instead I can use the known starting phase — the packet begins at maximum displacement, so the first center crossing occurs at a quarter period, letting me estimate the period as four times that first-crossing time.
+
+This only needs about 90-150 steps instead of hundreds. I'll rework the test to measure the first crossing step and compute period = 4×t₁, checking it against the earlier estimate of 353.
+
+
+</thinking>
+
+Only one crossing in 420 steps — I can get the period from a quarter swing instead, which is far cheaper.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/weyl_test.go'; s=open(p).read()
+old = """	mid := float64(sz)/2 + 1
+	var first, last, n int
+	prev := wyCtr(sz, WeylLMag, math32.X) - mid
+	for i := range 420 {
+		wyStep(osc)
+		d := wyCtr(sz, WeylLMag, math32.X) - mid
+		if prev > 0 && d <= 0 {
+			if n == 0 {
+				first = i
+			}
+			last, n = i, n+1
+		}
+		prev = d
+	}
+	l, r := wySums()
+	if math.Abs((l+r)/(l0+r0)-1) > 1e-4 {
+		t.Errorf("oscillator: total changed, it must be conserved")
+	}
+	if n < 2 {
+		t.Fatalf("oscillator: only %d crossings, it is not swinging", n)
+	}
+	got := float64(last-first) / float64(n-1)"""
+new = """	// it starts at full displacement, so the first pass through the center is
+	// a QUARTER period -- far cheaper than waiting for two whole swings
+	mid := float64(sz)/2 + 1
+	first := 0
+	prev := wyCtr(sz, WeylLMag, math32.X) - mid
+	for i := range 200 {
+		wyStep(osc)
+		d := wyCtr(sz, WeylLMag, math32.X) - mid
+		if first == 0 && prev > 0 && d <= 0 {
+			first = i + 1
+		}
+		prev = d
+	}
+	l, r := wySums()
+	if math.Abs((l+r)/(l0+r0)-1) > 1e-4 {
+		t.Errorf("oscillator: total changed, it must be conserved")
+	}
+	if first == 0 {
+		t.Fatalf("oscillator: never reached the center, it is not swinging")
+	}
+	got := 4 * float64(first)"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("ok")
+PY
+gofmt -w wavesim/weyl_test.go && go test ./wavesim/ -run TestWeylBound -v 2>&1|grep -vE "ld: warning|^=== RUN"``
+  ```
+  ok
+  # github.com/WaveReality/waves/wavesim.test
+      weyl_test.go:373: oscillator period 356.0 steps, want 364.9 (well says 320, slowed by E / m c^2 = 1.140)
+      weyl_test.go:394: hydrogen rms 8.605 -> 8.760 (+1.8%), L/R 1.0000, total held
+  --- PASS: TestWeylBound (13.96s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	13.983s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -v 2>&1|grep -c "^--- PASS"; go test ./wavesim/ -v 2>&1|grep -A3 "^--- FAIL"; echo "-- no fails --"``
+  ```
+  62
+  -- no fails --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Both work, and the oscillator turned out to be the more interesting of the two. 62 tests pass.
+
+```
+oscillator period 356.0 steps, want 364.9 (well says 320, slowed by E/mc² = 1.140)
+hydrogen  rms 8.605 -> 8.760 (+1.8%), L/R 1.0000, total held
+```
+
+## The oscillator is where a scalar potential stops being abstract
+
+It needed a new `WeylV` — and in this equation the mass **is** the L↔R conversion rate, so a scalar potential is *literally a position-dependent mass*. One line in the kernel:
 
 ```go
-l := float32(ss.Config.Size.X)
-ss.Sine(A0s, math32.X, l, 0, -WeylFieldE*l/TwoPi, 0)
+om := Params[0].Omega0 + State[z, y, x, WeylV, prv]
 ```
 
-A sine over exactly one period meets itself, so there's no boundary discontinuity, and its gradient is near-uniform across the middle where the packet lives, falling off toward the ends. Field strength doubled to compensate for that falloff.
+Which means confinement here is: **the wave flips faster the further out it goes, and a thing that flips faster gets less far per step.** There's no force in the picture at all. That's the same "mass tilts the balance between two lightspeed streams" idea from before, now with a spatial gradient in it — and it's a much more concrete thing to look at than the second-order version, where the scalar potential just appeared as a number added to M².
+
+It also has to be `WeylV` and not `A0`, for the reason from the KG oscillator: a well growing without bound in the *energy* runs past 2mc² where bound states dissolve into pairs; one growing in the *mass* has no such ceiling. And the hydrogen config right next to it uses `A0` instead — which works precisely because 1/r dies away. Two configs, two slots, and the contrast is the lesson.
+
+## Hydrogen
+
+Bound, +1.8% over 100 steps, L/R pinned at exactly 1.0000 (at rest is half of each), total conserved. It's the *first-order* Dirac Coulomb problem, so it's worth setting beside `DiracHydrogen` on the same atom — same `Config.HydrogenRadius`, same `BoundStateMass`.
+
+New `Sim.WeylPast(omega)` handles the initialization: bound states need a past for the same reason moving ones do — hand the leapfrog an identical past and you get an equal mix of both energy signs, which beats instead of sitting still.
+
+## Three masses, and why
+
+This equation now has `WeylMass = 0.5`, `WeylPacketMass = 2`, `WeylOscMass = 4`, each documented with its reason — they're genuinely in tension. A watchable chiral flip needs a *light* mass (period goes as 1/m). Visible sub-luminal motion needs mc² comparable to the momentum. And a recognizable oscillator needs mc² well above the 3.5ħω a coherent state carries, or "harmonic oscillator" is a stretch — at 4 the binding is 14% of the rest energy, which still shows as the lengthened period above but is recognizably Newtonian.
+
+Also added `WeylVMax`, the bound on the mass shift: the scheme needs √(c²k̂² + ω²) < 1, and the gradient stencil reaches √3 along a diagonal, so c√3 is spent before the potential gets any. `Quadratic` clamps to it.
+
+## On "these for every wave"
+
+You now have the oscillator on Schrödinger, complex KG, Dirac and Weyl, and hydrogen on all four. The comparison that falls out is worth a doc page at some point: the same atom binds in four formalisms, and the *mechanism* of the oscillator's confinement looks completely different in each — a potential energy in Schrödinger, a mass-squared shift in KG, the same on a spinor in Dirac, and a conversion-rate gradient in Weyl. Same physics, four descriptions.
+
+Both work, and the oscillator turned out to be the more interesting of the two. 62 tests pass.
 
 ```
-gauge: free 0.23732, constant A0 0.23279 (-1.91%)
-WeylQ 1: speed 0.21305 -> 0.16112 (-24.4%)
-WeylQ 0: speed 0.23375 -> 0.24253 ( +3.8%)
+oscillator period 356.0 steps, want 364.9 (well says 320, slowed by E/mc² = 1.140)
+hydrogen  rms 8.605 -> 8.760 (+1.8%), L/R 1.0000, total held
 ```
 
-61 tests pass, everything builds and generates clean.
+## The oscillator is where a scalar potential stops being abstract
 
-One honest note: the neutral packet isn't perfectly steady at +3.8%. It spreads, and under wrap its slab tails come round the other side and pollute my centroid measurement. So the test now asserts the charged one changes **several times more** than the neutral, rather than pretending the neutral is flat — 24.4% against 3.8% is a clean separation, and the residual is measurement, not physics.
+It needed a new `WeylV` — and in this equation the mass **is** the L↔R conversion rate, so a scalar potential is *literally a position-dependent mass*. One line in the kernel:
 
-If the edge artifacts persist for you, the thing to check is whether `Edges` is genuinely `Wrap` in your run. Adding a real `WeylDampKernel` would be the proper fix for wanting damped edges here — worth doing if you want `FreePacket`-style configs where waves leave rather than come round.
+```go
+om := Params[0].Omega0 + State[z, y, x, WeylV, prv]
+```
+
+Which means confinement here is: **the wave flips faster the further out it goes, and a thing that flips faster gets less far per step.** There's no force in the picture at all. That's the same "mass tilts the balance between two lightspeed streams" idea from before, now with a spatial gradient in it — and it's a much more concrete thing to look at than the second-order version, where the scalar potential just appeared as a number added to M².
+
+It also has to be `WeylV` and not `A0`, for the reason from the KG oscillator: a well growing without bound in the *energy* runs past 2mc² where bound states dissolve into pairs; one growing in the *mass* has no such ceiling. And the hydrogen config right next to it uses `A0` instead — which works precisely because 1/r dies away. Two configs, two slots, and the contrast is the lesson.
+
+## Hydrogen
+
+Bound, +1.8% over 100 steps, L/R pinned at exactly 1.0000 (at rest is half of each), total conserved. It's the *first-order* Dirac Coulomb problem, so it's worth setting beside `DiracHydrogen` on the same atom — same `Config.HydrogenRadius`, same `BoundStateMass`.
+
+New `Sim.WeylPast(omega)` handles the initialization: bound states need a past for the same reason moving ones do — hand the leapfrog an identical past and you get an equal mix of both energy signs, which beats instead of sitting still.
+
+## Three masses, and why
+
+This equation now has `WeylMass = 0.5`, `WeylPacketMass = 2`, `WeylOscMass = 4`, each documented with its reason — they're genuinely in tension. A watchable chiral flip needs a *light* mass (period goes as 1/m). Visible sub-luminal motion needs mc² comparable to the momentum. And a recognizable oscillator needs mc² well above the 3.5ħω a coherent state carries, or "harmonic oscillator" is a stretch — at 4 the binding is 14% of the rest energy, which still shows as the lengthened period above but is recognizably Newtonian.
+
+Also added `WeylVMax`, the bound on the mass shift: the scheme needs √(c²k̂² + ω²) < 1, and the gradient stencil reaches √3 along a diagonal, so c√3 is spent before the potential gets any. `Quadratic` clamps to it.
+
+## On "these for every wave"
+
+You now have the oscillator on Schrödinger, complex KG, Dirac and Weyl, and hydrogen on all four. The comparison that falls out is worth a doc page at some point: the same atom binds in four formalisms, and the *mechanism* of the oscillator's confinement looks completely different in each — a potential energy in Schrödinger, a mass-squared shift in KG, the same on a spinor in Dirac, and a conversion-rate gradient in Weyl. Same physics, four descriptions.
 

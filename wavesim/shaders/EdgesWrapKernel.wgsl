@@ -539,7 +539,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 43;
 const WaveStatesN: WaveStates = 7;
-const WeylStatesN: WeylStates = 28;
+const WeylStatesN: WeylStates = 29;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -737,8 +737,9 @@ const  WeylR1a: WeylStates = 22;
 const  WeylR1b: WeylStates = 23;
 const  WeylR2a: WeylStates = 24;
 const  WeylR2b: WeylStates = 25;
-const  WeylLMag: WeylStates = 26;
-const  WeylRMag: WeylStates = 27;
+const  WeylV: WeylStates = 26;
+const  WeylLMag: WeylStates = 27;
+const  WeylRMag: WeylStates = 28;
 
 //////// import: "slrand.wgsl"
 fn Philox2x32round(counter: su64, key: u32) -> su64 {

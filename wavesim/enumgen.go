@@ -772,20 +772,20 @@ func (i *WaveStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "WaveStates")
 }
 
-var _WeylStatesValues = []WeylStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
+var _WeylStatesValues = []WeylStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28}
 
 // WeylStatesN is the highest valid value for type WeylStates, plus one.
 //
 //gosl:start
-const WeylStatesN WeylStates = 28
+const WeylStatesN WeylStates = 29
 
 //gosl:end
 
-var _WeylStatesValueMap = map[string]WeylStates{`L1a`: 18, `L1b`: 19, `L2a`: 20, `L2b`: 21, `R1a`: 22, `R1b`: 23, `R2a`: 24, `R2b`: 25, `LMag`: 26, `RMag`: 27}
+var _WeylStatesValueMap = map[string]WeylStates{`L1a`: 18, `L1b`: 19, `L2a`: 20, `L2b`: 21, `R1a`: 22, `R1b`: 23, `R2a`: 24, `R2b`: 25, `V`: 26, `LMag`: 27, `RMag`: 28}
 
-var _WeylStatesDescMap = map[WeylStates]string{18: `WeylL1a is the left-handed spinor, component 1, real part.`, 19: `WeylL1b is the left-handed spinor, component 1, imaginary part.`, 20: `WeylL2a is the left-handed spinor, component 2, real part.`, 21: `WeylL2b is the left-handed spinor, component 2, imaginary part.`, 22: `WeylR1a is the right-handed spinor, component 1, real part.`, 23: `WeylR1b is the right-handed spinor, component 1, imaginary part.`, 24: `WeylR2a is the right-handed spinor, component 2, real part.`, 25: `WeylR2b is the right-handed spinor, component 2, imaginary part.`, 26: `WeylLMag is |psi_L|^2.`, 27: `WeylRMag is |psi_R|^2. The conserved total is this plus WeylLMag.`}
+var _WeylStatesDescMap = map[WeylStates]string{18: `WeylL1a is the left-handed spinor, component 1, real part.`, 19: `WeylL1b is the left-handed spinor, component 1, imaginary part.`, 20: `WeylL2a is the left-handed spinor, component 2, real part.`, 21: `WeylL2b is the left-handed spinor, component 2, imaginary part.`, 22: `WeylR1a is the right-handed spinor, component 1, real part.`, 23: `WeylR1b is the right-handed spinor, component 1, imaginary part.`, 24: `WeylR2a is the right-handed spinor, component 2, real part.`, 25: `WeylR2b is the right-handed spinor, component 2, imaginary part.`, 26: `WeylV is an external SCALAR potential, as a shift in the L-R conversion rate. In this equation the mass IS that rate, so a scalar potential is literally a position-dependent mass, and confining something means making it flip more often the further out it goes. Compare A0, which shifts the phase instead and cannot confine at all: see WeylOscillator.`, 27: `WeylLMag is |psi_L|^2.`, 28: `WeylRMag is |psi_R|^2. The conserved total is this plus WeylLMag.`}
 
-var _WeylStatesMap = map[WeylStates]string{18: `L1a`, 19: `L1b`, 20: `L2a`, 21: `L2b`, 22: `R1a`, 23: `R1b`, 24: `R2a`, 25: `R2b`, 26: `LMag`, 27: `RMag`}
+var _WeylStatesMap = map[WeylStates]string{18: `L1a`, 19: `L1b`, 20: `L2a`, 21: `L2b`, 22: `R1a`, 23: `R1b`, 24: `R2a`, 25: `R2b`, 26: `V`, 27: `LMag`, 28: `RMag`}
 
 // String returns the string representation of this WeylStates value.
 func (i WeylStates) String() string {

@@ -45,6 +45,13 @@ const (
 	// WeylR2b is the right-handed spinor, component 2, imaginary part.
 	WeylR2b
 
+	// WeylV is an external SCALAR potential, as a shift in the L-R conversion
+	// rate. In this equation the mass IS that rate, so a scalar potential is
+	// literally a position-dependent mass, and confining something means
+	// making it flip more often the further out it goes. Compare A0, which
+	// shifts the phase instead and cannot confine at all: see WeylOscillator.
+	WeylV
+
 	// WeylLMag is |psi_L|^2.
 	WeylLMag
 
@@ -147,7 +154,9 @@ func WeylKernel(i uint32) { //gosl:kernel
 	sr2b := gr1b.X + gr1a.Y - gr2b.Z
 
 	cc := Params[0].C
-	om := Params[0].Omega0 // m c^2 / hbar: the rate L and R turn into each other
+	// m c^2 / hbar, the rate L and R turn into each other, plus whatever the
+	// scalar potential adds to it locally
+	om := Params[0].Omega0 + State.Value(int(z), int(y), int(x), int(WeylV), int(prv))
 
 	// -i M psi takes (a, b) to (M b, -M a), which is the whole mass term
 	dl1a := cc*sl1a + om*nr1b
@@ -280,6 +289,14 @@ const WeylMass float32 = 0.5
 // 1/m. A packet this heavy zitters about four times faster than it crosses a
 // wavelength, which is the honest picture -- the trade really is that quick.
 const WeylPacketMass float32 = 2
+
+// WeylOscMass is the mass WeylOscillator sets. Heavier again, and for a third
+// reason: a coherent state in this well carries 3.5 hbar omega, and unless
+// m c^2 is well above that the thing is relativistic enough that calling it a
+// harmonic oscillator is a stretch. At 4 the binding is 14% of the rest
+// energy, which still shows as a lengthened period but is recognisably the
+// Newtonian picture.
+const WeylOscMass float32 = 4
 
 var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E", "Wavelength", "PacketWidth", "Amplitude"}
 
@@ -618,10 +635,116 @@ func ElectronInField(ss *Sim) {
 	ElectronPacket(ss)
 }
 
+// WeylVMax is the largest mass shift the leapfrog can carry. The scheme needs
+// sqrt(c^2 khat^2 + om^2) under 1, and the gradient stencil reaches sqrt(3)
+// along a diagonal, so c sqrt(3) of that is already spent before the potential
+// gets any.
+func (ss *Sim) WeylVMax() float32 {
+	c := ss.Params.C
+	r := 1 - 3*c*c
+	if r <= 0 {
+		return 0
+	}
+	return math32.Sqrt(r) - ss.Params.Omega0
+}
+
+// WeylPast sets the earlier time level by rotating the present one forward by
+// omega: what a stationary state of energy hbar omega looked like one step
+// ago. Call it after the profile has been written to BOTH levels.
+//
+// Bound states need this for the same reason moving ones do. The leapfrog
+// reads its own past, and a state handed an identical past is an equal mix of
+// the two signs of energy, which beats at 2 omega instead of sitting still.
+func (ss *Sim) WeylPast(omega float32) {
+	cs := math32.Cos(omega)
+	sn := math32.Sin(omega)
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				for _, base := range []WeylStates{WeylL1a, WeylL2a, WeylR1a, WeylR2a} {
+					b := int(base.Int64())
+					a := State.Value(int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
+					v := State.Value(int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
+					State.Set(cs*a-sn*v, int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
+					State.Set(sn*a+cs*v, int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
+				}
+			}
+		}
+	}
+}
+
+// WeylOscillator is the harmonic oscillator, and the one place where what a
+// scalar potential actually IS becomes visible.
+//
+// The well goes into WeylV, which shifts the L-R conversion rate. So confining
+// the particle means making it flip FASTER the further out it goes, and a
+// thing that flips faster gets less far per step. There is no force in this
+// picture at all -- the wave is held in by a gradient in how often it turns
+// around.
+//
+// It has to be the scalar potential and not A0. A well that grows without
+// bound in the ENERGY runs past 2 m c^2, where the bound states dissolve into
+// pairs; a well that grows in the MASS has no such ceiling. Compare
+// WeylHydrogen, whose 1/r well goes into A0 and can, because it dies away.
+func WeylOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = WeylOscMass
+	p.Update()
+	om := TwoPi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	d := 2 * w
+	ss.Quadratic(WeylV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om/p.Hbar, ss.WeylVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	a := ss.Config.Amplitude
+	// at rest is an equal mix of the two chiralities
+	ss.Gauss(WeylL1a, Both, ctr, w, a, 0)
+	ss.Gauss(WeylR1a, Both, ctr, w, a, 0)
+	e := 1.5*p.Hbar*om + 0.5*p.Mass*om*om*d*d // mean energy of a coherent state
+	ss.WeylPast(p.Omega0 + e/p.Hbar)
+}
+
+// WeylHydrogen is an electron bound in a Coulomb well, from the first-order
+// chiral equation rather than the second-order one DiracHydrogen uses. Same
+// atom, and worth setting the two against each other.
+//
+// The well is in A0, not WeylV, and that is the right choice here precisely
+// because 1/r dies away: there is no runaway to a Klein regime far from the
+// nucleus, only near it, which is the usual caveat. A harmonic well could not
+// be done this way, which is why WeylOscillator uses the other slot.
+//
+// Both chiralities are filled equally, which is the at-rest structure and is
+// right to order Z alpha. The true Dirac 1s has a small component with
+// different angular structure, so this breathes rather than sitting perfectly
+// still -- the same caveat as every other hydrogen config here, on top of the
+// softened 1/r core.
+func WeylHydrogen(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(true)
+	p.SelfField.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Update()
+	a := ss.Config.HydrogenRadius
+	om := ss.HydrogenWell(a, 1) // returns the bound-state frequency
+	amp := ss.Config.Amplitude
+	ctr := math32.Vec3(-1, -1, -1)
+	ss.Expo(WeylL1a, Both, ctr, a, amp)
+	ss.Expo(WeylR1a, Both, ctr, a, amp)
+	ss.WeylPast(om)
+}
+
 var WeylConfigs = []InitFunc{
 	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
 	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
 	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
 	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
 	InitFunc{Name: "Electron In Field", Doc: "A charged packet in a uniform electric field: it picks up momentum, and with WeylQ at 0 it is a neutrino and ignores the field", Func: ElectronInField},
+	InitFunc{Name: "Weyl Oscillator", Doc: "A coherent state in a harmonic well made of MASS: confinement here is flipping faster the further out you go", Func: WeylOscillator},
+	InitFunc{Name: "Weyl Hydrogen", Doc: "An electron bound in a Coulomb well, from the first-order chiral equation rather than the second-order one", Func: WeylHydrogen},
 }

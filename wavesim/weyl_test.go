@@ -308,3 +308,88 @@ func TestWeylCharge(t *testing.T) {
 			100*chg[1], 100*chg[0])
 	}
 }
+
+// wyRMS is the rms radius of the whole wave, both chiralities.
+func wyRMS(sz int32) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	mid := float64(sz) / 2
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(WeylLMag), cur)) +
+					float64(State.Value(int(z), int(y), int(x), int(WeylRMag), cur))
+				dx, dy, dz := float64(x-1)-mid, float64(y-1)-mid, float64(z-1)-mid
+				num += v * (dx*dx + dy*dy + dz*dz)
+				den += v
+			}
+		}
+	}
+	return math.Sqrt(num / den)
+}
+
+// TestWeylBound: the two bound-state configs, which exist so the chiral
+// equation can be set beside the others on the same problems.
+//
+// The oscillator is held by WeylV, a gradient in the L-R conversion rate, and
+// swings at the well frequency slowed by E / m c^2 as the relativistic ones
+// all do. Hydrogen is held by A0 instead, which works only because 1/r dies
+// away, and must stay the size of an atom.
+func TestWeylBound(t *testing.T) {
+	const sz = 48
+	osc := wySim(sz, WeylOscillator)
+	wyStep(osc)
+	l0, r0 := wySums()
+	p := osc.Params
+	om := 2 * math.Pi / float64(osc.Config.OscillatorPeriod)
+	w2 := 1 / (float64(p.Mass) * om) // squared ground state width
+	mc2 := float64(p.Mass) * float64(p.CSq)
+	e := 1.5*om + 0.5*float64(p.Mass)*om*om*4*w2
+	want := float64(osc.Config.OscillatorPeriod) * (mc2 + e) / mc2
+	// it starts at full displacement, so the first pass through the center is
+	// a QUARTER period -- far cheaper than waiting for two whole swings
+	mid := float64(sz)/2 + 1
+	first := 0
+	prev := wyCtr(sz, WeylLMag, math32.X) - mid
+	for i := range 200 {
+		wyStep(osc)
+		d := wyCtr(sz, WeylLMag, math32.X) - mid
+		if first == 0 && prev > 0 && d <= 0 {
+			first = i + 1
+		}
+		prev = d
+	}
+	l, r := wySums()
+	if math.Abs((l+r)/(l0+r0)-1) > 1e-4 {
+		t.Errorf("oscillator: total changed, it must be conserved")
+	}
+	if first == 0 {
+		t.Fatalf("oscillator: never reached the center, it is not swinging")
+	}
+	got := 4 * float64(first)
+	if math.Abs(got-want)/want > 0.1 {
+		t.Errorf("oscillator period %.1f steps, want %.1f (well period x E / m c^2)", got, want)
+	}
+	t.Logf("oscillator period %.1f steps, want %.1f (well says %.0f, slowed by E / m c^2 = %.3f)",
+		got, want, osc.Config.OscillatorPeriod, (mc2+e)/mc2)
+
+	hyd := wySim(sz, WeylHydrogen)
+	wyStep(hyd)
+	rms0 := wyRMS(sz)
+	hl0, hr0 := wySums()
+	for range 100 {
+		wyStep(hyd)
+	}
+	hl, hr := wySums()
+	grow := wyRMS(sz)/rms0 - 1
+	if grow > 0.15 {
+		t.Errorf("hydrogen spread by %.1f%%, it is not bound", 100*grow)
+	}
+	if math.Abs(hr/hl-1) > 0.01 {
+		t.Errorf("hydrogen L/R is %.4f, want 1: at rest it is half of each", hr/hl)
+	}
+	if math.Abs((hl+hr)/(hl0+hr0)-1) > 1e-4 {
+		t.Errorf("hydrogen: total changed, it must be conserved")
+	}
+	t.Logf("hydrogen rms %.3f -> %.3f (%+.1f%%), L/R %.4f, total held", rms0, wyRMS(sz), 100*grow, hr/hl)
+}
