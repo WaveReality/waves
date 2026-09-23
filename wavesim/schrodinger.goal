@@ -8,7 +8,37 @@ import "cogentcore.org/core/math32"
 
 //gosl:start
 
-// SchrodingerKernel is the kernel for computing the Schrodinger equations.
+// SchrodingerKernel is the kernel for Schrodinger's equation, as a staggered
+// leapfrog on the real and imaginary parts.
+//
+// Splitting i hbar d(chi)/dt = H chi into chi = a + ib gives
+//
+//	da/dt = -(hbar/2m) Lap b + (V/hbar) b
+//	db/dt = +(hbar/2m) Lap a - (V/hbar) a
+//
+// so each part is driven entirely by the other. Updating both from the same
+// old values is unstable -- it is a rotation being integrated by a method that
+// does not rotate, the same failure the complex Klein-Gordon equation has
+// without Params.Boris. The fix is to stagger them: advance a using the old b,
+// then advance b using the NEW a. That is Visscher's scheme -- see Visscher
+// 1991, building on Askar & Cakmak 1978 -- which is explicitly stable, second
+// order, and conserves a modified norm exactly.
+//
+// It is also the only form this can take in a cellular automaton. Advancing b
+// with the new a means reading the new a at the NEIGHBORS, which one local
+// pass cannot see -- so the update has to alternate between steps, a on even
+// and b on odd, with the other carried forward. The alternation is not a hack
+// around the instability; it is what makes the stable scheme local. Two sim
+// steps make one full leapfrog step, so time runs at half rate here compared
+// with the second-order equations: Sim.TimePerStep is 0.5, which the stats use.
+//
+// Note there is no C here at all. This is the nonrelativistic limit, and the
+// only rate in it is hbar / 2m; a wave moves at hbar k / m, not at some
+// fraction of a light speed the equation never mentions.
+//
+// Stability needs (hbar / 2m) < about 1: the Laplacian's extreme eigenvalue is
+// near 2 and the leapfrog tolerates a product under 2. SchrodingerConfig sets
+// a mass that satisfies it, which the Klein-Gordon default does NOT.
 func SchrodingerKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -24,33 +54,31 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	pvelB := State[z, y, x, CabBv, prv]
 	vpot := State[z, y, x, CabV, prv]
 
-	// need to alternate the updating for stability
-	// just carry forward other vars.
-	var forceA, velA, posA, forceB, velB, posB float32
-	if cur == 0 {
+	hbar := Params[0].Hbar
+	hm := Params[0].HSqOver2M / hbar // hbar / 2m
+	voh := vpot / hbar
+
+	var velA, posA, velB, posB float32
+	if cur == 0 { // a moves, driven by b
+		var lap float32
 		if Params[0].ThreeD.IsTrue() {
-			forceA = Laplacian19(x, y, z, int32(CabBs), prv, pposB) // A driven by B
+			lap = Laplacian19(x, y, z, int32(CabBs), prv, pposB)
 		} else {
-			forceA = Laplacian1D(x, y, z, int32(CabBs), prv, pposB) // A driven by B
+			lap = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
 		}
-		forceA *= -Params[0].HSqOver2M + vpot*pposB // note neg here, not in B
-		velA = forceA                               // first order, not +=
+		velA = -hm*lap + voh*pposB // first order: velocity IS the derivative
 		posA = pposA + velA
-
-		// carry the other component forward
-		velB = pvelB
+		velB = pvelB // b carried forward, to move on the next step
 		posB = pposB
-	} else {
+	} else { // b moves, driven by the a that just moved
+		var lap float32
 		if Params[0].ThreeD.IsTrue() {
-			forceB = Laplacian19(x, y, z, int32(CabAs), prv, pposA) // B driven by A
+			lap = Laplacian19(x, y, z, int32(CabAs), prv, pposA)
 		} else {
-			forceB = Laplacian1D(x, y, z, int32(CabAs), prv, pposA) // B driven by A
+			lap = Laplacian1D(x, y, z, int32(CabAs), prv, pposA)
 		}
-		forceB *= Params[0].HSqOver2M + vpot*pposA // todo: not sure about this!!
-		velB = forceB                              // first order, not +=
+		velB = hm*lap - voh*pposA
 		posB = pposB + velB
-
-		// carry the other component forward
 		velA = pvelA
 		posA = pposA
 	}
@@ -61,22 +89,144 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	State[z, y, x, CabBv, cur] = velB
 	State[z, y, x, CabBs, cur] = posB
 
-	State[z, y, x, CabMag, cur] = posA*posA + posB*posB
+	// the norm a^2 + b^2 is NOT what a staggered scheme conserves: a and b sit
+	// half a step apart, so squaring b compares it with itself at the wrong
+	// time and the total ripples at the level rate. What is exactly conserved
+	// is a^2 + b(t-1/2) b(t+1/2), which is available on the step b moves; on
+	// the step a moves, b has not changed, so carry it.
+	if cur == 0 {
+		State[z, y, x, CabMag, cur] = State[z, y, x, CabMag, prv]
+	} else {
+		State[z, y, x, CabMag, cur] = posA*posA + pposB*posB
+	}
 }
 
 //gosl:end
 
 func (ss *Sim) SchrodingerConfig() {
-	ParamsShouldDisplay = SchrodShouldDisplay
+	ParamsShouldDisplay = SchrodingerShouldDisplay
 	ss.StateVars = CabStatesN
+	ss.initFuncs = SchrodingerConfigs
+	ss.InitFunc = HarmonicOscillator
 	ss.SchrodingerStats()
+	// hbar / 2m must stay under about 1 for the leapfrog to hold, and the
+	// shared default mass of 0.125 puts it at 4. See SchrodingerKernel.
+	ss.Params.Mass = SchrodingerMass
+	ss.Params.Edges = EdgesFixed // walls at zero: a particle in a box
+	ss.TimePerStep = 0.5         // the staggered leapfrog: see SchrodingerKernel
+	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
-		view.SetVar(CabAs, -1)
+		view.SetVar(CabMag, -1)
 	})
 }
 
-// SchrodShouldDisplay determines which Parameters fields to display.
-var SchrodShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
+// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+// at the default hbar of 1, which is comfortably inside the stability bound.
+const SchrodingerMass float32 = 2
+
+//////// configurations
+
+// schrodOmega returns the angular frequency of the harmonic well, in radians
+// per LEAPFROG step. A sim step advances half of one, so the period you count
+// on screen is twice 2 pi / omega.
+func schrodOmega(ss *Sim) float32 {
+	return 2 * math32.Pi / SchrodingerPeriod
+}
+
+// SchrodingerPeriod is the harmonic oscillator period in leapfrog steps.
+const SchrodingerPeriod float32 = 320
+
+// HarmonicOscillator is the classic: a particle in a parabolic well
+// V = (1/2) m omega^2 r^2, started as its own ground state pushed off center.
+//
+// That displaced ground state is a coherent state, and it is the one quantum
+// state that behaves exactly like a classical particle: it swings back and
+// forth at omega and does NOT spread, because the well squeezes it back
+// together as fast as dispersion pulls it apart. Any other starting width
+// breathes as well as swinging.
+//
+// The ground state width is sqrt(hbar / m omega), which is set from the period
+// rather than chosen, so the two are not free to disagree.
+func HarmonicOscillator(ss *Sim) {
+	p := ss.Params
+	om := schrodOmega(ss)
+	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om)
+	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w
+	ss.Gauss(CabAs, Both, ctr, w, ss.Config.Amplitude, 0)
+}
+
+// BoxStandingWave is a particle in a box: the walls hold the wave at zero, and
+// the state is the lowest standing wave that fits between them.
+//
+// It is an energy eigenstate, so nothing about |chi|^2 moves at all -- the two
+// components turn into each other at the rate E / hbar and their squares add
+// to a constant. Stationary states being genuinely stationary is the whole
+// content of "energy level", and it is worth seeing that it is not an
+// approximation here.
+func BoxStandingWave(ss *Sim) {
+	ss.SineBox(CabAs, Both, 1, ss.Config.Amplitude)
+}
+
+// BoxTwoStates is the same box holding the lowest two standing waves at once.
+//
+// Neither one moves on its own, but they turn at different rates, E1/hbar and
+// E2/hbar, so their sum beats: |chi|^2 sloshes from one side to the other and
+// back at the DIFFERENCE frequency. Every visible motion in a bound quantum
+// system is a beat between levels like this one.
+func BoxTwoStates(ss *Sim) {
+	a := ss.Config.Amplitude
+	ss.SineBox(CabAs, Both, 1, a)
+	ss.SineBox(CabAs, Both, 2, a)
+}
+
+// HydrogenGround is as close to a hydrogen atom as this equation gets: an
+// attractive 1/r well with the electron in its ground state, exp(-r/a).
+//
+// For V = -k/r the ground state is exp(-r/a) with a = hbar^2 / m k, so the
+// well depth is set from the Bohr radius here rather than picked, which is
+// what makes the state actually stationary. Watch Mag sit still.
+//
+// Two caveats worth knowing. The 1/r singularity is softened to its value one
+// cube out, since a lattice cannot hold an infinity; that shifts the true
+// ground state slightly, so the wave breathes a little rather than sitting
+// perfectly still. And this is one electron in a fixed external potential, not
+// a nucleus and an electron finding each other -- there is no back-reaction,
+// and no second electron, so no chemistry.
+func HydrogenGround(ss *Sim) {
+	p := ss.Params
+	a := SchrodingerBohr
+	k := p.Hbar * p.Hbar / (p.Mass * a)
+	ss.InvR(CabV, math32.Vec3(-1, -1, -1), -k)
+	ss.CopyCurToPrev() // InvR writes cur only, and a potential that is there on
+	// one step and gone the next pumps the wave straight to infinity
+	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
+}
+
+// SchrodingerBohr is the Bohr radius of HydrogenGround, in cubes.
+const SchrodingerBohr float32 = 5
+
+// FreePacket is a gaussian wave packet moving along X with nothing to push it:
+// it travels at the group velocity and spreads, which is the one thing a free
+// quantum particle reliably does.
+func FreePacket(ss *Sim) {
+	ss.Params.Edges = EdgesDamp // let it leave rather than bounce
+	ss.Params.Update()
+	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+}
+
+// SchrodingerConfigs are the initialization options offered in the GUI.
+var SchrodingerConfigs = []InitFunc{
+	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator, Current: true},
+	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
+	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
+	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
+	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
+}
+
+// SchrodingerShouldDisplay determines which Parameters fields to display.
+var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
 
 // Cab1DViewAll configures the View to display A and B, Cur and Prev
 func Cab1DViewAll(view *View) {
@@ -93,6 +243,8 @@ func Cab1DViewAll(view *View) {
 func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(CabMag))
-	// a matter wave: the group velocity is not the phase velocity
-	ss.AddStat(ss.StatGroupVel(math32.X, CabAs))
+	// on CabMag, not a component: |chi|^2 is the envelope, while a^2 carries a
+	// ripple at twice the wavenumber that drags the centroid toward the phase
+	// velocity. A matter wave's group velocity is hbar k / m, not that.
+	ss.AddStat(ss.StatGroupVel(math32.X, CabMag))
 }

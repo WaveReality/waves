@@ -25,9 +25,9 @@ func main() {
 	threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
-	// eqs := wavesim.Schrodinger
+	eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
-	eqs := wavesim.Dirac
+	// eqs := wavesim.Dirac
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
@@ -132,7 +132,7 @@ func main() {
 			case wavesim.KleinGordonC:
 				wavesim.ChargeAtRest(sim)
 			case wavesim.Schrodinger:
-				sim.ComplexPacketConfig(wavesim.CabAs, wavesim.CabBs, math32.X, ctrPos, -1, 0, 1)
+				wavesim.HarmonicOscillator(sim)
 			case wavesim.Maxwell:
 				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:

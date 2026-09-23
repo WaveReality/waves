@@ -557,8 +557,9 @@ func (ss *Sim) DiracRest(sign float32) {
 // wavelength and width from [Config]. sign picks the sign of the charge.
 //
 // Built from [Sim.SlabPacket] at the exact lattice frequency for this mass, so
-// it is a clean positive-frequency packet running one way: chi = env e^i(kx -
-// wt), for which rho is env^2 times a constant. [Sim.MovingWavePacket] would
+// it is a clean positive-frequency packet running one way, with chi going as
+// env times e to the i kx minus i omega t, for which rho is env^2 times a
+// constant. [Sim.MovingWavePacket] would
 // be the obvious choice but its velocity comes from fitted constants tuned for
 // massless waves, so the packet it makes is not a KG eigenstate and splits.
 func (ss *Sim) ChargedPacketConfig(dim math32.Dims, amp, sign float32) {
@@ -595,6 +596,92 @@ func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
 					f := c.AddScalar(1)
 					v := ma * math32.Sin(kx*float32(c.X)+ky*float32(c.Y)+kz*float32(c.Z)+ph)
 					State[f.Z, f.Y, f.X, vri, cur] += v
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
+// Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
+// oscillator potential.
+func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr = CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Sub(ctr).Length()
+				v := coef * d * d
+				State[f.Z, f.Y, f.X, vri, cur] += v
+				State[f.Z, f.Y, f.X, vri, prv] += v
+			}
+		}
+	}
+}
+
+// Expo adds amp * exp(-r / decay) centered at ctr: the shape of a bound state
+// in a Coulomb potential, as opposed to the gaussian of a harmonic one.
+func (ss *Sim) Expo(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, decay, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr = CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Sub(ctr).Length()
+				v := amp * math32.FastExp(-d/decay)
+				if curPrev == CurOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
+// SineBox adds the product of half-sine waves that vanish on the walls, which
+// is the ground state of a particle in a box: sin(n pi x / L) in each
+// dimension that is more than one cube deep, with L the wall separation.
+// Use with EdgesFixed, which is what holds the walls at zero.
+func (ss *Sim) SineBox(vr enums.Enum, curPrev CurPrevBoth, n int32, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	fn := float32(n)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := amp
+				for d := math32.X; d <= math32.Z; d++ {
+					ln := sz.Dim(d)
+					if ln <= 1 {
+						continue
+					}
+					// walls sit at 0 and ln+1, so the separation is ln+1
+					v *= math32.Sin(fn * math32.Pi * float32(c.Dim(d)+1) / float32(ln+1))
+				}
+				if curPrev == CurOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev == PrevOnly || curPrev == Both {
 					State[f.Z, f.Y, f.X, vri, prv] += v
 				}
 			}

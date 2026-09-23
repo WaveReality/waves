@@ -514,6 +514,8 @@ struct Parameters {
 	MZ: f32,
 	SinThetaW: f32,
 	CosThetaW: f32,
+	pad: f32,
+	pad1: f32,
 }
 
 //////// import: "particle.go"
@@ -546,33 +548,33 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(prv)));
 	var pvelA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(prv)));
 	var pvelB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(prv)));
-	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabV), u32(prv)));
-	var forceA: f32;
+	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabV), u32(prv)));
+	var hbar = Params[0].Hbar;
+	var hm = Params[0].HSqOver2M / hbar; // hbar / 2m
+	var voh = vpot / hbar;
 	var velA: f32;
 	var posA: f32;
-	var forceB: f32;
 	var velB: f32;
 	var posB: f32;
-	if (cur == 0) {
+	if (cur == 0) { // a moves, driven by b
+		var lap: f32;
 		if (Params[0].ThreeD == 1) {
-			forceA = Laplacian19(x, y, z, i32(CabBs), prv, pposB); // A driven by B
+			lap = Laplacian19(x, y, z, i32(CabBs), prv, pposB);
 		} else {
-			forceA = Laplacian1D(x, y, z, i32(CabBs), prv, pposB); // A driven by B
+			lap = Laplacian1D(x, y, z, i32(CabBs), prv, pposB);
 		}
-		forceA *= -Params[0].HSqOver2M + vpot*pposB; // note neg here, not in B
-		velA = forceA;                               // first order, not +=
+		velA = -hm*lap + voh*pposB; // first order: velocity IS the derivative
 		posA = pposA + velA;
-		velB = pvelB;
+		velB = pvelB; // b carried forward, to move on the next step
 		posB = pposB;
-	} else {
+	} else { // b moves, driven by the a that just moved
+		var lap: f32;
 		if (Params[0].ThreeD == 1) {
-			forceB = Laplacian19(x, y, z, i32(CabAs), prv, pposA); // B driven by A
+			lap = Laplacian19(x, y, z, i32(CabAs), prv, pposA);
 		} else {
-			forceB = Laplacian1D(x, y, z, i32(CabAs), prv, pposA); // B driven by A
+			lap = Laplacian1D(x, y, z, i32(CabAs), prv, pposA);
 		}
-		forceB *= Params[0].HSqOver2M + vpot*pposA; // todo: not sure about this!!
-		velB = forceB;                              // first order, not +=
+		velB = hm*lap - voh*pposA;
 		posB = pposB + velB;
 		velA = pvelA;
 		posA = pposA;
@@ -580,8 +582,13 @@ fn SchrodingerKernel(i: u32) { //gosl:kernel
 	StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(cur)));
 	StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(cur)));
 	StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(cur)));
-	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));
-	StateSet(posA*posA + posB*posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabMag), u32(cur)));
+	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));
+	if (cur == 0) {
+		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabMag), u32(prv))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabMag), u32(cur)));
+	} else {
+		StateSet(posA*posA + pposB*posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabMag), u32(cur)));
+	}
 }
 
 //////// import: "settings.go"

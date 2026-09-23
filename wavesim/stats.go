@@ -242,7 +242,9 @@ func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) 
 		// the window slot about to be overwritten holds the oldest sample
 		old := n % win
 		have := n >= win
-		ds := float64(int(ctx.Step) - steps[old])
+		// elapsed TIME, not steps: Schrodinger takes two sim steps per step
+		// of time, and would otherwise read half the velocity it has
+		ds := float64(int(ctx.Step)-steps[old]) * float64(ss.TimePerStep)
 		for i, vr := range vrs {
 			vg := 0.0
 			if have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx {

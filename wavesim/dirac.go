@@ -281,7 +281,9 @@ func SpinPrecession(ss *Sim) {
 // not run and A0 stays exactly as set here. That matters, because the Dirac
 // kernel overwrites Charge every step with the wave's own charge, so a nucleus
 // left in that variable would be erased on the first step. Putting the
-
+// potential straight into A0 is both simpler and closer to what an electron
+// in a given external field actually means.
+//
 // The well depth is scaled to a fraction of the rest energy, for the reason in
 // kgSelfScale: once e A0 approaches m c^2 the single-particle equation is in
 // the Klein regime and stops describing one particle.

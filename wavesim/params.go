@@ -188,7 +188,8 @@ type Parameters struct {
 	// exponentially -- the radius of a pure-gauge rotation doubles about once
 	// per period. The Boris step applies that rotation EXACTLY instead, so it
 	// is norm-preserving by construction. Second-order accurate, and costs one
-	// extra force split (no extra neighbor reads).
+	// extra force split (no extra neighbor reads). From Boris 1970, the plasma
+	// particle pusher; Qin et al. 2013 show it preserves phase space volume.
 	Boris slbool.Bool
 
 	// Diff is the particle diffusion rate: how fast to spread distance to neighbors.
@@ -290,6 +291,9 @@ type Parameters struct {
 	// The photon direction is the one Q = T^3 + Y annihilates.
 	SinThetaW float32 `display:"-"`
 	CosThetaW float32 `display:"-"`
+
+	// gosl requires the total struct size to be a multiple of 16 bytes.
+	pad, pad1 float32
 }
 
 func (pr *Parameters) Update() {
