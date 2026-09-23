@@ -4,10 +4,7 @@
 
 package wavesim
 
-import (
-	"cogentcore.org/core/enums"
-	"cogentcore.org/core/math32"
-)
+import "cogentcore.org/core/math32"
 
 //gosl:start
 
@@ -84,6 +81,10 @@ const (
 // Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat
 // the gradient stencil can see, so C has to be well under its usual limit:
 // WeylConfig sets it.
+//
+// 3D only. sigma.grad mixes the three axes into each other, so a 1D version
+// would not be this equation with a dimension removed -- it would be a
+// different one.
 func WeylKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -114,27 +115,14 @@ func WeylKernel(i uint32) { //gosl:kernel
 	nr2a := State[z, y, x, WeylR2a, prv]
 	nr2b := State[z, y, x, WeylR2b, prv]
 
-	threeD := Params[0].ThreeD.IsTrue()
-	var gl1a, gl1b, gl2a, gl2b, gr1a, gr1b, gr2a, gr2b math32.Vector3
-	if threeD {
-		gl1a = Gradient10(x, y, z, int32(WeylL1a), prv)
-		gl1b = Gradient10(x, y, z, int32(WeylL1b), prv)
-		gl2a = Gradient10(x, y, z, int32(WeylL2a), prv)
-		gl2b = Gradient10(x, y, z, int32(WeylL2b), prv)
-		gr1a = Gradient10(x, y, z, int32(WeylR1a), prv)
-		gr1b = Gradient10(x, y, z, int32(WeylR1b), prv)
-		gr2a = Gradient10(x, y, z, int32(WeylR2a), prv)
-		gr2b = Gradient10(x, y, z, int32(WeylR2b), prv)
-	} else {
-		gl1a = Gradient1D(x, y, z, int32(WeylL1a), prv)
-		gl1b = Gradient1D(x, y, z, int32(WeylL1b), prv)
-		gl2a = Gradient1D(x, y, z, int32(WeylL2a), prv)
-		gl2b = Gradient1D(x, y, z, int32(WeylL2b), prv)
-		gr1a = Gradient1D(x, y, z, int32(WeylR1a), prv)
-		gr1b = Gradient1D(x, y, z, int32(WeylR1b), prv)
-		gr2a = Gradient1D(x, y, z, int32(WeylR2a), prv)
-		gr2b = Gradient1D(x, y, z, int32(WeylR2b), prv)
-	}
+	gl1a := Gradient10(x, y, z, int32(WeylL1a), prv)
+	gl1b := Gradient10(x, y, z, int32(WeylL1b), prv)
+	gl2a := Gradient10(x, y, z, int32(WeylL2a), prv)
+	gl2b := Gradient10(x, y, z, int32(WeylL2b), prv)
+	gr1a := Gradient10(x, y, z, int32(WeylR1a), prv)
+	gr1b := Gradient10(x, y, z, int32(WeylR1b), prv)
+	gr2a := Gradient10(x, y, z, int32(WeylR2a), prv)
+	gr2b := Gradient10(x, y, z, int32(WeylR2b), prv)
 
 	// sigma.grad on a 2-spinor, written out in real components:
 	//	(sigma.grad psi)_1 = d_z psi_1 + (d_x - i d_y) psi_2
@@ -201,6 +189,7 @@ func (ss *Sim) WeylConfig() {
 	// limit of sqrt(3)/2. Mass is set per config, not here.
 	ss.Params.C = WeylC
 	ss.Params.Edges = EdgesWrap
+	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: see WeylKernel
 	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WeylLMag, -1)
@@ -222,9 +211,17 @@ func WeylViewAll(view *View) {
 // tighter than the second-order one the other equations use.
 const WeylC float32 = 0.35
 
-// WeylMass is the electron mass the massive configs set, chosen so that the
-// L-R trade takes a few hundred steps: the period is pi hbar / m c^2.
+// WeylMass is the electron mass the AT REST configs set, light enough that the
+// L-R trade takes a watchable 50 steps: the period is pi hbar / m c^2.
 const WeylMass float32 = 0.5
+
+// WeylPacketMass is the heavier mass ElectronPacket sets, because the two
+// demands pull opposite ways. Visibly slower than light needs m c^2 to be
+// comparable to the momentum c khat, which at the default wavelength means
+// about this; a watchable flip needs the mass SMALL, since the period goes as
+// 1/m. A packet this heavy zitters about four times faster than it crosses a
+// wavelength, which is the honest picture -- the trade really is that quick.
+const WeylPacketMass float32 = 2
 
 var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
 
@@ -233,64 +230,42 @@ func (ss *Sim) WeylStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(WeylLMag))
 	ss.AddStat(ss.StatSum(WeylRMag))
-	ss.AddStat(ss.StatGroupVel(math32.X, WeylLMag))
+	// both chiralities: for the neutrino only L moves, and for an electron the
+	// two must track each other, since they are halves of one particle
+	ss.AddStat(ss.StatGroupVelMag(math32.X, WeylLMag, WeylRMag))
 }
 
-// WeylSpinor fills one chirality with a gaussian packet moving along X, with
-// the spin along the given axis. side picks L or R, and amp scales it.
-func (ss *Sim) WeylSpinor(side WeylStates, axis math32.Dims, amp float32) {
-	var c1, c2 enums.Enum = WeylL1a, WeylL2a
-	if side == WeylR1a {
-		c1, c2 = WeylR1a, WeylR2a
+// WeylDispersion returns the lattice frequency and group velocity of a wave of
+// the given wavelength running along an axis:
+//
+//	omega = arcsin(sqrt(c^2 sin^2 k + om0^2))
+//
+// The sin k is the gradient stencil's response to a plane wave and the arcsin
+// is the three-level leapfrog's own, and together they match the measured
+// period to five digits. Both corrections matter: at wavelength 8 the naive
+// c k overstates the frequency by 13%.
+func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
+	k := TwoPi / wavelength
+	c := ss.Params.C
+	o0 := ss.Params.Omega0
+	sk := math32.Sin(k)
+	ss2 := c*c*sk*sk + o0*o0
+	rs := math32.Sqrt(ss2)
+	if rs <= 0 {
+		return 0, 0
 	}
-	h := amp / math32.Sqrt2
-	ctr := math32.Vec3(-1, -1, -1)
-	w := ss.Config.PacketWidth
-	switch axis {
-	case math32.X: // spin along +X is the equal superposition of the two
-		ss.Gauss(c1, Both, ctr, w, h, 0)
-		ss.Gauss(c2, Both, ctr, w, h, 0)
-	default: // +Z is component 1 alone
-		ss.Gauss(c1, Both, ctr, w, amp, 0)
-	}
+	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
 }
 
-// WeylPacket puts a moving packet of one chirality into the state: a gaussian
-// envelope times exp(i k.x), with the spinor that makes it a HELICITY
-// eigenstate, so it is one frequency and travels rigidly.
-//
-// Left-handed means sigma.khat = -1, right-handed +1, and that locking is the
-// whole content of the equation: for L the spin points AGAINST the motion, so
-// reversing the spin reverses which way it goes. A plain gaussian with no
-// phase is not a helicity eigenstate at all -- it is a mixture of both
-// directions, and it mostly sits still while pulling apart.
-//
-// Both time levels are set, the earlier one shifted back by one step's travel.
-// The three-level leapfrog reads its own past, and a wave given no past goes
-// both ways at once. For a massless field the envelope and the phase move
-// together at c, so shifting the whole packet back is exact.
-func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, amp float32) {
-	c1 := int(WeylL1a.Int64())
-	sgn := float32(-1) // left: sigma.khat = -1
-	if side == WeylR1a {
-		c1 = int(WeylR1a.Int64())
-		sgn = 1
-	}
-	// the spinor with sigma.khat = sgn, for khat along +dim
-	s1, s2 := float32(1)/math32.Sqrt2, sgn/math32.Sqrt2 // +X: sigma_x
-	if dim == math32.Z {                                // +Z: sigma_z is already diagonal
-		s1, s2 = 0, 1
-		if sgn > 0 {
-			s1, s2 = 1, 0
-		}
-	}
+// WeylSlab fills one chirality with a gaussian slab at rest: flat across the
+// two transverse axes, no phase, spin along Z. For the configs that are not
+// meant to move but should still look like something.
+func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
+	c1 := int(side.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	ctr := CenterF(math32.Vec3(-1, -1, -1))
-	back := ctr
-	back.SetDim(dim, ctr.Dim(dim)-ss.Params.C) // where it was one step ago
-	wl := ss.Config.Wavelength
 	wd := ss.Config.PacketWidth
 	sz := ss.Config.Size
 	var c math32.Vector3i
@@ -298,13 +273,68 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, amp float32) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				ff := CoordToFloat(c)
-				d := ff.Sub(ctr)
-				e := ff.Sub(back)
-				na := WavePacket(d.Dim(dim), d.Length(), wl, wd, 0, amp)
-				nb := WavePacket(d.Dim(dim), d.Length(), wl, wd, -0.25, amp)
-				oa := WavePacket(e.Dim(dim), e.Length(), wl, wd, 0, amp)
-				ob := WavePacket(e.Dim(dim), e.Length(), wl, wd, -0.25, amp)
+				g := (CoordToFloat(c).Dim(dim) - ctr.Dim(dim)) / wd
+				v := amp * math32.FastExp(-g*g)
+				State[f.Z, f.Y, f.X, c1, cur] += v
+				State[f.Z, f.Y, f.X, c1, prv] += v
+			}
+		}
+	}
+}
+
+// WeylPacket puts a moving packet of one chirality into the state: a gaussian
+// envelope times exp(i k.x), on the spinor with sigma.khat = helicity, so it
+// is a single frequency and travels rigidly.
+//
+// Helicity, not chirality, is what the spinor encodes. A massless L wave can
+// only have helicity -1 and an R wave +1, which is why reversing a neutrino's
+// spin reverses its direction. A MASSIVE particle has both chiralities at one
+// helicity, in the ratio (omega - c khat) / (m c^2 / hbar), so ElectronPacket
+// calls this twice with the same helicity and different amplitudes.
+//
+// The envelope is a SLAB: gaussian along the direction of travel, flat across
+// the other two. That is not just for looks. A round blob carries transverse
+// momentum, so it is not a helicity eigenstate, it spreads sideways, and its
+// centroid crawls instead of moving at the group velocity. A slab has k purely
+// along one axis, travels rigidly, and reads on screen as bands sweeping
+// across rather than a dot that may or may not be drifting.
+//
+// Both time levels are set. The three-level leapfrog reads its own past, and a
+// wave given no past goes both ways at once: the earlier one has its envelope
+// pulled back by one step of GROUP velocity and its phase advanced by one step
+// of omega, which are the same thing only when the wave is massless.
+func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float32) {
+	c1 := int(side.Int64())
+	// the spinor with sigma.khat = helicity, for khat along +dim
+	s1, s2 := float32(1)/math32.Sqrt2, helicity/math32.Sqrt2 // +X: sigma_x
+	if dim == math32.Z {                                     // +Z: sigma_z is already diagonal
+		s1, s2 = 0, 1
+		if helicity > 0 {
+			s1, s2 = 1, 0
+		}
+	}
+	wl := ss.Config.Wavelength
+	wd := ss.Config.PacketWidth
+	om, vg := ss.WeylDispersion(wl)
+	k := TwoPi / wl
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Dim(dim) - ctr.Dim(dim)
+				g := d / wd
+				e := (d + vg) / wd // where the envelope was one step ago
+				en := amp * math32.FastExp(-g*g)
+				eo := amp * math32.FastExp(-e*e)
+				ph := k * d
+				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
+				oa, ob := eo*math32.Cos(ph+om), eo*math32.Sin(ph+om)
 				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
 				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
 				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
@@ -321,25 +351,51 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, amp float32) {
 // NeutrinoPacket is a massless left-handed wave and nothing else. With Mass at
 // zero there is no term anywhere that can put anything into the right-handed
 // half, so it stays exactly empty forever: that is what it means for the
-// neutrino to have only one handedness.
-//
-// It travels at exactly c, because a massless wave has nothing to slow it.
+// neutrino to have only one handedness. It travels at c, since a massless wave
+// has nothing to slow it.
 func NeutrinoPacket(ss *Sim) {
 	ss.Params.Mass = 0
 	ss.Params.Update()
-	ss.WeylPacket(WeylL1a, math32.X, ss.Config.Amplitude)
+	ss.WeylPacket(WeylL1a, math32.X, -1, ss.Config.Amplitude)
+}
+
+// ElectronPacket is the same wave given a mass, and the comparison to make
+// against NeutrinoPacket: identical wavelength, identical box, and it travels
+// visibly SLOWER. Both halves are there and both move together, because they
+// are halves of one particle.
+//
+// That is the whole picture made quantitative. The two halves each still go at
+// c; what the mass does is turn each into the other, and a thing that keeps
+// reversing gets down the box more slowly than one that does not. The heavier
+// it is, the more often it turns, and the slower it goes -- raise Mass and
+// watch the packet fall behind.
+//
+// The two amplitudes are not equal once it is moving: a momentum eigenstate
+// has them in the ratio (omega - c khat) / (m c^2 / hbar), which goes to 1 at
+// rest and to 0 at high momentum, where the particle becomes effectively
+// massless and one chirality takes over.
+func ElectronPacket(ss *Sim) {
+	p := ss.Params
+	p.Mass = WeylPacketMass
+	p.Update()
+	om, _ := ss.WeylDispersion(ss.Config.Wavelength)
+	ck := p.C * math32.Sin(TwoPi/ss.Config.Wavelength)
+	rr := (om - ck) / p.Omega0 // right-handed share of a positive-energy state
+	a := ss.Config.Amplitude
+	ss.WeylPacket(WeylL1a, math32.X, -1, a)
+	ss.WeylPacket(WeylR1a, math32.X, -1, a*rr)
 }
 
 // ElectronAtRest is the two halves in equal measure, which is what a massive
 // particle at rest IS: chirality is not helicity, and at zero momentum the
 // electron is half left and half right at every instant. Both magnitudes sit
-// flat while the phases turn.
+// flat while the phases turn at the rest mass frequency.
 func ElectronAtRest(ss *Sim) {
 	ss.Params.Mass = WeylMass
 	ss.Params.Update()
 	a := ss.Config.Amplitude
-	ss.WeylSpinor(WeylL1a, math32.Z, a)
-	ss.WeylSpinor(WeylR1a, math32.Z, a)
+	ss.WeylSlab(WeylL1a, math32.X, a)
+	ss.WeylSlab(WeylR1a, math32.X, a)
 }
 
 // ElectronChiralFlip starts the whole electron in the LEFT half and lets the
@@ -348,18 +404,19 @@ func ElectronAtRest(ss *Sim) {
 //	|psi_L|^2 = cos^2(m c^2 t / hbar),  |psi_R|^2 = sin^2(m c^2 t / hbar)
 //
 // so each swings over a period of pi hbar / m c^2 while the sum stays flat.
-// Watch LMag and RMag in the stats trade against each other. This is
+// Watch the band vanish from one panel and appear in the other. This is
 // zitterbewegung, and it is the clearest statement of what mass is: not a
 // property the wave has, but the rate at which two massless waves turn into
 // one another. Set Mass to zero and the trade stops dead -- a neutrino.
 func ElectronChiralFlip(ss *Sim) {
 	ss.Params.Mass = WeylMass
 	ss.Params.Update()
-	ss.WeylSpinor(WeylL1a, math32.Z, ss.Config.Amplitude)
+	ss.WeylSlab(WeylL1a, math32.X, ss.Config.Amplitude)
 }
 
 var WeylConfigs = []InitFunc{
 	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
+	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
 	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
 	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
 }

@@ -147,13 +147,15 @@ func StateMean(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	return StateSum(sz, vr, curPrv) / float64(n)
 }
 
-// StateCentroids computes the intensity-weighted (value squared) centroid
-// along dim for each of the given variables, in cube coordinates, along with
-// the total intensity, in ONE pass over the state. Variables that are
-// everywhere zero get the box center.
-// One pass because a full scan is the expensive part of any stat: at 100^3
-// that is a million cells, so do not add more passes than you need.
-func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, vrs []enums.Enum, ctrs, wts []float64) {
+// StateCentroids computes the intensity-weighted centroid of each of the given
+// variables along dim, into ctrs, with the total weight into wts.
+//
+// square says whether to weight by the value squared. An AMPLITUDE variable
+// wants that, since the intensity is its square. A variable that is already an
+// intensity -- any of the Mag ones -- does NOT: squaring it again weights by
+// |psi|^4, which tracks the peak instead of the envelope and reads several
+// percent slow on a packet that is dispersing at all.
+func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, square bool, vrs []enums.Enum, ctrs, wts []float64) {
 	nv := len(vrs)
 	vris := make([]int, nv)
 	num := make([]float64, nv)
@@ -168,8 +170,10 @@ func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, vrs []enu
 				f := c.AddScalar(1)
 				d := float64(c.Dim(dim))
 				for i := range nv {
-					v := float64(State[f.Z, f.Y, f.X, vris[i], curPrv])
-					w := v * v
+					w := float64(State[f.Z, f.Y, f.X, vris[i], curPrv])
+					if square {
+						w *= w
+					}
 					num[i] += w * d
 					den[i] += w
 				}
@@ -203,10 +207,25 @@ func StatGroupVelName(vr enums.Enum, dim math32.Dims) string {
 	return "Vg" + vr.String() + dim.String()
 }
 
-// StatGroupVel records, for each of the given variables, the intensity
-// centroid along dim and the speed of that centroid in units of C: the group
-// velocity of a wave packet. Both are recorded; only the velocity is plotted
-// by default.
+// StatGroupVel records the group velocity of each given AMPLITUDE variable
+// along dim, in units of C, as the centroid of its intensity over a trailing
+// window of StatGroupVelWindow steps. Use [Sim.StatGroupVelMag] for variables
+// that are already an intensity.
+func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, true, vrs)
+}
+
+// StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
+// intensity, such as any of the Mag ones: it weights the centroid by the value
+// rather than by its square. See StateCentroids for why that matters.
+func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, false, vrs)
+}
+
+// statGroupVel does the work of both. For each variable it records the
+// intensity centroid along dim and the speed of that centroid in units of C:
+// the group velocity of a wave packet. Both are recorded; only the velocity is
+// plotted by default.
 //
 // The shift is measured over [StatGroupVelWindow] samples, so the first that
 // many read zero. A packet crossing a wrapped edge is taken the short way
@@ -217,7 +236,7 @@ func StatGroupVelName(vr enums.Enum, dim math32.Dims) string {
 // pure noise: in a Z pulse, for instance, the photon field is not excited at
 // all. That is why these belong in one call rather than several -- besides
 // sharing the one pass over the state, they calibrate each other.
-func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func(init bool) {
 	nv := len(vrs)
 	ctrs := make([]float64, nv)
 	wts := make([]float64, nv)
@@ -249,7 +268,7 @@ func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) 
 		}
 		sz := ss.Config.Size
 		ln := float64(sz.Dim(dim))
-		StateCentroids(sz, dim, ctx.CurState, vrs, ctrs, wts)
+		StateCentroids(sz, dim, ctx.CurState, square, vrs, ctrs, wts)
 		mx := 0.0
 		for i := range nv {
 			if wts[i] > mx {

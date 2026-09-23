@@ -97,8 +97,17 @@ func TestWeylNeutrino(t *testing.T) {
 		if c := float64(ss.Params.C); speed[i] < 0.7*c || speed[i] > c {
 			t.Errorf("wavelength %g: speed %.4f, want just under c = %.4f", wl, speed[i], c)
 		}
-		t.Logf("wavelength %2g: speed %.4f = %.3f c; right half peaks at %.3g (r0 %.3g)",
-			wl, speed[i], speed[i]/float64(ss.Params.C), rmax, r0)
+		// the stat must see the same thing, and must see nothing at all in R
+		sl := ss.Stats.Float64(StatGroupVelName(WeylLMag, 0)).Float1D(-1) * float64(ss.Params.C)
+		sr := ss.Stats.Float64(StatGroupVelName(WeylRMag, 0)).Float1D(-1)
+		if math.Abs(sl-speed[i])/speed[i] > 0.05 {
+			t.Errorf("wavelength %g: stat says %.4f but the packet moved at %.4f", wl, sl, speed[i])
+		}
+		if sr != 0 {
+			t.Errorf("wavelength %g: right half has a group velocity of %.4f, but it is empty", wl, sr)
+		}
+		t.Logf("wavelength %2g: speed %.4f = %.3f c, stat %.4f; right half peaks at %.3g (r0 %.3g)",
+			wl, speed[i], speed[i]/float64(ss.Params.C), sl, rmax, r0)
 	}
 	if speed[1] <= speed[0] {
 		t.Errorf("longer wavelength is not faster (%.4f vs %.4f): massless must approach c", speed[1], speed[0])
@@ -165,4 +174,45 @@ func TestWeylElectronAtRest(t *testing.T) {
 		t.Errorf("|psi_L|^2 / |psi_R|^2 starts at %.6f and wanders by %.4f, want a flat 1", l0/r0, worst)
 	}
 	t.Logf("|psi_L|^2 / |psi_R|^2 starts %.6f, wanders at most %.2e over 400 steps", l0/r0, worst)
+}
+
+// TestWeylElectronSlower is the payoff comparison: the same wave, same
+// wavelength, same box, with and without a mass. The massive one travels
+// slower, which is what the L-R trade buys -- both halves still go at c, and a
+// thing that keeps reversing gets down the box less quickly than one that does
+// not.
+func TestWeylElectronSlower(t *testing.T) {
+	const sz = 64
+	speed := map[string]float64{}
+	for _, tc := range []struct {
+		name string
+		init func(*Sim)
+	}{{"neutrino", NeutrinoPacket}, {"electron", ElectronPacket}} {
+		ss := wySim(sz, tc.init)
+		wyStep(ss)
+		l0, r0 := wySums()
+		x0 := wyCtr(sz, WeylLMag, math32.X)
+		const n = 40
+		for range n {
+			wyStep(ss)
+		}
+		l, r := wySums()
+		speed[tc.name] = (wyCtr(sz, WeylLMag, math32.X) - x0) / n
+		if d := math.Abs((l+r)/(l0+r0) - 1); d > 1e-4 {
+			t.Errorf("%s: total changed by %.2e, it must be conserved", tc.name, d)
+		}
+		// a massive particle carries both chiralities at one helicity; a
+		// massless one cannot have the other at all
+		if tc.name == "neutrino" && r != 0 {
+			t.Errorf("neutrino has %.3g in its right half, must be exactly zero", r)
+		}
+		if tc.name == "electron" && (r/l < 0.05 || math.Abs(r/l-r0/l0) > 0.1) {
+			t.Errorf("electron R/L is %.3f, started %.3f: wanted a real and steady share", r/l, r0/l0)
+		}
+		t.Logf("%-8s speed %.4f = %.3f c, R/L %.3f -> %.3f",
+			tc.name, speed[tc.name], speed[tc.name]/float64(ss.Params.C), r0/l0, r/l)
+	}
+	if speed["electron"] >= 0.95*speed["neutrino"] {
+		t.Errorf("electron %.4f is not visibly slower than neutrino %.4f", speed["electron"], speed["neutrino"])
+	}
 }

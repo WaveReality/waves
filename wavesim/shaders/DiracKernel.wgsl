@@ -339,41 +339,22 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var mhsq = Params[0].MOverHSq;
 ; var csq = Params[0].CSq;
 ; var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracV), u32(prv)));
-; var threeD = Params[0].ThreeD == 1;
-; var l1a: f32;
-var l1b: f32;
-var l2a: f32;
-var l2b: f32;; if (threeD) {
-	l1a = Laplacian19(x, y, z, i32(Dirac1As), prv, p1a);
-	l1b = Laplacian19(x, y, z, i32(Dirac1Bs), prv, p1b);
-	l2a = Laplacian19(x, y, z, i32(Dirac2As), prv, p2a);
-	l2b = Laplacian19(x, y, z, i32(Dirac2Bs), prv, p2b);
-} else {
-	l1a = Laplacian1D(x, y, z, i32(Dirac1As), prv, p1a);
-	l1b = Laplacian1D(x, y, z, i32(Dirac1Bs), prv, p1b);
-	l2a = Laplacian1D(x, y, z, i32(Dirac2As), prv, p2a);
-	l2b = Laplacian1D(x, y, z, i32(Dirac2Bs), prv, p2b);
-}; var vm = vpot - mhsq;
+; var l1a = Laplacian19(x, y, z, i32(Dirac1As), prv, p1a);
+; var l1b = Laplacian19(x, y, z, i32(Dirac1Bs), prv, p1b);
+; var l2a = Laplacian19(x, y, z, i32(Dirac2As), prv, p2a);
+; var l2b = Laplacian19(x, y, z, i32(Dirac2Bs), prv, p2b);
+; var vm = vpot - mhsq;
 ; // scalar potential shifts the mass, as in complex KG
 var a1a = csq * (l1a + vm*p1a);
 ; var a1b = csq * (l1b + vm*p1b);
 ; var a2a = csq * (l2a + vm*p2a);
 ; var a2b = csq * (l2b + vm*p2b);
 ;
-var g1a: vec3<f32>;
-var g1b: vec3<f32>;
-var g2a: vec3<f32>;
-var g2b: vec3<f32>;; if (threeD) {
-	g1a = Gradient10(x, y, z, i32(Dirac1As), prv);
-	g1b = Gradient10(x, y, z, i32(Dirac1Bs), prv);
-	g2a = Gradient10(x, y, z, i32(Dirac2As), prv);
-	g2b = Gradient10(x, y, z, i32(Dirac2Bs), prv);
-} else {
-	g1a = Gradient1D(x, y, z, i32(Dirac1As), prv);
-	g1b = Gradient1D(x, y, z, i32(Dirac1Bs), prv);
-	g2a = Gradient1D(x, y, z, i32(Dirac2As), prv);
-	g2b = Gradient1D(x, y, z, i32(Dirac2Bs), prv);
-}; var em = Params[0].EM == 1;
+var g1a = Gradient10(x, y, z, i32(Dirac1As), prv);
+; var g1b = Gradient10(x, y, z, i32(Dirac1Bs), prv);
+; var g2a = Gradient10(x, y, z, i32(Dirac2As), prv);
+; var g2b = Gradient10(x, y, z, i32(Dirac2Bs), prv);
+; var em = Params[0].EM == 1;
 ; var a0: f32;
 var omega: f32;; if (em) {
 	a0 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(A0s), u32(prv)));
@@ -563,12 +544,6 @@ const  AverageWts: NeighWeights = 1;
 const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
-fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
-	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
-return (m1 + p1) - 2*ctr;
-}
 fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
@@ -578,11 +553,6 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
-}
-fn Gradient1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
-	var g: vec3<f32>;
-	g.x = 0.5 * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))));
-return g;
 }
 fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	var g: vec3<f32>;

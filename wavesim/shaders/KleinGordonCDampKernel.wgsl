@@ -477,16 +477,6 @@ const  OneoAverage27Sum = 0.049741138;
 fn EdgeInBounds1(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32) -> bool {
 	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz;
 }
-fn LaplacianEdge1D(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var sum = f32(0);
-	if (EdgeInBounds1(x-1, y, z, sx, sy, sz)) {
-		sum += StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))) - ctr;
-	}
-	if (EdgeInBounds1(x+1, y, z, sx, sy, sz)) {
-		sum += StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43],
-		TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - ctr;
-	}return sum;
-}
 fn LaplacianEdge19(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
@@ -524,15 +514,8 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(prv)));
 	var csq = Params[0].CSq;
-	var forceA: f32;
-	var forceB: f32;
-	if (Params[0].ThreeD == 1) {
-		forceA = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(CabAs), prv, pposA);
-		forceB = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(CabBs), prv, pposB);
-	} else {
-		forceA = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(CabAs), prv, pposA);
-		forceB = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(CabBs), prv, pposB);
-	}
+	var forceA = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(CabAs), prv, pposA);
+	var forceB = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(CabBs), prv, pposB);
 	var velA = csq * forceA;
 	var posA = pposA + velA;
 	var velB = csq * forceB;

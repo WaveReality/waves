@@ -127,30 +127,16 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
-	threeD := Params[0].ThreeD.IsTrue()
-
-	var forceA, forceB float32
-	if threeD {
-		forceA = Laplacian19(x, y, z, int32(CabAs), prv, pposA)
-		forceB = Laplacian19(x, y, z, int32(CabBs), prv, pposB)
-	} else {
-		forceA = Laplacian1D(x, y, z, int32(CabAs), prv, pposA)
-		forceB = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
-	}
+	forceA := Laplacian19(x, y, z, int32(CabAs), prv, pposA)
+	forceB := Laplacian19(x, y, z, int32(CabBs), prv, pposB)
 	forceA += (vpot - mhsq) * pposA // this is the only diff from standard Wave
 	forceB += (vpot - mhsq) * pposB
 	accA := csq * forceA
 	accB := csq * forceB
 
 	// needed for the current in any case, and for the A.grad term when coupled
-	var gA, gB math32.Vector3
-	if threeD {
-		gA = Gradient10(x, y, z, int32(CabAs), prv)
-		gB = Gradient10(x, y, z, int32(CabBs), prv)
-	} else {
-		gA = Gradient1D(x, y, z, int32(CabAs), prv)
-		gB = Gradient1D(x, y, z, int32(CabBs), prv)
-	}
+	gA := Gradient10(x, y, z, int32(CabAs), prv)
+	gB := Gradient10(x, y, z, int32(CabBs), prv)
 
 	em := Params[0].EM.IsTrue()
 	var a0, ax, ay, az, omega float32
@@ -277,14 +263,8 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	// mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
 
-	var forceA, forceB float32
-	if Params[0].ThreeD.IsTrue() {
-		forceA = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
-		forceB = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
-	} else {
-		forceA = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
-		forceB = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
-	}
+	forceA := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
+	forceB := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
 	// forceA -= mhsq * pposA // this is the only diff from standard Wave
 	velA := csq * forceA
 	posA := pposA + velA
@@ -314,6 +294,7 @@ func (ss *Sim) KleinGordonConfig() {
 func (ss *Sim) KleinGordonCConfig() {
 	ParamsShouldDisplay = KGCShouldDisplay
 	ss.Params.Edges = EdgesWrap
+	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.StateVars = CabStatesN
 	ss.initFuncs = KGCConfigs
 	ss.InitFunc = ChargeAtRest

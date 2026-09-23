@@ -92,6 +92,7 @@ func main() {
 			case wavesim.Dirac:
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(128, 128, 128)
+				sim.ViewInit(wavesim.DiracViewAll)
 			case wavesim.Weyl:
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(128, 128, 128)

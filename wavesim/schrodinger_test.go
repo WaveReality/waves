@@ -167,7 +167,7 @@ func TestSchrodingerGroupVel(t *testing.T) {
 	// the stat measures the same thing over its own trailing window
 	tsr := ss.Stats.Float64(StatGroupVelName(CabMag, 0))
 	sv := tsr.Float1D(tsr.Len()-1) * float64(ss.Params.C)
-	if math.Abs(sv-vg)/vg > 0.1 {
+	if math.Abs(sv-vg)/vg > 0.03 {
 		t.Errorf("StatGroupVel %.5f, but the packet moved at %.5f", sv, vg)
 	}
 	t.Logf("group velocity %.5f, hbar sin(k) / m = %.5f, stat %.5f", vg, want, sv)

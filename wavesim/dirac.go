@@ -116,20 +116,10 @@ func DiracKernel(i uint32) { //gosl:kernel
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
 	vpot := State.Value(int(z), int(y), int(x), int(DiracV), int(prv))
-	threeD := Params[0].ThreeD.IsTrue()
-
-	var l1a, l1b, l2a, l2b float32
-	if threeD {
-		l1a = Laplacian19(x, y, z, int32(Dirac1As), prv, p1a)
-		l1b = Laplacian19(x, y, z, int32(Dirac1Bs), prv, p1b)
-		l2a = Laplacian19(x, y, z, int32(Dirac2As), prv, p2a)
-		l2b = Laplacian19(x, y, z, int32(Dirac2Bs), prv, p2b)
-	} else {
-		l1a = Laplacian1D(x, y, z, int32(Dirac1As), prv, p1a)
-		l1b = Laplacian1D(x, y, z, int32(Dirac1Bs), prv, p1b)
-		l2a = Laplacian1D(x, y, z, int32(Dirac2As), prv, p2a)
-		l2b = Laplacian1D(x, y, z, int32(Dirac2Bs), prv, p2b)
-	}
+	l1a := Laplacian19(x, y, z, int32(Dirac1As), prv, p1a)
+	l1b := Laplacian19(x, y, z, int32(Dirac1Bs), prv, p1b)
+	l2a := Laplacian19(x, y, z, int32(Dirac2As), prv, p2a)
+	l2b := Laplacian19(x, y, z, int32(Dirac2Bs), prv, p2b)
 	vm := vpot - mhsq // scalar potential shifts the mass, as in complex KG
 	a1a := csq * (l1a + vm*p1a)
 	a1b := csq * (l1b + vm*p1b)
@@ -137,18 +127,10 @@ func DiracKernel(i uint32) { //gosl:kernel
 	a2b := csq * (l2b + vm*p2b)
 
 	// gradients: needed for the current always, and for the A.grad term
-	var g1a, g1b, g2a, g2b math32.Vector3
-	if threeD {
-		g1a = Gradient10(x, y, z, int32(Dirac1As), prv)
-		g1b = Gradient10(x, y, z, int32(Dirac1Bs), prv)
-		g2a = Gradient10(x, y, z, int32(Dirac2As), prv)
-		g2b = Gradient10(x, y, z, int32(Dirac2Bs), prv)
-	} else {
-		g1a = Gradient1D(x, y, z, int32(Dirac1As), prv)
-		g1b = Gradient1D(x, y, z, int32(Dirac1Bs), prv)
-		g2a = Gradient1D(x, y, z, int32(Dirac2As), prv)
-		g2b = Gradient1D(x, y, z, int32(Dirac2Bs), prv)
-	}
+	g1a := Gradient10(x, y, z, int32(Dirac1As), prv)
+	g1b := Gradient10(x, y, z, int32(Dirac1Bs), prv)
+	g2a := Gradient10(x, y, z, int32(Dirac2As), prv)
+	g2b := Gradient10(x, y, z, int32(Dirac2Bs), prv)
 
 	em := Params[0].EM.IsTrue()
 	var a0, omega float32
@@ -299,14 +281,30 @@ func (ss *Sim) DiracConfig() {
 	// config that couples to its own field wants damped edges instead, for the
 	// reason in ChargeSelfField, and should set that itself.
 	ss.Params.Edges = EdgesWrap
+	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.DiracStats()
+	// the -1 is what initializes the view: it sets every panel and builds the
+	// vars list. Choosing what is actually SHOWN across panels belongs in
+	// DiracViewAll, which the app adds afterwards.
 	ss.ViewInit(func(view *View) {
 		view.SetVar(DiracMag, -1)
-		view.SetVar(DiracLMag, 1)
 	})
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
+// DiracViewAll shows the two chiralities against each other, which is what
+// the mass term acts on: the right-handed half the kernel evolves, the
+// left-handed one it recovers, and the two components of the spinor.
+func DiracViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = DiracMag
+	view.Panels[1].Var = DiracLMag
+	view.Panels[2].Var = Dirac1As
+	view.Panels[3].Var = DiracL1As
+}
+
 var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
 
 //////// configurations

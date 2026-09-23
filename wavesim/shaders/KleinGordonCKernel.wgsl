@@ -419,12 +419,6 @@ const  AverageWts: NeighWeights = 1;
 const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
-fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
-	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
-return (m1 + p1) - 2*ctr;
-}
 fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
@@ -434,11 +428,6 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		var nv = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
-}
-fn Gradient1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
-	var g: vec3<f32>;
-	g.x = 0.5 * (StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx))) - StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx))));
-return g;
 }
 fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	var g: vec3<f32>;
@@ -496,29 +485,14 @@ fn KleinGordonCKernel(i: u32) { //gosl:kernel
 	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabV), u32(prv)));
 	var mhsq = Params[0].MOverHSq;
 	var csq = Params[0].CSq;
-	var threeD = Params[0].ThreeD == 1;
-	var forceA: f32;
-	var forceB: f32;
-	if (threeD) {
-		forceA = Laplacian19(x, y, z, i32(CabAs), prv, pposA);
-		forceB = Laplacian19(x, y, z, i32(CabBs), prv, pposB);
-	} else {
-		forceA = Laplacian1D(x, y, z, i32(CabAs), prv, pposA);
-		forceB = Laplacian1D(x, y, z, i32(CabBs), prv, pposB);
-	}
+	var forceA = Laplacian19(x, y, z, i32(CabAs), prv, pposA);
+	var forceB = Laplacian19(x, y, z, i32(CabBs), prv, pposB);
 	forceA += (vpot - mhsq) * pposA; // this is the only diff from standard Wave
 	forceB += (vpot - mhsq) * pposB;
 	var accA = csq * forceA;
 	var accB = csq * forceB;
-	var gA: vec3<f32>;
-	var gB: vec3<f32>;
-	if (threeD) {
-		gA = Gradient10(x, y, z, i32(CabAs), prv);
-		gB = Gradient10(x, y, z, i32(CabBs), prv);
-	} else {
-		gA = Gradient1D(x, y, z, i32(CabAs), prv);
-		gB = Gradient1D(x, y, z, i32(CabBs), prv);
-	}
+	var gA = Gradient10(x, y, z, i32(CabAs), prv);
+	var gB = Gradient10(x, y, z, i32(CabBs), prv);
 	var em = Params[0].EM == 1;
 	var a0: f32;
 	var ax: f32;

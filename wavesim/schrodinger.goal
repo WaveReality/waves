@@ -282,5 +282,5 @@ func (ss *Sim) SchrodingerStats() {
 	// on CabMag, not a component: |chi|^2 is the envelope, while a^2 carries a
 	// ripple at twice the wavenumber that drags the centroid toward the phase
 	// velocity. A matter wave's group velocity is hbar k / m, not that.
-	ss.AddStat(ss.StatGroupVel(math32.X, CabMag))
+	ss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))
 }
