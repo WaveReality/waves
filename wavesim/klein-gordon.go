@@ -290,6 +290,10 @@ func (ss *Sim) KleinGordonConfig() {
 	ss.initFuncs = WaveConfigs
 	ss.InitFunc = WavePacket
 	ss.WaveStats()
+	ss.Params.C = 0.5
+	ss.Params.Mass = 0.125
+	ss.Params.Dispersion.SetBool(false) // KG has its own mass term
+	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
 	})

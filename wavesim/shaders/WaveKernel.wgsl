@@ -545,6 +545,10 @@ struct Parameters {
 	CosThetaW: f32,
 	WeylQ: f32,
 	WaveDir: f32,
+	Dispersion: i32,
+	pad: f32,
+	pad1: f32,
+	pad2: f32,
 }
 
 //////// import: "particle.go"
@@ -638,7 +642,9 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 } else {
 	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
 }; force += vpot * ppos;
-; var vel = pvel + Params[0].CSq*force;
+; if (Params[0].Dispersion == 1) {
+	force -= Params[0].MOverHSq * ppos; // this makes it KleinGordon
+}; var vel = pvel + Params[0].CSq*force;
 ; var pos = ppos + vel;
 ; if (Params[0].Energy == 1) {
 	var midVel = 0.5 * (pvel + vel);

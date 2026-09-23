@@ -146,6 +146,7 @@ func (gui *GUI) MakeBody(b tree.Node, sim *Sim, fsroot fs.FS, appname, title, ab
 	gui.SimForm = core.NewForm(split).SetStruct(sim)
 	gui.SimForm.OnChange(func(e events.Event) {
 		sim.Params.Update()
+		sim.Config.Update()
 	})
 	gui.SimForm.Name = "sim-form"
 	if gui.Body != nil {

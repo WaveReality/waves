@@ -130,25 +130,28 @@ func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi
 }
 
 func (ss *Sim) ConfigSim() {
-	// the equation Config methods below add their own stats, so start clean:
-	// registering the same stat twice appends two rows per step, silently.
-	ss.StatFuncs = nil
-	ss.Root, _ = tensorfs.NewDir("Root")
-	tensorfs.CurRoot = ss.Root
-	ss.Stats = ss.Root.Dir("Stats")
 	ss.RandSeeds.Init(100) // max 100 runs
 	randx.InitSysRand(&ss.Rand, ss.RandSeeds[0])
 	ss.ConfigVars()
 	if ss.ConfigFunc != nil {
 		ss.ConfigFunc(ss)
 	}
-	ss.Params.Update()
 	if ss.Config.GPU {
 		// gpu.DebugAdapter = true
 		// gpu.SelectAdapter = ss.Config.Run.GPUDevice
 		GPUInit()
 		UseGPU = true
 	}
+	ss.Config.sim = ss // so changing Config.Equation can reconfigure
+	ss.ConfigEquation()
+}
+
+// ConfigEquation configures everything that depends on which Equation is
+// selected. It is separate from ConfigSim so that it can be called AGAIN to
+// switch equations at runtime, which is what [Config.Update] does when the
+// Equation field changes.
+func (ss *Sim) ConfigEquation() { //types:add
+	ss.Reset()
 	switch ss.Config.Equation {
 	case Wave:
 		ss.WaveConfig()
@@ -174,10 +177,29 @@ func (ss *Sim) ConfigSim() {
 		ss.SpinfieldConfig()
 	}
 	ss.ConfigState()
-	// if ss.Config.GPU {
-	// 	fmt.Println(axon.GPUSystem.Vars().StringDoc())
-	// }
 	ss.Init()
+	ss.Config.curEquation = ss.Config.Equation
+}
+
+// Reset clears everything an equation's Config method installs, so that
+// ConfigEquation starts from a clean slate rather than accumulating the
+// previous equation's stats, init options and view panels.
+//
+// It deliberately does NOT touch Params. Those hold things you would want to
+// survive a switch -- ThreeD above all -- so each equation's Config method
+// declares the ones it actually depends on instead, rather than inheriting
+// whatever the last equation happened to leave.
+//
+// The stats tree is rebuilt rather than emptied, since tensorfs has no delete:
+// a GUI holding the old one needs to pick up ss.Stats again.
+func (ss *Sim) Reset() { //types:add
+	ss.StatFuncs = nil
+	ss.initFuncs = nil
+	ss.viewInitFuncs = nil
+	ss.InitFunc = nil
+	ss.Root, _ = tensorfs.NewDir("Root")
+	tensorfs.CurRoot = ss.Root
+	ss.Stats = ss.Root.Dir("Stats")
 }
 
 func (ss *Sim) ConfigState() {

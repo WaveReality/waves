@@ -322,6 +322,23 @@ type Parameters struct {
 	// or -1. A first-order equation has to be told; a second-order one does
 	// not, because it does both.
 	WaveDir float32 `default:"1"`
+
+	// Dispersion turns the mass term on in the plain Wave equation, which is
+	// the whole of what separates it from KleinGordon. Off, the equation has
+	// no scale in it -- c is a ratio, not a length -- so omega can only be
+	// proportional to k, and every wavelength travels at c. On, the mass
+	// supplies the one scale there is, the Compton wavelength, and after that
+	// it cannot be proportional to anything.
+	//
+	// Note WHICH waves it slows. The Laplacian couples a cell to its
+	// neighbours and its restoring force is the DIFFERENCE from them, which
+	// fades as the wave gets longer; the mass is a spring to ground and its
+	// does not. So short waves barely notice and long ones are dominated --
+	// the opposite way round from the usual lattice error.
+	Dispersion slbool.Bool
+
+	// gosl requires the total struct size to be a multiple of 16 bytes.
+	pad, pad1, pad2 float32
 }
 
 func (pr *Parameters) Update() {

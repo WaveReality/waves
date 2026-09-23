@@ -14,8 +14,16 @@ type Config struct {
 	// GUI determines whether to show the GUI.
 	GUI bool `default:"true"`
 
-	// Equation to run
-	Equation Equations `edit:"-"`
+	// Equation to run. Changing this reconfigures the whole simulation for the
+	// new equation, via [Sim.ConfigEquation].
+	Equation Equations
+
+	// curEquation is the one actually configured, so that Update can tell when
+	// Equation has been changed out from under it.
+	curEquation Equations `display:"-"`
+
+	// sim is what to reconfigure when Equation changes. Set by ConfigSim.
+	sim *Sim `display:"-"`
 
 	// Size of Universe to run. This is only the active portion, excluding
 	// edges at all sizes (add 2 to each dim).
@@ -75,6 +83,17 @@ type Config struct {
 
 	// MaxSteps is the maximum number of steps to run.
 	MaxSteps int
+}
+
+// Update reconfigures for a new Equation if one has been selected, which is
+// what makes switching equations in the GUI work. curEquation is set BEFORE
+// reconfiguring, since that path calls back through here.
+func (cfg *Config) Update() {
+	if cfg.sim == nil || cfg.Equation == cfg.curEquation {
+		return
+	}
+	cfg.curEquation = cfg.Equation
+	cfg.sim.ConfigEquation()
 }
 
 func (cfg *Config) Defaults() {

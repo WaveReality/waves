@@ -58,6 +58,9 @@ func WaveKernel(i uint32) { //gosl:kernel
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
 	force += vpot * ppos
+	if Params[0].Dispersion.IsTrue() {
+		force -= Params[0].MOverHSq * ppos // this makes it KleinGordon
+	}
 	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
@@ -408,6 +411,7 @@ func (ss *Sim) WaveCDirConfig() {
 	ss.initFuncs = WaveCDirConfigs
 	ss.InitFunc = WaveCDirPacket
 	ss.WaveCDirStats()
+	ss.Params.C = 0.5 // under 1 in 1D, under 1/sqrt(3) in 3D
 	ss.Params.Edges = EdgesWrap
 	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
@@ -513,6 +517,11 @@ func (ss *Sim) WaveConfig() {
 	ss.initFuncs = WaveConfigs
 	ss.InitFunc = WavePacket
 	ss.WaveStats()
+	// declared, not inherited: switching equations leaves Params alone, so
+	// whatever the last one wanted would otherwise still be here
+	ss.Params.C = 0.5
+	ss.Params.Mass = 0.125
+	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(WavePos, -1)
 	})
@@ -550,7 +559,7 @@ func WavePulse(ss *Sim) {
 }
 
 // WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"Edges", "Energy", "C", "VPotential"}
+var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Mass", "Dispersion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
 
 // Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
 func Wave1DViewAll(view *View) {
