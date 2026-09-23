@@ -297,6 +297,22 @@ func TestKGBorisStability(t *testing.T) {
 	}
 }
 
+// atomCtrX is the |wave|^2 weighted X centroid, in interior cube coords.
+func atomCtrX(sz int32, mag enums.Enum) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(mag.Int64()), cur))
+				num += v * float64(x)
+				den += v
+			}
+		}
+	}
+	return num / den
+}
+
 // atomRMS is the |wave|^2 weighted rms radius about the center, in cubes: how
 // spread out the state is, which is what says whether it is bound.
 func atomRMS(sz int32, mag enums.Enum) float64 {
@@ -322,7 +338,7 @@ func scalarUnbound(ss *Sim) {
 	p := ss.Params
 	p.EM.SetBool(false)
 	p.SelfField.SetBool(false)
-	p.Mass = HydrogenMass
+	p.Mass = BoundStateMass
 	p.Edges = EdgesDamp
 	p.Update()
 	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), ss.Config.HydrogenRadius, ss.Config.Amplitude)
@@ -358,5 +374,60 @@ func TestScalarHydrogenBound(t *testing.T) {
 			t.Errorf("%s spread by only %.1f%%, so the control is not a control", tc.name, 100*grow)
 		}
 		t.Logf("%-16s rms %6.3f -> %6.3f (%+.1f%%)", tc.name, r0, r0*(1+grow), 100*grow)
+	}
+}
+
+// TestScalarOscillator: the relativistic coherent state swings at the well
+// frequency slowed by E / m c^2, because the level spacing is
+// hbar omega (m c^2 / E) rather than hbar omega. Dirac must agree exactly:
+// with no EM field its spin term is zero and it is two copies of this.
+func TestScalarOscillator(t *testing.T) {
+	const sz = 48
+	var period [2]float64
+	for i, tc := range []struct {
+		name string
+		mag  enums.Enum
+		init func(*Sim)
+		mk   func(int32, func(*Sim)) *Sim
+		step func(*Sim)
+	}{
+		{"ScalarOscillator", CabMag, ScalarOscillator, kgSim, kgStepExt},
+		{"DiracOscillator", DiracMag, DiracOscillator, drSim, drStepExt},
+	} {
+		ss := tc.mk(sz, tc.init)
+		tc.step(ss)
+		mid := float64(sz)/2 + 1
+		p := ss.Params
+		om := 2 * math.Pi / float64(ss.Config.OscillatorPeriod)
+		w := math.Sqrt(float64(p.Hbar) / (float64(p.Mass) * om))
+		mc2 := float64(p.Mass) * float64(p.CSq)
+		e := 1.5*float64(p.Hbar)*om + 0.5*float64(p.Mass)*om*om*4*w*w
+		want := float64(ss.Config.OscillatorPeriod) * (mc2 + e) / mc2
+		var first, last, n int
+		prev := atomCtrX(sz, tc.mag) - mid
+		for s := range 800 {
+			tc.step(ss)
+			d := atomCtrX(sz, tc.mag) - mid
+			if prev > 0 && d <= 0 { // downward zero crossing: one per swing
+				if n == 0 {
+					first = s
+				}
+				last, n = s, n+1
+			}
+			prev = d
+		}
+		if n < 2 {
+			t.Fatalf("%s: only %d crossings, it is not swinging", tc.name, n)
+		}
+		period[i] = float64(last-first) / float64(n-1)
+		if math.Abs(period[i]-want)/want > 0.05 {
+			t.Errorf("%s period %.1f steps, want %.1f (well period x E / m c^2)", tc.name, period[i], want)
+		}
+		t.Logf("%-17s period %.1f steps, want %.1f (well says %.0f, slowed by E / m c^2 = %.3f)",
+			tc.name, period[i], want, ss.Config.OscillatorPeriod, (mc2+e)/mc2)
+	}
+	if period[0] != period[1] {
+		t.Errorf("Dirac period %.1f but scalar %.1f: with no field the spin term must do nothing",
+			period[1], period[0])
 	}
 }

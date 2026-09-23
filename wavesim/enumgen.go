@@ -6,20 +6,20 @@ import (
 	"cogentcore.org/core/enums"
 )
 
-var _DiracStatesValues = []DiracStates{18, 19, 20, 21, 22, 23, 24, 25, 26}
+var _DiracStatesValues = []DiracStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
 
 // DiracStatesN is the highest valid value for type DiracStates, plus one.
 //
 //gosl:start
-const DiracStatesN DiracStates = 27
+const DiracStatesN DiracStates = 28
 
 //gosl:end
 
-var _DiracStatesValueMap = map[string]DiracStates{`1As`: 18, `1Bs`: 19, `2As`: 20, `2Bs`: 21, `1Av`: 22, `1Bv`: 23, `2Av`: 24, `2Bv`: 25, `Mag`: 26}
+var _DiracStatesValueMap = map[string]DiracStates{`1As`: 18, `1Bs`: 19, `2As`: 20, `2Bs`: 21, `1Av`: 22, `1Bv`: 23, `2Av`: 24, `2Bv`: 25, `V`: 26, `Mag`: 27}
 
-var _DiracStatesDescMap = map[DiracStates]string{18: `Dirac1As is the wave state variable for value 1, component A: real`, 19: `Dirac1Bs is the wave state variable for value 1, component B: imaginary.`, 20: `Dirac1As is the wave state variable for value 2, component A: real`, 21: `Dirac1Bs is the wave state variable for value 2, component B: imaginary.`, 22: `Dirac1Av is the velocity of wave state 1A.`, 23: `Dirac1Bv is the velocity of wave state 1B.`, 24: `Dirac2Av is the velocity of wave state 2A.`, 25: `Dirac2Bv is the velocity of wave state 2B.`, 26: `DiracMag is the state magnitude (state * complex conjugate), summed over both components, which represents the total probability or a conserved charge value.`}
+var _DiracStatesDescMap = map[DiracStates]string{18: `Dirac1As is the wave state variable for value 1, component A: real`, 19: `Dirac1Bs is the wave state variable for value 1, component B: imaginary.`, 20: `Dirac1As is the wave state variable for value 2, component A: real`, 21: `Dirac1Bs is the wave state variable for value 2, component B: imaginary.`, 22: `Dirac1Av is the velocity of wave state 1A.`, 23: `Dirac1Bv is the velocity of wave state 1B.`, 24: `Dirac2Av is the velocity of wave state 2A.`, 25: `Dirac2Bv is the velocity of wave state 2B.`, 26: `DiracV is an external SCALAR potential: it adds to the mass term rather than to the energy, so it is a position-dependent mass. That is the coupling a relativistic equation needs in order to confine, as [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.`, 27: `DiracMag is the state magnitude (state * complex conjugate), summed over both components, which represents the total probability or a conserved charge value.`}
 
-var _DiracStatesMap = map[DiracStates]string{18: `1As`, 19: `1Bs`, 20: `2As`, 21: `2Bs`, 22: `1Av`, 23: `1Bv`, 24: `2Av`, 25: `2Bv`, 26: `Mag`}
+var _DiracStatesMap = map[DiracStates]string{18: `1As`, 19: `1Bs`, 20: `2As`, 21: `2Bs`, 22: `1Av`, 23: `1Bv`, 24: `2Av`, 25: `2Bv`, 26: `V`, 27: `Mag`}
 
 // String returns the string representation of this DiracStates value.
 func (i DiracStates) String() string {

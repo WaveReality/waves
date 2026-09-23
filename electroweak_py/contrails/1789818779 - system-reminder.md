@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 10:28:28
+- **Last Message:** 2026-09-23 10:52:06
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -21567,7 +21567,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `title, summary`
+- **mcp__ccd_session__mark_chapter**: `summary, title`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23930,7 +23930,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -50004,48 +50004,754 @@ Six now-redundant `CopyCurToPrev()` calls removed from `HydrogenWell`, `Hydrogen
 
 `CopyCurToPrev` itself has no callers left. I left it exported — it's a reasonable thing for an outside config to want — but say the word if you'd rather drop it.
 
-All 53 pass, generate/gofmt/build clean.
+## 🧑 User - 2026-09-23 10:41:52
 
-## `Config.HydrogenRadius`
+How about adding the HarmonicOscillator to KG, Dirac too?
 
-Now a Config field, default 5, added to the Schrödinger, KGC and Dirac `ShouldDisplay` lists so it's tunable in the GUI. All six configs read `ss.Config.HydrogenRadius`; the constant is gone.
+## 🤖 Assistant - 2026-09-23 10:43:18
 
-**Mass = 2 stays fine as a constant** — in fact it has to be. The radius and the mass aren't independent knobs: a = Compton/Zα, and at C = 0.5 the Compton wavelength is exactly one cube, so **Zα = 1/R** falls out. Growing R just makes the well shallower and the atom more non-relativistic, which is the direction you want. Verified at R = 10 in a 100³ box:
+*Model: claude-opus-5*
+
+<thinking>
+That old background notification about the killed `rm` task is irrelevant, nothing to do there. Now I'm turning to adding HarmonicOscillator to KG and Dirac, working through the physics: the Schrödinger case has a Gaussian ground state of width √(ħ/mω), with coherent states oscillating at ω without spreading, and I need to work out how this generalizes to the relativistic KG case.
+
+For KG, coupling could happen two ways — through the scalar potential A0 (minimal/electromagnetic coupling, giving V=−eA0 growing as r², implying a uniform background charge density) or through the `CabV` term, which I notice actually enters the mass term itself (`vpot − mhsq`) rather than acting like an electric potential. That means CabV represents a Lorentz scalar potential shifting the effective mass, so a harmonic CabV term would build something like a relativistic analogue of the Dirac oscillator, and I'm weighing whether the vector (electromagnetic) coupling or this scalar mass coupling makes the better demo.
+
+Both reduce to the same non-relativistic Schrödinger oscillator limit, but they diverge relativistically: the vector coupling suffers from the Klein paradox, where a confining potential exceeding 2mc² causes bound states to dissolve into particle-antiparticle pairs, meaning a KG oscillator with vector coupling actually has no true bound states for a growing linear or quadratic potential.
+
+This makes the scalar coupling the physically correct choice for relativistic confinement — it's a genuinely instructive point, and the kernel already has the term needed to support it. The vector option would become unstable once the potential grows large enough in a big box, which is exactly the concern I need to address.
+
+For Dirac though, checking the state variables shows there's no scalar potential slot defined, only the vector coupling. So I'd need to add one to the kernel, which is a modest but meaningful change since it would let me realize the Dirac oscillator, a well-known exactly-solvable model.
+
+Adding scalar potential support gives Dirac a capability it currently lacks, which seems generally useful, so I want to check the mass term in the Dirac kernel.
+
+Alternatively, I could use A0 vector coupling instead, but that risks Klein tunneling instability in a large box, so I'm weighing whether the vector-coupled oscillator actually stays stable at modest amplitudes given mc²=1.0 and the well depth at r=50.
+
+My decision is to add a scalar potential term to Dirac (DiracV) mirroring KG's CabV, since it's the physically correct confinement coupling and keeps the three equations symmetric, though I'm now wondering if this counts as scope creep beyond the original oscillator task.
+
+I reconsider whether to just reuse A0 vector coupling everywhere for consistency with the hydrogen model, but the physics doesn't support that — a 1/r well stays bounded so vector coupling works fine for hydrogen, whereas a growing r² confining well necessarily pushes into the Klein paradox regime with vector coupling. That's the standard reasoning behind why relativistic confinement models use scalar rather than vector potentials, so I'll go with scalar coupling and explain the distinction as a genuine teaching point.
+
+Now I'm checking how the Dirac kernel's mass term works to see how difficult adding a scalar potential term would be. I sketch a plan: for the Klein-Gordon oscillator I need to work out how the scalar coupling shifts the mass-squared term, and figure out what quadratic coefficient reproduces the correct nonrelativistic harmonic oscillator energy levels.
+
+Working through the algebra, I substitute a stationary solution into the wave equation and expand ω in terms of mc² plus a small energy correction ε, showing that in the nonrelativistic limit ω²/c² − M² reduces to 2mε/ħ², which is the term I need to match against the standard oscillator potential.
+
+So this reduces to a Schrödinger-like equation with an effective potential proportional to the original kernel term. Matching V_eff = ½mω_o²r² to the harmonic oscillator, I find the kernel coefficient must be coef = −(mω_o/ħ)², and I note the sign is negative since a confining potential effectively increases the mass term in the kernel.
+
+For the ground state energy ε = (3/2)ħω_o in 3D, I need to figure out how to set a phase rate for coherent states. Since Schrödinger's coherent state formulation doesn't need one (b starts at 0), but KG/Dirac cases require setting a single ω, and a coherent state is really a superposition across many energy levels rather than a single eigenstate, I'm weighing whether to just use the ground state energy as the reference frequency.
+
+A stationary Gaussian using the ground-state ω is simple and testable but static — nothing moves. Alternatively, using a displaced coherent state with that same ω would let it oscillate while keeping the phase approximately right, though I need to check whether the initial velocity works out correctly since the mean energy is mc² + (3/2)ħω_o, not a single eigenvalue.
+
+Actually the uniform-phase-rate assumption isn't exact — a genuine Schrödinger evolution of a real initial χ(0) evolves as Hχ(0), not as a uniform phase times ⟨E⟩, so the approximation only captures the dominant mc²/ħ piece correctly. I should focus on what's most robust, which is that the rest-mass frequency dominates.
+
+Since mc²/ħ is so much larger than the small correction ε, getting ε slightly wrong pointwise is a minor perturbation. There's already a `ChargedRest` construct with a local rate for exactly this "lump at rest" case, so I'm considering using `ChargedBound(1, ω)` with ω set to Omega0 plus the mean nonrelativistic energy over ħ, which is exactly right for a coherent state's overall phase rate — though it might be even cleaner to just make the ground state itself the configuration for the KG/Dirac case.
+
+Since the user asked for "HarmonicOscillator" singular and the Schrödinger version is a coherent state, I should match that with the coherent state here too, using ω = Omega0 + [(3/2)ħω_o + ½mω_o²d²]/ħ, and test that the centroid oscillates at the correct period 2π/ω_o — a nice testable prediction mirroring TestSchrodingerCoherent. Though I'm now wondering whether a coherent state in a relativistic scalar harmonic potential still oscillates rigidly at that same frequency.
+
+Deriving the exact relativistic levels, E_n = √(m²c⁴ + 2mc²ħω_o(n+3/2)), I notice these aren't equally spaced like the nonrelativistic case — meaning the coherent state will actually dephase over time due to this anharmonicity, with the level spacing shrinking slightly as dE/dn ≈ ħω_o(1 − ε/mc²).
+
+Since ω_o is small this anharmonicity is tiny, so the wavepacket should oscillate almost rigidly with only slow dephasing — a subtle relativistic signature worth flagging. I'm matching the oscillator frequency to the Schrödinger setup's 320-step period, giving ω_o = 2π/320 ≈ 0.0196 per step, and computing the width w = √(ħ/(mω_o)) ≈ 5.05, same as Schrödinger since the mass parameter is also 2.
+
+I'm using the same centering displacement as Schrödinger, then checking the stability of the KG/Dirac evolution: at the box corner (r≈50) the potential term adds about 3.85 to the effective mass-squared, giving a total acceleration coefficient near 2.54, safely under the stability bound of 4. Pushing further out to r≈86, the potential term grows to around -11.4, so I need to verify stability holds there too.
+
+Confirming the corner-case calculation shows instability (about 4.43, above the bound of 4) — the same box-size stability problem I hit with Schrödinger. The fix is to clamp on the magnitude of v rather than just its upper bound, since `Quadratic`'s existing clamp only catches positive overshoot and won't trigger for the negative coefficient case here; this preserves the original Schrödinger behavior while fixing the Klein-Gordon case with a minimal change.
+
+Now I'm working out an analogous stability bound for Klein-Gordon: with csq=0.25, the allowable |vpot| comes out to about 9.67, and since the r=86 case gives 11.4 it's confirmed unstable, matching my earlier estimate. I need to define a similar vmax-style bound for the KG parameters, mirroring how the CFL condition is documented for the pure wave case.
+
+I confirm the C < sqrt(3)/2 bound checks out numerically. Now I need to find where the Dirac kernel handles its mass term so I can add a comparable scalar potential variable, but I realize CabStates and DiracStates both start at EMStatesN, so if I add CabV without checking, it could overlap in memory with Dirac's own fields.
+
+So the safer path is adding a new DiracV entry to the end of the Dirac enum, after DiracMag, and reading it in the kernel. Adding a state variable will automatically update the StateVars count. I'm going to look at the enum and mass term now.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 15,60p wavesim/dirac.goal; echo "==== mass term:"; sed -n 85,112p wavesim/dirac.goal``
+  ```
+  // DiracStates are the state variables for wave equations on
+  // a wave state with two complex values (1, 2),
+  // where A = real and B = complex components.
+  type DiracStates EMStates //enums:enum -trim-prefix=Dirac
+  
+  const (
+  	// Dirac1As is the wave state variable for value 1, component A: real
+  	Dirac1As DiracStates = DiracStates(EMStatesN) + iota
+  
+  	// Dirac1Bs is the wave state variable for value 1, component B: imaginary.
+  	Dirac1Bs
+  
+  	// Dirac1As is the wave state variable for value 2, component A: real
+  	Dirac2As
+  
+  	// Dirac1Bs is the wave state variable for value 2, component B: imaginary.
+  	Dirac2Bs
+  
+  	// Dirac1Av is the velocity of wave state 1A.
+  	Dirac1Av
+  ...
+  ```
+
+</details>
+
+<thinking>
+This is a small symmetric fix: adding a `DiracV` state to mirror the enum ordering used in `CabStates`, and updating the potential term so `mhsq*p1a` becomes `(mhsq-vpot)*p1a`, matching the convention already used for KG's `(vpot - mhsq)`.
+
+I need to make sure the enum shift doesn't break anything since everything references states by name rather than index. Then in the kernel I'll read the potential value from state and apply it in the mass term.
+
+For the max-value helper, since both Klein-Gordon and Dirac share the same formula involving CSq, MOverHSq, and the Laplacian radius, I'm considering factoring this into a shared function — maybe `KleinGordonVMax()` placed in init.goal, with Dirac reusing it, or naming it something more general like `ScalarPotentialMax()` to reflect that both equations share this mass-term math.
+
+I'll call it `KleinGordonVMax()` in klein-gordon.goal and have the Dirac config call it directly, with a comment noting the mass term is identical — that's cleaner than inventing a third generic name. For the oscillator configs, I'll follow the existing naming pattern: `ScalarOscillator` for KG and `DiracOscillator` for Dirac, matching `ScalarHydrogen` and `DiracHydrogen`. Then I'm weighing whether to introduce a shared `OscillatorPeriod` constant in init.goal, similar to how `HydrogenRadius` was promoted before becoming configurable, rather than hardcoding period values per file.
+
+Since they just asked for HydrogenRadius to be configurable so they could run larger simulations, the same reasoning applies to the oscillator period — a longer period gives a wider, more accurate result. I'll promote `SchrodingerPeriod` to `Config.OscillatorPeriod` and share it across all three oscillator configs, which mirrors the pattern they already approved. I do need to be careful though, since `TestSchrodingerCoherent` relies on `SchrodingerPeriod` and expects 640 sim steps, so I'll need to update that test to match the new config-driven value.
+
+Now I'm working through the KG oscillator math: with OscillatorPeriod = 320, the angular frequency comes out to roughly 0.019635 per step. For mass, I'm wondering whether to reuse `HydrogenMass` or give the oscillator its own — reusing it feels like the wrong name for something that isn't hydrogen, so I'm considering renaming it to something more general like `BoundMass` or `AtomMass` rather than churning existing naming for no reason.
+
+I settle on `BoundStateMass` as the clearest name — it describes the mass shared by relativistic bound-state configs. Since HydrogenMass is already committed but I just renamed HydrogenRadius to Config, one more small rename is acceptable as long as I flag it, so I decide to do the rename rather than keep the confusing `HydrogenMass` name used inconsistently in the oscillator code.
+
+Now I'm working through the oscillator's physics parameters: computing the quadratic coefficient for CabV, the width and displacement to match the Schrödinger case, the 3D ground state energy, and the extra energy from the coherent state formula, checking that the displacement-squared term correctly reduces in terms of ħ and mass.
+
+Adding these up gives ⟨E⟩ = mc² plus the ground state and coherent contributions, roughly 0.5688, which sets the phase frequency. I check stability by verifying the phase rate per step is safely below 2, and confirm the leapfrog scheme's frequency matches Omega0 since there's no vector potential here—only the scalar mass term drives the phase.
+
+For the potential bound, I compute the maximum radius where |vpot| stays within limits: around r ≤ 79.2, meaning a 100³ box's corner would exceed it slightly, but since the wave packet sits near the center, clamping there is harmless.
+
+Then I consider whether the Dirac spin-coupling term contributes anything here — with no A0, E, or B fields, it vanishes, reducing the Dirac oscillator to just two Klein-Gordon oscillators. That raises a fair question about what Dirac structure actually adds in this case, and I want to give an honest answer about that limitation.
+
+I weigh two options: leave it as-is and document that spin does nothing without an EM field (which is itself an instructive point), or make it more interesting by adding a uniform B field so the spin precesses while the wave oscillates, like a Landau-level demo. I lean toward the simpler option, documenting the behavior honestly.
+
+Z is simpler, so I'll go with that. Now I'm laying out the implementation plan: clamp the quadratic magnitude, add an OscillatorPeriod config replacing SchrodingerPeriod, rename HydrogenMass to BoundStateMass, add a DiracV state and kernel term, add KleinGordonVMax, wire up ScalarOscillator and DiracOscillator configs with InitFunc entries and display logic, and write tests. I also want a shared helper function since both KG and Dirac need the same harmonic well potential coefficient — starting on that helper now.
+
+Writing helper function...
+
+I'm computing the energy shift by adding the ground-state coherent energy to the displacement contribution, then returning the total relative to Omega0. That looks right, so I'll move on to writing out the rest of the code, keeping an eye on bracket and quote balance line by line.
+
+
+</thinking>
+
+Adding a scalar potential to Dirac first — it needs one for this.
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/dirac.goal'; s=open(p).read()
+
+old = """	// DiracMag is the state magnitude (state * complex conjugate),"""
+new = """	// DiracV is an external SCALAR potential: it adds to the mass term rather
+	// than to the energy, so it is a position-dependent mass. That is the
+	// coupling a relativistic equation needs in order to confine, as
+	// [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.
+	DiracV
+
+	// DiracMag is the state magnitude (state * complex conjugate),"""
+assert old in s; s = s.replace(old,new,1)
+
+old = """	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+	threeD := Params[0].ThreeD.IsTrue()"""
+new = """	mhsq := Params[0].MOverHSq
+	csq := Params[0].CSq
+	vpot := State[z, y, x, DiracV, prv]
+	threeD := Params[0].ThreeD.IsTrue()"""
+assert old in s; s = s.replace(old,new,1)
+
+old = """	a1a := csq * (l1a - mhsq*p1a)
+	a1b := csq * (l1b - mhsq*p1b)
+	a2a := csq * (l2a - mhsq*p2a)
+	a2b := csq * (l2b - mhsq*p2b)"""
+new = """	vm := vpot - mhsq // scalar potential shifts the mass, as in complex KG
+	a1a := csq * (l1a + vm*p1a)
+	a1b := csq * (l1b + vm*p1b)
+	a2a := csq * (l2a + vm*p2a)
+	a2b := csq * (l2b + vm*p2b)"""
+assert old in s; s = s.replace(old,new,1)
+open(p,'w').write(s); print("dirac scalar potential added")
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./wavesim/ 2>&1 | grep -icE "error"``
+  ```
+  dirac scalar potential added
+  go build
+  goal build succeeded
+  0
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+
+# 1. Quadratic: clamp on MAGNITUDE so a negative (confining scalar) well clamps too
+p=base+'wavesim/init.goal'; s=open(p).read()
+old = """				v := coef * d * d
+				if vmax > 0 && v > vmax {
+					v = vmax
+				}"""
+new = """				v := coef * d * d
+				if vmax > 0 && math32.Abs(v) > vmax {
+					v = math32.Copysign(vmax, v)
+				}"""
+assert old in s; s=s.replace(old,new,1)
+old = """// oscillator potential. vmax caps it if positive -- the bowl grows without
+// bound while the lattice is finite, so on a big box the corners hold more
+// than the integrator can carry long before the wave gets anywhere near them."""
+new = """// oscillator potential. vmax caps its MAGNITUDE if positive -- the bowl grows
+// without bound while the lattice is finite, so on a big box the corners hold
+// more than the integrator can carry long before the wave gets anywhere near
+// them. A confining SCALAR well has a negative coef and clamps just the same."""
+assert old in s; s=s.replace(old,new,1)
+
+# 2. HydrogenMass -> BoundStateMass, since the oscillator configs use it too
+old = """// HydrogenMass is the mass the relativistic hydrogen configs set. It has to be
+// this heavy: a = Compton / Z alpha, so a light particle makes an atom far too
+// big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube,
+// so Z alpha is just 1 / [Config.HydrogenRadius] for n = 1 and twice that for
+// the deeper n = 2 well. The default 5 means Z alpha = 0.2, around iron, so the
+// relativistic corrections are not small -- which is the point of running these
+// at all. Raise the radius to make them smaller.
+const HydrogenMass float32 = 2"""
+new = """// BoundStateMass is the mass the relativistic bound-state configs set, both
+// the atoms and the oscillators. It has to be this heavy: a = Compton / Z
+// alpha, so a light particle makes an atom far too big for the lattice. At
+// C = 0.5 this puts the Compton wavelength at one cube, so Z alpha is just
+// 1 / [Config.HydrogenRadius] for n = 1 and twice that for the deeper n = 2
+// well. The default 5 means Z alpha = 0.2, around iron, so the relativistic
+// corrections are not small -- which is the point of running these at all.
+// Raise the radius to make them smaller.
+const BoundStateMass float32 = 2
+
+// HarmonicWell puts a harmonic well of angular frequency om into vr, the
+// SCALAR potential of a second-order equation, and returns the phase rate of a
+// coherent state displaced by d from the center.
+//
+// Scalar, not electric. The kernel adds vpot to the MASS term, so this is a
+// position-dependent mass and confinement means getting heavier with distance.
+// That is the coupling a relativistic equation needs in order to confine at
+// all: a well that grows without bound in the ENERGY runs past 2 m c^2, where
+// the bound states dissolve into pairs and the single-particle equation stops
+// meaning anything. A scalar well has no such ceiling, which is why the quark
+// models use one.
+//
+// In the nonrelativistic limit V_eff = -(hbar^2 / 2m) vpot, so the well
+// 1/2 m om^2 r^2 needs vpot = -(m om / hbar)^2 r^2 -- negative, which is the
+// mass rising. The returned rate is the MEAN energy of the coherent state,
+// 3/2 hbar om for the ground state plus 1/2 m om^2 d^2 from the displacement.
+func (ss *Sim) HarmonicWell(vr enums.Enum, om, d, vmax float32) float32 {
+	p := ss.Params
+	mo := p.Mass * om / p.Hbar
+	ss.Quadratic(vr, math32.Vec3(-1, -1, -1), -mo*mo, vmax)
+	e := 1.5*p.Hbar*om + 0.5*p.Mass*om*om*d*d
+	return p.Omega0 + e/p.Hbar
+}"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("init.goal ok")
+PY
+grep -rln "HydrogenMass" --include=*.goal --include=*_test.go wavesim/``
+  ```
+  init.goal ok
+  wavesim/klein-gordon.goal
+  wavesim/kg_test.go
+  wavesim/dirac.goal
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -i '' 's/HydrogenMass/BoundStateMass/g' wavesim/klein-gordon.goal wavesim/kg_test.go wavesim/dirac.goal && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+# Config.OscillatorPeriod replaces the Schrodinger-only constant
+p=base+'wavesim/config.go'; s=open(p).read()
+old = """	// Source is the location of a point source"""
+new = """	// OscillatorPeriod is the period of the harmonic well in the oscillator
+	// configs, in leapfrog steps, which sets both its strength and the width
+	// sqrt(hbar / m omega) of the state that sits in it. Longer is wider and
+	// slower. Schrodinger takes two sim steps per leapfrog step, so the period
+	// you count on screen there is twice this.
+	OscillatorPeriod float32
+
+	// Source is the location of a point source"""
+assert old in s; s=s.replace(old,new,1)
+old = "	cfg.HydrogenRadius = 5\n"
+new = "	cfg.HydrogenRadius = 5\n	cfg.OscillatorPeriod = 320\n"
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+p=base+'wavesim/schrodinger.goal'; s=open(p).read()
+old = """// SchrodingerPeriod is the harmonic oscillator period in leapfrog steps.
+const SchrodingerPeriod float32 = 320
+
+"""
+assert old in s; s=s.replace(old,"",1)
+s=s.replace("SchrodingerPeriod","ss.Config.OscillatorPeriod")
+open(p,'w').write(s)
+print("OscillatorPeriod ok")
+PY
+sed -i '' 's/SchrodingerPeriod/ss.Config.OscillatorPeriod/g' wavesim/schrodinger_test.go
+grep -rn "SchrodingerPeriod\|OscillatorPeriod" --include=*.goal --include=*_test.go wavesim/``
+  ```
+  OscillatorPeriod ok
+  wavesim/schrodinger_test.go:119:	want := 2 * float64(ss.Config.OscillatorPeriod) // sim steps per swing
+  wavesim/schrodinger.goal:143:	return 2 * math32.Pi / ss.Config.OscillatorPeriod
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/schrodOmega returns/,/^}/p' wavesim/schrodinger.goal; echo ====; cd wavesim && goal build 2>&1|tail -3``
+  ```
+  // schrodOmega returns the angular frequency of the harmonic well, in radians
+  // per LEAPFROG step. A sim step advances half of one, so the period you count
+  // on screen is twice 2 pi / omega.
+  func schrodOmega(ss *Sim) float32 {
+  	return 2 * math32.Pi / ss.Config.OscillatorPeriod
+  }
+  ====
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now the two configs.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/klein-gordon.goal'; s=open(p).read()
+anchor = "var KGCConfigs = []InitFunc{"
+blk = '''// KleinGordonVMax is the largest |CabV| the leapfrog can carry. The kernel
+// applies c^2 (Laplacian + V - M^2) as an acceleration, and a leapfrog holds
+// while that coefficient stays under 4 -- of which Laplacian19Radius and the
+// mass M^2 are already spent. The Dirac kernel has the identical mass term, so
+// its DiracV obeys the same bound.
+func (ss *Sim) KleinGordonVMax() float32 {
+	p := ss.Params
+	return 4/p.CSq - Laplacian19Radius - p.MOverHSq
+}
+
+// ScalarOscillator is HarmonicOscillator for the relativistic scalar: a
+// coherent state swinging in a harmonic well, which is the one quantum state
+// that moves like a classical particle.
+//
+// The well is a SCALAR potential in CabV, not an electric one, for the reason
+// in [Sim.HarmonicWell]: a confining well in the energy would run past 2 m c^2
+// and stop binding anything. Here confinement is the particle getting heavier
+// as it goes out, which has no such ceiling. There is no EM field at all in
+// this config.
+//
+// It swings at the well frequency, but not forever: the relativistic levels go
+// as sqrt(m^2 c^4 + 2 m c^2 hbar omega (n + 3/2)), which are NOT evenly spaced
+// the way the Schrodinger ones are, so the packet slowly dephases and smears.
+// That anharmonicity is the relativistic correction, and it is why the
+// classical-looking coherent state is only a nonrelativistic idea.
+func ScalarOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Edges = EdgesDamp
+	p.Update()
+	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	d := 2 * w
+	ph := ss.HarmonicWell(CabV, om, d, ss.KleinGordonVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	ss.Gauss(CabAs, Both, ctr, w, ss.Config.Amplitude, 0)
+	ss.ChargedBound(1, ph)
+}
+
+'''
+assert anchor in s; s = s.replace(anchor, blk + anchor, 1)
+old = '''	InitFunc{Name: "Scalar Hydrogen P", Doc: "The 2p orbital of the same: two lobes of opposite phase with a node between them", Func: ScalarHydrogenP},'''
+new = old + '''
+	InitFunc{Name: "Scalar Oscillator", Doc: "A coherent state swinging in a harmonic well, held by a scalar (mass) potential rather than an electric one", Func: ScalarOscillator},'''
+assert old in s; s = s.replace(old,new,1)
+open(p,'w').write(s); print("kg ok")
+
+p=base+'wavesim/dirac.goal'; s=open(p).read()
+anchor = "var DiracConfigs = []InitFunc{"
+blk = '''// DiracOscillator is ScalarOscillator carried on a spinor: the same coherent
+// state in the same scalar well, with spin along Z.
+//
+// It looks identical to the scalar one, and that is the lesson. The spin term
+// is sigma . (cB + iE), so with no electromagnetic field anywhere it is
+// exactly zero and the two components evolve independently -- the Dirac
+// equation really is two Klein-Gordon ones until you give the spin a field to
+// feel. SpinPrecession is where it wakes up.
+//
+// The well is DiracV, the scalar potential, for the confinement reason in
+// [Sim.HarmonicWell]; the bound is KleinGordonVMax because the mass term the
+// two kernels share is what sets it.
+func DiracOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Edges = EdgesDamp
+	p.Update()
+	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om))
+	d := 2 * w
+	ph := ss.HarmonicWell(DiracV, om, d, ss.KleinGordonVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	ss.Gauss(Dirac1As, Both, ctr, w, ss.Config.Amplitude, 0)
+	ss.DiracBound(1, ph)
+}
+
+'''
+assert anchor in s; s = s.replace(anchor, blk + anchor, 1)
+old = '''	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},'''
+new = old + '''
+	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},'''
+assert old in s; s = s.replace(old,new,1)
+open(p,'w').write(s); print("dirac ok")
+PY
+python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+for f, var in [('wavesim/dirac.goal','DiracShouldDisplay'),('wavesim/klein-gordon.goal','KGCShouldDisplay'),('wavesim/schrodinger.goal','SchrodingerShouldDisplay')]:
+    p=base+f; lines=open(p).read().split('\n')
+    for i,l in enumerate(lines):
+        if l.startswith('var '+var+' ='):
+            lines[i]=l.replace('"HydrogenRadius"}', '"HydrogenRadius", "OscillatorPeriod"}')
+    open(p,'w').write('\n'.join(lines)); print("display", var)
+PY
+cd wavesim && goal build 2>&1|tail -3``
+  ```
+  kg ok
+  dirac ok
+  display DiracShouldDisplay
+  display KGCShouldDisplay
+  display SchrodingerShouldDisplay
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I should verify the KG/Dirac oscillator actually swings at the expected period of 320 sim steps, unlike Schrödinger's 640. I'll set up a scratch test that tracks the X centroid over roughly 700 steps to measure the oscillation period directly, similar to how TestSchrodingerCoherent works.
+
+Given the initial displacement d = 2w ≈ 10.1 and a swing of ±10 with width 5, a 48³ box should be sufficient—the swing spans x from 14 to 34, which fits comfortably. Now let me run the measurement.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+)
+
+func ctrX(sz int32, mag enums.Enum) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(mag.Int64()), cur))
+				num += v * float64(x)
+				den += v
+			}
+		}
+	}
+	return num / den
+}
+
+func TestScratchOsc(t *testing.T) {
+	const sz = 48
+	for _, tc := range []struct {
+		name string
+		mag  enums.Enum
+		init func(*Sim)
+		mk   func(int32, func(*Sim)) *Sim
+		step func(*Sim)
+	}{
+		{"ScalarOscillator", CabMag, ScalarOscillator, kgSim, kgStepExt},
+		{"DiracOscillator", DiracMag, DiracOscillator, drSim, drStepExt},
+	} {
+		ss := tc.mk(sz, tc.init)
+		tc.step(ss)
+		c0 := ctrX(sz, tc.mag)
+		mid := float64(sz) / 2
+		var crossings []int
+		prev := c0 - mid
+		lo, hi := c0, c0
+		for i := range 800 {
+			tc.step(ss)
+			c := ctrX(sz, tc.mag)
+			if c < lo {
+				lo = c
+			}
+			if c > hi {
+				hi = c
+			}
+			d := c - mid
+			if prev > 0 && d <= 0 {
+				crossings = append(crossings, i)
+			}
+			prev = d
+		}
+		per := 0.0
+		if len(crossings) >= 2 {
+			per = float64(crossings[len(crossings)-1]-crossings[0]) / float64(len(crossings)-1)
+		}
+		fmt.Printf("%-17s start %.2f, swings %.2f..%.2f, period %.1f steps (want %.0f)\n",
+			tc.name, c0, lo, hi, per, ss.Config.OscillatorPeriod)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchOsc -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  ScalarOscillator  start 35.09, swings 14.90..35.09, period 358.0 steps (want 320)
+  DiracOscillator   start 35.09, swings 14.90..35.09, period 358.0 steps (want 320)
+  --- PASS: TestScratchOsc (40.95s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	40.968s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The oscillation swings symmetrically and centers correctly, with KG and Dirac matching exactly as expected since the spin term is dormant. But the period comes out 12% too slow compared to target, worse than the Schrödinger case's 1.4% deviation — I'm trying to figure out what's causing this systematic slowdown, possibly a relativistic correction to the effective oscillator frequency.
+
+Checking the relativistic energy level formula, the spacing between levels gets scaled down by mc²/E, essentially a time-dilation factor since the particle carries extra energy from the oscillation. Computing this out: with ⟨E⟩ ≈ 0.5688 and mc² = 0.5, the ratio gives 0.879, predicting a period of 364 versus the measured 358 — within 2%, confirming this is genuine relativistic time dilation slowing the oscillator, which is actually a nice physical result worth highlighting. Though I wonder if the relativistic correction (13.8% of rest mass) is too large for what's meant to be a demo oscillator, and I'm working out how the displacement and frequency terms combine to set that energy scale so I can suggest tuning it down if needed.
+
+I trace through how the shift scales with the oscillator period and confirm it falls off as 1/P, matching the measured value at P=320 and predicting about 4.4% at P=1000 — a clean, controllable relationship. With that confirmed, I plan to update the ScalarOscillator documentation with the measured slowdown and derived formula, then write a test that predicts the period from mc²/⟨E⟩, checking it lands within roughly 5% of the measured 358 vs predicted 364.
+
+I should also add the same note to the Dirac documentation, referencing back to ScalarOscillator, and write the corresponding test in kg_test.go covering both cases before finalizing everything.
+
+
+</thinking>
+
+That 358 vs 320 is real physics, not an error — let me confirm and pin it.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 -c "
+import math
+P=320.0; m=2.0; c=0.5; hbar=1.0
+om=2*math.pi/P; w=math.sqrt(hbar/(m*om)); d=2*w
+mc2=m*c*c
+e=1.5*hbar*om+0.5*m*om*om*d*d
+print(f'omega {om:.6f}  width {w:.3f}  displacement {d:.3f}')
+print(f'mc^2 {mc2}  mean binding {e:.5f}  E {mc2+e:.5f}  E/mc^2 {(mc2+e)/mc2:.4f}')
+print(f'predicted period {P*(mc2+e)/mc2:.1f} steps, measured 358.0')
+print(f'binding/mc^2 = 3.5 hbar om / mc^2 = {3.5*om/mc2:.4f} = 44/P')
+"``
+  ```
+  omega 0.019635  width 5.046  displacement 10.093
+  mc^2 0.5  mean binding 0.06872  E 0.56872  E/mc^2 1.1374
+  predicted period 364.0 steps, measured 358.0
+  binding/mc^2 = 3.5 hbar om / mc^2 = 0.1374 = 44/P
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/klein-gordon.goal'; s=open(p).read()
+old = """// It swings at the well frequency, but not forever: the relativistic levels go
+// as sqrt(m^2 c^4 + 2 m c^2 hbar omega (n + 3/2)), which are NOT evenly spaced
+// the way the Schrodinger ones are, so the packet slowly dephases and smears.
+// That anharmonicity is the relativistic correction, and it is why the
+// classical-looking coherent state is only a nonrelativistic idea."""
+new = """// It swings SLOWER than the well says, by the factor E / m c^2. The levels go
+// as sqrt(m^2 c^4 + 2 m c^2 hbar omega (n + 3/2)), so their spacing is
+// hbar omega (m c^2 / E) rather than hbar omega: the energy the particle
+// carries dilates its own clock. At the default period that is 14% -- the
+// swing takes about 364 steps, not 320 -- and it falls as 44 /
+// [Config.OscillatorPeriod], so a longer period is a more Newtonian one.
+//
+// Those levels are also not evenly spaced, so unlike the Schrodinger coherent
+// state this one slowly dephases and smears. The state that moves exactly like
+// a classical particle forever is a nonrelativistic idea."""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("ok")
+PY
+rm -f wavesim/zz_scratch_test.go && cat >> wavesim/kg_test.go <<'EOF'
+
+// TestScalarOscillator: the relativistic coherent state swings at the well
+// frequency slowed by E / m c^2, because the level spacing is
+// hbar omega (m c^2 / E) rather than hbar omega. Dirac must agree exactly:
+// with no EM field its spin term is zero and it is two copies of this.
+func TestScalarOscillator(t *testing.T) {
+	const sz = 48
+	var period [2]float64
+	for i, tc := range []struct {
+		name string
+		mag  enums.Enum
+		init func(*Sim)
+		mk   func(int32, func(*Sim)) *Sim
+		step func(*Sim)
+	}{
+		{"ScalarOscillator", CabMag, ScalarOscillator, kgSim, kgStepExt},
+		{"DiracOscillator", DiracMag, DiracOscillator, drSim, drStepExt},
+	} {
+		ss := tc.mk(sz, tc.init)
+		tc.step(ss)
+		mid := float64(sz)/2 + 1
+		p := ss.Params
+		om := 2 * math.Pi / float64(ss.Config.OscillatorPeriod)
+		w := math.Sqrt(float64(p.Hbar) / (float64(p.Mass) * om))
+		mc2 := float64(p.Mass) * float64(p.CSq)
+		e := 1.5*float64(p.Hbar)*om + 0.5*float64(p.Mass)*om*om*4*w*w
+		want := float64(ss.Config.OscillatorPeriod) * (mc2 + e) / mc2
+		var first, last, n int
+		prev := atomCtrX(sz, tc.mag) - mid
+		for s := range 800 {
+			tc.step(ss)
+			d := atomCtrX(sz, tc.mag) - mid
+			if prev > 0 && d <= 0 { // downward zero crossing: one per swing
+				if n == 0 {
+					first = s
+				}
+				last, n = s, n+1
+			}
+			prev = d
+		}
+		if n < 2 {
+			t.Fatalf("%s: only %d crossings, it is not swinging", tc.name, n)
+		}
+		period[i] = float64(last-first) / float64(n-1)
+		if math.Abs(period[i]-want)/want > 0.05 {
+			t.Errorf("%s period %.1f steps, want %.1f (well period x E / m c^2)", tc.name, period[i], want)
+		}
+		t.Logf("%-17s period %.1f steps, want %.1f (well says %.0f, slowed by E / m c^2 = %.3f)",
+			tc.name, period[i], want, ss.Config.OscillatorPeriod, (mc2+e)/mc2)
+	}
+	if period[0] != period[1] {
+		t.Errorf("Dirac period %.1f but scalar %.1f: with no field the spin term must do nothing",
+			period[1], period[0])
+	}
+}
+EOF
+python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/kg_test.go'; s=open(p).read()
+old="""// atomRMS is the |wave|^2 weighted rms radius"""
+new="""// atomCtrX is the |wave|^2 weighted X centroid, in interior cube coords.
+func atomCtrX(sz int32, mag enums.Enum) float64 {
+	var num, den float64
+	cur := int(GetCtx(0).CurState)
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), int(mag.Int64()), cur))
+				num += v * float64(x)
+				den += v
+			}
+		}
+	}
+	return num / den
+}
+
+// atomRMS is the |wave|^2 weighted rms radius"""
+assert old in s
+open(p,'w').write(s.replace(old,new,1))
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && gofmt -w wavesim/kg_test.go && go test ./wavesim/ -run TestScalarOscillator -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  ok
+  go build
+  goal build succeeded
+  # github.com/WaveReality/waves/wavesim.test
+      kg_test.go:426: ScalarOscillator  period 357.0 steps, want 364.0 (well says 320, slowed by E / m c^2 = 1.137)
+      kg_test.go:426: DiracOscillator   period 357.0 steps, want 364.0 (well says 320, slowed by E / m c^2 = 1.137)
+  --- PASS: TestScalarOscillator (40.45s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	40.474s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now the app entry point and full rebuild.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./... 2>&1 | grep -icE "error"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok``
+  ```
+  go build
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -v 2>&1 | grep -c "^--- PASS"; go test ./wavesim/ -v 2>&1 | grep -A4 "^--- FAIL"; echo "-- no fails above --"``
+  ```
+  54
+  -- no fails above --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+54 tests pass, everything builds and generates clean. `ScalarOscillator` and `DiracOscillator` added.
+
+## The well had to be a *scalar* potential
+
+This is the interesting part. For hydrogen I used `A0` — an electric potential, coupling to the energy. That's fine for 1/r because it dies away. A harmonic well doesn't: it grows without bound, so it inevitably runs past 2mc², where bound states dissolve into pairs and the single-particle equation stops meaning anything. **The relativistic oscillator can't be built from an electric potential.**
+
+The fix is a Lorentz scalar potential, which adds to the *mass* term instead — confinement becomes "the particle gets heavier as it goes out", which has no such ceiling. Same reason quark models use scalar confinement.
+
+The KG kernel already had the slot (`CabV` enters as `(vpot − M²)`). Dirac didn't, so I added `DiracV` and the matching term. Two lines in the kernel, and now Dirac has external-scalar-potential capability generally, symmetric with KG. New `Sim.HarmonicWell` works out the coefficient: `vpot = −(mω/ħ)²r²`, negative because it's the mass rising.
+
+## It swings slow, and that's the physics
 
 ```
-R  5  box  50^3  Z*alpha 0.200  omega 0.49000  rms  8.619
-R 10  box 100^3  Z*alpha 0.100  omega 0.49750  rms 17.240
+ScalarOscillator  period 357.0 steps, want 364.0 (well says 320, slowed by E/mc² = 1.137)
+DiracOscillator   period 357.0 steps, want 364.0
 ```
 
-rms scales exactly 2×, still bound, still stable.
+The levels go as √(m²c⁴ + 2mc²ħω(n+3/2)), so the spacing is ħω·(mc²/E), not ħω — **the energy the particle carries dilates its own clock.** 14% at the default period, and it falls as 44/`OscillatorPeriod`, so a longer period is a more Newtonian one. Prediction lands within 2% of measurement, and the test checks against the derived value rather than a magic number.
 
-## Bigger does help — but as 1/R, not fast
+Those levels are also unevenly spaced, so unlike the Schrödinger coherent state this one slowly dephases and smears. The state that moves like a classical particle *forever* is a non-relativistic idea.
 
-You're right, and I measured it. Schrödinger ground state, each radius run for the same *physics* time (the binding period goes as R²):
+## Dirac is identical to scalar here — on purpose
 
-| R | box | peak swing |
-|---|---|---|
-| 4 | 40³ | 50.6% |
-| 5 | 50³ | 41.9% |
-| 8 | 80³ | 28.0% |
+Both come out at exactly 357.0, and the test asserts that equality. With no EM field, `σ·(cB + iE)` is identically zero and the Dirac equation genuinely *is* two Klein-Gordon equations. Spin needs a field to do anything; `SpinPrecession` is where it wakes up. I'd rather the demo make that explicit than have it look like a redundant config.
 
-That's roughly 1/R, which is what you'd expect: the softened core is one cube out of R, so it's a 1/R fraction of the atom. It shrinks steadily but you'd need R ≈ 40 to get under 5%.
+## Also
 
-For KG and Dirac there are **two** error sources and they die at different rates — the relativistic one (starting from the non-relativistic shape) goes as (Zα)² = 1/R², so it's gone quickly; the core one goes as 1/R and is what's left. So on the GPU at R = 20–30 these should look distinctly cleaner, dominated by the core. Agreed that's enough without the lattice eigenstate — and if you ever want it exact, imaginary-time relaxation is still the answer.
+- **`Config.OscillatorPeriod`** (default 320), replacing `SchrodingerPeriod` — same reasoning you applied to `HydrogenRadius`, and it now drives all three oscillators. Added to the display lists alongside `HydrogenRadius`.
+- **`HydrogenMass` → `BoundStateMass`**, since the oscillators use it too.
+- **`Quadratic`'s clamp now works on magnitude**, so a negative (confining scalar) coefficient clamps the same way a positive one does. New `KleinGordonVMax()` gives the bound: `4/c² − Laplacian19Radius − M²` = 9.67 at defaults, which the corners of a 100³ box would otherwise exceed. Dirac shares it, since the mass term is the same.
 
-I put all of this in the `Config.HydrogenRadius` doc comment so the trade-off is visible where you set it.
+54 tests pass, everything builds and generates clean. `ScalarOscillator` and `DiracOscillator` added.
 
-## The cur/prev fix
+## The well had to be a *scalar* potential
 
-Audited every function in `init.goal` for the asymmetry. Three offenders, now all writing both:
+This is the interesting part. For hydrogen I used `A0` — an electric potential, coupling to the energy. That's fine for 1/r because it dies away. A harmonic well doesn't: it grows without bound, so it inevitably runs past 2mc², where bound states dissolve into pairs and the single-particle equation stops meaning anything. **The relativistic oscillator can't be built from an electric potential.**
 
-- **`InvR`** — the one that bit us
-- **`InvRDrive`** — same pattern, spinfield drive
-- **`Sine`** — used by `StandingWave`
+The fix is a Lorentz scalar potential, which adds to the *mass* term instead — confinement becomes "the particle gets heavier as it goes out", which has no such ceiling. Same reason quark models use scalar confinement.
 
-Six now-redundant `CopyCurToPrev()` calls removed from `HydrogenWell`, `HydrogenGround`, `HydrogenP`, `SpinInPotential`, `StandingWave` and a KG test. Everything else in `init.goal` was already symmetric.
+The KG kernel already had the slot (`CabV` enters as `(vpot − M²)`). Dirac didn't, so I added `DiracV` and the matching term. Two lines in the kernel, and now Dirac has external-scalar-potential capability generally, symmetric with KG. New `Sim.HarmonicWell` works out the coefficient: `vpot = −(mω/ħ)²r²`, negative because it's the mass rising.
 
-`InvR`'s doc now says why, since it's the trap: a value that's there on one step and gone the next isn't a well, it's a drive, and it pumps whatever sits in it to infinity.
+## It swings slow, and that's the physics
 
-`CopyCurToPrev` itself has no callers left. I left it exported — it's a reasonable thing for an outside config to want — but say the word if you'd rather drop it.
+```
+ScalarOscillator  period 357.0 steps, want 364.0 (well says 320, slowed by E/mc² = 1.137)
+DiracOscillator   period 357.0 steps, want 364.0
+```
+
+The levels go as √(m²c⁴ + 2mc²ħω(n+3/2)), so the spacing is ħω·(mc²/E), not ħω — **the energy the particle carries dilates its own clock.** 14% at the default period, and it falls as 44/`OscillatorPeriod`, so a longer period is a more Newtonian one. Prediction lands within 2% of measurement, and the test checks against the derived value rather than a magic number.
+
+Those levels are also unevenly spaced, so unlike the Schrödinger coherent state this one slowly dephases and smears. The state that moves like a classical particle *forever* is a non-relativistic idea.
+
+## Dirac is identical to scalar here — on purpose
+
+Both come out at exactly 357.0, and the test asserts that equality. With no EM field, `σ·(cB + iE)` is identically zero and the Dirac equation genuinely *is* two Klein-Gordon equations. Spin needs a field to do anything; `SpinPrecession` is where it wakes up. I'd rather the demo make that explicit than have it look like a redundant config.
+
+## Also
+
+- **`Config.OscillatorPeriod`** (default 320), replacing `SchrodingerPeriod` — same reasoning you applied to `HydrogenRadius`, and it now drives all three oscillators. Added to the display lists alongside `HydrogenRadius`.
+- **`HydrogenMass` → `BoundStateMass`**, since the oscillators use it too.
+- **`Quadratic`'s clamp now works on magnitude**, so a negative (confining scalar) coefficient clamps the same way a positive one does. New `KleinGordonVMax()` gives the bound: `4/c² − Laplacian19Radius − M²` = 9.67 at defaults, which the corners of a 100³ box would otherwise exceed. Dirac shares it, since the mass term is the same.
 

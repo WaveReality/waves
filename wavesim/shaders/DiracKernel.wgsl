@@ -313,7 +313,8 @@ const  Dirac1Av: DiracStates = 22;
 const  Dirac1Bv: DiracStates = 23;
 const  Dirac2Av: DiracStates = 24;
 const  Dirac2Bv: DiracStates = 25;
-const  DiracMag: DiracStates = 26;
+const  DiracV: DiracStates = 26;
+const  DiracMag: DiracStates = 27;
 fn DiracKernel(i: u32) { //gosl:kernel
 let ctx = Ctx[0];; var x: i32;
 var y: i32;
@@ -332,6 +333,7 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 ; var v2b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bv), u32(prv)));
 ; var mhsq = Params[0].MOverHSq;
 ; var csq = Params[0].CSq;
+; var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracV), u32(prv)));
 ; var threeD = Params[0].ThreeD == 1;
 ; var l1a: f32;
 var l1b: f32;
@@ -346,10 +348,12 @@ var l2b: f32;; if (threeD) {
 	l1b = Laplacian1D(x, y, z, i32(Dirac1Bs), prv, p1b);
 	l2a = Laplacian1D(x, y, z, i32(Dirac2As), prv, p2a);
 	l2b = Laplacian1D(x, y, z, i32(Dirac2Bs), prv, p2b);
-}; var a1a = csq * (l1a - mhsq*p1a);
-; var a1b = csq * (l1b - mhsq*p1b);
-; var a2a = csq * (l2a - mhsq*p2a);
-; var a2b = csq * (l2b - mhsq*p2b);
+}; var vm = vpot - mhsq;
+; // scalar potential shifts the mass, as in complex KG
+var a1a = csq * (l1a + vm*p1a);
+; var a1b = csq * (l1b + vm*p1b);
+; var a2a = csq * (l2a + vm*p2a);
+; var a2b = csq * (l2b + vm*p2b);
 ;
 var g1a: vec3<f32>;
 var g1b: vec3<f32>;
@@ -507,7 +511,7 @@ const YPhi = 0.5;
 const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 27;
+const DiracStatesN: DiracStates = 28;
 const EdgesN: Edges = 3;
 const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;

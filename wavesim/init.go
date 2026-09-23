@@ -445,14 +445,39 @@ func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, 
 	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
-// HydrogenMass is the mass the relativistic hydrogen configs set. It has to be
-// this heavy: a = Compton / Z alpha, so a light particle makes an atom far too
-// big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube,
-// so Z alpha is just 1 / [Config.HydrogenRadius] for n = 1 and twice that for
-// the deeper n = 2 well. The default 5 means Z alpha = 0.2, around iron, so the
-// relativistic corrections are not small -- which is the point of running these
-// at all. Raise the radius to make them smaller.
-const HydrogenMass float32 = 2
+// BoundStateMass is the mass the relativistic bound-state configs set, both
+// the atoms and the oscillators. It has to be this heavy: a = Compton / Z
+// alpha, so a light particle makes an atom far too big for the lattice. At
+// C = 0.5 this puts the Compton wavelength at one cube, so Z alpha is just
+// 1 / [Config.HydrogenRadius] for n = 1 and twice that for the deeper n = 2
+// well. The default 5 means Z alpha = 0.2, around iron, so the relativistic
+// corrections are not small -- which is the point of running these at all.
+// Raise the radius to make them smaller.
+const BoundStateMass float32 = 2
+
+// HarmonicWell puts a harmonic well of angular frequency om into vr, the
+// SCALAR potential of a second-order equation, and returns the phase rate of a
+// coherent state displaced by d from the center.
+//
+// Scalar, not electric. The kernel adds vpot to the MASS term, so this is a
+// position-dependent mass and confinement means getting heavier with distance.
+// That is the coupling a relativistic equation needs in order to confine at
+// all: a well that grows without bound in the ENERGY runs past 2 m c^2, where
+// the bound states dissolve into pairs and the single-particle equation stops
+// meaning anything. A scalar well has no such ceiling, which is why the quark
+// models use one.
+//
+// In the nonrelativistic limit V_eff = -(hbar^2 / 2m) vpot, so the well
+// 1/2 m om^2 r^2 needs vpot = -(m om / hbar)^2 r^2 -- negative, which is the
+// mass rising. The returned rate is the MEAN energy of the coherent state,
+// 3/2 hbar om for the ground state plus 1/2 m om^2 d^2 from the displacement.
+func (ss *Sim) HarmonicWell(vr enums.Enum, om, d, vmax float32) float32 {
+	p := ss.Params
+	mo := p.Mass * om / p.Hbar
+	ss.Quadratic(vr, math32.Vec3(-1, -1, -1), -mo*mo, vmax)
+	e := 1.5*p.Hbar*om + 0.5*p.Mass*om*om*d*d
+	return p.Omega0 + e/p.Hbar
+}
 
 // HydrogenWell puts a 1/r Coulomb well into A0, deep enough that its n = 1
 // orbital decays over the Bohr radius a, and returns the frequency of level n:
@@ -694,9 +719,10 @@ func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
 }
 
 // Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
-// oscillator potential. vmax caps it if positive -- the bowl grows without
-// bound while the lattice is finite, so on a big box the corners hold more
-// than the integrator can carry long before the wave gets anywhere near them.
+// oscillator potential. vmax caps its MAGNITUDE if positive -- the bowl grows
+// without bound while the lattice is finite, so on a big box the corners hold
+// more than the integrator can carry long before the wave gets anywhere near
+// them. A confining SCALAR well has a negative coef and clamps just the same.
 func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
@@ -711,8 +737,8 @@ func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) 
 				f := c.AddScalar(1)
 				d := CoordToFloat(c).Sub(ctr).Length()
 				v := coef * d * d
-				if vmax > 0 && v > vmax {
-					v = vmax
+				if vmax > 0 && math32.Abs(v) > vmax {
+					v = math32.Copysign(vmax, v)
 				}
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))

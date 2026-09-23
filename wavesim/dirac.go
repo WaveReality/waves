@@ -44,6 +44,12 @@ const (
 	// Dirac2Bv is the velocity of wave state 2B.
 	Dirac2Bv
 
+	// DiracV is an external SCALAR potential: it adds to the mass term rather
+	// than to the energy, so it is a position-dependent mass. That is the
+	// coupling a relativistic equation needs in order to confine, as
+	// [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.
+	DiracV
+
 	// DiracMag is the state magnitude (state * complex conjugate),
 	// summed over both components, which represents the total
 	// probability or a conserved charge value.
@@ -90,6 +96,7 @@ func DiracKernel(i uint32) { //gosl:kernel
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
+	vpot := State.Value(int(z), int(y), int(x), int(DiracV), int(prv))
 	threeD := Params[0].ThreeD.IsTrue()
 
 	var l1a, l1b, l2a, l2b float32
@@ -104,10 +111,11 @@ func DiracKernel(i uint32) { //gosl:kernel
 		l2a = Laplacian1D(x, y, z, int32(Dirac2As), prv, p2a)
 		l2b = Laplacian1D(x, y, z, int32(Dirac2Bs), prv, p2b)
 	}
-	a1a := csq * (l1a - mhsq*p1a)
-	a1b := csq * (l1b - mhsq*p1b)
-	a2a := csq * (l2a - mhsq*p2a)
-	a2b := csq * (l2b - mhsq*p2b)
+	vm := vpot - mhsq // scalar potential shifts the mass, as in complex KG
+	a1a := csq * (l1a + vm*p1a)
+	a1b := csq * (l1b + vm*p1b)
+	a2a := csq * (l2a + vm*p2a)
+	a2b := csq * (l2b + vm*p2b)
 
 	// gradients: needed for the current always, and for the A.grad term
 	var g1a, g1b, g2a, g2b math32.Vector3
@@ -237,7 +245,7 @@ func (ss *Sim) DiracConfig() {
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}
+var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
 
 //////// configurations
 
@@ -320,7 +328,7 @@ func diracAtom(ss *Sim, a, n float32) float32 {
 	p := ss.Params
 	p.EM.SetBool(true)
 	p.SelfField.SetBool(false) // the well is EXTERNAL and must stay as set
-	p.Mass = HydrogenMass
+	p.Mass = BoundStateMass
 	p.Edges = EdgesDamp
 	p.Update()
 	return ss.HydrogenWell(a, n)
@@ -362,12 +370,41 @@ func DiracHydrogenP(ss *Sim) {
 	ss.DiracBound(1, om)
 }
 
+// DiracOscillator is ScalarOscillator carried on a spinor: the same coherent
+// state in the same scalar well, with spin along Z.
+//
+// It looks identical to the scalar one, and that is the lesson. The spin term
+// is sigma . (cB + iE), so with no electromagnetic field anywhere it is
+// exactly zero and the two components evolve independently -- the Dirac
+// equation really is two Klein-Gordon ones until you give the spin a field to
+// feel. SpinPrecession is where it wakes up.
+//
+// The well is DiracV, the scalar potential, for the confinement reason in
+// [Sim.HarmonicWell]; the bound is KleinGordonVMax because the mass term the
+// two kernels share is what sets it.
+func DiracOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Edges = EdgesDamp
+	p.Update()
+	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om))
+	d := 2 * w
+	ph := ss.HarmonicWell(DiracV, om, d, ss.KleinGordonVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	ss.Gauss(Dirac1As, Both, ctr, w, ss.Config.Amplitude, 0)
+	ss.DiracBound(1, ph)
+}
+
 var DiracConfigs = []InitFunc{
 	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
 	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
 	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
 	InitFunc{Name: "Dirac Hydrogen", Doc: "A spin-1/2 electron bound in a Coulomb well in its exp(-r/a) ground state: the closest this gets to a real atom", Func: DiracHydrogen},
 	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
+	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
 }
 
 // DiracStats adds the stats plotted over time in the GUI.

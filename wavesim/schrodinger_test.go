@@ -116,7 +116,7 @@ func TestSchrodingerBoxStationary(t *testing.T) {
 func TestSchrodingerCoherent(t *testing.T) {
 	const sz = 40
 	ss := scSim(sz, HarmonicOscillator)
-	want := 2 * float64(SchrodingerPeriod) // sim steps per swing
+	want := 2 * float64(ss.Config.OscillatorPeriod) // sim steps per swing
 	scStep(ss)
 	mid := float64(sz) / 2
 	// count zero crossings of (centroid - center) to get the period

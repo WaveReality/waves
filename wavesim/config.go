@@ -54,6 +54,13 @@ type Config struct {
 	// since the binding energy falls as 1/R^2 too.
 	HydrogenRadius float32
 
+	// OscillatorPeriod is the period of the harmonic well in the oscillator
+	// configs, in leapfrog steps, which sets both its strength and the width
+	// sqrt(hbar / m omega) of the state that sits in it. Longer is wider and
+	// slower. Schrodinger takes two sim steps per leapfrog step, so the period
+	// you count on screen there is twice this.
+	OscillatorPeriod float32
+
 	// Source is the location of a point source (a charge, say) for functions
 	// that use it. Negative values mean the center, as in [CenterF].
 	Source math32.Vector3
@@ -78,6 +85,7 @@ func (cfg *Config) Defaults() {
 	cfg.PacketWidth = 12
 	cfg.Amplitude = 1
 	cfg.HydrogenRadius = 5
+	cfg.OscillatorPeriod = 320
 	cfg.Source.Set(-1, -1, -1) // center
 	cfg.Polarization = math32.Y
 }

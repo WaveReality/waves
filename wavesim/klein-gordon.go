@@ -424,7 +424,7 @@ func scalarAtom(ss *Sim, a, n float32) float32 {
 	p := ss.Params
 	p.EM.SetBool(true)
 	p.SelfField.SetBool(false) // the well is EXTERNAL and must stay as set
-	p.Mass = HydrogenMass
+	p.Mass = BoundStateMass
 	p.Edges = EdgesDamp
 	p.Update()
 	return ss.HydrogenWell(a, n)
@@ -466,6 +466,52 @@ func ScalarHydrogenP(ss *Sim) {
 	ss.ChargedBound(1, om)
 }
 
+// KleinGordonVMax is the largest |CabV| the leapfrog can carry. The kernel
+// applies c^2 (Laplacian + V - M^2) as an acceleration, and a leapfrog holds
+// while that coefficient stays under 4 -- of which Laplacian19Radius and the
+// mass M^2 are already spent. The Dirac kernel has the identical mass term, so
+// its DiracV obeys the same bound.
+func (ss *Sim) KleinGordonVMax() float32 {
+	p := ss.Params
+	return 4/p.CSq - Laplacian19Radius - p.MOverHSq
+}
+
+// ScalarOscillator is HarmonicOscillator for the relativistic scalar: a
+// coherent state swinging in a harmonic well, which is the one quantum state
+// that moves like a classical particle.
+//
+// The well is a SCALAR potential in CabV, not an electric one, for the reason
+// in [Sim.HarmonicWell]: a confining well in the energy would run past 2 m c^2
+// and stop binding anything. Here confinement is the particle getting heavier
+// as it goes out, which has no such ceiling. There is no EM field at all in
+// this config.
+//
+// It swings SLOWER than the well says, by the factor E / m c^2. The levels go
+// as sqrt(m^2 c^4 + 2 m c^2 hbar omega (n + 3/2)), so their spacing is
+// hbar omega (m c^2 / E) rather than hbar omega: the energy the particle
+// carries dilates its own clock. At the default period that is 14% -- the
+// swing takes about 364 steps, not 320 -- and it falls as 44 /
+// [Config.OscillatorPeriod], so a longer period is a more Newtonian one.
+//
+// Those levels are also not evenly spaced, so unlike the Schrodinger coherent
+// state this one slowly dephases and smears. The state that moves exactly like
+// a classical particle forever is a nonrelativistic idea.
+func ScalarOscillator(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Mass = BoundStateMass
+	p.Edges = EdgesDamp
+	p.Update()
+	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	d := 2 * w
+	ph := ss.HarmonicWell(CabV, om, d, ss.KleinGordonVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	ss.Gauss(CabAs, Both, ctr, w, ss.Config.Amplitude, 0)
+	ss.ChargedBound(1, ph)
+}
+
 var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charge At Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
 	InitFunc{Name: "Charge At Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
@@ -474,6 +520,7 @@ var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
 	InitFunc{Name: "Scalar Hydrogen", Doc: "A spin-0 particle bound in a Coulomb well in its exp(-r/a) ground state: a pionic atom, turning at one frequency everywhere", Func: ScalarHydrogen},
 	InitFunc{Name: "Scalar Hydrogen P", Doc: "The 2p orbital of the same: two lobes of opposite phase with a node between them", Func: ScalarHydrogenP},
+	InitFunc{Name: "Scalar Oscillator", Doc: "A coherent state swinging in a harmonic well, held by a scalar (mass) potential rather than an electric one", Func: ScalarOscillator},
 }
 
 // KGCConfigs stats plotted over time in the GUI.
@@ -489,4 +536,4 @@ var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Waveleng
 
 // KGCShouldDisplay determines which Parameters fields to display for the
 // complex, optionally EM-coupled version.
-var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}
+var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}

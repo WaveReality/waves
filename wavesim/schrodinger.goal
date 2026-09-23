@@ -140,11 +140,8 @@ func (ss *Sim) SchrodingerVMax() float32 {
 // per LEAPFROG step. A sim step advances half of one, so the period you count
 // on screen is twice 2 pi / omega.
 func schrodOmega(ss *Sim) float32 {
-	return 2 * math32.Pi / SchrodingerPeriod
+	return 2 * math32.Pi / ss.Config.OscillatorPeriod
 }
-
-// SchrodingerPeriod is the harmonic oscillator period in leapfrog steps.
-const SchrodingerPeriod float32 = 320
 
 // HarmonicOscillator is the classic: a particle in a parabolic well
 // V = (1/2) m omega^2 r^2, started as its own ground state pushed off center.
@@ -258,7 +255,7 @@ var SchrodingerConfigs = []InitFunc{
 }
 
 // SchrodingerShouldDisplay determines which Parameters fields to display.
-var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}
+var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
 
 // Cab1DViewAll configures the View to display A and B, Cur and Prev
 func Cab1DViewAll(view *View) {

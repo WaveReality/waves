@@ -313,7 +313,8 @@ const  Dirac1Av: DiracStates = 22;
 const  Dirac1Bv: DiracStates = 23;
 const  Dirac2Av: DiracStates = 24;
 const  Dirac2Bv: DiracStates = 25;
-const  DiracMag: DiracStates = 26;
+const  DiracV: DiracStates = 26;
+const  DiracMag: DiracStates = 27;
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -740,7 +741,7 @@ fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,
 }
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 27;
+const DiracStatesN: DiracStates = 28;
 const EdgesN: Edges = 3;
 const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;
