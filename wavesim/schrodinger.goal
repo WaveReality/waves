@@ -124,6 +124,16 @@ func (ss *Sim) SchrodingerConfig() {
 // at the default hbar of 1, which is comfortably inside the stability bound.
 const SchrodingerMass float32 = 2
 
+// SchrodingerVMax is the largest potential the staggered leapfrog can carry.
+// Stability needs |E| / hbar < 2 for every eigenvalue of H, and the kinetic
+// term already spends (hbar^2 / 2m) * Laplacian19Radius of that, leaving this
+// for V. At the defaults it is 0.667. Note this scales with the SIZE of the
+// box for any potential that grows with r, which is why a harmonic well that
+// is fine at 24^3 blows up from the edges inward at 100^3.
+func (ss *Sim) SchrodingerVMax() float32 {
+	return 2*ss.Params.Hbar - ss.Params.HSqOver2M*Laplacian19Radius
+}
+
 //////// configurations
 
 // schrodOmega returns the angular frequency of the harmonic well, in radians
@@ -150,7 +160,7 @@ const SchrodingerPeriod float32 = 320
 func HarmonicOscillator(ss *Sim) {
 	p := ss.Params
 	om := schrodOmega(ss)
-	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om)
+	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())
 	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w
@@ -218,11 +228,11 @@ func FreePacket(ss *Sim) {
 
 // SchrodingerConfigs are the initialization options offered in the GUI.
 var SchrodingerConfigs = []InitFunc{
+	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
 	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator, Current: true},
 	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
 	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
 	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
-	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
 }
 
 // SchrodingerShouldDisplay determines which Parameters fields to display.

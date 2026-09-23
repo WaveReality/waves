@@ -44,6 +44,25 @@ func (ss *Sim) RunStats(init bool) {
 
 // StateSum computes the sum of given variable at given cur vs. prev state
 // with given non-edge size.
+// StateMax returns the largest value of the vr variable over the interior.
+func StateMax(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	vri := int(vr.Int64())
+	mx := float32(-math32.MaxFloat32)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
+				if v > mx {
+					mx = v
+				}
+			}
+		}
+	}
+	return float64(mx)
+}
+
 func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
 	sum := 0.0

@@ -14,6 +14,11 @@ import (
 	"cogentcore.org/lab/tensor"
 )
 
+// Laplacian19Radius is the spectral radius of Laplacian19, attained at
+// k = (pi, pi, 0). Every explicit stability bound on this lattice is set by
+// it: the wave equations through C, and Schrodinger through SchrodingerVMax.
+const Laplacian19Radius float32 = 16.0 / 3.0
+
 func (ss *Sim) ConfigVars() {
 	Params = make([]Parameters, 1)
 	Params[0].Defaults()

@@ -126,6 +126,16 @@ func (ss *Sim) SchrodingerConfig() {
 // at the default hbar of 1, which is comfortably inside the stability bound.
 const SchrodingerMass float32 = 2
 
+// SchrodingerVMax is the largest potential the staggered leapfrog can carry.
+// Stability needs |E| / hbar < 2 for every eigenvalue of H, and the kinetic
+// term already spends (hbar^2 / 2m) * Laplacian19Radius of that, leaving this
+// for V. At the defaults it is 0.667. Note this scales with the SIZE of the
+// box for any potential that grows with r, which is why a harmonic well that
+// is fine at 24^3 blows up from the edges inward at 100^3.
+func (ss *Sim) SchrodingerVMax() float32 {
+	return 2*ss.Params.Hbar - ss.Params.HSqOver2M*Laplacian19Radius
+}
+
 //////// configurations
 
 // schrodOmega returns the angular frequency of the harmonic well, in radians
@@ -152,7 +162,7 @@ const SchrodingerPeriod float32 = 320
 func HarmonicOscillator(ss *Sim) {
 	p := ss.Params
 	om := schrodOmega(ss)
-	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om)
+	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())
 	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w

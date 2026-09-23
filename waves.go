@@ -25,9 +25,9 @@ func main() {
 	threed := true
 	// eqs := wavesim.Wave
 	// eqs := wavesim.KleinGordonC
-	eqs := wavesim.Schrodinger
+	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
-	// eqs := wavesim.Dirac
+	eqs := wavesim.Dirac
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
@@ -54,8 +54,7 @@ func main() {
 				})
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					// sim.Config.Size.Set(100, 100, 1)
-					sim.Config.Size.Set(100, 100, 100)
+					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					// sim.Config.Size.Set(80, 1, 1)
 					sim.Config.Size.Set(1000, 1, 1)
@@ -65,18 +64,18 @@ func main() {
 			case wavesim.KleinGordon:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 100)
+					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 					sim.ViewInit(wavesim.Wave1DViewAll)
 				}
 			case wavesim.KleinGordonC:
 				sim.Params.ThreeD.SetBool(true) // only 3D
-				sim.Config.Size.Set(100, 100, 100)
+				sim.Config.Size.Set(64, 64, 64)
 			case wavesim.Schrodinger:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 100)
+					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 					sim.ViewInit(wavesim.Cab1DViewAll)
@@ -84,18 +83,18 @@ func main() {
 			case wavesim.Maxwell:
 				if threed {
 					sim.Params.ThreeD.SetBool(true)
-					sim.Config.Size.Set(100, 100, 100)
+					sim.Config.Size.Set(64, 64, 64)
 				} else {
 					sim.Config.Size.Set(500, 1, 1)
 				}
 				sim.ViewInit(wavesim.MaxwellViewAll)
 			case wavesim.Dirac:
 				sim.Params.ThreeD.SetBool(true)
-				sim.Config.Size.Set(100, 100, 100)
+				sim.Config.Size.Set(64, 64, 64)
 			case wavesim.Electroweak:
 				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
 				sim.Params.ThreeD.SetBool(true)
-				sim.Config.Size.Set(100, 100, 100)
+				sim.Config.Size.Set(64, 64, 64)
 				sim.ViewInit(wavesim.ElectroweakViewAll)
 			case wavesim.Spinfield:
 				sim.Params.Edges = wavesim.EdgesDamp

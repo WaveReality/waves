@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 08:12:51
+- **Last Message:** 2026-09-23 08:33:31
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -1020,7 +1020,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `summary, title`
+- **mcp__ccd_session__mark_chapter**: `title, summary`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -24925,7 +24925,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -44835,7 +44835,7 @@ But actually the deeper issue is that Schrödinger doesn't have a speed of light
 <summary>Tool Calls (2)</summary>
 
 - **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "C \|CSq\|HSqOver2M" wavesim/params.go | head -20; echo ==== schrod uses C?; grep -n "Params\[0\]\.C\|Params.C\|ss.Params.C" wavesim/schrodinger.goal; echo "(none above = C unused in schrodinger)"; echo ==== ; grep -n "SchrodPeriod\|SchrodBohr\|HarmonicOscillator" wavesim/schrodinger.goal | head``
-- **ToolSearch**: `max_results, query`
+- **ToolSearch**: `query, max_results`
   ```
   33:	// KleinGordonC is the Klein-Gordon massive particle wave function,
   77:	// C is the speed of light factor, in cubes per time step. The stability
@@ -46841,16 +46841,615 @@ One thing to know for next time: **`wavesim/schrodinger.go` is not a safe backup
 
 Verification: all 49 tests pass, and every Schrödinger number matches the pre-corruption run to the last digit — norms 1953.12492 / 180.31984 / 362.42591 at 0.000% drift, box eigenstate 0.97468, coherent period 649.0, group velocity 0.34895. Generate clean, gofmt clean, builds.
 
-Restored. Two damaged lines, both around the kernel/config boundary:
+## 🧑 User - 2026-09-23 08:27:30
 
-| line | corrupted | restored |
-|---|---|---|
-| 104 | `\tss.InitFu` | `//gosl:end` |
-| 110 | `\tss.InitFuSim) SchrodingerConfig(` | `\tss.InitFunc = HarmonicOscillator` |
+I committed and pushed! Just removed the "C" parameter from the params display list. Now I'm running waves.go and the harmonic oscillator case is getting extreme values coming in from the edges, very quickly! I'm running at size = 100^3. Hbar=1, Mass = 2. The V potential is at roughly 1.5 around the edges -- is that too high? I just confirmed that when I run at size = 24^3 then it is fully stable (and crazy fast on the GPU!) so it is the size.
 
-It looks like a botched paste: a fragment of the `ss.InitFunc` line landed on top of `//gosl:end`, and a fragment of the `func (ss *Sim) SchrodingerConfig(` signature landed on top of the `ss.InitFunc` line. The rest of the file was intact.
+## 🤖 Assistant - 2026-09-23 08:28:20
 
-One thing to know for next time: **`wavesim/schrodinger.go` is not a safe backup.** `goal build` transpiles before it compiles, so the failed build had already overwritten the generated `.go` with the corrupted content — the good version was gone before I looked. Same will be true of any generated file after a failed build.
+*Model: claude-opus-5*
 
-Verification: all 49 tests pass, and every Schrödinger number matches the pre-corruption run to the last digit — norms 1953.12492 / 180.31984 / 362.42591 at 0.000% drift, box eigenstate 0.97468, coherent period 649.0, group velocity 0.34895. Generate clean, gofmt clean, builds.
+<thinking>
+I'm checking the stability condition for the Visscher scheme with this 100³ harmonic oscillator setup—the key constraint is that dt times the Hamiltonian eigenvalue range divided by ħ needs to stay within [0, 2] for the simulation to remain stable.
+
+For the isotropic 19-point Laplacian, the spectral radius is 16/3 ≈ 5.333, so E_max/ħ works out to about 1.333 + V_max. With Δt=1, stability requires V_max ≤ 0.667, but since the edges here have V ≈ 1.5, giving E_max/ħ ≈ 2.83 which exceeds 2 — this confirms the scheme is unstable.
+
+This also explains the size dependence: with V = ½mω²r², the potential scales as r², so a 24³ box has smaller V_max near the corners while a 100³ box reaches much larger V_max at the far corners, consistent with the user seeing ~1.5 there. Let me check the actual harmonic oscillator potential code to compute V_max precisely and confirm this.
+
+The best fix is to clamp the potential to the stability bound, since physically the well only needs to be harmonic near the center where the wavefunction lives — capping it far out is standard practice and safer than trying to rescale ω with box size or reduce the hopping parameter. Let me look at the code to implement the clamp properly.
+
+Checking numerically: with ω ≈ 0.0196 and ħ/(mω) ≈ 25.5, the wave packet width σ comes out to about 5 cubes, and capping V at 0.6 pushes the truncation radius out to roughly 39 cubes — nearly 8σ away from the packet, so the clamp won't disturb the physics at all.
+
+I then cross-check against the box geometry: for a 100³ box, the corner sits at r≈86.6 giving V≈2.89, face centers at r=50 give V≈0.96, and edge midpoints at r≈70.7 give V≈1.93 — roughly matching the user's estimate of ~1.5 near the edges. Scaling down to a 24³ box, the corner distance is about 20.8, giving a correspondingly smaller V.
+
+This confirms my earlier analysis fully explains the observed instability pattern. Now I want to look at the actual code — checking `Quadratic` and `HarmonicOscillator` in the source to decide where best to add a clamp: either inside the general `Quadratic` helper (which risks hiding the issue), or as an explicit exported stability-bound helper in schrodinger.goal that computes the max safe V and has `HarmonicOscillator` clamp against it.
+
+I also want to check whether `HydrogenGround`, which uses a softened InvR potential, stays within the stability bound — working through the depth constant and confirming the resulting potential magnitude stays safely inside the [-2,2] range.
+
+The problem really only shows up with Quadratic/HarmonicOscillator, since the box-wave configs have zero potential. I'm weighing whether to add the cap as a parameter directly to Quadratic versus introducing a separate exported helper documenting the stability bound, since changing Quadratic's signature could break other callers like the yaegi bindings.
+
+Rather than rescaling the potential everywhere, the right fix is to clamp it to the stability bound derived from the leapfrog scheme's energy constraint, since the well only needs to be accurate near the center where the wavefunction actually lives.
+
+Double-checking the derivation: the stability condition |E|/ħ ≤ 2 combines the kinetic contribution (ħ²/2m)λ_max with the potential V, giving V_max = 2ħ − (ħ²/2m)λ_max. Plugging in ħ=1, ħ²/2m=0.25, and λ_max=16/3 gives V_max ≈ 0.667, confirming the earlier number.
+
+3D case has spectral radius 16/3, which is higher and thus more conservative than the 1D value of 4 — so I should use 16/3 for both cases. I should check whether there's already a named constant for this value in params.go before adding my own. Then I need to implement a SchrodingerVMax() function and figure out whether HarmonicOscillator should clamp via Quadratic or clamp afterward, which means looking at those functions first — and I should also clarify whether the user actually wants code changes or just an answer to their question about whether the value is too high.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^func (ss \*Sim) Quadratic/,/^}/p' wavesim/init.goal; echo ====; sed -n '/^func HarmonicOscillator/,/^}/p' wavesim/schrodinger.goal; echo ====; sed -n '/schrodOmega/,/^}/p' wavesim/schrodinger.goal | head -20; echo ==== lap max const; grep -rn "16.0/3\|16/3\|LaplacianMax\|SpectralRadius" wavesim/*.go wavesim/*.goal | head``
+  ```
+  func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {
+  	vri := int(vr.Int64())
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	ctr = CenterF(ctr)
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				d := CoordToFloat(c).Sub(ctr).Length()
+  				v := coef * d * d
+  				State[f.Z, f.Y, f.X, vri, cur] += v
+  				State[f.Z, f.Y, f.X, vri, prv] += v
+  			}
+  		}
+  	}
+  }
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm calculating the potential values for the 100³ case: with ω=0.0196350 and coefficient 0.00038553, the face-center point at r=50 gives a potential of 0.9638, and I'm continuing to the edge midpoint calculation.
+
+The edge midpoint gives 1.928 and the corner gives 2.891, matching the user's observation of instability around 1.5 near edges. Computing the stability bound V ≤ 2ħ − (ħ²/2m)λmax = 0.6667, I check the 24³ case and find it stays well under this threshold at all points, confirming stability there. Solving for the crossover N where corner potential hits the bound gives N ≤ 48, which nicely explains why 24³ is fine but instability creeps in from the corners first, then edges, then faces as size grows past that threshold — matching the user's exact observation about 100³ blowing up from the edges inward.
+
+Now I want to fix this by clamping the potential at the stability bound, so I'm defining a constant for the maximum allowable potential based on this stability analysis.
+
+Still need a named constant for the Laplacian spectral radius (16/3) — checking whether one already exists in funcs.goal before adding it there.
+
+I'll place the const in funcs.goal near the Laplacian19 doc, ideally outside the gosl:start block. For clamping, I'm weighing whether to add a `max` parameter directly to `Quadratic` versus a separate `ClampVar` helper — I lean toward extending `Quadratic` itself, using `max` to bound |v| when max > 0, since the clamp feels intrinsic to a growing lattice potential.
+
+I'll name the parameter `vmax` and document that it caps the result when positive, otherwise the quadratic well can run past what the integrator handles at the lattice corners. I'm also considering whether to add a runtime guard that warns if V exceeds bounds, since the user will likely hit this again with other potentials — but that risks scope creep, so I'll just add the clamp and note the issue rather than building a full warning system.
+
+Rather than a slow warning check, I'll keep the clamp silent and correct — no need to log anything if it's already fixed properly. I'll stay focused: add the constant, SchrodingerVMax, the clamp in Quadratic, and wire it into HarmonicOscillator, then add a test confirming stability at a large lattice size.
+
+Testing at 100³ would be too slow given the cell count and step requirements, so I'm picking 64³ instead — a size cheap enough to run quickly but still large enough that the corner potential would previously have exceeded the stability bound and blown up, unlike the existing tests which use smaller 48³ lattices.
+
+Now I want to check how the existing TestSchrodingerNorm test is sized, so I'm looking at the test file and its helper functions.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 30,55p wavesim/funcs.goal; echo "==== gosl markers in funcs.goal:"; grep -n "gosl:start\|gosl:end" wavesim/funcs.goal; echo "==== test sizes:"; sed -n 57,80p wavesim/schrodinger_test.go``
+  ```
+  	//	sum_j w_j dx_j^2 = 2
+  	// makes the stencil exact on quadratics. Isotropy of the leading
+  	// (4th-order) error additionally needs
+  	//	sum_j w_j dx^4 == 3 sum_j w_j dx^2 dy^2
+  	// The intuitive 1/d^2 weighting over all 26 neighbors normalizes correctly
+  	// but leaves that ratio at 1.615, giving ~36x more directional spread in
+  	// the wave dispersion (1.97% vs 0.055% at |k| = 0.8). The 18 face+edge
+  	// neighbors at 2:1 land EXACTLY on the isotropy condition: the 19-point
+  	// stencil of O'Reilly & Beck (2006) is already isotropic, and extending
+  	// 1/d^2 out to the corners is precisely what breaks it.
+  	//
+  	// The trade: spectral radius rises from 4 to 16/3, so the CFL limit
+  	// tightens from C < 1 to C < sqrt(3)/2 = 0.866 -- isotropy costs ~13% of
+  	// the timestep. Adding the corners back with any isotropic weighting buys
+  	// nothing: same spectral radius, same directional spread.
+  	lapWt := [4]float32{0, 1.0 / 3.0, 1.0 / 6.0, 0}
+  	idx := 0
+  	for shell := 1; shell <= 3; shell++ {
+  		for z := -1; z <= 1; z++ {
+  			for y := -1; y <= 1; y++ {
+  ...
+  ```
+
+</details>
+
+<thinking>
+I realize the test uses sz = 24, which happens to be exactly the stable size, so it never caught this gap. Since the relevant code sits before gosl:start, it's Go-only, so I can safely define the SchrodingerVMax constant there in funcs.go.
+
+I'll add an exported constant, Laplacian19Radius, set to 16/3, representing the spectral radius of Laplacian19 attained at k=(pi,pi,0), which underlies every stability bound using it. Now I'm scanning the top of funcs.goal to find a clean spot to place it, right before the function containing that comment.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 1,25p wavesim/funcs.goal``
+  ```
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  import (
+  	// "fmt"
+  	
+  	"cogentcore.org/core/math32"
+  	"cogentcore.org/lab/gosl/slrand"
+  	"cogentcore.org/lab/tensor"
+  )
+  
+  func (ss *Sim) ConfigVars() {
+  	Params = make([]Parameters, 1)
+  	Params[0].Defaults()
+  	ss.Params = &Params[0]
+  	ss.Units.Defaults()
+  	Ctx = make([]Context, 1)
+  ...
+  ```
+
+</details>
+
+Diagnosis confirmed — it's the potential, and the box size sets it.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+om = 2*3.141592653589793/320; coef = 0.5*2*om*om
+vmax = 2*1.0 - 0.25*(16/3)
+print(f"omega {om:.6f}  coef {coef:.8f}  stability bound V <= {vmax:.4f}\n")
+for N in (24, 48, 64, 100):
+    c = N/2
+    print(f"{N}^3: face {coef*c*c:.3f}  edge {coef*2*c*c:.3f}  corner {coef*3*c*c:.3f}"
+          f"   {'OK' if coef*3*c*c <= vmax else 'UNSTABLE'}")
+PY``
+  ```
+  omega 0.019635  coef 0.00038553  stability bound V <= 0.6667
+  
+  24^3: face 0.056  edge 0.111  corner 0.167   OK
+  48^3: face 0.222  edge 0.444  corner 0.666   OK
+  64^3: face 0.395  edge 0.790  corner 1.184   UNSTABLE
+  100^3: face 0.964  edge 1.928  corner 2.891   UNSTABLE
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The numbers confirm the user's report exactly, with instability edges near 100³ and full stability at 24³ with a 4× margin, pinpointing the threshold right around 48³. Now I'm implementing the clamp: adding a constant to funcs.goal, a `SchrodingerVMax()` function in schrodinger.goal, giving `Quadratic` a vmax parameter, and updating the harmonic oscillator accordingly.
+
+Before finishing, I should check other callers of Quadratic to make sure the vmax change doesn't break anything, then test at 64³.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -rn "Quadratic(" --include=*.goal --include=*.go . | grep -v "yaegiwaves\|typegen\|/init.go:\|/schrodinger.go:"``
+  ```
+  wavesim/init.goal:608:func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {
+  wavesim/schrodinger.goal:153:	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+# 1. spectral radius constant, in funcs.goal next to the Laplacian it describes
+p='wavesim/funcs.goal'; s=open(p).read()
+old="""func (ss *Sim) ConfigVars() {"""
+new="""// Laplacian19Radius is the spectral radius of Laplacian19, attained at
+// k = (pi, pi, 0). Every explicit stability bound on this lattice is set by
+// it: the wave equations through C, and Schrodinger through SchrodingerVMax.
+const Laplacian19Radius float32 = 16.0 / 3.0
+
+func (ss *Sim) ConfigVars() {"""
+assert old in s and 'Laplacian19Radius' not in s
+open(p,'w').write(s.replace(old,new,1))
+
+# 2. Quadratic gains a cap
+p='wavesim/init.goal'; s=open(p).read()
+old="""func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {"""
+new="""// Quadratic adds a quadratic bowl, coef * r^2, centered on ctr, to the vr
+// variable in both cur and prv. vmax caps it if positive: a bowl grows without
+// bound while the lattice is finite, so on a big box the corners can carry
+// more than the integrator can take long before the wave reaches them.
+func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) {"""
+assert old in s
+s = s.replace(old,new,1)
+old2="""				v := coef * d * d
+				State[f.Z, f.Y, f.X, vri, cur] += v"""
+new2="""				v := coef * d * d
+				if vmax > 0 && v > vmax {
+					v = vmax
+				}
+				State[f.Z, f.Y, f.X, vri, cur] += v"""
+assert old2 in s
+open(p,'w').write(s.replace(old2,new2,1))
+print("init.goal ok")
+PY
+sed -n '/^\/\/ Quadratic adds/,/^}/p' wavesim/init.goal | head -8``
+  ```
+  init.goal ok
+  // Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
+  // oscillator potential.
+  // Quadratic adds a quadratic bowl, coef * r^2, centered on ctr, to the vr
+  // variable in both cur and prv. vmax caps it if positive: a bowl grows without
+  // bound while the lattice is finite, so on a big box the corners can carry
+  // more than the integrator can take long before the wave reaches them.
+  func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) {
+  	vri := int(vr.Int64())
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I notice there's now a duplicated doc comment, so I should merge them into a single concise one.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='wavesim/init.goal'; s=open(p).read()
+old="""// Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
+// oscillator potential.
+// Quadratic adds a quadratic bowl, coef * r^2, centered on ctr, to the vr
+// variable in both cur and prv. vmax caps it if positive: a bowl grows without
+// bound while the lattice is finite, so on a big box the corners can carry
+// more than the integrator can take long before the wave reaches them.
+"""
+new="""// Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
+// oscillator potential. vmax caps it if positive -- the bowl grows without
+// bound while the lattice is finite, so on a big box the corners hold more
+// than the integrator can carry long before the wave gets anywhere near them.
+"""
+assert old in s
+open(p,'w').write(s.replace(old,new,1))
+print("ok")
+PY
+sed -n '/^\/\/ Quadratic adds/,/^func/p' wavesim/init.goal``
+  ```
+  ok
+  // Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
+  // oscillator potential. vmax caps it if positive -- the bowl grows without
+  // bound while the lattice is finite, so on a big box the corners hold more
+  // than the integrator can carry long before the wave gets anywhere near them.
+  func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) {
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='wavesim/schrodinger.goal'; s=open(p).read()
+
+old="""	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om)"""
+new="""	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())"""
+assert old in s
+s = s.replace(old,new,1)
+
+old2 = """// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+// at the default hbar of 1, which is comfortably inside the stability bound.
+const SchrodingerMass float32 = 2"""
+new2 = """// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+// at the default hbar of 1, which is comfortably inside the stability bound.
+const SchrodingerMass float32 = 2
+
+// SchrodingerVMax is the largest potential the staggered leapfrog can carry.
+// Stability needs |E| / hbar < 2 for every eigenvalue of H, and the kinetic
+// term already spends (hbar^2 / 2m) * Laplacian19Radius of that, leaving this
+// for V. At the defaults it is 0.667. Note this scales with the SIZE of the
+// box for any potential that grows with r, which is why a harmonic well that
+// is fine at 24^3 blows up from the edges inward at 100^3."""
+assert old2 in s
+s = s.replace(old2,new2,1)
+open(p,'w').write(s)
+print("ok")
+PY
+cat >> /Users/oreilly/wavereality/waves/wavesim/schrodinger.goal <<'EOF'
+EOF
+python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/schrodinger.goal'; s=open(p).read()
+old = """// is fine at 24^3 blows up from the edges inward at 100^3."""
+new = """// is fine at 24^3 blows up from the edges inward at 100^3.
+func (ss *Sim) SchrodingerVMax() float32 {
+	return 2*ss.Params.Hbar - ss.Params.HSqOver2M*Laplacian19Radius
+}"""
+assert old in s
+open(p,'w').write(s.replace(old,new,1))
+print("func added")
+PY``
+  ```
+  ok
+  func added
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I want to add a test at 64³ that would have previously failed, plus confirm the existing 24³ tests still match since the corner clamp doesn't trigger there. I'm planning a HarmonicOscillator test at 64³ (262144 cells, 300 steps, ~78M updates) that checks the norm stays bounded.
+
+Based on group-velocity timing (64³ steps taking ~0.26s for smaller sizes), 78M updates should run in roughly 3 seconds, which is acceptable. I'll write the test to also explicitly verify the potential gets capped, then implement it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat >> wavesim/schrodinger_test.go <<'EOF'
+
+// TestSchrodingerBigBox: the harmonic well grows as r^2, so it runs past what
+// the staggered leapfrog can carry once the box is big enough -- at the
+// defaults, past 48^3. Quadratic clamps at SchrodingerVMax, which is why this
+// stays finite instead of blowing in from the edges.
+func TestSchrodingerBigBox(t *testing.T) {
+	const sz = 64
+	ss := scSim(sz, HarmonicOscillator)
+	vmax := float64(ss.SchrodingerVMax())
+	om := float64(schrodOmega(ss))
+	corner := 0.5 * float64(ss.Params.Mass) * om * om * 3 * (sz / 2) * (sz / 2)
+	if corner <= vmax {
+		t.Fatalf("box too small to test the clamp: corner V %.3f <= %.3f", corner, vmax)
+	}
+	if v := float64(StateMax(GetCtx(0).Size.V(), CabV, GetCtx(0).CurState)); v > vmax {
+		t.Errorf("V reaches %.3f, over the %.3f the integrator can carry", v, vmax)
+	}
+	scStep(ss)
+	n0 := scNorm(sz)
+	lo, hi := n0, n0
+	for range 300 {
+		scStep(ss)
+		n := scNorm(sz)
+		lo, hi = math.Min(lo, n), math.Max(hi, n)
+	}
+	if (hi-lo)/n0 > 1e-3 {
+		t.Errorf("norm %.5f varies by %.2e (%.3f%%) -- unstable", n0, hi-lo, 100*(hi-lo)/n0)
+	}
+	t.Logf("uncapped corner V would be %.3f, clamped to %.3f; norm %.5f varies by %.2e (%.3f%%)",
+		corner, vmax, n0, hi-lo, 100*(hi-lo)/n0)
+}
+EOF
+grep -n "func StateMax" wavesim/stats.goal || echo "NO StateMax -- need one"``
+  ```
+  NO StateMax -- need one
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^func StateSum/,/^}/p' wavesim/stats.goal``
+  ```
+  func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+  	vri := int(vr.Int64())
+  	sum := 0.0
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				sum += float64(State[f.Z, f.Y, f.X, vri, curPrv])
+  			}
+  		}
+  	}
+  	return sum
+  }
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='wavesim/stats.goal'; s=open(p).read()
+old="""func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {"""
+new="""// StateMax returns the largest value of the vr variable over the interior.
+func StateMax(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	vri := int(vr.Int64())
+	mx := float32(-math32.MaxFloat32)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := State[f.Z, f.Y, f.X, vri, curPrv]
+				if v > mx {
+					mx = v
+				}
+			}
+		}
+	}
+	return float64(mx)
+}
+
+func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {"""
+assert old in s and 'func StateMax' not in s
+open(p,'w').write(s.replace(old,new,1))
+print("ok")
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && gofmt -w wavesim/schrodinger_test.go && go test ./wavesim/ -run "TestSchrodingerBigBox" -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  ok
+  go build
+  goal build succeeded
+  # github.com/WaveReality/waves/wavesim.test
+      schrodinger_test.go:205: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by 5.39e-06 (0.000%)
+  --- PASS: TestSchrodingerBigBox (3.74s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	3.760s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I want to confirm the test would actually fail without the clamp, so I'll temporarily disable it by setting vmax to 0 in the HarmonicOscillator call, rerun to verify the test catches the issue, then revert the change carefully.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -i.bak 's/0.5\*p.Mass\*om\*om, ss.SchrodingerVMax())/0.5*p.Mass*om*om, 0)/' wavesim/schrodinger.goal && cd wavesim && goal build 2>&1|tail -1 && cd .. && go test ./wavesim/ -run "TestSchrodingerBigBox" 2>&1 | grep -vE "ld: warning" | head -6; mv wavesim/schrodinger.goal.bak wavesim/schrodinger.goal && cd wavesim && goal build 2>&1|tail -1``
+  ```
+  goal build succeeded
+  # github.com/WaveReality/waves/wavesim.test
+  --- FAIL: TestSchrodingerBigBox (3.63s)
+      schrodinger_test.go:192: V reaches 1.184, over the 0.667 the integrator can carry
+      schrodinger_test.go:205: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by NaN (NaN%)
+  FAIL
+  FAIL	github.com/WaveReality/waves/wavesim	3.655s
+  overwrite wavesim/schrodinger.goal? (y/n [n]) not overwritten
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The test failed correctly without the clamp, confirming the NaN issue, but my revert didn't take since `mv` prompted for overwrite confirmation and I didn't answer, so schrodinger.goal still has vmax=0 while the .bak holds the original. I need to redo this with `mv -f` to force the overwrite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='wavesim/schrodinger.goal'; s=open(p).read()
+old="0.5*p.Mass*om*om, 0)"
+new="0.5*p.Mass*om*om, ss.SchrodingerVMax())"
+assert old in s, "already restored?"
+open(p,'w').write(s.replace(old,new,1))
+print("restored")
+PY
+rm -f wavesim/schrodinger.goal.bak && ls wavesim/*.bak 2>&1; grep -n "SchrodingerVMax()" wavesim/schrodinger.goal``
+  ```
+  restored
+  ls: wavesim/*.bak: No such file or directory
+  133:func (ss *Sim) SchrodingerVMax() float32 {
+  163:	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./... 2>&1 | grep -icE "error"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -v 2>&1 | grep -E "^--- (PASS|FAIL)" | wc -l; go test ./wavesim/ -v 2>&1 | grep -c "^--- FAIL"``
+  ```
+  go build
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+        50
+  0
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -run TestSchrodinger -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+      schrodinger_test.go:79: BoxStandingWave     norm 1953.12492, varies by 9.51e-05 (0.000%) over 2000 steps
+      schrodinger_test.go:79: HarmonicOscillator  norm 180.31984, varies by 1.32e-05 (0.000%) over 2000 steps
+      schrodinger_test.go:79: HydrogenGround      norm 362.42591, varies by 1.67e-05 (0.000%) over 2000 steps
+  --- PASS: TestSchrodingerNorm (3.71s)
+      schrodinger_test.go:106: box ground state |chi|^2 at center: 0.97468, varies by 3.40e-06 (0.000%)
+  --- PASS: TestSchrodingerBoxStationary (0.40s)
+      schrodinger_test.go:142: coherent state period 649.0 sim steps, want 640.0 (+1.4%)
+  --- PASS: TestSchrodingerCoherent (4.79s)
+      schrodinger_test.go:175: group velocity 0.34895, hbar sin(k) / m = 0.35355, stat 0.37007
+  --- PASS: TestSchrodingerGroupVel (0.26s)
+      schrodinger_test.go:205: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by 5.39e-06 (0.000%)
+  --- PASS: TestSchrodingerBigBox (3.46s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	12.642s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Yes — 1.5 is too high, and the size is exactly why.
+
+## The bound
+
+The staggered leapfrog is stable only while every eigenvalue of H satisfies |E|/ħ < 2. The kinetic term already spends part of that budget:
+
+$$\frac{\hbar}{2m}\lambda_{\max} = 0.25 \times \tfrac{16}{3} = 1.333$$
+
+(16/3 being the spectral radius of `Laplacian19` — the same number that caps `C` at √3/2.) That leaves **V ≤ 0.667**. Your ~1.5 is more than double it.
+
+## Why size is the whole story
+
+V = ½mω²r², and ω is fixed by `SchrodingerPeriod` — so V at the walls scales as the **square of the box**. The center is at N/2, so the corner sits at √3·N/2:
+
+| size | face | edge | corner | |
+|---|---|---|---|---|
+| 24³ | 0.056 | 0.111 | 0.167 | fine, 4× margin |
+| 48³ | 0.222 | 0.444 | 0.666 | right at the limit |
+| 64³ | 0.395 | 0.790 | 1.184 | blows |
+| 100³ | 0.964 | **1.928** | 2.891 | blows |
+
+Your measured ~1.5 at the edges of a 100³ box lands right between the face and edge values. And "coming in from the edges" is the signature — the violation is largest where V is largest, i.e. at the boundary, worst in the corners.
+
+Unlucky that 24³ is stable and the cutover is at 48³, so the default test size hid it.
+
+## Fix
+
+Clamped the bowl rather than weakening it. The wave function is a Gaussian of width √(ħ/mω) ≈ 5 cubes; the clamp first bites around r ≈ 39, nearly 8σ out, where the amplitude is ~10⁻¹⁴. The well is untouched everywhere it does anything.
+
+- `Laplacian19Radius` — named the 16/3 in [funcs.goal](wavesim/funcs.goal), since it now sets two different stability limits
+- `Sim.SchrodingerVMax()` — `2ħ − (ħ²/2m)·Laplacian19Radius`, with the size-dependence noted
+- `Quadratic` takes a `vmax` (capped when positive, 0 = uncapped); `HarmonicOscillator` passes the bound
+- `StateMax` in `stats.goal`
+
+`TestSchrodingerBigBox` runs `HarmonicOscillator` at 64³ and checks both that V stays under the bound and that the norm holds. I verified it actually catches the bug — with the clamp removed it fails with the norm going NaN, exactly what you saw.
+
+50 tests pass, generate/gofmt/build clean, and all the 24³ numbers are bit-identical (the clamp never triggers there).
+
+Worth knowing: this bound applies to **any** potential you add, not just the harmonic one. `HydrogenGround` is well inside it (depth 0.1), but if you build a new config with a steep or deep well, `SchrodingerVMax()` is the number to check against.
+
+Yes — 1.5 is too high, and the size is exactly why.
+
+## The bound
+
+The staggered leapfrog is stable only while every eigenvalue of H satisfies |E|/ħ < 2. The kinetic term already spends part of that budget:
+
+$$\frac{\hbar}{2m}\lambda_{\max} = 0.25 \times \tfrac{16}{3} = 1.333$$
+
+(16/3 being the spectral radius of `Laplacian19` — the same number that caps `C` at √3/2.) That leaves **V ≤ 0.667**. Your ~1.5 is more than double it.
+
+## Why size is the whole story
+
+V = ½mω²r², and ω is fixed by `SchrodingerPeriod` — so V at the walls scales as the **square of the box**. The center is at N/2, so the corner sits at √3·N/2:
+
+| size | face | edge | corner | |
+|---|---|---|---|---|
+| 24³ | 0.056 | 0.111 | 0.167 | fine, 4× margin |
+| 48³ | 0.222 | 0.444 | 0.666 | right at the limit |
+| 64³ | 0.395 | 0.790 | 1.184 | blows |
+| 100³ | 0.964 | **1.928** | 2.891 | blows |
+
+Your measured ~1.5 at the edges of a 100³ box lands right between the face and edge values. And "coming in from the edges" is the signature — the violation is largest where V is largest, i.e. at the boundary, worst in the corners.
+
+Unlucky that 24³ is stable and the cutover is at 48³, so the default test size hid it.
+
+## Fix
+
+Clamped the bowl rather than weakening it. The wave function is a Gaussian of width √(ħ/mω) ≈ 5 cubes; the clamp first bites around r ≈ 39, nearly 8σ out, where the amplitude is ~10⁻¹⁴. The well is untouched everywhere it does anything.
+
+- `Laplacian19Radius` — named the 16/3 in [funcs.goal](wavesim/funcs.goal), since it now sets two different stability limits
+- `Sim.SchrodingerVMax()` — `2ħ − (ħ²/2m)·Laplacian19Radius`, with the size-dependence noted
+- `Quadratic` takes a `vmax` (capped when positive, 0 = uncapped); `HarmonicOscillator` passes the bound
+- `StateMax` in `stats.goal`
+
+`TestSchrodingerBigBox` runs `HarmonicOscillator` at 64³ and checks both that V stays under the bound and that the norm holds. I verified it actually catches the bug — with the clamp removed it fails with the norm going NaN, exactly what you saw.
+
+50 tests pass, generate/gofmt/build clean, and all the 24³ numbers are bit-identical (the clamp never triggers there).
+
+Worth knowing: this bound applies to **any** potential you add, not just the harmonic one. `HydrogenGround` is well inside it (depth 0.1), but if you build a new config with a steep or deep well, `SchrodingerVMax()` is the number to check against.
 

@@ -174,3 +174,34 @@ func TestSchrodingerGroupVel(t *testing.T) {
 	}
 	t.Logf("group velocity %.5f, hbar sin(k) / m = %.5f, stat %.5f", vg, want, sv)
 }
+
+// TestSchrodingerBigBox: the harmonic well grows as r^2, so it runs past what
+// the staggered leapfrog can carry once the box is big enough -- at the
+// defaults, past 48^3. Quadratic clamps at SchrodingerVMax, which is why this
+// stays finite instead of blowing in from the edges.
+func TestSchrodingerBigBox(t *testing.T) {
+	const sz = 64
+	ss := scSim(sz, HarmonicOscillator)
+	vmax := float64(ss.SchrodingerVMax())
+	om := float64(schrodOmega(ss))
+	corner := 0.5 * float64(ss.Params.Mass) * om * om * 3 * (sz / 2) * (sz / 2)
+	if corner <= vmax {
+		t.Fatalf("box too small to test the clamp: corner V %.3f <= %.3f", corner, vmax)
+	}
+	if v := float64(StateMax(GetCtx(0).Size.V(), CabV, GetCtx(0).CurState)); v > vmax {
+		t.Errorf("V reaches %.3f, over the %.3f the integrator can carry", v, vmax)
+	}
+	scStep(ss)
+	n0 := scNorm(sz)
+	lo, hi := n0, n0
+	for range 300 {
+		scStep(ss)
+		n := scNorm(sz)
+		lo, hi = math.Min(lo, n), math.Max(hi, n)
+	}
+	if (hi-lo)/n0 > 1e-3 {
+		t.Errorf("norm %.5f varies by %.2e (%.3f%%) -- unstable", n0, hi-lo, 100*(hi-lo)/n0)
+	}
+	t.Logf("uncapped corner V would be %.3f, clamped to %.3f; norm %.5f varies by %.2e (%.3f%%)",
+		corner, vmax, n0, hi-lo, 100*(hi-lo)/n0)
+}

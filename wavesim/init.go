@@ -606,8 +606,10 @@ func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
 }
 
 // Quadratic adds a parabolic bowl coef * r^2 centered at ctr: the harmonic
-// oscillator potential.
-func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {
+// oscillator potential. vmax caps it if positive -- the bowl grows without
+// bound while the lattice is finite, so on a big box the corners hold more
+// than the integrator can carry long before the wave gets anywhere near them.
+func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) {
 	vri := int(vr.Int64())
 	ctx := GetCtx(0)
 	cur := ctx.CurState
@@ -621,6 +623,9 @@ func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef float32) {
 				f := c.AddScalar(1)
 				d := CoordToFloat(c).Sub(ctr).Length()
 				v := coef * d * d
+				if vmax > 0 && v > vmax {
+					v = vmax
+				}
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}

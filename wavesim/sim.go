@@ -380,7 +380,7 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	vw.Start.X = 1
 	vw.Start.SetDim(vw.Depth, 1)
 	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
-	fmt.Println("start:", vw.Start)
+	// fmt.Println("start:", vw.Start)
 	ss.callViewInit(vw)
 	ss.RunStats(true)
 	ss.GUI.FinalizeGUI(false)
