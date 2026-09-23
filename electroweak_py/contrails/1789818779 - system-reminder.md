@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 09:13:54
+- **Last Message:** 2026-09-23 10:28:28
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -21567,7 +21567,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `summary, title`
+- **mcp__ccd_session__mark_chapter**: `title, summary`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23930,7 +23930,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -44835,7 +44835,7 @@ But actually the deeper issue is that Schrödinger doesn't have a speed of light
 <summary>Tool Calls (2)</summary>
 
 - **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "C \|CSq\|HSqOver2M" wavesim/params.go | head -20; echo ==== schrod uses C?; grep -n "Params\[0\]\.C\|Params.C\|ss.Params.C" wavesim/schrodinger.goal; echo "(none above = C unused in schrodinger)"; echo ==== ; grep -n "SchrodPeriod\|SchrodBohr\|HarmonicOscillator" wavesim/schrodinger.goal | head``
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
   ```
   33:	// KleinGordonC is the Klein-Gordon massive particle wave function,
   77:	// C is the speed of light factor, in cubes per time step. The stability
@@ -49288,63 +49288,764 @@ If you want these genuinely stationary, the fix is imaginary-time relaxation to 
 
 Also removed a duplicate `KleinGordonCStats()` call in `kgSim` — `ConfigSim` already registers them, so the test harness was appending two rows per step, the same bug you hit with the electroweak stats.
 
-53 tests pass, everything builds and generates clean.
+## 🧑 User - 2026-09-23 10:15:13
 
-## Six new configs
+amazing! looks great. how about we add HydrogenRadius to the Config? It would be nice to be able to run it bigger in the GUI -- no problem on the GPU. Assuming it will still work with the Mass = 2 as a constant? I don't think we need to do the lattice eigenstate -- presumably as we make it bigger these issues will go away, right? Also, a hanging issue from before: make InvR set both cur and prev states, and in general if this issue is relevant to any of the new init functions, go ahead and implement that as the standard.
 
-| equation | 1s | 2p |
+## 🤖 Assistant - 2026-09-23 10:15:38
+
+*Model: claude-opus-5*
+
+<thinking>
+I have three things to work through: exposing HydrogenRadius as a tunable Config parameter instead of a hardcoded constant, figuring out whether Mass=2 stability holds and lattice issues resolve as R increases, and fixing InvR to properly write both current and previous states while auditing other init functions for the same pattern. I'll start by reasoning through the Mass/R behavior since it shapes the rest of the design.
+
+Since Zα scales as 1/R, growing R pushes the system further into the non-relativistic regime, shrinking the (Zα)² error from using the NR wavefunction as 1/R². The core-softening lattice error also shrinks proportionally to 1/R since the core occupies a smaller fraction of the domain, confirming the intuition that both error sources diminish as R grows — though the binding energy shrinking as 1/R² means the state evolves more slowly, requiring more simulation steps and possibly accumulating phase error over long runs, which I should check empirically rather than just estimate.
+
+For the Schrödinger case with the same mass, similar scaling holds with k~1/(2R) and correspondingly small binding energy, so growing R should improve accuracy at the cost of speed in both formulations — I want to test this directly with a larger box, say R=10 or 15.
+
+I'm now adding a HydrogenRadius field to the Config struct to make this radius configurable rather than hardcoded, then swapping references to the old constant over to the new config value.
+
+I need to check the other files (schrodinger, klein-gordon, dirac configs and tests) that reference the old constant and convert them to use Config.Defaults() the same way other Config fields are initialized, rather than struct tag defaults, since that's the established pattern there. I should also check whether Config fields participate in some display mechanism similar to ParamsShouldDisplay for Params.
+
+Now I'm confirming that the ShouldDisplay lists for KGC (and presumably Schrodinger, Dirac) already include Config fields like Wavelength and PacketWidth, meaning those lists cover both Params and Config together. So I'll need to add HydrogenRadius to the ShouldDisplay lists for Schrodinger, KGC, and Dirac, and then move on to auditing the init functions where InvR only writes to the current buffer instead of both.
+
+My plan is to first audit and fix any functions writing only `cur` without `prv` (InvR, InvRDrive, and possibly others, since EFromA0 already handles both), then add the Config.HydrogenRadius field, and finally verify that a larger radius actually improves results. Starting with the audit now.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+import re
+src=open('wavesim/init.goal').read()
+# split into top-level funcs
+parts=re.split(r'\n(?=func )', src)
+for p in parts:
+    m=re.match(r'func (\(ss \*Sim\) )?(\w+)', p)
+    if not m: continue
+    name=m.group(2)
+    cur = len(re.findall(r'\[[^\]]*,\s*cur\]\s*[+:]?=', p))
+    prv = len(re.findall(r'\[[^\]]*,\s*prv\]\s*[+:]?=', p))
+    if cur and not prv:
+        print(f"CUR-ONLY  {name}: {cur} writes")
+    elif cur and prv and cur!=prv:
+        print(f"MISMATCH  {name}: cur {cur}, prv {prv}")
+PY``
+  ```
+  CUR-ONLY  Sine: 1 writes
+  CUR-ONLY  InvR: 2 writes
+  CUR-ONLY  InvRDrive: 2 writes
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^\/\/ Sine /,/^}/p' wavesim/init.goal; echo ====; sed -n '/^\/\/ InvRDrive/,/^}/p' wavesim/init.goal; echo "==== callers:"; grep -rn "\.Sine(\|\.InvR(\|\.InvRDrive(" --include=*.goal --include=*.go . | grep -v "yaegiwaves\|/init.go:\|typegen"``
+  ```
+  // Sine adds sine wave values along given dimension, to given variable.
+  func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
+  	vri := int(vr.Int64())
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				dv := float32(c.Dim(dim))
+  				v := off + amp*math32.Sin(TwoPi*((dv+phase)/wavelength))
+  				State[f.Z, f.Y, f.X, vri, cur] += v
+  			}
+  		}
+  	}
+  }
+  ====
+  // InvRDrive adds pow(decay, r) values radiating from given center point,
+  ...
+  ```
+
+</details>
+
+<thinking>
+I need to make Sine, InvR, and InvRDrive write both cur and prv instead of cur only, then remove the CopyCurToPrev() calls that were compensating for this elsewhere. But I need to be careful since CopyCurToPrev() copies all variables, not just InvR, so its use in HydrogenWell and related files might be serving other purposes too.
+
+Going through each call site: HydrogenWell, HydrogenGround, HydrogenP, and SpinInPotential all call InvR then CopyCurToPrev then something else that writes both — so once InvR itself writes both, these CopyCurToPrev calls become redundant and safe to remove. I still need to check kg_test.go and the spinfield config in init.goal, since spinfield might actually depend on cur-only behavior for InvR/InvRDrive. I also want to verify the Sine usage in maxwell.goal — for a standing wave, writing both cur and prv should be correct since velocity is zero there, but I need to confirm it wasn't previously relying on cur-only to generate motion.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 380,400p wavesim/maxwell.goal; echo "==== spinfield:"; sed -n 895,915p wavesim/init.goal; echo "==== kg_test 260-275:"; sed -n 260,275p wavesim/kg_test.go``
+  ```
+  // cos(kx) sin(wt) and B = curl A as sin(kx) cos(wt). Their nodes are a quarter
+  // wavelength apart -- E vanishes where B peaks -- and they are also a quarter
+  // PERIOD apart in time. That double offset is why a standing wave stores
+  // energy without transporting it: E x B averages to zero both ways.
+  //
+  // Edges wrap, so put a whole number of wavelengths in the box or the two ends
+  // will not meet.
+  func StandingWave(ss *Sim) {
+  	ss.Params.Edges = EdgesWrap
+  	ss.Params.Update()
+  	pos, _, _, _ := emTransverse(ss)
+  	ss.Sine(pos, math32.X, ss.Config.Wavelength, 0, ss.Config.Amplitude, 0)
+  	ss.CopyCurToPrev() // no velocity
+  }
+  
+  // MovingCharge shows the magnetic field that moving charge produces: a
+  // uniformly charged line along X, moving along its own length at
+  // [Config.Velocity].X, which is a current.
+  //
+  // A line rather than a blob, because this kernel has no advection: charge and
+  ...
+  ```
+
+</details>
+
+<thinking>
+For StandingWave, since Sine already writes both values, the CopyCurToPrev call becomes redundant and I can remove it, just updating the comment accordingly. Now I'm looking at how ParticleField's spinfield writes SpinfieldDist, SpinfieldDrive, and CabAs.
+
+Since CabAs with prv=0 implies velocity, writing both values would be a real behavioral change for this older experimental model, so I want to check whether there's a spinfield test before assuming it's safe — the user wants both-state writes to become the standard where relevant, but I should verify this doesn't break something specific to spinfield's usage.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -rn "ParticleField\|Spinfield" --include=*_test.go wavesim/ | head; echo "-- tests above --"; grep -rn "ParticleField" --include=*.goal wavesim/ | head``
+  ```
+  -- tests above --
+  wavesim/init.goal:901:// ParticleField sets field parameters for particle at given position.
+  wavesim/init.goal:902:func (ss *Sim) ParticleField(c math32.Vector3i, width float32) {
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Since ParticleField is never actually called, there's no risk there, and no spinfield tests to worry about either. Now I'll make the changes: update Sine, InvR, and InvRDrive to write both cur and prv, remove the now-redundant CopyCurToPrev() calls that existed just to compensate, add Config.HydrogenRadius, and then verify that larger R values behave better.
+
+I could add a curPrev parameter like Expo/Gauss use for consistency, but since the ask was to make InvR set both states unconditionally as the new standard, I'll just write both directly — simpler and matches the request. Time to implement it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='wavesim/init.goal'; s=open(p).read()
+
+# --- Sine ---
+old = """func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	sz := ss.Config.Size"""
+new = """func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size"""
+assert old in s; s = s.replace(old,new,1)
+old = """				v := off + amp*math32.Sin(TwoPi*((dv+phase)/wavelength))
+				State[f.Z, f.Y, f.X, vri, cur] += v"""
+new = """				v := off + amp*math32.Sin(TwoPi*((dv+phase)/wavelength))
+				State[f.Z, f.Y, f.X, vri, cur] += v
+				State[f.Z, f.Y, f.X, vri, prv] += v"""
+assert old in s; s = s.replace(old,new,1)
+
+# --- InvR ---
+old = """func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3, val float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	ctr = CenterF(ctr)"""
+new = """func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3, val float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr = CenterF(ctr)"""
+assert old in s; s = s.replace(old,new,1)
+old = """				if c == ctri {
+					State[f.Z, f.Y, f.X, vri, cur] += val
+				} else {
+					State[f.Z, f.Y, f.X, vri, cur] += val / d
+				}"""
+new = """				v := val
+				if c != ctri {
+					v = val / d
+				}
+				State[f.Z, f.Y, f.X, vri, cur] += v
+				State[f.Z, f.Y, f.X, vri, prv] += v"""
+assert old in s; s = s.replace(old,new,1)
+
+# --- InvRDrive ---
+old = """func (ss *Sim) InvRDrive(vr enums.Enum, ctr math32.Vector3, decay float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	ctr = CenterF(ctr)"""
+new = """func (ss *Sim) InvRDrive(vr enums.Enum, ctr math32.Vector3, decay float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr = CenterF(ctr)"""
+assert old in s; s = s.replace(old,new,1)
+old = """				if c == ctri {
+					State[f.Z, f.Y, f.X, vri, cur] += 1
+				} else {
+					State[f.Z, f.Y, f.X, vri, cur] += math32.Pow(decay, d)
+				}"""
+new = """				v := float32(1)
+				if c != ctri {
+					v = math32.Pow(decay, d)
+				}
+				State[f.Z, f.Y, f.X, vri, cur] += v
+				State[f.Z, f.Y, f.X, vri, prv] += v"""
+assert old in s; s = s.replace(old,new,1)
+open(p,'w').write(s)
+print("writers fixed")
+PY
+python3 - <<'PY'
+# drop the CopyCurToPrev calls that only existed to compensate
+import re
+edits = [
+ ('wavesim/init.goal', "\tss.EFromA0()\n\tss.CopyCurToPrev() // InvR and EFromA0 write cur only\n", "\tss.EFromA0()\n"),
+ ('wavesim/schrodinger.goal', "\tss.InvR(CabV, math32.Vec3(-1, -1, -1), -k)\n\tss.CopyCurToPrev() // InvR writes cur only, and a potential that is there on\n\t// one step and gone the next pumps the wave straight to infinity\n", "\tss.InvR(CabV, math32.Vec3(-1, -1, -1), -k)\n"),
+ ('wavesim/schrodinger.goal', "\tss.InvR(CabV, ctr, -k)\n\tss.CopyCurToPrev()\n", "\tss.InvR(CabV, ctr, -k)\n"),
+ ('wavesim/dirac.goal', "\tss.InvR(A0s, math32.Vec3(-1, -1, -1), a0)\n\tss.CopyCurToPrev()\n", "\tss.InvR(A0s, math32.Vec3(-1, -1, -1), a0)\n"),
+ ('wavesim/maxwell.goal', "\tss.Sine(pos, math32.X, ss.Config.Wavelength, 0, ss.Config.Amplitude, 0)\n\tss.CopyCurToPrev() // no velocity\n", "\tss.Sine(pos, math32.X, ss.Config.Wavelength, 0, ss.Config.Amplitude, 0)\n"),
+ ('wavesim/kg_test.go', "\t\t\ts.InvR(A0s, math32.Vec3(-1, -1, -1), a0amp)\n\t\t\ts.CopyCurToPrev()\n", "\t\t\ts.InvR(A0s, math32.Vec3(-1, -1, -1), a0amp)\n"),
+]
+base='/Users/oreilly/wavereality/waves/'
+for f, old, new in edits:
+    s=open(base+f).read()
+    assert old in s, f"MISS {f}: {old[:60]!r}"
+    open(base+f,'w').write(s.replace(old,new,1))
+    print("cleaned", f)
+PY``
+  ```
+  writers fixed
+  cleaned wavesim/init.goal
+  cleaned wavesim/schrodinger.goal
+  cleaned wavesim/schrodinger.goal
+  cleaned wavesim/dirac.goal
+  cleaned wavesim/maxwell.goal
+  cleaned wavesim/kg_test.go
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I should update the doc comments now to reflect that these functions write to both cur and prv, and note in Sine's doc that this means no initial velocity for the standing wave, since that rationale was removed from the code line itself.
+
+Similarly for `InvR` and `InvRDrive`, I'll add a note explaining they write both cur and prv, making them static potentials where a value present on one step and gone the next would pump the wave to infinity. Then I should check whether `HydrogenWell` still needs `CopyCurToPrev` since `EFromA0` already writes both, and verify `CopyCurToPrev` isn't now dead code before building and testing.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+docs = [
+ ('wavesim/init.goal',
+  "// Sine adds sine wave values along given dimension, to given variable.\n",
+  "// Sine adds sine wave values along given dimension, to given variable, in\n// both cur and prv: a standing wave, with no initial velocity.\n"),
+ ('wavesim/init.goal',
+  "// InvR adds 1/r values radiating from given center point,\n// with peak point as given value.\n",
+  "// InvR adds 1/r values radiating from given center point, with peak point as\n// given value, in both cur and prv. Both, because this is a STATIC potential:\n// a value that is there on one step and gone the next is not a well, it is a\n// drive, and it pumps whatever sits in it straight to infinity.\n"),
+ ('wavesim/init.goal',
+  "// InvRDrive adds pow(decay, r) values radiating from given center point,\n// with peak point as given value, which is used for the drive value\n// in the spinfield model.\n",
+  "// InvRDrive adds pow(decay, r) values radiating from given center point, with\n// peak point as given value, in both cur and prv as [Sim.InvR] does. Used for\n// the drive value in the spinfield model.\n"),
+]
+for f, old, new in docs:
+    s=open(base+f).read(); assert old in s, f"MISS {old[:50]!r}"
+    open(base+f,'w').write(s.replace(old,new,1)); print("doc", f)
+PY
+grep -rn "CopyCurToPrev()" --include=*.goal --include=*_test.go wavesim/ | grep -v "^wavesim/init.goal:3[0-9]:"``
+  ```
+  doc wavesim/init.goal
+  doc wavesim/init.goal
+  doc wavesim/init.goal
+  ```
+
+</details>
+
+<thinking>
+CopyCurToPrev() has no remaining callers, but since it's an exported helper that's generally useful, I'll leave it in place. Next I need to add Config.HydrogenRadius, so I'm checking the Config struct's current fields.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^type Config struct/,/^}/p' wavesim/config.go | tail -30``
+  ```
+  	// e.g., for KG and other matter waves.
+  	Wavelength float32
+  
+  	// PacketWidth is the wave packet width to use for functions that use it
+  	// (Config suffix). Allows user to manipulate the wave parameters easily,
+  	// e.g., for KG and other matter waves.
+  	PacketWidth float32
+  
+  	// Amplitude scales the peak value of wave packets made by the functions
+  	// that use it (Config suffix), whose own amp argument becomes a relative
+  	// weight, so mixing factors such as cos(theta_W) stay intact. 1 fills the
+  	// display range, and is also large enough for a massive field to push the
+  	// Higgs condensate around: turn it down for the linear regime.
+  	Amplitude float32
+  
+  	// Source is the location of a point source (a charge, say) for functions
+  	// that use it. Negative values mean the center, as in [CenterF].
+  	Source math32.Vector3
+  
+  	// Polarization is the transverse direction a linearly polarized wave is
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+# 1. Config field + default
+p=base+'wavesim/config.go'; s=open(p).read()
+old = """	// Source is the location of a point source (a charge, say) for functions
+	// that use it. Negative values mean the center, as in [CenterF]."""
+new = """	// HydrogenRadius is the size of the orbitals in the hydrogen configs, in
+	// cubes: the Bohr radius a for the n = 1 states, and the decay length 2a
+	// for the n = 2 ones, whose well is four times deeper so that both come
+	// out the same size and fit the same box. Binding is hbar^2 / 2 m R^2
+	// either way.
+	//
+	// Bigger is more accurate, and costs only box: the well depth goes as 1/R,
+	// so Z alpha = Compton / R and the relativistic error in starting from the
+	// nonrelativistic shape falls as 1/R^2, while the softened core shrinks
+	// from a 1/R fraction of the atom to nothing. It is also slower to watch,
+	// since the binding energy falls as 1/R^2 too.
+	HydrogenRadius float32
+
+	// Source is the location of a point source (a charge, say) for functions
+	// that use it. Negative values mean the center, as in [CenterF]."""
+assert old in s; s=s.replace(old,new,1)
+old = "	cfg.Amplitude = 1\n"
+new = "	cfg.Amplitude = 1\n	cfg.HydrogenRadius = 5\n"
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("config ok")
+
+# 2. drop the const, point everything at Config
+p=base+'wavesim/init.goal'; s=open(p).read()
+old = """// HydrogenRadius is the size of the orbitals in the hydrogen configs, in
+// cubes: the Bohr radius a for the n = 1 states, and the decay length 2a for
+// the n = 2 ones, whose well is four times deeper so that both come out the
+// same size and fit the same box. Binding is hbar^2 / 2 m R^2 either way.
+const HydrogenRadius float32 = 5
+
+"""
+assert old in s; s=s.replace(old,"",1)
+old = """// HydrogenMass is the mass the relativistic hydrogen configs set. It has to be
+// this heavy: a = Compton / Z alpha, so a light particle makes an atom far too
+// big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube,
+// and HydrogenRadius then means Z alpha = 0.2 for n = 1, 0.4 for the deeper
+// n = 2 well. Both are real atoms -- 0.2 is around iron -- so the relativistic
+// corrections here are not small, which is the point of running them at all."""
+new = """// HydrogenMass is the mass the relativistic hydrogen configs set. It has to be
+// this heavy: a = Compton / Z alpha, so a light particle makes an atom far too
+// big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube,
+// so Z alpha is just 1 / [Config.HydrogenRadius] for n = 1 and twice that for
+// the deeper n = 2 well. The default 5 means Z alpha = 0.2, around iron, so the
+// relativistic corrections are not small -- which is the point of running these
+// at all. Raise the radius to make them smaller."""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("init const removed")
+PY
+grep -rn "HydrogenRadius" --include=*.goal --include=*_test.go wavesim/``
+  ```
+  config ok
+  init const removed
+  wavesim/klein-gordon.goal:445:	a := HydrogenRadius
+  wavesim/klein-gordon.goal:461:	a := HydrogenRadius / 2
+  wavesim/schrodinger_test.go:225:	peak := mag(int(HydrogenRadius))
+  wavesim/schrodinger_test.go:226:	if d := math.Abs(mag(-int(HydrogenRadius)) - peak); d > 1e-6*peak {
+  wavesim/schrodinger_test.go:229:	if up, dn := as(int(HydrogenRadius)), as(-int(HydrogenRadius)); up*dn >= 0 {
+  wavesim/schrodinger_test.go:241:		peak, HydrogenRadius, worst, 100*worst/peak)
+  wavesim/kg_test.go:328:	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), HydrogenRadius, ss.Config.Amplitude)
+  wavesim/dirac.goal:341:	a := HydrogenRadius
+  wavesim/dirac.goal:357:	a := HydrogenRadius / 2
+  wavesim/init.goal:449:// so Z alpha is just 1 / [Config.HydrogenRadius] for n = 1 and twice that for
+  wavesim/schrodinger.goal:211:	a := HydrogenRadius
+  wavesim/schrodinger.goal:234:	a := HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+import re
+base='/Users/oreilly/wavereality/waves/'
+for f in ['wavesim/klein-gordon.goal','wavesim/dirac.goal','wavesim/schrodinger.goal','wavesim/kg_test.go']:
+    s=open(base+f).read()
+    n=s.count('HydrogenRadius')
+    s=s.replace('HydrogenRadius','ss.Config.HydrogenRadius')
+    open(base+f,'w').write(s); print(f, n)
+PY
+python3 - <<'PY'
+# tests use a local sim variable name, fix those
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/schrodinger_test.go'; s=open(p).read()
+s=s.replace('HydrogenRadius','ss.Config.HydrogenRadius')
+open(p,'w').write(s)
+PY
+grep -n "Config.HydrogenRadius" wavesim/*.goal wavesim/*_test.go``
+  ```
+  wavesim/klein-gordon.goal 2
+  wavesim/dirac.goal 2
+  wavesim/schrodinger.goal 2
+  wavesim/kg_test.go 1
+  wavesim/dirac.goal:341:	a := ss.Config.HydrogenRadius
+  wavesim/dirac.goal:357:	a := ss.Config.HydrogenRadius / 2
+  wavesim/klein-gordon.goal:445:	a := ss.Config.HydrogenRadius
+  wavesim/klein-gordon.goal:461:	a := ss.Config.HydrogenRadius / 2
+  wavesim/init.goal:449:// so Z alpha is just 1 / [Config.HydrogenRadius] for n = 1 and twice that for
+  wavesim/schrodinger.goal:211:	a := ss.Config.HydrogenRadius
+  wavesim/schrodinger.goal:234:	a := ss.Config.HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
+  wavesim/kg_test.go:328:	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), ss.Config.HydrogenRadius, ss.Config.Amplitude)
+  wavesim/schrodinger_test.go:225:	peak := mag(int(ss.Config.HydrogenRadius))
+  wavesim/schrodinger_test.go:226:	if d := math.Abs(mag(-int(ss.Config.HydrogenRadius)) - peak); d > 1e-6*peak {
+  wavesim/schrodinger_test.go:229:	if up, dn := as(int(ss.Config.HydrogenRadius)), as(-int(ss.Config.HydrogenRadius)); up*dn >= 0 {
+  wavesim/schrodinger_test.go:241:		peak, ss.Config.HydrogenRadius, worst, 100*worst/peak)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now add it to the GUI display lists.
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "ShouldDisplay = \[\]string" wavesim/*.goal``
+  ```
+  wavesim/dirac.goal:238:var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+  wavesim/klein-gordon.goal:486:var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Wavelength", "PacketWidth"}
+  wavesim/klein-gordon.goal:490:var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+  wavesim/maxwell.goal:263:var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0NoWave"}
+  wavesim/schrodinger.goal:261:var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
+  wavesim/wave.goal:123:var WaveShouldDisplay = []string{"Edges", "Energy", "C", "VPotential"}
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+for f, var in [('wavesim/dirac.goal','DiracShouldDisplay'),('wavesim/klein-gordon.goal','KGCShouldDisplay'),('wavesim/schrodinger.goal','SchrodingerShouldDisplay')]:
+    p=base+f; s=open(p).read()
+    old = '"PacketWidth", "Amplitude"}'
+    assert s.count(var) and old in s, f
+    # only touch the line holding this var
+    lines=s.split('\n')
+    for i,l in enumerate(lines):
+        if l.startswith('var '+var+' ='):
+            assert old in l, l
+            lines[i]=l.replace(old, '"PacketWidth", "Amplitude", "HydrogenRadius"}')
+            print(f, "->", lines[i][:120])
+    open(p,'w').write('\n'.join(lines))
+PY
+cd wavesim && goal build 2>&1|tail -3``
+  ```
+  wavesim/dirac.goal -> var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoW
+  wavesim/klein-gordon.goal -> var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWav
+  wavesim/schrodinger.goal -> var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadi
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && gofmt -w wavesim/*_test.go && go test ./wavesim/ -v 2>&1 | grep -E "^--- (PASS|FAIL)" | sort | uniq -c | head; echo "==== fails:"; go test ./wavesim/ -v 2>&1 | grep -A3 "^--- FAIL" | head -30``
+  ```
+     1 --- PASS: TestBorisStability (0.32s)
+     1 --- PASS: TestCircularPolarization (0.02s)
+     1 --- PASS: TestConfigHiggsSymmetric (3.79s)
+     1 --- PASS: TestConfigPulseSpeeds (0.50s)
+     1 --- PASS: TestConfigWCollision (2.04s)
+     1 --- PASS: TestCurl10 (0.00s)
+     1 --- PASS: TestDiracCharge (2.94s)
+     1 --- PASS: TestDiracFreeNoSpin (0.29s)
+     1 --- PASS: TestDiracHydrogenBound (29.46s)
+     1 --- PASS: TestDiracLarmor (0.60s)
+  ==== fails:
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -v 2>&1 | grep -c "^--- PASS"; go test ./wavesim/ -v 2>&1 | grep -c "^--- FAIL"; go test ./wavesim/ 2>&1 | grep -vE "ld: warning"``
+  ```
+  53
+  0
+  # github.com/WaveReality/waves/wavesim.test
+  ok  	github.com/WaveReality/waves/wavesim	151.230s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With all 53 tests passing, I want to check whether a larger radius actually improves accuracy as assumed. I'll scan R = 5, 10, 20 for the cheap Schrödinger ground state and then the KG/Dirac cases, scaling the step count with R² to keep the same number of binding periods so I can fairly compare the swing in peak |χ|² across radii.
+
+Running the full R=20 case would be far too expensive on CPU, so I'm settling on comparing R=5 (48³, 1000 steps) against R=8 (72³, 2560 steps) as a cheaper but still meaningful test of how the initial relaxation and breathing amplitude change with box size, estimating this should take roughly 40-50 seconds based on the earlier BigBox timing.
+
+Working out the binding period in simulation steps for the Schrödinger HydrogenGround case, I find R=5 corresponds to about 1257 steps while R=8 needs roughly 3217, meaning my original 1000-step run for R=5 only covers about 0.8 of a period and I'll need closer to 2573 steps for R=8 to match that same fraction.
+
+With a box size of 72, this comes out to roughly 960 million grid-point evaluations, around 44 seconds of compute. That seems reasonable, so I'll set up the scratch script and run it.
+
+
+</thinking>
+
+Now checking your assumption that bigger is better.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+)
+
+// equal PHYSICS time at each radius: the binding period goes as R^2
+func TestScratchRadius(t *testing.T) {
+	for _, R := range []float32{4, 5, 8} {
+		sz := int32(10 * R)
+		if sz%2 == 1 {
+			sz++
+		}
+		steps := int(50.3 * R * R * 0.8)
+		ss := &Sim{}
+		ss.Config = &Config{}
+		ss.Config.Defaults()
+		ss.Config.GPU, ss.Config.GUI = false, false
+		ss.Config.Equation = Schrodinger
+		ss.Config.Size.Set(sz, sz, sz)
+		ss.Config.HydrogenRadius = R
+		ss.ConfigSim()
+		ss.Params.ThreeD.SetBool(true)
+		ss.Params.Update()
+		ss.StateVars = CabStatesN
+		ss.ConfigState()
+		ss.InitFunc = HydrogenGround
+		ss.Init()
+		scStep(ss)
+		ctr := int(sz/2) + 1
+		at := func() float64 {
+			return float64(State.Value(ctr, ctr, ctr, int(CabMag), int(GetCtx(0).CurState)))
+		}
+		v0 := at()
+		lo, hi := v0, v0
+		for range steps {
+			scStep(ss)
+			lo, hi = math.Min(lo, at()), math.Max(hi, at())
+		}
+		fmt.Printf("R %.0f  box %d^3  %5d steps (0.8 binding period)  peak swings %.1f%% of start\n",
+			R, sz, steps, 100*(hi-lo)/v0)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchRadius -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  R 4  box 40^3    643 steps (0.8 binding period)  peak swings 50.6% of start
+  R 5  box 50^3   1006 steps (0.8 binding period)  peak swings 41.9% of start
+  R 8  box 80^3   2575 steps (0.8 binding period)  peak swings 28.0% of start
+  --- PASS: TestScratchRadius (62.28s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	62.301s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+This confirms breathing decreases with R as expected: 50.6% → 41.9% → 28.0% for R = 4, 5, 8, roughly tracking a 1/R scaling since the softened-core error should be a fixed fraction of the atom's size relative to distance. This validates the user's intuition, and I can now quantify it precisely for the Schrödinger case.
+
+For the KG/Dirac case, there are two competing error sources: the core softening error scaling as 1/R, and the relativistic correction scaling as 1/R² — meaning the relativistic error vanishes much faster while the core error dominates and persists at large R, only slowly improving.
+
+I want to verify that Mass = 2 remains stable at larger R for both KG and Dirac — checking that the effective coupling shrinks and the frequency approaches its asymptotic value smoothly. I'm planning a quick stability check at R=10 with a modestly sized box and short run to confirm the atom stays bound and doesn't outgrow the simulation domain.
+
+To keep this cheap, I'll go with R=8, an 80³ box, and 200 steps instead — enough to confirm Mass=2 stays bound without excessive runtime. Let me run it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+)
+
+func TestScratchKGRadius(t *testing.T) {
+	for _, R := range []float32{5, 10} {
+		sz := int32(10 * R)
+		ss := &Sim{}
+		ss.Config = &Config{}
+		ss.Config.Defaults()
+		ss.Config.GPU, ss.Config.GUI = false, false
+		ss.Config.Equation = KleinGordonC
+		ss.Config.Size.Set(sz, sz, sz)
+		ss.Config.HydrogenRadius = R
+		ss.ConfigSim()
+		ss.Params.ThreeD.SetBool(true)
+		ss.Params.Update()
+		ss.StateVars = CabStatesN
+		ss.ConfigState()
+		ss.InitFunc = ScalarHydrogen
+		ss.Init()
+		kgStepExt(ss)
+		r0 := atomRMS(sz, CabMag)
+		p := ss.Params
+		za := p.Hbar / (p.Mass * p.C * R)
+		for range 200 {
+			kgStepExt(ss)
+		}
+		r1 := atomRMS(sz, CabMag)
+		fmt.Printf("R %2.0f  box %3d^3  Z*alpha %.3f  omega %.5f  rms %6.3f -> %6.3f (%+.1f%%)\n",
+			R, sz, za, p.Omega0-p.Hbar/(2*p.Mass*R*R), r0, r1, 100*(r1-r0)/r0)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchKGRadius -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  R  5  box  50^3  Z*alpha 0.200  omega 0.49000  rms  8.619 ->  8.454 (-1.9%)
+  R 10  box 100^3  Z*alpha 0.100  omega 0.49750  rms 17.240 -> 16.448 (-4.6%)
+  --- PASS: TestScratchKGRadius (33.56s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	33.581s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+At R=10 it also works fine — Zα drops to 0.1, ω shifts accordingly, and the rms scales exactly by the expected factor of 2 while staying bound. The difference in drift percentages between the two runs is just because 200 steps covers a smaller fraction of the longer binding period at larger R, not a real discrepancy — the key takeaway is stability and boundedness hold. Time to wrap this up.
+
+Let me double check the test harnesses default HydrogenRadius=5 via Config.Defaults(), confirm the config loading path doesn't need any extra wiring since the new field just flows through TOML naturally, then clean up scratch files and run the final full verification.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && rm -f wavesim/zz_scratch_test.go && cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./... 2>&1 | grep -icE "error"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -v 2>&1 | grep -c "^--- PASS"; go test ./wavesim/ -v 2>&1 | grep -c "^--- FAIL"``
+  ```
+  go build
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  53
+  0
+  ```
+
+</details>
+
+All 53 pass, generate/gofmt/build clean.
+
+## `Config.HydrogenRadius`
+
+Now a Config field, default 5, added to the Schrödinger, KGC and Dirac `ShouldDisplay` lists so it's tunable in the GUI. All six configs read `ss.Config.HydrogenRadius`; the constant is gone.
+
+**Mass = 2 stays fine as a constant** — in fact it has to be. The radius and the mass aren't independent knobs: a = Compton/Zα, and at C = 0.5 the Compton wavelength is exactly one cube, so **Zα = 1/R** falls out. Growing R just makes the well shallower and the atom more non-relativistic, which is the direction you want. Verified at R = 10 in a 100³ box:
+
+```
+R  5  box  50^3  Z*alpha 0.200  omega 0.49000  rms  8.619
+R 10  box 100^3  Z*alpha 0.100  omega 0.49750  rms 17.240
+```
+
+rms scales exactly 2×, still bound, still stable.
+
+## Bigger does help — but as 1/R, not fast
+
+You're right, and I measured it. Schrödinger ground state, each radius run for the same *physics* time (the binding period goes as R²):
+
+| R | box | peak swing |
 |---|---|---|
-| Schrödinger | `HydrogenGround` (existing) | **`HydrogenP`** |
-| complex KG | **`ScalarHydrogen`** | **`ScalarHydrogenP`** |
-| Dirac | **`DiracHydrogen`** | **`DiracHydrogenP`** |
+| 4 | 40³ | 50.6% |
+| 5 | 50³ | 41.9% |
+| 8 | 80³ | 28.0% |
 
-All three use one atom, sized by a shared `HydrogenRadius = 5`. The n=2 configs use a well four times deeper so the 2p comes out the same size as the 1s and fits the same box — and the binding energy works out identical either way, ħ²/2mR².
+That's roughly 1/R, which is what you'd expect: the softened core is one cube out of R, so it's a 1/R fraction of the atom. It shrinks steadily but you'd need R ≈ 40 to get under 5%.
 
-I renamed `SchrodingerBohr` → `HydrogenRadius` and moved it to `init.goal`, since it's now shared by all three.
+For KG and Dirac there are **two** error sources and they die at different rates — the relativistic one (starting from the non-relativistic shape) goes as (Zα)² = 1/R², so it's gone quickly; the core one goes as 1/R and is what's left. So on the GPU at R = 20–30 these should look distinctly cleaner, dominated by the core. Agreed that's enough without the lattice eigenstate — and if you ever want it exact, imaginary-time relaxation is still the answer.
 
-## The p orbital
+I put all of this in the `Config.HydrogenRadius` doc comment so the trade-off is visible where you set it.
 
-Textbook, and exact where it matters:
+## The cur/prev fix
 
-```
-dz  -8  0.10435     lobes peak at dz = ±5, which is the n=2
-dz  -5  0.13533     decay length 2a
-dz  -1  0.02681
-dz  +0  0.00000  <- node
-dz  +5  0.13533
-```
+Audited every function in `init.goal` for the asymmetry. Three offenders, now all writing both:
 
-The node is fixed by symmetry, not by getting the radial function right, so it stays exact — under 0.8% of the lobe peak after 1000 steps. The lobes are opposite-signed in `CabAs`, which is invisible in |χ|² and is precisely what keeps them from merging into one lump.
+- **`InvR`** — the one that bit us
+- **`InvRDrive`** — same pattern, spinfield drive
+- **`Sine`** — used by `StandingWave`
 
-## A bug this turned up
+Six now-redundant `CopyCurToPrev()` calls removed from `HydrogenWell`, `HydrogenGround`, `HydrogenP`, `SpinInPotential`, `StandingWave` and a KG test. Everything else in `init.goal` was already symmetric.
 
-`SpinInPotential` — your existing config — has no spin term acting. The Dirac kernel reads `EX/EY/EZ` and `BX/BY/BZ` as **state**, and `MaxwellKernel` is what fills them from the potentials. With `SelfField` off it never runs, so a well written straight into `A0s` carries no E field, `σ·(cB + iE)` is identically zero, and the Dirac equation quietly collapses into two independent Klein-Gordon ones.
+`InvR`'s doc now says why, since it's the trap: a value that's there on one step and gone the next isn't a well, it's a drive, and it pumps whatever sits in it to infinity.
 
-I caught it because `DiracHydrogen` and `ScalarHydrogen` came out **bit-identical**. New `EFromA0()` fills E = −∇A0 with the same stencil Maxwell uses, and `HydrogenWell` calls it. After that they diverge properly, and `TestDiracHydrogenBound` asserts the E field is nonzero so this can't come back silently.
+`CopyCurToPrev` itself has no callers left. I left it exported — it's a reasonable thing for an outside config to want — but say the word if you'd rather drop it.
 
-Worth deciding separately whether `SpinInPotential` should call it too — I left your config alone.
+All 53 pass, generate/gofmt/build clean.
 
-## Results, honestly
+## `Config.HydrogenRadius`
 
-Binding is real and the control proves it isn't just edge damping:
+Now a Config field, default 5, added to the Schrödinger, KGC and Dirac `ShouldDisplay` lists so it's tunable in the GUI. All six configs read `ss.Config.HydrogenRadius`; the constant is gone.
+
+**Mass = 2 stays fine as a constant** — in fact it has to be. The radius and the mass aren't independent knobs: a = Compton/Zα, and at C = 0.5 the Compton wavelength is exactly one cube, so **Zα = 1/R** falls out. Growing R just makes the well shallower and the atom more non-relativistic, which is the direction you want. Verified at R = 10 in a 100³ box:
 
 ```
-ScalarHydrogen    rms  8.654 ->  8.915  (+3.0%)
-ScalarHydrogenP   rms 13.639 -> 13.100  (-4.0%)
-unbound control   rms  8.654 -> 20.163  (+133.0%)
+R  5  box  50^3  Z*alpha 0.200  omega 0.49000  rms  8.619
+R 10  box 100^3  Z*alpha 0.100  omega 0.49750  rms 17.240
 ```
 
-Both rms values match theory exactly — √3·a = 8.66 for the 1s, 13.69 for the 2p.
+rms scales exactly 2×, still bound, still stable.
 
-These states **breathe rather than sit still**, and I updated the docs to say so with real numbers instead of "a little":
+## Bigger does help — but as 1/R, not fast
 
-- The initial shape is the non-relativistic exp(−r/a), an eigenstate only to O((Zα)²), and `HydrogenRadius` puts you at Zα = 0.2 for n=1 and 0.4 for the deeper n=2 well. Those are real atoms — 0.2 is around iron — so the corrections are visibly not small. The breathing *is* the relativistic correction.
-- `DiracHydrogen` swings widest (rms up ~25% then back down to ~10% by step 800 — bounded, oscillating, not diverging). It has the σ·E term the scalar case lacks.
-- Even the Schrödinger `HydrogenGround` you already had breathes ~40% at the peak, which I hadn't measured before. It's the cusp: exp(−r/a) is non-smooth exactly at the softened core, so the peak relaxes immediately and then oscillates. The shape away from the core barely moves.
+You're right, and I measured it. Schrödinger ground state, each radius run for the same *physics* time (the binding period goes as R²):
 
-`HydrogenMass = 2` is forced — a = Compton/Zα, so a light particle makes an atom far too big for the lattice. At C = 0.5 this puts the Compton wavelength at one cube.
+| R | box | peak swing |
+|---|---|---|
+| 4 | 40³ | 50.6% |
+| 5 | 50³ | 41.9% |
+| 8 | 80³ | 28.0% |
 
-If you want these genuinely stationary, the fix is imaginary-time relaxation to find the true lattice eigenstate rather than initializing from the continuum formula. Say the word and I'll add it.
+That's roughly 1/R, which is what you'd expect: the softened core is one cube out of R, so it's a 1/R fraction of the atom. It shrinks steadily but you'd need R ≈ 40 to get under 5%.
 
-Also removed a duplicate `KleinGordonCStats()` call in `kgSim` — `ConfigSim` already registers them, so the test harness was appending two rows per step, the same bug you hit with the electroweak stats.
+For KG and Dirac there are **two** error sources and they die at different rates — the relativistic one (starting from the non-relativistic shape) goes as (Zα)² = 1/R², so it's gone quickly; the core one goes as 1/R and is what's left. So on the GPU at R = 20–30 these should look distinctly cleaner, dominated by the core. Agreed that's enough without the lattice eigenstate — and if you ever want it exact, imaginary-time relaxation is still the answer.
+
+I put all of this in the `Config.HydrogenRadius` doc comment so the trade-off is visible where you set it.
+
+## The cur/prev fix
+
+Audited every function in `init.goal` for the asymmetry. Three offenders, now all writing both:
+
+- **`InvR`** — the one that bit us
+- **`InvRDrive`** — same pattern, spinfield drive
+- **`Sine`** — used by `StandingWave`
+
+Six now-redundant `CopyCurToPrev()` calls removed from `HydrogenWell`, `HydrogenGround`, `HydrogenP`, `SpinInPotential`, `StandingWave` and a KG test. Everything else in `init.goal` was already symmetric.
+
+`InvR`'s doc now says why, since it's the trap: a value that's there on one step and gone the next isn't a well, it's a drive, and it pumps whatever sits in it to infinity.
+
+`CopyCurToPrev` itself has no callers left. I left it exported — it's a reasonable thing for an outside config to want — but say the word if you'd rather drop it.
 

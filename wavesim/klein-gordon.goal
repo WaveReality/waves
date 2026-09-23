@@ -442,7 +442,7 @@ func scalarAtom(ss *Sim, a, n float32) float32 {
 // everywhere, E = m c^2 + binding. Compare Charge At Rest, which uses the local
 // rate and is not an eigenstate of anything.
 func ScalarHydrogen(ss *Sim) {
-	a := HydrogenRadius
+	a := ss.Config.HydrogenRadius
 	om := scalarAtom(ss, a, 1)
 	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
 	ss.ChargedBound(1, om)
@@ -458,7 +458,7 @@ func ScalarHydrogen(ss *Sim) {
 // at all; l = 1 is safe until 3/2, so the p state tolerates a far heavier
 // nucleus than the s state does.
 func ScalarHydrogenP(ss *Sim) {
-	a := HydrogenRadius / 2
+	a := ss.Config.HydrogenRadius / 2
 	om := scalarAtom(ss, a, 2)
 	ss.ExpoP(CabAs, Both, math32.Vec3(-1, -1, -1), math32.Z, 2*a, ss.Config.Amplitude)
 	ss.ChargedBound(1, om)
@@ -487,4 +487,4 @@ var KGShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "Waveleng
 
 // KGCShouldDisplay determines which Parameters fields to display for the
 // complex, optionally EM-coupled version.
-var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}

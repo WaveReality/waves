@@ -208,11 +208,9 @@ func BoxTwoStates(ss *Sim) {
 // no second electron, so no chemistry.
 func HydrogenGround(ss *Sim) {
 	p := ss.Params
-	a := HydrogenRadius
+	a := ss.Config.HydrogenRadius
 	k := p.Hbar * p.Hbar / (p.Mass * a)
 	ss.InvR(CabV, math32.Vec3(-1, -1, -1), -k)
-	ss.CopyCurToPrev() // InvR writes cur only, and a potential that is there on
-	// one step and gone the next pumps the wave straight to infinity
 	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
 }
 
@@ -233,11 +231,10 @@ func HydrogenGround(ss *Sim) {
 // lobes are why bonds built from them point in particular directions.
 func HydrogenP(ss *Sim) {
 	p := ss.Params
-	a := HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
+	a := ss.Config.HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
 	k := p.Hbar * p.Hbar / (p.Mass * a)
 	ctr := math32.Vec3(-1, -1, -1)
 	ss.InvR(CabV, ctr, -k)
-	ss.CopyCurToPrev()
 	ss.ExpoP(CabAs, Both, ctr, math32.Z, 2*a, ss.Config.Amplitude)
 }
 
@@ -261,7 +258,7 @@ var SchrodingerConfigs = []InitFunc{
 }
 
 // SchrodingerShouldDisplay determines which Parameters fields to display.
-var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
+var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}
 
 // Cab1DViewAll configures the View to display A and B, Cur and Prev
 func Cab1DViewAll(view *View) {

@@ -41,6 +41,19 @@ type Config struct {
 	// Higgs condensate around: turn it down for the linear regime.
 	Amplitude float32
 
+	// HydrogenRadius is the size of the orbitals in the hydrogen configs, in
+	// cubes: the Bohr radius a for the n = 1 states, and the decay length 2a
+	// for the n = 2 ones, whose well is four times deeper so that both come
+	// out the same size and fit the same box. Binding is hbar^2 / 2 m R^2
+	// either way.
+	//
+	// Bigger is more accurate, and costs only box: the well depth goes as 1/R,
+	// so Z alpha = Compton / R and the relativistic error in starting from the
+	// nonrelativistic shape falls as 1/R^2, while the softened core shrinks
+	// from a 1/R fraction of the atom to nothing. It is also slower to watch,
+	// since the binding energy falls as 1/R^2 too.
+	HydrogenRadius float32
+
 	// Source is the location of a point source (a charge, say) for functions
 	// that use it. Negative values mean the center, as in [CenterF].
 	Source math32.Vector3
@@ -64,6 +77,7 @@ func (cfg *Config) Defaults() {
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 12
 	cfg.Amplitude = 1
+	cfg.HydrogenRadius = 5
 	cfg.Source.Set(-1, -1, -1) // center
 	cfg.Polarization = math32.Y
 }

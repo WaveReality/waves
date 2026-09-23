@@ -215,7 +215,6 @@ func init() {
 		"HydrogenGround":               reflect.ValueOf(wavesim.HydrogenGround),
 		"HydrogenMass":                 reflect.ValueOf(wavesim.HydrogenMass),
 		"HydrogenP":                    reflect.ValueOf(wavesim.HydrogenP),
-		"HydrogenRadius":               reflect.ValueOf(wavesim.HydrogenRadius),
 		"InvSqrt2":                     reflect.ValueOf(constant.MakeFromLiteral("0.70710678118654752438189403651591646848828531801700592041015625", token.FLOAT, 0)),
 		"InvTwoPi":                     reflect.ValueOf(constant.MakeFromLiteral("0.1591549430918953357688837633725143620344596457404564487476673444300040780141996719106026727715820407878956216412499261342547601113743180312262497636526683285512964044234457405835314602882135659456253051757812", token.FLOAT, 0)),
 		"Ip":                           reflect.ValueOf(constant.MakeFromLiteral("34789900000000000000000000", token.FLOAT, 0)),

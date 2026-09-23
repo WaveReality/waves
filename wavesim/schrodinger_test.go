@@ -222,11 +222,11 @@ func TestSchrodingerHydrogenP(t *testing.T) {
 		return float64(State.Value(ctr+dz, ctr, ctr, int(CabAs), int(GetCtx(0).CurState)))
 	}
 	// the lobes peak at the n = 2 decay length, and are mirror images
-	peak := mag(int(HydrogenRadius))
-	if d := math.Abs(mag(-int(HydrogenRadius)) - peak); d > 1e-6*peak {
+	peak := mag(int(ss.Config.HydrogenRadius))
+	if d := math.Abs(mag(-int(ss.Config.HydrogenRadius)) - peak); d > 1e-6*peak {
 		t.Errorf("lobes differ by %.2e, should be mirror images", d)
 	}
-	if up, dn := as(int(HydrogenRadius)), as(-int(HydrogenRadius)); up*dn >= 0 {
+	if up, dn := as(int(ss.Config.HydrogenRadius)), as(-int(ss.Config.HydrogenRadius)); up*dn >= 0 {
 		t.Errorf("lobes have the same sign (%+.4f, %+.4f), so this is not a p orbital", up, dn)
 	}
 	worst := mag(0)
@@ -238,5 +238,5 @@ func TestSchrodingerHydrogenP(t *testing.T) {
 		t.Errorf("node reaches %.3g, %.2f%% of the lobe peak %.3g", worst, 100*worst/peak, peak)
 	}
 	t.Logf("lobe peak %.5f at dz = +-%g, node stays under %.3g (%.3f%% of peak) over 1000 steps",
-		peak, HydrogenRadius, worst, 100*worst/peak)
+		peak, ss.Config.HydrogenRadius, worst, 100*worst/peak)
 }

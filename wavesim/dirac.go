@@ -237,7 +237,7 @@ func (ss *Sim) DiracConfig() {
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude"}
+var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius"}
 
 //////// configurations
 
@@ -298,7 +298,6 @@ func SpinInPotential(ss *Sim) {
 	p.Update()
 	a0 := DiracWellDepth * (p.Omega0 * p.Hbar) / p.E
 	ss.InvR(A0s, math32.Vec3(-1, -1, -1), a0)
-	ss.CopyCurToPrev()
 	w := ss.Config.PacketWidth
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w
@@ -341,7 +340,7 @@ func diracAtom(ss *Sim, a, n float32) float32 {
 // Watch SigZ: it holds, because an s state has no orbital angular momentum for
 // the spin to couple to. DiracHydrogenP is where that changes.
 func DiracHydrogen(ss *Sim) {
-	a := HydrogenRadius
+	a := ss.Config.HydrogenRadius
 	om := diracAtom(ss, a, 1)
 	ss.Expo(Dirac1As, Both, math32.Vec3(-1, -1, -1), a, ss.Config.Amplitude)
 	ss.DiracBound(1, om)
@@ -357,7 +356,7 @@ func DiracHydrogen(ss *Sim) {
 // into j = 1/2 and j = 3/2 for exactly this reason, and a spin-up l = 1 state
 // is a mixture of the two, so it evolves rather than sitting still.
 func DiracHydrogenP(ss *Sim) {
-	a := HydrogenRadius / 2
+	a := ss.Config.HydrogenRadius / 2
 	om := diracAtom(ss, a, 2)
 	ss.ExpoP(Dirac1As, Both, math32.Vec3(-1, -1, -1), math32.Z, 2*a, ss.Config.Amplitude)
 	ss.DiracBound(1, om)

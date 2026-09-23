@@ -264,7 +264,6 @@ func TestKGBorisStability(t *testing.T) {
 			s.Params.Boris.SetBool(boris)
 			s.Params.Update()
 			s.InvR(A0s, math32.Vec3(-1, -1, -1), a0amp)
-			s.CopyCurToPrev()
 			ChargedPacket(s)
 		})
 		kgStepExt(ss)
@@ -326,7 +325,7 @@ func scalarUnbound(ss *Sim) {
 	p.Mass = HydrogenMass
 	p.Edges = EdgesDamp
 	p.Update()
-	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), HydrogenRadius, ss.Config.Amplitude)
+	ss.Expo(CabAs, Both, math32.Vec3(-1, -1, -1), ss.Config.HydrogenRadius, ss.Config.Amplitude)
 	ss.ChargedBound(1, p.Omega0)
 }
 

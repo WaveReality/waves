@@ -391,7 +391,6 @@ func StandingWave(ss *Sim) {
 	ss.Params.Update()
 	pos, _, _, _ := emTransverse(ss)
 	ss.Sine(pos, math32.X, ss.Config.Wavelength, 0, ss.Config.Amplitude, 0)
-	ss.CopyCurToPrev() // no velocity
 }
 
 // MovingCharge shows the magnetic field that moving charge produces: a
