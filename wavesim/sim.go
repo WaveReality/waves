@@ -324,6 +324,10 @@ func (ss *Sim) StepRun() {
 				RunMaxwellDampKernel(ne)
 			case Spinfield:
 				RunKleinGordonCDampKernel(ne)
+				// no damping for Weyl either: its configs use EdgesWrap, and
+				// setting EdgesDamp there runs NOTHING, which is worse than
+				// wrapping -- the halo keeps whatever it was initialized to
+				// and the gradient stencil reads it forever.
 			}
 		}
 	}

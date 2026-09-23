@@ -836,6 +836,35 @@ func (ss *Sim) SineBox(vr enums.Enum, curPrev CurPrevBoth, n int32, amp float32)
 	}
 }
 
+// Ramp adds a linear gradient along dim, slope per cube, zero at the center,
+// to both cur and prv. In A0 that is a UNIFORM field, E = -grad A0, which is
+// the simplest thing that can push a charge.
+//
+// NOT periodic. A ramp does not meet itself, so with EdgesWrap the two ends
+// differ by the whole range of the ramp and the edge cells see that entire
+// drop across one cube -- an enormous spurious field pinned to the boundary.
+// Use it with damped or fixed edges, or use [Sim.Sine] over exactly one box
+// length, which is periodic and near-uniform across the middle.
+func (ss *Sim) Ramp(vr enums.Enum, dim math32.Dims, slope float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := slope * (CoordToFloat(c).Dim(dim) - ctr.Dim(dim))
+				State[f.Z, f.Y, f.X, vri, cur] += v
+				State[f.Z, f.Y, f.X, vri, prv] += v
+			}
+		}
+	}
+}
+
 // InvR adds 1/r values radiating from given center point, with peak point as
 // given value, in both cur and prv. Both, because this is a STATIC potential:
 // a value that is there on one step and gone the next is not a well, it is a

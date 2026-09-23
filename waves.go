@@ -95,7 +95,7 @@ func main() {
 				sim.ViewInit(wavesim.DiracViewAll)
 			case wavesim.Weyl:
 				sim.Params.ThreeD.SetBool(true)
-				sim.Config.Size.Set(128, 128, 128)
+				sim.Config.Size.Set(64, 64, 64)
 				sim.ViewInit(wavesim.WeylViewAll)
 			case wavesim.Electroweak:
 				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1

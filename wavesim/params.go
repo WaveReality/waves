@@ -297,8 +297,20 @@ type Parameters struct {
 	SinThetaW float32 `display:"-"`
 	CosThetaW float32 `display:"-"`
 
+	// WeylQ is the electric charge of the Weyl field, in units of E. It is an
+	// INPUT here, not a consequence: set it to 0 and you have a neutrino, to 1
+	// and you have an electron, and nothing in this equation prefers either.
+	//
+	// Neutrality only becomes a RESULT one level up, where Q = T^3 + Y and the
+	// photon is the combination of B and W^3 that the doublet's upper
+	// component is blind to. There the neutrino's isospin cancels its
+	// hypercharge exactly, and e_L and e_R land on the same -1 from different
+	// assignments -- which is why electromagnetism does not care about
+	// chirality although the weak force does.
+	WeylQ float32 `default:"1"`
+
 	// gosl requires the total struct size to be a multiple of 16 bytes.
-	pad, pad1 float32
+	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -352,6 +364,7 @@ func (pr *Parameters) Defaults() {
 	pr.Mass = 0.125
 	pr.A0NoWave.SetBool(true)
 	pr.E = 1.0
+	pr.WeylQ = 1
 	pr.Mu0 = 1.0
 	pr.Move.SetBool(true)
 	// Standard Model values at HiggsCompton = 16 cubes (see Units.Update):

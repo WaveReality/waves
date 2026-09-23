@@ -216,3 +216,95 @@ func TestWeylElectronSlower(t *testing.T) {
 		t.Errorf("electron %.4f is not visibly slower than neutrino %.4f", speed["electron"], speed["neutrino"])
 	}
 }
+
+// TestWeylHelicity: helicity is conserved and chirality is not, and the
+// difference between them is the thing worth seeing. A massive packet holds
+// sigma . khat at -1 in BOTH halves while their magnitudes trade -- so the
+// electron is not "left-handed some of the time", it is one helicity carried
+// by two chiralities.
+func TestWeylHelicity(t *testing.T) {
+	const sz = 48
+	for _, tc := range []struct {
+		name  string
+		init  func(*Sim)
+		bothH bool
+	}{{"NeutrinoPacket", NeutrinoPacket, false}, {"ElectronPacket", ElectronPacket, true}} {
+		ss := wySim(sz, tc.init)
+		for range 30 {
+			wyStep(ss)
+		}
+		hl := ss.Stats.Float64("HelicityL")
+		hr := ss.Stats.Float64("HelicityR")
+		for _, v := range []float64{hl.Float1D(0), hl.Float1D(-1)} {
+			if math.Abs(v+1) > 1e-4 {
+				t.Errorf("%s: left helicity %.5f, want -1", tc.name, v)
+			}
+		}
+		if tc.bothH {
+			if math.Abs(hr.Float1D(-1)+1) > 1e-4 {
+				t.Errorf("%s: right helicity %.5f, want -1 -- helicity is conserved, chirality is not",
+					tc.name, hr.Float1D(-1))
+			}
+		} else if hr.Float1D(-1) != 0 {
+			t.Errorf("%s: right half is empty, its helicity should read 0, got %.5f", tc.name, hr.Float1D(-1))
+		}
+		l, r := wySums()
+		t.Logf("%-15s helicity L %+.5f, R %+.5f, with |R|^2/|L|^2 = %.3f",
+			tc.name, hl.Float1D(-1), hr.Float1D(-1), r/l)
+	}
+}
+
+// TestWeylCharge: minimal coupling. A charged packet in a uniform field picks
+// up momentum and changes speed; the same packet with WeylQ at 0 sails
+// through. That is a neutrino ignoring a field -- though note WeylQ is a
+// number that was typed in, not anything this equation derived.
+//
+// Also checks the gauge: a CONSTANT A0 is pure phase and must change nothing.
+// It nearly does not, the residue being the scheme's arcsin.
+func TestWeylCharge(t *testing.T) {
+	const sz = 64
+	speed := func(ss *Sim, n int) float64 {
+		x0 := wyCtr(sz, WeylLMag, math32.X)
+		for range n {
+			wyStep(ss)
+		}
+		return (wyCtr(sz, WeylLMag, math32.X) - x0) / float64(n)
+	}
+	mk := func(f func(*Sim)) *Sim {
+		ss := wySim(sz, f)
+		wyStep(ss)
+		return ss
+	}
+	free := speed(mk(ElectronPacket), 40)
+	gauge := speed(mk(func(s *Sim) {
+		s.Params.EM.SetBool(true)
+		s.Params.SelfField.SetBool(false)
+		s.Params.Update()
+		s.Fill(A0s, Both, 0.02) // uniform: pure gauge, and set BEFORE the packet
+		ElectronPacket(s)
+	}), 40)
+	if d := math.Abs(gauge-free) / free; d > 0.03 {
+		t.Errorf("a constant A0 changed the speed by %.2f%%, but it is pure gauge", 100*d)
+	}
+	t.Logf("gauge: free %.5f, constant A0 %.5f (%+.2f%%)", free, gauge, 100*(gauge-free)/free)
+
+	chg := map[float32]float64{}
+	for _, q := range []float32{1, 0} {
+		ss := mk(func(s *Sim) {
+			ElectronInField(s)
+			s.Params.WeylQ = q
+			s.Params.Update()
+		})
+		early := speed(ss, 30)
+		late := speed(ss, 30)
+		ch := (late - early) / early
+		chg[q] = ch
+		t.Logf("WeylQ %.0f: speed %.5f -> %.5f (%+.1f%%)", q, early, late, 100*ch)
+	}
+	// the neutral one is not perfectly steady -- it spreads, and its tails
+	// wrap -- so the test is that the charged one moves several times more
+	if math.Abs(chg[1]) < 3*math.Abs(chg[0]) {
+		t.Errorf("charged changed %.1f%% against the neutral %.1f%%: the field is barely telling them apart",
+			100*chg[1], 100*chg[0])
+	}
+}

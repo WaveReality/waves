@@ -4,7 +4,11 @@
 
 package wavesim
 
-import "cogentcore.org/core/math32"
+import (
+	"cogentcore.org/core/math32"
+	"cogentcore.org/lab/plot"
+	"cogentcore.org/core/base/metadata"
+)
 
 //gosl:start
 
@@ -151,6 +155,56 @@ func WeylKernel(i uint32) { //gosl:kernel
 	dr2a := -cc*sr2a + om*nl2b
 	dr2b := -cc*sr2b - om*nl2a
 
+	// minimal coupling, grad -> grad - i (q/hbar c) A and the A0 energy shift:
+	//
+	//	d_t psi_L += i (q/hbar) [A0 + sigma.A] psi_L
+	//	d_t psi_R += i (q/hbar) [A0 - sigma.A] psi_R
+	//
+	// sigma.A has the identical component structure to sigma.grad above, with
+	// the potential in place of the derivative, and carries the same sign as
+	// it does for each chirality -- both are halves of one sigma.D.
+	//
+	// Cheaper than the second-order version in two ways that are not
+	// accidents. There is no (qA)^2 term, which only exists because squaring
+	// the operator makes one. And there is no Boris push: in the second-order
+	// equation A0 multiplies the VELOCITY, so it rotates it and has to be
+	// applied exactly, while here it is one more term in the right-hand side.
+	//
+	// Params.WeylQ is the charge, and 0 is a neutrino. Nothing here derives
+	// that -- see the WeylQ doc for where it does become a result.
+	//
+	// Keep |q A0 / hbar| well under the free omega. A constant A0 is pure
+	// gauge and ought to change nothing, and on this lattice it very nearly
+	// does: a couple of percent at A0 of 0.1 against a free omega of 0.36.
+	// What is left is the scheme's own arcsin, which makes a shift in
+	// frequency not quite a shift in frequency. Push A0 toward 1 and the
+	// arcsin saturates and the wave stops making sense.
+	if Params[0].EM.IsTrue() && Params[0].WeylQ != 0 {
+		eoh := Params[0].WeylQ * Params[0].E / Params[0].Hbar
+		a0 := State[z, y, x, A0s, prv]
+		ax := State[z, y, x, AXs, prv]
+		ay := State[z, y, x, AYs, prv]
+		az := State[z, y, x, AZs, prv]
+		// sigma.A on each spinor, same component pattern as sigma.grad
+		ql1a := a0*nl1a + (az*nl1a + ax*nl2a + ay*nl2b)
+		ql1b := a0*nl1b + (az*nl1b + ax*nl2b - ay*nl2a)
+		ql2a := a0*nl2a + (ax*nl1a - ay*nl1b - az*nl2a)
+		ql2b := a0*nl2b + (ax*nl1b + ay*nl1a - az*nl2b)
+		qr1a := a0*nr1a - (az*nr1a + ax*nr2a + ay*nr2b)
+		qr1b := a0*nr1b - (az*nr1b + ax*nr2b - ay*nr2a)
+		qr2a := a0*nr2a - (ax*nr1a - ay*nr1b - az*nr2a)
+		qr2b := a0*nr2b - (ax*nr1b + ay*nr1a - az*nr2b)
+		// multiplying by i takes (a, b) to (-b, a)
+		dl1a -= eoh * ql1b
+		dl1b += eoh * ql1a
+		dl2a -= eoh * ql2b
+		dl2b += eoh * ql2a
+		dr1a -= eoh * qr1b
+		dr1b += eoh * qr1a
+		dr2a -= eoh * qr2b
+		dr2b += eoh * qr2a
+	}
+
 	l1a := ol1a + 2*dl1a
 	l1b := ol1b + 2*dl1b
 	l2a := ol2a + 2*dl2a
@@ -223,7 +277,7 @@ const WeylMass float32 = 0.5
 // wavelength, which is the honest picture -- the trade really is that quick.
 const WeylPacketMass float32 = 2
 
-var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
+var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E", "Wavelength", "PacketWidth", "Amplitude"}
 
 // WeylStats tracks the two chiralities separately, which is the whole point.
 func (ss *Sim) WeylStats() {
@@ -233,6 +287,79 @@ func (ss *Sim) WeylStats() {
 	// both chiralities: for the neutrino only L moves, and for an electron the
 	// two must track each other, since they are halves of one particle
 	ss.AddStat(ss.StatGroupVelMag(math32.X, WeylLMag, WeylRMag))
+	ss.AddStat(ss.StatWeylHelicity(math32.X))
+}
+
+// StatWeylHelicity records the spin of each chirality along dim, normalized by
+// its own magnitude. For a wave travelling along dim that IS the helicity,
+// sigma . khat, and it must sit at -1 for the left-handed half and +1 for the
+// right-handed one.
+//
+// Spin lives in the two components, which are the sigma_z basis: 1 is spin up
+// along Z and 2 is spin down. So for motion along Z the helicity is simply
+// WHICH component is filled, and for motion along X it is the relative SIGN of
+// the two, since (1,-1)/sqrt2 is spin along -X and (1,1)/sqrt2 along +X.
+//
+// The equation is what locks them together. Its only spatial term is
+// sigma.grad, so a positive-energy left-handed solution is forced to have
+// sigma . khat = -1; a spinor pointing any other way is not one wave but two,
+// and splits. That is why reversing a neutrino's spin reverses where it goes.
+//
+// Helicity is conserved and chirality is not, so on a massive packet these
+// stay pinned while the L and R magnitudes trade.
+func (ss *Sim) StatWeylHelicity(dim math32.Dims) func(init bool) {
+	names := []string{"HelicityL", "HelicityR"}
+	return func(init bool) {
+		if init {
+			for _, nm := range names {
+				tsr := ss.Stats.Float64(nm)
+				tsr.SetNumRows(0)
+				plot.SetFirstStyler(tsr, func(s *plot.Style) {
+					s.On = true
+					s.Range.SetMin(-1.1).SetMax(1.1)
+				})
+				metadata.SetDoc(tsr, "Spin along "+dim.String()+" per unit magnitude: the helicity of a wave going that way")
+			}
+			return
+		}
+		ctx := GetCtx(0)
+		cur := ctx.CurState
+		sz := ss.Config.Size
+		var num, den [2]float64
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					for h, base := range []WeylStates{WeylL1a, WeylR1a} {
+						b := int(base.Int64())
+						a1 := float64(State[f.Z, f.Y, f.X, b, cur])
+						b1 := float64(State[f.Z, f.Y, f.X, b+1, cur])
+						a2 := float64(State[f.Z, f.Y, f.X, b+2, cur])
+						b2 := float64(State[f.Z, f.Y, f.X, b+3, cur])
+						sp := 0.0
+						switch dim {
+						case math32.X:
+							sp = 2 * (a1*a2 + b1*b2)
+						case math32.Y:
+							sp = 2 * (a1*b2 - b1*a2)
+						default:
+							sp = (a1*a1 + b1*b1) - (a2*a2 + b2*b2)
+						}
+						num[h] += sp
+						den[h] += a1*a1 + b1*b1 + a2*a2 + b2*b2
+					}
+				}
+			}
+		}
+		for h, nm := range names {
+			v := 0.0
+			if den[h] > 0 {
+				v = num[h] / den[h]
+			}
+			ss.Stats.Float64(nm).AppendRowFloat(v)
+		}
+	}
 }
 
 // WeylDispersion returns the lattice frequency and group velocity of a wave of
@@ -317,6 +444,15 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float3
 	wd := ss.Config.PacketWidth
 	om, vg := ss.WeylDispersion(wl)
 	k := TwoPi / wl
+	// the LOCAL potential belongs in the phase advance too, as it does in
+	// [Sim.ChargedRest]: a wave at rest in a potential turns at a rate shifted
+	// by q A0 / hbar, and a past written without it is a past of the wrong
+	// wave -- which shows up as an admixture of the other energy sign,
+	// dragging the packet backwards in proportion to A0.
+	eoh := float32(0)
+	if ss.Params.EM.IsTrue() {
+		eoh = ss.Params.WeylQ * ss.Params.E / ss.Params.Hbar
+	}
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
@@ -334,7 +470,8 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float3
 				eo := amp * math32.FastExp(-e*e)
 				ph := k * d
 				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
-				oa, ob := eo*math32.Cos(ph+om), eo*math32.Sin(ph+om)
+				po := om + eoh*State[f.Z, f.Y, f.X, A0s, prv]
+				oa, ob := eo*math32.Cos(ph+po), eo*math32.Sin(ph+po)
 				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
 				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
 				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
@@ -433,9 +570,54 @@ func ElectronChiralFlip(ss *Sim) {
 	ss.WeylSlab(WeylL1a, math32.X, ss.Config.Amplitude)
 }
 
+// WeylFieldE is the electric field ElectronInField sets, as the slope of A0
+// per cube at the center. Small: it has to push the packet noticeably over a
+// few dozen steps while |q A0 / hbar| stays well under the free omega, or the
+// arcsin in the scheme starts distorting things by more than the field does.
+const WeylFieldE float32 = 0.008
+
+// ElectronInField is the same moving electron in a uniform electric field, and
+// the place to see what charge does here. The field pushes against its motion,
+// so it loses momentum and visibly slows -- about 17% over 60 steps.
+//
+// The field points this way rather than the other because the lattice is not
+// symmetric about it. Slowing lowers k, and the group velocity falls steeply
+// there; speeding up raises k toward pi/2, where the gradient stencil's
+// response turns over and the velocity barely moves. The same force is far
+// easier to see as a brake than as an accelerator.
+//
+// Now set Params.WeylQ to 0 and run it again: the packet sails straight
+// through as though the field were not there. That is a neutrino, and it is
+// worth being clear about what has just been shown. Nothing in this equation
+// DERIVED the neutrality -- WeylQ is a number that was typed in. The wave does
+// not care which value it gets.
+//
+// Neutrality becomes a result only with the electroweak structure, where
+// Q = T^3 + Y and the photon is the mix of B and W^3 that the doublet's upper
+// component cannot see. There the neutrino has no choice.
+func ElectronInField(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(true)
+	p.SelfField.SetBool(false) // the field is external and must stay as set
+	p.Edges = EdgesWrap
+	p.Update()
+	// A sine over exactly one box length, not a ramp. The field has to be
+	// PERIODIC: Weyl has no damping kernel, so EdgesDamp runs nothing at all
+	// and wrapping is the only edge that works -- and a linear ramp wrapped
+	// round puts its whole drop across the boundary cells. One period of a
+	// sine meets itself, and its gradient is near-uniform across the middle
+	// where the packet lives, falling off toward the ends.
+	//
+	// Field FIRST: WeylPacket reads A0 to get its own past right.
+	l := float32(ss.Config.Size.X)
+	ss.Sine(A0s, math32.X, l, 0, -WeylFieldE*l/TwoPi, 0)
+	ElectronPacket(ss)
+}
+
 var WeylConfigs = []InitFunc{
 	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
 	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
 	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
 	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
+	InitFunc{Name: "Electron In Field", Doc: "A charged packet in a uniform electric field: it picks up momentum, and with WeylQ at 0 it is a neutrino and ignores the field", Func: ElectronInField},
 }

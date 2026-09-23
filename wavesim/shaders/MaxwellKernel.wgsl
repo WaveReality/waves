@@ -690,8 +690,8 @@ struct Parameters {
 	MZ: f32,
 	SinThetaW: f32,
 	CosThetaW: f32,
+	WeylQ: f32,
 	pad: f32,
-	pad1: f32,
 }
 
 //////// import: "particle.go"
