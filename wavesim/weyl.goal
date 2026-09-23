@@ -1,0 +1,366 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import (
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+//gosl:start
+
+// WeylStates are the state variables for the chiral equation: a left-handed
+// and a right-handed 2-spinor, each with two complex components. There are no
+// velocity variables -- the equation is FIRST order in time, so the value is
+// the whole state.
+type WeylStates EMStates //enums:enum -trim-prefix=Weyl
+
+const (
+	// WeylL1a is the left-handed spinor, component 1, real part.
+	WeylL1a WeylStates = WeylStates(EMStatesN) + iota
+
+	// WeylL1b is the left-handed spinor, component 1, imaginary part.
+	WeylL1b
+
+	// WeylL2a is the left-handed spinor, component 2, real part.
+	WeylL2a
+
+	// WeylL2b is the left-handed spinor, component 2, imaginary part.
+	WeylL2b
+
+	// WeylR1a is the right-handed spinor, component 1, real part.
+	WeylR1a
+
+	// WeylR1b is the right-handed spinor, component 1, imaginary part.
+	WeylR1b
+
+	// WeylR2a is the right-handed spinor, component 2, real part.
+	WeylR2a
+
+	// WeylR2b is the right-handed spinor, component 2, imaginary part.
+	WeylR2b
+
+	// WeylLMag is |psi_L|^2.
+	WeylLMag
+
+	// WeylRMag is |psi_R|^2. The conserved total is this plus WeylLMag.
+	WeylRMag
+)
+
+// WeylKernel is the chiral (Weyl) form of the Dirac equation, as two
+// first-order 2-spinors rather than one second-order one:
+//
+//	d_t psi_L = +c (sigma.grad) psi_L - i (m c^2 / hbar) psi_R
+//	d_t psi_R = -c (sigma.grad) psi_R - i (m c^2 / hbar) psi_L
+//
+// At m = 0 the two halves come apart completely, and each is a massless wave
+// moving at exactly c with one fixed helicity: spin against momentum for L,
+// along it for R. A neutrino is one of these on its own. The mass term is the
+// ONLY thing joining them, and all it does is turn each into the other at
+// m c^2 / hbar. That is what an electron is here -- two lightspeed waves
+// trading places, so the average motion comes out slower than c, and the rest
+// mass is the frequency of the trade.
+//
+// Keeping L and R as separate fields is the point. The second-order Dirac
+// equation eliminates one of them, which needs both to share a covariant
+// derivative and a constant mass -- neither survives the electroweak theory,
+// where only L feels the weak force and the mass is the Higgs field.
+//
+// The integration is NOT Visscher's. That scheme splits a complex field into
+// real and imaginary parts driven by each other, which works because
+// Schrodinger's H is real in the position basis. Here sigma.grad carries
+// sigma_y, which is imaginary, so d_t(real) depends on the real parts too and
+// there is nothing to stagger. What this is instead is the three-level
+// leapfrog for a first-order system, which the two state buffers already hold:
+// cur is two steps back before it is written, prv is one, so
+//
+//	u(t+1) = u(t-1) + 2 dt (d_t u)(t)
+//
+// falls out with no extra storage. Second-order accurate and norm-preserving
+// for an antisymmetric right-hand side, which this is.
+//
+// Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat
+// the gradient stencil can see, so C has to be well under its usual limit:
+// WeylConfig sets it.
+func WeylKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+
+	// the three-level leapfrog: cur still holds u(t-1) until we write it
+	ol1a := State[z, y, x, WeylL1a, cur]
+	ol1b := State[z, y, x, WeylL1b, cur]
+	ol2a := State[z, y, x, WeylL2a, cur]
+	ol2b := State[z, y, x, WeylL2b, cur]
+	or1a := State[z, y, x, WeylR1a, cur]
+	or1b := State[z, y, x, WeylR1b, cur]
+	or2a := State[z, y, x, WeylR2a, cur]
+	or2b := State[z, y, x, WeylR2b, cur]
+
+	// u(t), which the right-hand side is evaluated at
+	nl1a := State[z, y, x, WeylL1a, prv]
+	nl1b := State[z, y, x, WeylL1b, prv]
+	nl2a := State[z, y, x, WeylL2a, prv]
+	nl2b := State[z, y, x, WeylL2b, prv]
+	nr1a := State[z, y, x, WeylR1a, prv]
+	nr1b := State[z, y, x, WeylR1b, prv]
+	nr2a := State[z, y, x, WeylR2a, prv]
+	nr2b := State[z, y, x, WeylR2b, prv]
+
+	threeD := Params[0].ThreeD.IsTrue()
+	var gl1a, gl1b, gl2a, gl2b, gr1a, gr1b, gr2a, gr2b math32.Vector3
+	if threeD {
+		gl1a = Gradient10(x, y, z, int32(WeylL1a), prv)
+		gl1b = Gradient10(x, y, z, int32(WeylL1b), prv)
+		gl2a = Gradient10(x, y, z, int32(WeylL2a), prv)
+		gl2b = Gradient10(x, y, z, int32(WeylL2b), prv)
+		gr1a = Gradient10(x, y, z, int32(WeylR1a), prv)
+		gr1b = Gradient10(x, y, z, int32(WeylR1b), prv)
+		gr2a = Gradient10(x, y, z, int32(WeylR2a), prv)
+		gr2b = Gradient10(x, y, z, int32(WeylR2b), prv)
+	} else {
+		gl1a = Gradient1D(x, y, z, int32(WeylL1a), prv)
+		gl1b = Gradient1D(x, y, z, int32(WeylL1b), prv)
+		gl2a = Gradient1D(x, y, z, int32(WeylL2a), prv)
+		gl2b = Gradient1D(x, y, z, int32(WeylL2b), prv)
+		gr1a = Gradient1D(x, y, z, int32(WeylR1a), prv)
+		gr1b = Gradient1D(x, y, z, int32(WeylR1b), prv)
+		gr2a = Gradient1D(x, y, z, int32(WeylR2a), prv)
+		gr2b = Gradient1D(x, y, z, int32(WeylR2b), prv)
+	}
+
+	// sigma.grad on a 2-spinor, written out in real components:
+	//	(sigma.grad psi)_1 = d_z psi_1 + (d_x - i d_y) psi_2
+	//	(sigma.grad psi)_2 = (d_x + i d_y) psi_1 - d_z psi_2
+	// The d_y terms are where sigma_y puts real and imaginary into each
+	// other, and are why this cannot be staggered the way Schrodinger is.
+	sl1a := gl1a.Z + gl2a.X + gl2b.Y
+	sl1b := gl1b.Z + gl2b.X - gl2a.Y
+	sl2a := gl1a.X - gl1b.Y - gl2a.Z
+	sl2b := gl1b.X + gl1a.Y - gl2b.Z
+	sr1a := gr1a.Z + gr2a.X + gr2b.Y
+	sr1b := gr1b.Z + gr2b.X - gr2a.Y
+	sr2a := gr1a.X - gr1b.Y - gr2a.Z
+	sr2b := gr1b.X + gr1a.Y - gr2b.Z
+
+	cc := Params[0].C
+	om := Params[0].Omega0 // m c^2 / hbar: the rate L and R turn into each other
+
+	// -i M psi takes (a, b) to (M b, -M a), which is the whole mass term
+	dl1a := cc*sl1a + om*nr1b
+	dl1b := cc*sl1b - om*nr1a
+	dl2a := cc*sl2a + om*nr2b
+	dl2b := cc*sl2b - om*nr2a
+	dr1a := -cc*sr1a + om*nl1b
+	dr1b := -cc*sr1b - om*nl1a
+	dr2a := -cc*sr2a + om*nl2b
+	dr2b := -cc*sr2b - om*nl2a
+
+	l1a := ol1a + 2*dl1a
+	l1b := ol1b + 2*dl1b
+	l2a := ol2a + 2*dl2a
+	l2b := ol2b + 2*dl2b
+	r1a := or1a + 2*dr1a
+	r1b := or1b + 2*dr1b
+	r2a := or2a + 2*dr2a
+	r2b := or2b + 2*dr2b
+
+	State[z, y, x, WeylL1a, cur] = l1a
+	State[z, y, x, WeylL1b, cur] = l1b
+	State[z, y, x, WeylL2a, cur] = l2a
+	State[z, y, x, WeylL2b, cur] = l2b
+	State[z, y, x, WeylR1a, cur] = r1a
+	State[z, y, x, WeylR1b, cur] = r1b
+	State[z, y, x, WeylR2a, cur] = r2a
+	State[z, y, x, WeylR2b, cur] = r2b
+
+	// the STAGGERED magnitude u(t).u(t+1), not |u(t+1)|^2: a three-level
+	// leapfrog conserves the product of adjacent levels exactly, the same way
+	// Visscher's scheme does, and squaring one level alone ripples instead.
+	State[z, y, x, WeylLMag, cur] = nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
+	State[z, y, x, WeylRMag, cur] = nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
+}
+
+//gosl:end
+
+func (ss *Sim) WeylConfig() {
+	ParamsShouldDisplay = WeylShouldDisplay
+	ss.StateVars = WeylStatesN
+	ss.initFuncs = WeylConfigs
+	ss.InitFunc = NeutrinoPacket
+	ss.WeylStats()
+	// a first-order leapfrog needs sqrt(c^2 khat^2 + om^2) < 1, and khat for
+	// the 10-point gradient runs past 1, so C sits well under the second-order
+	// limit of sqrt(3)/2. Mass is set per config, not here.
+	ss.Params.C = WeylC
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	ss.ViewInit(func(view *View) {
+		view.SetVar(WeylLMag, -1)
+	})
+}
+
+// WeylViewAll configures the View to display Weyl values
+func WeylViewAll(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	view.Panels[0].Var = WeylL1a
+	view.Panels[1].Var = WeylL1b
+	view.Panels[2].Var = WeylR1a
+	view.Panels[3].Var = WeylR2b
+}
+
+
+// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+// tighter than the second-order one the other equations use.
+const WeylC float32 = 0.35
+
+// WeylMass is the electron mass the massive configs set, chosen so that the
+// L-R trade takes a few hundred steps: the period is pi hbar / m c^2.
+const WeylMass float32 = 0.5
+
+var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude"}
+
+// WeylStats tracks the two chiralities separately, which is the whole point.
+func (ss *Sim) WeylStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(WeylLMag))
+	ss.AddStat(ss.StatSum(WeylRMag))
+	ss.AddStat(ss.StatGroupVel(math32.X, WeylLMag))
+}
+
+// WeylSpinor fills one chirality with a gaussian packet moving along X, with
+// the spin along the given axis. side picks L or R, and amp scales it.
+func (ss *Sim) WeylSpinor(side WeylStates, axis math32.Dims, amp float32) {
+	var c1, c2 enums.Enum = WeylL1a, WeylL2a
+	if side == WeylR1a {
+		c1, c2 = WeylR1a, WeylR2a
+	}
+	h := amp / math32.Sqrt2
+	ctr := math32.Vec3(-1, -1, -1)
+	w := ss.Config.PacketWidth
+	switch axis {
+	case math32.X: // spin along +X is the equal superposition of the two
+		ss.Gauss(c1, Both, ctr, w, h, 0)
+		ss.Gauss(c2, Both, ctr, w, h, 0)
+	default: // +Z is component 1 alone
+		ss.Gauss(c1, Both, ctr, w, amp, 0)
+	}
+}
+
+// WeylPacket puts a moving packet of one chirality into the state: a gaussian
+// envelope times exp(i k.x), with the spinor that makes it a HELICITY
+// eigenstate, so it is one frequency and travels rigidly.
+//
+// Left-handed means sigma.khat = -1, right-handed +1, and that locking is the
+// whole content of the equation: for L the spin points AGAINST the motion, so
+// reversing the spin reverses which way it goes. A plain gaussian with no
+// phase is not a helicity eigenstate at all -- it is a mixture of both
+// directions, and it mostly sits still while pulling apart.
+//
+// Both time levels are set, the earlier one shifted back by one step's travel.
+// The three-level leapfrog reads its own past, and a wave given no past goes
+// both ways at once. For a massless field the envelope and the phase move
+// together at c, so shifting the whole packet back is exact.
+func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, amp float32) {
+	c1 := int(WeylL1a.Int64())
+	sgn := float32(-1) // left: sigma.khat = -1
+	if side == WeylR1a {
+		c1 = int(WeylR1a.Int64())
+		sgn = 1
+	}
+	// the spinor with sigma.khat = sgn, for khat along +dim
+	s1, s2 := float32(1)/math32.Sqrt2, sgn/math32.Sqrt2 // +X: sigma_x
+	if dim == math32.Z {                                // +Z: sigma_z is already diagonal
+		s1, s2 = 0, 1
+		if sgn > 0 {
+			s1, s2 = 1, 0
+		}
+	}
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	back := ctr
+	back.SetDim(dim, ctr.Dim(dim)-ss.Params.C) // where it was one step ago
+	wl := ss.Config.Wavelength
+	wd := ss.Config.PacketWidth
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				ff := CoordToFloat(c)
+				d := ff.Sub(ctr)
+				e := ff.Sub(back)
+				na := WavePacket(d.Dim(dim), d.Length(), wl, wd, 0, amp)
+				nb := WavePacket(d.Dim(dim), d.Length(), wl, wd, -0.25, amp)
+				oa := WavePacket(e.Dim(dim), e.Length(), wl, wd, 0, amp)
+				ob := WavePacket(e.Dim(dim), e.Length(), wl, wd, -0.25, amp)
+				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
+				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
+				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
+				State[f.Z, f.Y, f.X, c1+3, prv] += s2 * nb
+				State[f.Z, f.Y, f.X, c1, cur] += s1 * oa
+				State[f.Z, f.Y, f.X, c1+1, cur] += s1 * ob
+				State[f.Z, f.Y, f.X, c1+2, cur] += s2 * oa
+				State[f.Z, f.Y, f.X, c1+3, cur] += s2 * ob
+			}
+		}
+	}
+}
+
+// NeutrinoPacket is a massless left-handed wave and nothing else. With Mass at
+// zero there is no term anywhere that can put anything into the right-handed
+// half, so it stays exactly empty forever: that is what it means for the
+// neutrino to have only one handedness.
+//
+// It travels at exactly c, because a massless wave has nothing to slow it.
+func NeutrinoPacket(ss *Sim) {
+	ss.Params.Mass = 0
+	ss.Params.Update()
+	ss.WeylPacket(WeylL1a, math32.X, ss.Config.Amplitude)
+}
+
+// ElectronAtRest is the two halves in equal measure, which is what a massive
+// particle at rest IS: chirality is not helicity, and at zero momentum the
+// electron is half left and half right at every instant. Both magnitudes sit
+// flat while the phases turn.
+func ElectronAtRest(ss *Sim) {
+	ss.Params.Mass = WeylMass
+	ss.Params.Update()
+	a := ss.Config.Amplitude
+	ss.WeylSpinor(WeylL1a, math32.Z, a)
+	ss.WeylSpinor(WeylR1a, math32.Z, a)
+}
+
+// ElectronChiralFlip starts the whole electron in the LEFT half and lets the
+// mass term do the rest. It converts entirely into the right half and back:
+//
+//	|psi_L|^2 = cos^2(m c^2 t / hbar),  |psi_R|^2 = sin^2(m c^2 t / hbar)
+//
+// so each swings over a period of pi hbar / m c^2 while the sum stays flat.
+// Watch LMag and RMag in the stats trade against each other. This is
+// zitterbewegung, and it is the clearest statement of what mass is: not a
+// property the wave has, but the rate at which two massless waves turn into
+// one another. Set Mass to zero and the trade stops dead -- a neutrino.
+func ElectronChiralFlip(ss *Sim) {
+	ss.Params.Mass = WeylMass
+	ss.Params.Update()
+	ss.WeylSpinor(WeylL1a, math32.Z, ss.Config.Amplitude)
+}
+
+var WeylConfigs = []InitFunc{
+	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
+	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
+	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
+}

@@ -27,7 +27,8 @@ func main() {
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
-	eqs := wavesim.Dirac
+	// eqs := wavesim.Dirac
+	eqs := wavesim.Weyl
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
@@ -91,6 +92,10 @@ func main() {
 			case wavesim.Dirac:
 				sim.Params.ThreeD.SetBool(true)
 				sim.Config.Size.Set(128, 128, 128)
+			case wavesim.Weyl:
+				sim.Params.ThreeD.SetBool(true)
+				sim.Config.Size.Set(128, 128, 128)
+				sim.ViewInit(wavesim.WeylViewAll)
 			case wavesim.Electroweak:
 				sim.Params.C = 0.5 // note: Lorentz gauge constraint on A0 requires < 1
 				sim.Params.ThreeD.SetBool(true)
@@ -136,6 +141,8 @@ func main() {
 				wavesim.ElectricPotential(sim)
 			case wavesim.Dirac:
 				wavesim.SpinAtRest(sim)
+			case wavesim.Weyl:
+				wavesim.NeutrinoPacket(sim)
 			case wavesim.Electroweak:
 				wavesim.HiggsBroken(sim)
 			case wavesim.Spinfield:

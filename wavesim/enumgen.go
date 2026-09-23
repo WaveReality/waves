@@ -6,20 +6,20 @@ import (
 	"cogentcore.org/core/enums"
 )
 
-var _DiracStatesValues = []DiracStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
+var _DiracStatesValues = []DiracStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32}
 
 // DiracStatesN is the highest valid value for type DiracStates, plus one.
 //
 //gosl:start
-const DiracStatesN DiracStates = 28
+const DiracStatesN DiracStates = 33
 
 //gosl:end
 
-var _DiracStatesValueMap = map[string]DiracStates{`1As`: 18, `1Bs`: 19, `2As`: 20, `2Bs`: 21, `1Av`: 22, `1Bv`: 23, `2Av`: 24, `2Bv`: 25, `V`: 26, `Mag`: 27}
+var _DiracStatesValueMap = map[string]DiracStates{`1As`: 18, `1Bs`: 19, `2As`: 20, `2Bs`: 21, `1Av`: 22, `1Bv`: 23, `2Av`: 24, `2Bv`: 25, `V`: 26, `Mag`: 27, `L1As`: 28, `L1Bs`: 29, `L2As`: 30, `L2Bs`: 31, `LMag`: 32}
 
-var _DiracStatesDescMap = map[DiracStates]string{18: `Dirac1As is the wave state variable for value 1, component A: real`, 19: `Dirac1Bs is the wave state variable for value 1, component B: imaginary.`, 20: `Dirac1As is the wave state variable for value 2, component A: real`, 21: `Dirac1Bs is the wave state variable for value 2, component B: imaginary.`, 22: `Dirac1Av is the velocity of wave state 1A.`, 23: `Dirac1Bv is the velocity of wave state 1B.`, 24: `Dirac2Av is the velocity of wave state 2A.`, 25: `Dirac2Bv is the velocity of wave state 2B.`, 26: `DiracV is an external SCALAR potential: it adds to the mass term rather than to the energy, so it is a position-dependent mass. That is the coupling a relativistic equation needs in order to confine, as [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.`, 27: `DiracMag is the state magnitude (state * complex conjugate), summed over both components, which represents the total probability or a conserved charge value.`}
+var _DiracStatesDescMap = map[DiracStates]string{18: `Dirac1As is the wave state variable for value 1, component A: real`, 19: `Dirac1Bs is the wave state variable for value 1, component B: imaginary.`, 20: `Dirac1As is the wave state variable for value 2, component A: real`, 21: `Dirac1Bs is the wave state variable for value 2, component B: imaginary.`, 22: `Dirac1Av is the velocity of wave state 1A.`, 23: `Dirac1Bv is the velocity of wave state 1B.`, 24: `Dirac2Av is the velocity of wave state 2A.`, 25: `Dirac2Bv is the velocity of wave state 2B.`, 26: `DiracV is an external SCALAR potential: it adds to the mass term rather than to the energy, so it is a position-dependent mass. That is the coupling a relativistic equation needs in order to confine, as [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.`, 27: `DiracMag is the magnitude of the evolved spinor, summed over both components. That spinor is the RIGHT-chiral half of the electron, so this is |psi_R|^2 and it is NOT the probability: the conserved quantity is |psi_L|^2 + |psi_R|^2, and Charge is the conserved current.`, 28: `DiracL1As is the LEFT-chiral spinor, value 1, component A: real. psi_L is not evolved. It follows from psi_R algebraically, and the kernel recovers it each step: see DiracKernel.`, 29: `DiracL1Bs is the left-chiral spinor, value 1, component B: imaginary.`, 30: `DiracL2As is the left-chiral spinor, value 2, component A: real.`, 31: `DiracL2Bs is the left-chiral spinor, value 2, component B: imaginary.`, 32: `DiracLMag is |psi_L|^2, the left-chiral magnitude, to set against DiracMag. Their sum is what is actually conserved.`}
 
-var _DiracStatesMap = map[DiracStates]string{18: `1As`, 19: `1Bs`, 20: `2As`, 21: `2Bs`, 22: `1Av`, 23: `1Bv`, 24: `2Av`, 25: `2Bv`, 26: `V`, 27: `Mag`}
+var _DiracStatesMap = map[DiracStates]string{18: `1As`, 19: `1Bs`, 20: `2As`, 21: `2Bs`, 22: `1Av`, 23: `1Bv`, 24: `2Av`, 25: `2Bv`, 26: `V`, 27: `Mag`, 28: `L1As`, 29: `L1Bs`, 30: `L2As`, 31: `L2Bs`, 32: `LMag`}
 
 // String returns the string representation of this DiracStates value.
 func (i DiracStates) String() string {
@@ -392,20 +392,20 @@ func (i EMStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *EMStates) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "EMStates") }
 
-var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7, 8}
+var _EquationsValues = []Equations{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 // EquationsN is the highest valid value for type Equations, plus one.
 //
 //gosl:start
-const EquationsN Equations = 9
+const EquationsN Equations = 10
 
 //gosl:end
 
-var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Electroweak`: 6, `Spinfield`: 7, `ParticleMove`: 8}
+var _EquationsValueMap = map[string]Equations{`Wave`: 0, `KleinGordon`: 1, `KleinGordonC`: 2, `Schrodinger`: 3, `Maxwell`: 4, `Dirac`: 5, `Weyl`: 6, `Electroweak`: 7, `Spinfield`: 8, `ParticleMove`: 9}
 
-var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Electroweak simulates the electroweak system, including the Higgs`, 7: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 8: `ParticleMove is just particle motion without any wave field.`}
+var _EquationsDescMap = map[Equations]string{0: `Wave is the basic wave equation in one dimension (X).`, 1: `KleinGordon is the Klein-Gordon massive particle wave function, on a scalar wave state.`, 2: `KleinGordonC is the Klein-Gordon massive particle wave function, on a complex wave state.`, 3: `Schrodinger is the Schrodinger wave function on complex state.`, 4: `Maxwell is Maxwell&#39;s equations for electromagnetic (EM) waves.`, 5: `Dirac is Dirac&#39;s wave equation coupled with electromagnetic (EM) waves.`, 6: `Weyl is the first-order chiral equation on a left- and a right-handed 2-spinor: a massless neutrino in one of them, and an electron when the mass term binds the two together.`, 7: `Electroweak simulates the electroweak system, including the Higgs`, 8: `Spinfield is the Klein-Gordon complex version of stochastic particles.`, 9: `ParticleMove is just particle motion without any wave field.`}
 
-var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Electroweak`, 7: `Spinfield`, 8: `ParticleMove`}
+var _EquationsMap = map[Equations]string{0: `Wave`, 1: `KleinGordon`, 2: `KleinGordonC`, 3: `Schrodinger`, 4: `Maxwell`, 5: `Dirac`, 6: `Weyl`, 7: `Electroweak`, 8: `Spinfield`, 9: `ParticleMove`}
 
 // String returns the string representation of this Equations value.
 func (i Equations) String() string { return enums.String(i, _EquationsMap) }
@@ -770,4 +770,59 @@ func (i WaveStates) MarshalText() ([]byte, error) { return []byte(i.String()), n
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *WaveStates) UnmarshalText(text []byte) error {
 	return enums.UnmarshalText(i, text, "WaveStates")
+}
+
+var _WeylStatesValues = []WeylStates{18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
+
+// WeylStatesN is the highest valid value for type WeylStates, plus one.
+//
+//gosl:start
+const WeylStatesN WeylStates = 28
+
+//gosl:end
+
+var _WeylStatesValueMap = map[string]WeylStates{`L1a`: 18, `L1b`: 19, `L2a`: 20, `L2b`: 21, `R1a`: 22, `R1b`: 23, `R2a`: 24, `R2b`: 25, `LMag`: 26, `RMag`: 27}
+
+var _WeylStatesDescMap = map[WeylStates]string{18: `WeylL1a is the left-handed spinor, component 1, real part.`, 19: `WeylL1b is the left-handed spinor, component 1, imaginary part.`, 20: `WeylL2a is the left-handed spinor, component 2, real part.`, 21: `WeylL2b is the left-handed spinor, component 2, imaginary part.`, 22: `WeylR1a is the right-handed spinor, component 1, real part.`, 23: `WeylR1b is the right-handed spinor, component 1, imaginary part.`, 24: `WeylR2a is the right-handed spinor, component 2, real part.`, 25: `WeylR2b is the right-handed spinor, component 2, imaginary part.`, 26: `WeylLMag is |psi_L|^2.`, 27: `WeylRMag is |psi_R|^2. The conserved total is this plus WeylLMag.`}
+
+var _WeylStatesMap = map[WeylStates]string{18: `L1a`, 19: `L1b`, 20: `L2a`, 21: `L2b`, 22: `R1a`, 23: `R1b`, 24: `R2a`, 25: `R2b`, 26: `LMag`, 27: `RMag`}
+
+// String returns the string representation of this WeylStates value.
+func (i WeylStates) String() string {
+	return enums.StringExtended[WeylStates, EMStates](i, _WeylStatesMap)
+}
+
+// SetString sets the WeylStates value from its string representation,
+// and returns an error if the string is invalid.
+func (i *WeylStates) SetString(s string) error {
+	return enums.SetStringExtended(i, (*EMStates)(i), s, _WeylStatesValueMap)
+}
+
+// Int64 returns the WeylStates value as an int64.
+func (i WeylStates) Int64() int64 { return int64(i) }
+
+// SetInt64 sets the WeylStates value from an int64.
+func (i *WeylStates) SetInt64(in int64) { *i = WeylStates(in) }
+
+// Desc returns the description of the WeylStates value.
+func (i WeylStates) Desc() string {
+	return enums.DescExtended[WeylStates, EMStates](i, _WeylStatesDescMap)
+}
+
+// WeylStatesValues returns all possible values for the type WeylStates.
+func WeylStatesValues() []WeylStates {
+	return enums.ValuesGlobalExtended(_WeylStatesValues, EMStatesValues())
+}
+
+// Values returns all possible values for the type WeylStates.
+func (i WeylStates) Values() []enums.Enum {
+	return enums.ValuesExtended(_WeylStatesValues, EMStatesValues())
+}
+
+// MarshalText implements the [encoding.TextMarshaler] interface.
+func (i WeylStates) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
+
+// UnmarshalText implements the [encoding.TextUnmarshaler] interface.
+func (i *WeylStates) UnmarshalText(text []byte) error {
+	return enums.UnmarshalText(i, text, "WeylStates")
 }

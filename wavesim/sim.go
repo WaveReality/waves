@@ -72,12 +72,6 @@ type Sim struct {
 	// StateVars points the current state variables in effect.
 	StateVars enums.Enum `display:"-"`
 
-	// TimePerStep is how much simulation time one sim step advances, which
-	// stats need to convert per-step motion into a velocity. It is 1 for the
-	// second-order equations, and 0.5 for Schrodinger, where the staggered
-	// leapfrog takes two sim steps to advance the state by one time step.
-	TimePerStep float32 `display:"-"`
-
 	// Rand is the random number generator: all random calls must use this.
 	Rand randx.Rand `display:"-"`
 
@@ -139,7 +133,6 @@ func (ss *Sim) ConfigSim() {
 	// the equation Config methods below add their own stats, so start clean:
 	// registering the same stat twice appends two rows per step, silently.
 	ss.StatFuncs = nil
-	ss.TimePerStep = 1
 	ss.Root, _ = tensorfs.NewDir("Root")
 	tensorfs.CurRoot = ss.Root
 	ss.Stats = ss.Root.Dir("Stats")
@@ -165,6 +158,8 @@ func (ss *Sim) ConfigSim() {
 		ss.KleinGordonCConfig()
 	case Schrodinger:
 		ss.SchrodingerConfig()
+	case Weyl:
+		ss.WeylConfig()
 	case Maxwell:
 		ss.MaxwellConfig()
 	case Dirac:
@@ -286,7 +281,7 @@ func (ss *Sim) StepRun() {
 		}
 		RunKleinGordonCKernel(ns)
 	case Schrodinger:
-		RunSchrodingerKernel(ns)
+		RunSchrodinger(ns)
 	case Maxwell:
 		RunMaxwellKernel(ns)
 	case Dirac:
@@ -294,6 +289,8 @@ func (ss *Sim) StepRun() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunDiracKernel(ns)
+	case Weyl:
+		RunWeylKernel(ns)
 	case Electroweak:
 		// No MaxwellKernel here: ElectroweakKernel writes A0s..AZs itself, as
 		// the weak-mixing-angle rotation of (W^3, B). Letting MaxwellKernel

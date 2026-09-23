@@ -10,8 +10,8 @@ import "cogentcore.org/core/math32"
 
 //gosl:start
 
-// SchrodingerKernel is the kernel for Schrodinger's equation, as a staggered
-// leapfrog on the real and imaginary parts.
+// Schrodinger's equation runs as TWO kernels, a then b, both within one sim
+// step. RunSchrodinger dispatches them; nothing else needs to know.
 //
 // Splitting i hbar d(chi)/dt = H chi into chi = a + ib gives
 //
@@ -26,13 +26,13 @@ import "cogentcore.org/core/math32"
 // 1991, building on Askar & Cakmak 1978 -- which is explicitly stable, second
 // order, and conserves a modified norm exactly.
 //
-// It is also the only form this can take in a cellular automaton. Advancing b
-// with the new a means reading the new a at the NEIGHBORS, which one local
-// pass cannot see -- so the update has to alternate between steps, a on even
-// and b on odd, with the other carried forward. The alternation is not a hack
-// around the instability; it is what makes the stable scheme local. Two sim
-// steps make one full leapfrog step, so time runs at half rate here compared
-// with the second-order equations: Sim.TimePerStep is 0.5, which the stats use.
+// Advancing b from the new a means reading that new a at the NEIGHBORS, which
+// one pass cannot do. Two kernel dispatches can: the barrier between them is
+// what makes the neighbors visible. CurState does NOT advance in between, so
+// both write cur and one sim step is one whole leapfrog step. The two kernels
+// touch disjoint variables -- A writes CabAs and CabAv, B writes CabBs, CabBv
+// and CabMag -- so the only thing crossing between them is the new a, which is
+// the dependency the split exists to satisfy.
 //
 // Note there is no C here at all. This is the nonrelativistic limit, and the
 // only rate in it is hbar / 2m; a wave moves at hbar k / m, not at some
@@ -41,7 +41,7 @@ import "cogentcore.org/core/math32"
 // Stability needs (hbar / 2m) < about 1: the Laplacian's extreme eigenvalue is
 // near 2 and the leapfrog tolerates a product under 2. SchrodingerConfig sets
 // a mass that satisfies it, which the Klein-Gordon default does NOT.
-func SchrodingerKernel(i uint32) { //gosl:kernel
+func SchrodingerAKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
 	ok := ctx.StateCoords(i, &x, &y, &z)
@@ -52,58 +52,66 @@ func SchrodingerKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
 	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
-	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
 
 	hbar := Params[0].Hbar
 	hm := Params[0].HSqOver2M / hbar // hbar / 2m
-	voh := vpot / hbar
+	voh := State.Value(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
 
-	var velA, posA, velB, posB float32
-	if cur == 0 { // a moves, driven by b
-		var lap float32
-		if Params[0].ThreeD.IsTrue() {
-			lap = Laplacian19(x, y, z, int32(CabBs), prv, pposB)
-		} else {
-			lap = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
-		}
-		velA = -hm*lap + voh*pposB // first order: velocity IS the derivative
-		posA = pposA + velA
-		velB = pvelB // b carried forward, to move on the next step
-		posB = pposB
-	} else { // b moves, driven by the a that just moved
-		var lap float32
-		if Params[0].ThreeD.IsTrue() {
-			lap = Laplacian19(x, y, z, int32(CabAs), prv, pposA)
-		} else {
-			lap = Laplacian1D(x, y, z, int32(CabAs), prv, pposA)
-		}
-		velB = hm*lap - voh*pposA
-		posB = pposB + velB
-		velA = pvelA
-		posA = pposA
+	var lap float32
+	if Params[0].ThreeD.IsTrue() {
+		lap = Laplacian19(x, y, z, int32(CabBs), prv, pposB)
+	} else {
+		lap = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
 	}
-
+	velA := -hm*lap + voh*pposB // first order: the velocity IS the derivative
 	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+	State.Set(pposA+velA, int(z), int(y), int(x), int(CabAs), int(cur))
+}
 
+// SchrodingerBKernel advances b from the a that SchrodingerAKernel just wrote,
+// reading it at cur. See that kernel for the scheme.
+func SchrodingerBKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	posA := State.Value(int(z), int(y), int(x), int(CabAs), int(cur)) // the new a: this is the whole point
+
+	hbar := Params[0].Hbar
+	hm := Params[0].HSqOver2M / hbar
+	voh := State.Value(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
+
+	var lap float32
+	if Params[0].ThreeD.IsTrue() {
+		lap = Laplacian19(x, y, z, int32(CabAs), cur, posA)
+	} else {
+		lap = Laplacian1D(x, y, z, int32(CabAs), cur, posA)
+	}
+	velB := hm*lap - voh*posA
+	posB := pposB + velB
 	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 
 	// the norm a^2 + b^2 is NOT what a staggered scheme conserves: a and b sit
 	// half a step apart, so squaring b compares it with itself at the wrong
 	// time and the total ripples at the level rate. What is exactly conserved
-	// is a^2 + b(t-1/2) b(t+1/2), which is available on the step b moves; on
-	// the step a moves, b has not changed, so carry it.
-	if cur == 0 {
-		State.Set(State.Value(int(z), int(y), int(x), int(CabMag), int(prv)), int(z), int(y), int(x), int(CabMag), int(cur))
-	} else {
-		State.Set(posA*posA+pposB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
-	}
+	// is a^2 + b(t-1/2) b(t+1/2), and this kernel holds all three.
+	State.Set(posA*posA+pposB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
 }
 
 //gosl:end
+
+// RunSchrodinger runs one whole step of Schrodinger's equation: the a kernel
+// then the b kernel, with CurState held fixed across both.
+func RunSchrodinger(n int) {
+	RunSchrodingerAKernel(n)
+	RunSchrodingerBKernel(n)
+}
 
 func (ss *Sim) SchrodingerConfig() {
 	ParamsShouldDisplay = SchrodingerShouldDisplay
@@ -112,10 +120,9 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.InitFunc = HarmonicOscillator
 	ss.SchrodingerStats()
 	// hbar / 2m must stay under about 1 for the leapfrog to hold, and the
-	// shared default mass of 0.125 puts it at 4. See SchrodingerKernel.
+	// shared default mass of 0.125 puts it at 4. See SchrodingerAKernel.
 	ss.Params.Mass = SchrodingerMass
 	ss.Params.Edges = EdgesFixed // walls at zero: a particle in a box
-	ss.TimePerStep = 0.5         // the staggered leapfrog: see SchrodingerKernel
 	ss.Params.Update()
 	ss.ViewInit(func(view *View) {
 		view.SetVar(CabMag, -1)

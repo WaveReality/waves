@@ -315,6 +315,11 @@ const  Dirac2Av: DiracStates = 24;
 const  Dirac2Bv: DiracStates = 25;
 const  DiracV: DiracStates = 26;
 const  DiracMag: DiracStates = 27;
+const  DiracL1As: DiracStates = 28;
+const  DiracL1Bs: DiracStates = 29;
+const  DiracL2As: DiracStates = 30;
+const  DiracL2Bs: DiracStates = 31;
+const  DiracLMag: DiracStates = 32;
 fn DiracKernel(i: u32) { //gosl:kernel
 let ctx = Ctx[0];; var x: i32;
 var y: i32;
@@ -442,7 +447,23 @@ var jx = jf * ((p1a*g1b.x - p1b*g1a.x) + (p2a*g2b.x - p2b*g2a.x));
 	jx -= ja * StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXs), u32(prv)));
 	jy -= ja * StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYs), u32(prv)));
 	jz -= ja * StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZs), u32(prv)));
-}; StateSet(rho, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Charge), u32(cur)));; StateSet(jx, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentX), u32(cur)));; StateSet(jy, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentY), u32(cur)));; StateSet(jz, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentZ), u32(cur)));; StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracMag), u32(cur)));; StateSet(n1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Av), u32(cur)));; StateSet(n1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bv), u32(cur)));; StateSet(n2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Av), u32(cur)));; StateSet(n2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bv), u32(cur)));; StateSet(q1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1As), u32(cur)));; StateSet(q1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bs), u32(cur)));; StateSet(q2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2As), u32(cur)));; StateSet(q2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bs), u32(cur))); }
+}; StateSet(rho, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Charge), u32(cur)));; StateSet(jx, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentX), u32(cur)));; StateSet(jy, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentY), u32(cur)));; StateSet(jz, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CurrentZ), u32(cur)));; var om0 = Params[0].Omega0;
+; var kf = f32(0);
+; if (om0 > 0) {
+	kf = 1 / om0;
+}; var cc2 = Params[0].C;
+; var u1a = m1a + cc2*(g1a.z+g2a.x+g2b.y);
+; var u1b = m1b + cc2*(g1b.z+g2b.x-g2a.y);
+; var u2a = m2a + cc2*(g1a.x-g1b.y-g2a.z);
+; var u2b = m2b + cc2*(g1b.x+g1a.y-g2b.z);
+;
+var w1a = -kf * u1b;
+; // multiplying by i
+var w1b = kf * u1a;
+; var w2a = -kf * u2b;
+; var w2b = kf * u2a;
+; StateSet(w1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1As), u32(cur)));; StateSet(w1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1Bs), u32(cur)));; StateSet(w2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2As), u32(cur)));; StateSet(w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2Bs), u32(cur)));; StateSet(w1a*w1a + w1b*w1b + w2a*w2a + w2b*w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracLMag), u32(cur)));; StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracMag), u32(cur)));; StateSet(n1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Av), u32(cur)));; StateSet(n1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bv), u32(cur)));; StateSet(n2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Av), u32(cur)));; StateSet(n2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bv), u32(cur)));; StateSet(q1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1As), u32(cur)));; StateSet(q1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bs), u32(cur)));; StateSet(q2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2As), u32(cur)));; StateSet(q2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bs), u32(cur))); }
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -511,7 +532,7 @@ const YPhi = 0.5;
 const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 28;
+const DiracStatesN: DiracStates = 33;
 const EdgesN: Edges = 3;
 const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;
@@ -519,7 +540,7 @@ const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 24;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 9;
+const EquationsN: Equations = 10;
 const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 3;
 const CurPrevN: CurPrev = 2;
@@ -527,6 +548,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 43;
 const WaveStatesN: WaveStates = 7;
+const WeylStatesN: WeylStates = 28;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -630,9 +652,10 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
-const  Electroweak: Equations = 6;
-const  Spinfield: Equations = 7;
-const  ParticleMove: Equations = 8;
+const  Weyl: Equations = 6;
+const  Electroweak: Equations = 7;
+const  Spinfield: Equations = 8;
+const  ParticleMove: Equations = 9;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -762,6 +785,19 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+
+//////// import: "weyl.go"
+alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl
+const  WeylL1a: WeylStates = 18;
+const  WeylL1b: WeylStates = 19;
+const  WeylL2a: WeylStates = 20;
+const  WeylL2b: WeylStates = 21;
+const  WeylR1a: WeylStates = 22;
+const  WeylR1b: WeylStates = 23;
+const  WeylR2a: WeylStates = 24;
+const  WeylR2b: WeylStates = 25;
+const  WeylLMag: WeylStates = 26;
+const  WeylRMag: WeylStates = 27;
 
 //////// import: "slrand.wgsl"
 fn Philox2x32round(counter: su64, key: u32) -> su64 {

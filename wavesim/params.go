@@ -43,6 +43,11 @@ const (
 	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
 	Dirac
 
+	// Weyl is the first-order chiral equation on a left- and a right-handed
+	// 2-spinor: a massless neutrino in one of them, and an electron when the
+	// mass term binds the two together.
+	Weyl
+
 	// Electroweak simulates the electroweak system, including the Higgs
 	Electroweak
 

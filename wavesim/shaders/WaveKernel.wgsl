@@ -309,6 +309,11 @@ const  Dirac2Av: DiracStates = 24;
 const  Dirac2Bv: DiracStates = 25;
 const  DiracV: DiracStates = 26;
 const  DiracMag: DiracStates = 27;
+const  DiracL1As: DiracStates = 28;
+const  DiracL1Bs: DiracStates = 29;
+const  DiracL2As: DiracStates = 30;
+const  DiracL2Bs: DiracStates = 31;
+const  DiracLMag: DiracStates = 32;
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -377,7 +382,7 @@ const YPhi = 0.5;
 const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
-const DiracStatesN: DiracStates = 28;
+const DiracStatesN: DiracStates = 33;
 const EdgesN: Edges = 3;
 const EWStatesN: EWStates = 73;
 const MinusPlusOneN: MinusPlusOne = 2;
@@ -385,7 +390,7 @@ const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
 const CabStatesN: CabStates = 24;
 const EMStatesN: EMStates = 18;
-const EquationsN: Equations = 9;
+const EquationsN: Equations = 10;
 const ParticleVarsN: ParticleVars = 10;
 const ViewModesN: ViewModes = 3;
 const CurPrevN: CurPrev = 2;
@@ -393,6 +398,7 @@ const CurPrevBothN: CurPrevBoth = 3;
 const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 43;
 const WaveStatesN: WaveStates = 7;
+const WeylStatesN: WeylStates = 28;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -480,9 +486,10 @@ const  KleinGordonC: Equations = 2;
 const  Schrodinger: Equations = 3;
 const  Maxwell: Equations = 4;
 const  Dirac: Equations = 5;
-const  Electroweak: Equations = 6;
-const  Spinfield: Equations = 7;
-const  ParticleMove: Equations = 8;
+const  Weyl: Equations = 6;
+const  Electroweak: Equations = 7;
+const  Spinfield: Equations = 8;
+const  ParticleMove: Equations = 9;
 const  Pi       = 3.14159265358979323846264338327950288419716939937510582097494459;
 const  TwoPi    = 2 * Pi;
 const  InvTwoPi = 1.0 / TwoPi;
@@ -644,6 +651,19 @@ var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
 	StateSet(kinetic + potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
 }; StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
+
+//////// import: "weyl.go"
+alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl
+const  WeylL1a: WeylStates = 18;
+const  WeylL1b: WeylStates = 19;
+const  WeylL2a: WeylStates = 20;
+const  WeylL2b: WeylStates = 21;
+const  WeylR1a: WeylStates = 22;
+const  WeylR1b: WeylStates = 23;
+const  WeylR2a: WeylStates = 24;
+const  WeylR2b: WeylStates = 25;
+const  WeylLMag: WeylStates = 26;
+const  WeylRMag: WeylStates = 27;
 
 //////// import: "slrand.wgsl"
 fn Philox2x32round(counter: su64, key: u32) -> su64 {

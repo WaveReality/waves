@@ -297,3 +297,66 @@ func TestDiracHydrogenBound(t *testing.T) {
 		t.Logf("%-15s rms %6.3f, spreads at most %+.1f%%, max E %.4g", tc.name, r0, 100*worst, ez)
 	}
 }
+
+// drChiralUniform is a proper rest state on a uniform field: the control for
+// TestDiracChirality, which must come out an exact 50/50 of the chiralities.
+func drChiralUniform(ss *Sim) {
+	ss.Params.EM.SetBool(false)
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	ss.Fill(Dirac1As, Both, ss.Config.Amplitude)
+	ss.DiracRest(1)
+}
+
+// TestDiracChirality checks the left-chiral spinor the kernel recovers, and
+// with it the claim that an electron is two massless waves bound by mass.
+//
+// Two things have to hold. A particle AT REST is an exact 50/50 mixture, since
+// chirality is not helicity. And a state started purely right-chiral converts
+// ENTIRELY into the left one and back, at the rest mass frequency, with the
+// sum conserved -- which is what the mass term does and all it does.
+func TestDiracChirality(t *testing.T) {
+	const sz = 16
+	sums := func() (l, r float64) {
+		c := GetCtx(0)
+		return StateSum(c.Size.V(), DiracLMag, c.CurState), StateSum(c.Size.V(), DiracMag, c.CurState)
+	}
+
+	rs := drSim(sz, drChiralUniform)
+	drStepExt(rs)
+	l, r := sums()
+	if math.Abs(l/r-1) > 0.01 {
+		t.Errorf("at rest |psi_L|^2 / |psi_R|^2 = %.5f, want 1: chirality is not helicity", l/r)
+	}
+	t.Logf("at rest  |psi_L|^2 / |psi_R|^2 = %.5f", l/r)
+
+	ss := drSim(sz, ChiralOscillation)
+	drStepExt(ss)
+	l, r = sums()
+	tot := l + r
+	if l/tot > 0.01 {
+		t.Errorf("starts %.2f%% left-chiral, should be purely right", 100*l/tot)
+	}
+	// half a period of |psi|^2 is where the right half has gone entirely away
+	want := math.Pi / float64(ss.Params.Omega0)
+	lo, hi, rmin, at := tot, tot, r, 0
+	for i := range int(1.2 * want) {
+		drStepExt(ss)
+		l, r = sums()
+		lo, hi = math.Min(lo, l+r), math.Max(hi, l+r)
+		if r < rmin {
+			rmin, at = r, i+1
+		}
+	}
+	if rmin/tot > 0.01 {
+		t.Errorf("right half only ever falls to %.2f%%, so it does not fully convert", 100*rmin/tot)
+	}
+	if got := 2 * float64(at); math.Abs(got-want)/want > 0.05 {
+		t.Errorf("conversion period %.1f steps, want pi hbar / m c^2 = %.1f", got, want)
+	}
+	if (hi-lo)/tot > 0.01 {
+		t.Errorf("total varies by %.3f%%, but |psi_L|^2 + |psi_R|^2 must be conserved", 100*(hi-lo)/tot)
+	}
+	t.Logf("right half falls to %.3f%% at step %d, so the period is %d vs pi hbar / m c^2 = %.1f; total varies %.4f%%",
+		100*rmin/tot, at, 2*at, want, 100*(hi-lo)/tot)
+}

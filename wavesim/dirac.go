@@ -50,10 +50,29 @@ const (
 	// [Sim.HarmonicWell] explains. Matches CabV in the complex KG states.
 	DiracV
 
-	// DiracMag is the state magnitude (state * complex conjugate),
-	// summed over both components, which represents the total
-	// probability or a conserved charge value.
+	// DiracMag is the magnitude of the evolved spinor, summed over both
+	// components. That spinor is the RIGHT-chiral half of the electron, so
+	// this is |psi_R|^2 and it is NOT the probability: the conserved quantity
+	// is |psi_L|^2 + |psi_R|^2, and Charge is the conserved current.
 	DiracMag
+
+	// DiracL1As is the LEFT-chiral spinor, value 1, component A: real.
+	// psi_L is not evolved. It follows from psi_R algebraically, and the
+	// kernel recovers it each step: see DiracKernel.
+	DiracL1As
+
+	// DiracL1Bs is the left-chiral spinor, value 1, component B: imaginary.
+	DiracL1Bs
+
+	// DiracL2As is the left-chiral spinor, value 2, component A: real.
+	DiracL2As
+
+	// DiracL2Bs is the left-chiral spinor, value 2, component B: imaginary.
+	DiracL2Bs
+
+	// DiracLMag is |psi_L|^2, the left-chiral magnitude, to set against
+	// DiracMag. Their sum is what is actually conserved.
+	DiracLMag
 )
 
 // DiracKernel is the second-order (Feynman-Gell-Mann) Dirac equation: the
@@ -215,6 +234,48 @@ func DiracKernel(i uint32) { //gosl:kernel
 	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
 	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
 
+	// the LEFT-chiral half, recovered rather than evolved. Writing the Dirac
+	// equation in the chiral basis splits it into two 2-spinors:
+	//
+	//	i hbar d_t psi_L = -c sigma.p psi_L + m c^2 psi_R
+	//	i hbar d_t psi_R = +c sigma.p psi_R + m c^2 psi_L
+	//
+	// At m = 0 they decouple completely, and each is a massless Weyl wave
+	// moving at exactly c with fixed helicity. The mass term is the ONLY
+	// thing joining them, and it turns each into the other at m c^2 / hbar --
+	// which is what an electron IS: two lightspeed waves trading places, so
+	// that the average motion comes out slower than c. The trading is
+	// zitterbewegung, and the rest mass is its frequency.
+	//
+	// Solving the second line for psi_L costs nothing here, since the
+	// velocity and the gradients are already in hand:
+	//
+	//	psi_L = (i hbar / m c^2) (d_t + c sigma.grad) psi_R
+	//
+	// Same instant as mag: previous positions, midpoint velocity. At rest the
+	// two come out EQUAL -- chirality is not helicity, and a particle at rest
+	// is half of each. Only at high momentum does one of them win.
+	om0 := Params[0].Omega0
+	kf := float32(0)
+	if om0 > 0 {
+		kf = 1 / om0
+	}
+	cc2 := Params[0].C
+	u1a := m1a + cc2*(g1a.Z+g2a.X+g2b.Y)
+	u1b := m1b + cc2*(g1b.Z+g2b.X-g2a.Y)
+	u2a := m2a + cc2*(g1a.X-g1b.Y-g2a.Z)
+	u2b := m2b + cc2*(g1b.X+g1a.Y-g2b.Z)
+	// w for the left spinor: l is taken by the Laplacians above
+	w1a := -kf * u1b // multiplying by i
+	w1b := kf * u1a
+	w2a := -kf * u2b
+	w2b := kf * u2a
+	State.Set(w1a, int(z), int(y), int(x), int(DiracL1As), int(cur))
+	State.Set(w1b, int(z), int(y), int(x), int(DiracL1Bs), int(cur))
+	State.Set(w2a, int(z), int(y), int(x), int(DiracL2As), int(cur))
+	State.Set(w2b, int(z), int(y), int(x), int(DiracL2Bs), int(cur))
+	State.Set(w1a*w1a+w1b*w1b+w2a*w2a+w2b*w2b, int(z), int(y), int(x), int(DiracLMag), int(cur))
+
 	State.Set(mag, int(z), int(y), int(x), int(DiracMag), int(cur))
 	State.Set(n1a, int(z), int(y), int(x), int(Dirac1Av), int(cur))
 	State.Set(n1b, int(z), int(y), int(x), int(Dirac1Bv), int(cur))
@@ -240,7 +301,8 @@ func (ss *Sim) DiracConfig() {
 	ss.Params.Edges = EdgesWrap
 	ss.DiracStats()
 	ss.ViewInit(func(view *View) {
-		view.SetVar(Dirac1As, -1)
+		view.SetVar(DiracMag, -1)
+		view.SetVar(DiracLMag, 1)
 	})
 }
 
@@ -398,6 +460,43 @@ func DiracOscillator(ss *Sim) {
 	ss.DiracBound(1, ph)
 }
 
+// ChiralOscillation is the electron taking itself apart: a lump at rest with
+// NO initial velocity, which makes it purely right-chiral at t = 0, and then
+// watching the left half grow out of nothing.
+//
+// Every other config here calls DiracRest, which sets the phase turning at the
+// rest mass frequency and so starts the wave as an equal mix of the two
+// chiralities -- a particle at rest is half L and half R, and stays that way.
+// Leaving the velocity at zero instead starts it entirely in one, which is not
+// an energy eigenstate at all but an equal superposition of the two signs of
+// energy. The mass then converts one into the other and back:
+//
+//	|psi_R|^2 = cos^2(m c^2 t / hbar),  |psi_L|^2 = sin^2(m c^2 t / hbar)
+//
+// so each swings over a full period of pi hbar / m c^2, about 100 steps at the
+// default mass, while the SUM stays flat. Watch DiracMag and LMag in the stats
+// trade against each other. This is zitterbewegung, and it is the clearest
+// statement of what mass is here: not a property of the wave, but the rate at
+// which two massless waves turn into one another.
+//
+// Turn Mass to zero and the trading stops dead, which is the neutrino.
+//
+// The field is UNIFORM, and it has to be. Chirality is not a local property:
+// psi_L depends on sigma.grad psi_R, so any localized lump carries a spread of
+// momentum and is a mixture of chiralities before the mass does anything at
+// all. A lump narrower than the Compton wavelength is mostly the wrong
+// chirality from the start. Flat is dull to look at, but it is the only way
+// the trade comes out exactly cos^2 and sin^2. Edges wrap, or the boundary
+// would put a gradient back in.
+func ChiralOscillation(ss *Sim) {
+	p := ss.Params
+	p.EM.SetBool(false)
+	p.Edges = EdgesWrap
+	p.Update()
+	// no DiracRest: zero velocity is what makes it purely right-chiral
+	ss.Fill(Dirac1As, Both, ss.Config.Amplitude)
+}
+
 var DiracConfigs = []InitFunc{
 	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
 	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
@@ -405,6 +504,7 @@ var DiracConfigs = []InitFunc{
 	InitFunc{Name: "Dirac Hydrogen", Doc: "A spin-1/2 electron bound in a Coulomb well in its exp(-r/a) ground state: the closest this gets to a real atom", Func: DiracHydrogen},
 	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
 	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
+	InitFunc{Name: "Chiral Oscillation", Doc: "A lump started purely right-chiral: the mass turns it into the left one and back at m c^2 / hbar, which is what mass IS", Func: ChiralOscillation},
 }
 
 // DiracStats adds the stats plotted over time in the GUI.
@@ -412,6 +512,7 @@ func (ss *Sim) DiracStats() {
 	ss.AddStat(ss.StatStep())
 	ss.AddStat(ss.StatSum(Charge))
 	ss.AddStat(ss.StatSum(DiracMag))
+	ss.AddStat(ss.StatSum(DiracLMag))
 	ss.AddStat(ss.StatDiracSpin())
 }
 
