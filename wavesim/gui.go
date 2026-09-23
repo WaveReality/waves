@@ -223,6 +223,8 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 					gui.sim.initFuncs[ici].Current = true
 					gui.sim.InitFunc = ic.Func
 					gui.sim.Init()
+					gui.SimForm.Update()
+					go gui.sim.UpdateView()
 				})
 				if ic.Current {
 					mb.SetIcon(icons.Check)
