@@ -155,6 +155,7 @@ func (ss *Sim) SchrodingerStats() {
 	// ripple at twice the wavenumber that drags the centroid toward the phase
 	// velocity. A matter wave's group velocity is hbar k / m, not that.
 	ss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))
+	ss.AddStat(ss.StatWidthMag(math32.Z, CabMag))
 }
 
 //////// configurations

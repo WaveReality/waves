@@ -42,6 +42,19 @@ type Config struct {
 	// e.g., for KG and other matter waves.
 	PacketWidth float32
 
+	// PacketSlab makes every travelling-packet config lay down a planar SLAB
+	// -- gaussian along the direction of travel, uniform across the other two
+	// axes -- rather than a 3D gaussian blob. Off gives the blob.
+	//
+	// Worth flipping under each equation in turn. A blob spreads for two
+	// reasons at once: it disperses, and it DIFFRACTS, because a finite
+	// transverse extent is a spread of transverse wavenumbers. So a blob grows
+	// even under an equation with no dispersion at all, and its centroid
+	// crawls rather than tracking the group velocity. A slab has no transverse
+	// structure to diffract, leaving the dispersion on its own, which is what
+	// the Vd stat is trying to read.
+	PacketSlab bool `default:"true"`
+
 	// Amplitude scales the peak value of wave packets made by the functions
 	// that use it (Config suffix), whose own amp argument becomes a relative
 	// weight, so mixing factors such as cos(theta_W) stay intact. 1 fills the
@@ -102,6 +115,7 @@ func (cfg *Config) Defaults() {
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 12
+	cfg.PacketSlab = true
 	cfg.Amplitude = 1
 	cfg.HydrogenRadius = 5
 	cfg.OscillatorPeriod = 320

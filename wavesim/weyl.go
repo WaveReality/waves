@@ -333,6 +333,7 @@ func (ss *Sim) WeylStats() {
 	// for the neutrino only L moves, and for an electron the two must track
 	// each other, since they are halves of one particle
 	ss.AddStat(ss.StatGroupVelMag(math32.X, WeylMag, WeylLMag, WeylRMag))
+	ss.AddStat(ss.StatWidthMag(math32.Z, WeylMag))
 	ss.AddStat(ss.StatWeylHelicity(math32.X))
 }
 
@@ -458,7 +459,7 @@ func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				g := (CoordToFloat(c).Dim(dim) - ctr.Dim(dim)) / wd
+				g := ss.PacketDist(CoordToFloat(c).Sub(ctr), dim) / wd
 				v := amp * math32.FastExp(-g*g)
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(cur))
 				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(prv))
@@ -477,12 +478,13 @@ func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
 // helicity, in the ratio (omega - c khat) / (m c^2 / hbar), so ElectronPacket
 // calls this twice with the same helicity and different amplitudes.
 //
-// The envelope is a SLAB: gaussian along the direction of travel, flat across
-// the other two. That is not just for looks. A round blob carries transverse
-// momentum, so it is not a helicity eigenstate, it spreads sideways, and its
-// centroid crawls instead of moving at the group velocity. A slab has k purely
-// along one axis, travels rigidly, and reads on screen as bands sweeping
-// across rather than a dot that may or may not be drifting.
+// The envelope defaults to a SLAB -- gaussian along the direction of travel,
+// flat across the other two -- and that is not just for looks. A round blob
+// carries transverse momentum, so it is not a helicity eigenstate, it spreads
+// sideways, and its centroid crawls instead of moving at the group velocity. A
+// slab has k purely along one axis, travels rigidly, and reads on screen as
+// bands sweeping across rather than a dot that may or may not be drifting.
+// Clear [Config.PacketSlab] to see the blob fail at exactly that.
 //
 // Both time levels are set. The three-level leapfrog reads its own past, and a
 // wave given no past goes both ways at once: the earlier one has its envelope
@@ -521,9 +523,12 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float3
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				d := CoordToFloat(c).Dim(dim) - ctr.Dim(dim)
-				g := d / wd
-				e := (d + vg) / wd // where the envelope was one step ago
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.SetDim(dim, off.Dim(dim)+vg) // where it was one step ago
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / wd
+				e := ss.PacketDist(pst, dim) / wd
 				en := amp * math32.FastExp(-g*g)
 				eo := amp * math32.FastExp(-e*e)
 				ph := k * d

@@ -110,6 +110,7 @@ func (ss *Sim) WaveCDirStats() {
 	ss.AddStat(ss.StatSum(WaveCMag))
 	// massless and one-way: this should sit at c, up to the lattice
 	ss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))
+	ss.AddStat(ss.StatWidthMag(math32.Z, WaveCMag))
 }
 
 //////// configurations
@@ -147,19 +148,22 @@ func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
 	ctx := GetCtx(0)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
 	wd := ss.Config.PacketWidth
-	back := ctr - ss.Params.C*ss.Params.WaveDir
+	back := ss.Params.C * ss.Params.WaveDir // how far upstream the past sits
 	sz := ss.Config.Size
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				d := float32(c.X) - ctr
-				e := float32(c.X) - back
-				gd := d / wd
-				ge := e / wd
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.X += back
+				d := off.X
+				e := pst.X
+				gd := ss.PacketDist(off, math32.X) / wd
+				ge := ss.PacketDist(pst, math32.X) / wd
 				en := amp * math32.FastExp(-gd*gd)
 				eo := amp * math32.FastExp(-ge*ge)
 				var na, nb, oa, ob float32

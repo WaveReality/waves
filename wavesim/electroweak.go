@@ -877,6 +877,7 @@ func (ss *Sim) ElectroweakStats() {
 	// The photon runs at ~c and the Z visibly slower, while W^3 and B each show
 	// whichever of the two they currently carry.
 	ss.AddStat(ss.StatGroupVel(math32.X, AYs, EWZY, EWBYs, EWW3Ys))
+	ss.AddStat(ss.StatWidth(math32.Z, AYs, EWZY))
 	// W collision: W^3 generated out of nothing by the non-abelian coupling.
 	ss.AddStat(ss.StatSumSq(EWW3SqStat, EWW30s, EWW3Xs, EWW3Ys, EWW3Zs))
 	// what a Z packet does to the condensate it travels through.
@@ -965,8 +966,8 @@ func PhotonPulse(ss *Sim) {
 	om := ss.LatticeFreq(wl, 0) // massless
 	cx := float32(ss.Config.Size.X) * 0.2
 	// the weights are the photon direction itself; Config.Amplitude sets the size
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+	ss.CarrierPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+	ss.CarrierPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
 }
 
 // ZPulse sends a Z boson pulse along X, which travels SLOWER than light.
@@ -989,8 +990,8 @@ func ZPulse(ss *Sim) {
 	om := ss.LatticeFreq(wl, p.MZ)
 	cx := float32(ss.Config.Size.X) * 0.2
 	// the weights are the Z direction itself; Config.Amplitude sets the size
-	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
-	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+	ss.CarrierPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+	ss.CarrierPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
 }
 
 // WCollision fires two W packets at each other. They do not bounce -- gauge
@@ -1020,6 +1021,6 @@ func WCollision(ss *Sim) {
 	om := ss.LatticeFreq(wl, p.MW)
 	amp := 0.25 * p.HiggsV * ss.Config.Amplitude
 	xl := float32(ss.Config.Size.X)
-	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
-	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+	ss.CarrierPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+	ss.CarrierPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
 }

@@ -233,6 +233,7 @@ func (ss *Sim) KleinGordonCStats() {
 	ss.AddStat(ss.StatSum(Charge))
 	ss.AddStat(ss.StatSum(CabMag))
 	ss.AddStat(ss.StatGroupVel(math32.X, CabAs))
+	ss.AddStat(ss.StatWidthMag(math32.Z, CabMag))
 }
 
 //////// configurations

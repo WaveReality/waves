@@ -252,6 +252,7 @@ func (ss *Sim) MaxwellStats() {
 	ss.AddStat(ss.StatRadialVec("Emag", EX, EMNRadii))
 	ss.AddStat(ss.StatRadialVec("Bmag", BX, EMNRadii))
 	ss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))
+	ss.AddStat(ss.StatWidth(math32.Z, AYs, AZs))
 }
 
 //////// configurations
@@ -349,7 +350,7 @@ func PolarizedPhoton(ss *Sim) {
 	pos, vel, _, _ := emTransverse(ss)
 	om := ss.LatticeFreq(ss.Config.Wavelength, 0)
 	cx := float32(ss.Config.Size.X) * 0.25
-	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+	ss.CarrierPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
 }
 
 // CircularPolarization sends a circularly polarized packet along X: both
@@ -371,8 +372,8 @@ func CircularPolarization(ss *Sim) {
 	pos, vel, opos, ovel := emTransverse(ss)
 	om := ss.LatticeFreq(ss.Config.Wavelength, 0)
 	cx := float32(ss.Config.Size.X) * 0.25
-	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
-	ss.SlabPacketConfig(opos, ovel, math32.X, cx, 1, 1, om, -0.5*math32.Pi)
+	ss.CarrierPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+	ss.CarrierPacketConfig(opos, ovel, math32.X, cx, 1, 1, om, -0.5*math32.Pi)
 }
 
 // StandingWave fills the box with a sinusoidal vector potential and NO

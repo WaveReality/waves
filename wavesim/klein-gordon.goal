@@ -103,4 +103,4 @@ func (ss *Sim) KleinGordonConfig() {
 }
 
 // KGShouldDisplay determines which Parameters fields to display.
-var KGShouldDisplay = []string{"Edges", "Energy", "C", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+var KGShouldDisplay = []string{"Edges", "Energy", "C", "Mass", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}

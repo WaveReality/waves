@@ -155,6 +155,8 @@ func (ss *Sim) WaveStats() {
 	ss.AddStat(ss.StatSum(WaveEnergy))
 	// a massless packet: should sit at c, up to the lattice cos(k/2)
 	ss.AddStat(ss.StatGroupVel(math32.X, WavePos))
+	// across the travel: diffraction alone, and zero for a slab
+	ss.AddStat(ss.StatWidth(math32.Z, WavePos))
 }
 
 //////// configurations
@@ -187,5 +189,5 @@ func WavePacket(ss *Sim) {
 // contains both directions and nothing in the bump chose between them. Written
 // to both time levels, which is what "no velocity" means in a leapfrog.
 func WavePulse(ss *Sim) {
-	ss.Gauss(WavePos, Both, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, 0)
+	ss.PacketEnv(WavePos, Both, math32.X, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude)
 }

@@ -277,20 +277,40 @@ func StatDispersionName(vr enums.Enum, dim math32.Dims) string {
 // where it is, how fast it moves, how wide it is and how fast it spreads. Use
 // [Sim.StatGroupVelMag] for variables that are already an intensity.
 func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
-	return ss.statGroupVel(dim, true, vrs)
+	return ss.statGroupVel(true, true, dim, vrs)
 }
 
 // StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
 // intensity, such as any of the Mag ones: it weights the moments by the value
 // rather than by its square. See [StateMoments] for why that matters.
 func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
-	return ss.statGroupVel(dim, false, vrs)
+	return ss.statGroupVel(true, false, dim, vrs)
 }
 
-// statGroupVel does the work of both. For each variable it records four stats:
-// the intensity centroid along dim and its width, both in cubes, and the rate
-// of change of each, both in units of C. Vg is the group velocity: how fast
-// the packet travels. Vd is the dispersion rate: how fast it spreads.
+// StatWidth records the width and the spreading rate along dim, and not the
+// centroid or the group velocity. For the TRANSVERSE axis, where nothing is
+// travelling and a centroid would be reporting its own roundoff.
+//
+// Paired with the along-travel [Sim.StatGroupVel] it separates two things that
+// both widen a packet. Vd along the direction of travel is DISPERSION: the
+// spread of speeds among the wavenumbers in the packet. Vd across it is
+// DIFFRACTION: a packet of finite transverse extent is a spread of transverse
+// wavenumbers, so it fans out whether or not the equation disperses at all.
+// A slab has no transverse extent to fan out, so it pins the transverse rate
+// at zero and leaves dispersion on its own: see [Config.PacketSlab].
+func (ss *Sim) StatWidth(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(false, true, dim, vrs)
+}
+
+// StatWidthMag is [Sim.StatWidth] for variables that are ALREADY an intensity.
+func (ss *Sim) StatWidthMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(false, false, dim, vrs)
+}
+
+// statGroupVel does the work of all four. For each variable it records the
+// intensity width along dim in cubes and its rate of change in units of C --
+// Vd, how fast the packet spreads -- and, when vel is set, the centroid and
+// its rate too: Vg, the group velocity.
 //
 // The two rates share a scale on purpose, so a single plot says how far a
 // packet gets before it smears out. A non-dispersive wave holds Vd at zero. A
@@ -309,7 +329,7 @@ func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init boo
 // pure noise: in a Z pulse, for instance, the photon field is not excited at
 // all. That is why these belong in one call rather than several -- besides
 // sharing the one pass over the state, they calibrate each other.
-func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func(init bool) {
+func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum) func(init bool) {
 	nv := len(vrs)
 	ctrs := make([]float64, nv)
 	wids := make([]float64, nv)
@@ -326,31 +346,35 @@ func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func
 			steps = make([]int, win)
 			n = 0
 			for _, vr := range vrs {
-				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
-				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
 				wt := ss.Stats.Float64(StatWidthName(vr, dim))
 				dt := ss.Stats.Float64(StatDispersionName(vr, dim))
-				ct.SetNumRows(0)
-				vt.SetNumRows(0)
 				wt.SetNumRows(0)
 				dt.SetNumRows(0)
-				// only the two rates are on by default: they share a scale
-				plot.SetFirstStyler(ct, func(s *plot.Style) {
-					s.On = false
-				})
-				plot.SetFirstStyler(vt, func(s *plot.Style) {
-					s.On = true
-				})
+				// only the RATES are on by default: they share a scale, where
+				// a width in cubes would flatten them against the axis
 				plot.SetFirstStyler(wt, func(s *plot.Style) {
 					s.On = false
 				})
 				plot.SetFirstStyler(dt, func(s *plot.Style) {
 					s.On = true
 				})
+				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
+				metadata.SetDoc(dt, "Spreading rate of "+vr.String()+" along "+dim.String()+", in units of C, on the same scale as the group velocity: dispersion along the direction of travel, diffraction across it")
+				if !vel {
+					continue
+				}
+				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
+				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
+				ct.SetNumRows(0)
+				vt.SetNumRows(0)
+				plot.SetFirstStyler(ct, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(vt, func(s *plot.Style) {
+					s.On = true
+				})
 				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
 				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
-				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
-				metadata.SetDoc(dt, "Dispersion rate of "+vr.String()+" along "+dim.String()+", in units of C: how fast the packet spreads, on the same scale as its group velocity")
 			}
 			return
 		}
@@ -368,9 +392,19 @@ func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func
 		have := n >= win
 		ds := float64(int(ctx.Step) - steps[old])
 		for i, vr := range vrs {
-			vg := 0.0
+			live := have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx
 			vd := 0.0
-			if have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx {
+			if live {
+				vd = (wids[i] - whist[old*nv+i]) / ds / float64(ss.Params.C)
+			}
+			whist[old*nv+i] = wids[i]
+			ss.Stats.Float64(StatWidthName(vr, dim)).AppendRowFloat(wids[i])
+			ss.Stats.Float64(StatDispersionName(vr, dim)).AppendRowFloat(vd)
+			if !vel {
+				continue
+			}
+			vg := 0.0
+			if live {
 				d := ctrs[i] - chist[old*nv+i]
 				if d > ln/2 {
 					d -= ln
@@ -378,14 +412,10 @@ func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func
 					d += ln
 				}
 				vg = d / ds / float64(ss.Params.C)
-				vd = (wids[i] - whist[old*nv+i]) / ds / float64(ss.Params.C)
 			}
 			chist[old*nv+i] = ctrs[i]
-			whist[old*nv+i] = wids[i]
 			ss.Stats.Float64(StatCentroidName(vr, dim)).AppendRowFloat(ctrs[i])
 			ss.Stats.Float64(StatGroupVelName(vr, dim)).AppendRowFloat(vg)
-			ss.Stats.Float64(StatWidthName(vr, dim)).AppendRowFloat(wids[i])
-			ss.Stats.Float64(StatDispersionName(vr, dim)).AppendRowFloat(vd)
 		}
 		steps[old] = int(ctx.Step)
 		n++

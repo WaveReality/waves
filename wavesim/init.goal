@@ -121,6 +121,46 @@ func GaussWave(x, d, wavelength, width, phase, amp float32) float32 {
 	return cos * gauss
 }
 
+// PacketDist is the distance a travelling packet's envelope falls off with,
+// given the offset d from its center: the full 3D radius, or, when
+// [Config.PacketSlab] is set, the distance along dim alone, which leaves the
+// envelope uniform across the other two axes. Every packet config goes through
+// this, so the one switch changes them all together.
+func (ss *Sim) PacketDist(d math32.Vector3, dim math32.Dims) float32 {
+	if ss.Config.PacketSlab {
+		return math32.Abs(d.Dim(dim))
+	}
+	return d.Length()
+}
+
+// PacketEnv is the bare packet envelope at offset d from the center: the same
+// gaussian [GaussWave] puts under the carrier, with no carrier on it. For the
+// pulse configs, which are a packet with the phase left out.
+func (ss *Sim) PacketEnv(vr enums.Enum, curPrev CurPrevBoth, dim math32.Dims, ctr math32.Vector3, width, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctrf := CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				g := ss.PacketDist(CoordToFloat(c).Sub(ctrf), dim) / width
+				v := amp * math32.FastExp(-g*g)
+				if curPrev == CurOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
 // Point adds value to individual point, optionally for both cur and previous values.
 func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val float32) {
 	vri := int(vr.Int64())
@@ -257,12 +297,12 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3,
 				f := c.AddScalar(1)
 				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf)
-				cv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
+				cv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)
 				State[f.Z, f.Y, f.X, vri, cur] += cv
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
-				pv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
+				pv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)
 				State[f.Z, f.Y, f.X, vri, prv] += pv
 			}
 		}
@@ -317,7 +357,7 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 				f := c.AddScalar(1)
 				d := CoordToFloat(c).Sub(ctrf)
 				dd := d.Dim(dim)
-				dl := d.Length()
+				dl := ss.PacketDist(d, dim)
 				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
 				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
 				State[f.Z, f.Y, f.X, posI, cur] += pv
@@ -349,7 +389,7 @@ func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.
 				f := c.AddScalar(1)
 				d := CoordToFloat(c).Sub(ctrf)
 				dd := d.Dim(dim)
-				dl := d.Length()
+				dl := ss.PacketDist(d, dim)
 				av := GaussWave(dd, dl, wavelength, width, phase, amp)
 				bv := dir * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
 				State[f.Z, f.Y, f.X, ai, cur] += av
@@ -387,10 +427,15 @@ func (ss *Sim) LatticeFreq(wavelength, mass float32) float32 {
 	return ss.Params.C * math32.Sqrt(khat*khat+mass*mass)
 }
 
-// SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
-// its velocity: a cosine carrier under a Gaussian envelope along dim, centered
-// at ctr and uniform across the other two dims. A slab, not a blob, so it does
-// not diffract and the speed stays unambiguous to the eye.
+// CarrierPacket adds a ONE-WAY travelling wave packet to a field and its
+// velocity: a cosine carrier of the GIVEN frequency om under a gaussian
+// envelope along dim, centered at ctr along that axis and at the middle of the
+// box across the other two. [Config.PacketSlab] picks whether the envelope is
+// a slab or a blob.
+//
+// om is passed in rather than taken from [Sim.PacketFreq] because the callers
+// are fields whose dispersion the generic version does not know: a gauge
+// potential, or a complex field at its own lattice frequency.
 //
 // The velocity is the point: for psi = env(d) cos(k d - om t) the initial time
 // derivative is om env sin(k d), with dir flipping the direction. Setting only
@@ -400,7 +445,7 @@ func (ss *Sim) LatticeFreq(wavelength, mass float32) float32 {
 // a TRANSVERSE component, normally Y, which the X-Z view draws vertically.
 // phase shifts the carrier under the envelope: two packets a quarter cycle
 // apart in orthogonal components make a circularly polarized wave.
-func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
+func (ss *Sim) CarrierPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
 	pi := int(pos.Int64())
 	vi := int(vel.Int64())
 	ctx := GetCtx(0)
@@ -408,12 +453,15 @@ func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength,
 	prv := ctx.PrevState()
 	sz := ss.Config.Size
 	k := TwoPi / wavelength
+	ctrf := CenterF(math32.Vec3(-1, -1, -1))
+	ctrf.SetDim(dim, ctr)
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
-				d := float32(c.Dim(dim)) - ctr
-				g := d / width
+				off := CoordToFloat(c).Sub(ctrf)
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / width
 				env := amp * math32.FastExp(-g*g)
 				ph := k*d + phase
 				pv := env * math32.Cos(ph)
@@ -428,12 +476,12 @@ func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength,
 	}
 }
 
-// SlabPacketConfig is a version of [SlabPacket] that takes its wavelength and
-// width variables from [Config]. amp is relative to [Config.Amplitude], so a
-// caller can keep a mixing weight such as cos(theta_W) in amp and leave the
-// overall size to the user.
-func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
-	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
+// CarrierPacketConfig is a version of [Sim.CarrierPacket] that takes its
+// wavelength and width variables from [Config]. amp is relative to
+// [Config.Amplitude], so a caller can keep a mixing weight such as
+// cos(theta_W) in amp and leave the overall size to the user.
+func (ss *Sim) CarrierPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+	ss.CarrierPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
 // BoundStateMass is the mass the relativistic bound-state configs set, both
@@ -662,7 +710,7 @@ func (ss *Sim) diracPhase(sign, om float32, local bool) {
 // the two components a quarter cycle apart so it carries charge. Takes its
 // wavelength and width from [Config]. sign picks the sign of the charge.
 //
-// Built from [Sim.SlabPacket] at the exact lattice frequency for this mass, so
+// Built from [Sim.CarrierPacket] at the exact lattice frequency for this mass, so
 // it is a clean positive-frequency packet running one way, with chi going as
 // env times e to the i kx minus i omega t, for which rho is env^2 times a
 // constant. [Sim.MovingWavePacket] would
@@ -673,8 +721,27 @@ func (ss *Sim) ChargedPacketConfig(dim math32.Dims, amp, sign float32) {
 	om := ss.LatticeFreq(wl, math32.Sqrt(ss.Params.MOverHSq))
 	ctr := float32(ss.Config.Size.Dim(dim)) * 0.5
 	wd := ss.Config.PacketWidth
-	ss.SlabPacket(CabAs, CabAv, dim, ctr, wl, wd, amp, 1, om, 0)
-	ss.SlabPacket(CabBs, CabBv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+	ss.CarrierPacket(CabAs, CabAv, dim, ctr, wl, wd, amp, 1, om, 0)
+	ss.CarrierPacket(CabBs, CabBv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+}
+
+// DiracPacketConfig adds a travelling spinor packet along dim, spin along Z,
+// built exactly as [Sim.ChargedPacketConfig] builds the spin-0 one: the same
+// envelope, the same carrier, the same lattice frequency for the same mass.
+// That is the point of it. Run this against Charged Packet and the ONLY
+// difference left is the spin, so whatever the two do differently is the spin
+// doing it.
+//
+// Spin along Z means the whole amplitude sits in component 1 and component 2
+// starts empty, as in the Z branch of [Sim.DiracBlob]. The equation fills
+// component 2 in on its own wherever sigma.grad has something to act on.
+func (ss *Sim) DiracPacketConfig(dim math32.Dims, amp, sign float32) {
+	wl := ss.Config.Wavelength
+	om := ss.LatticeFreq(wl, math32.Sqrt(ss.Params.MOverHSq))
+	ctr := float32(ss.Config.Size.Dim(dim)) * 0.5
+	wd := ss.Config.PacketWidth
+	ss.CarrierPacket(Dirac1As, Dirac1Av, dim, ctr, wl, wd, amp, 1, om, 0)
+	ss.CarrierPacket(Dirac1Bs, Dirac1Bv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
 }
 
 // SmoothNoise seeds a state variable with a sum of a few long-wavelength modes

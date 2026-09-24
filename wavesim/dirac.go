@@ -338,6 +338,7 @@ func (ss *Sim) DiracStats() {
 	ss.AddStat(ss.StatSum(DiracLMag))
 	// massive, so dispersive: watch Vd against the other equations
 	ss.AddStat(ss.StatGroupVelMag(math32.X, DiracMag))
+	ss.AddStat(ss.StatWidthMag(math32.Z, DiracMag))
 	ss.AddStat(ss.StatDiracSpin())
 }
 
@@ -388,6 +389,7 @@ func (ss *Sim) StatDiracSpin() func(init bool) {
 //////// configurations
 
 var DiracConfigs = []InitFunc{
+	InitFunc{Name: "Spin Packet", Doc: "A travelling spin-1/2 packet along X: the same packet the other equations get, so the mass term and the spin are the only things left that could act differently", Func: SpinPacket},
 	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
 	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
 	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
@@ -395,6 +397,17 @@ var DiracConfigs = []InitFunc{
 	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
 	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
 	InitFunc{Name: "Chiral Oscillation", Doc: "A lump started purely right-chiral: the mass turns it into the left one and back at m c^2 / hbar, which is what mass IS", Func: ChiralOscillation},
+}
+
+// SpinPacket is the travelling packet every other equation has, on a spinor:
+// spin along +Z, moving along X at the lattice group velocity for this mass.
+//
+// It is the same construction as the spin-0 Charged Packet under KleinGordonC,
+// at the same wavelength, width and frequency, so the pair isolates what spin
+// costs. [Config.PacketSlab] switches both between a slab and a blob.
+func SpinPacket(ss *Sim) {
+	ss.Params.Update()
+	ss.DiracPacketConfig(math32.X, ss.Config.Amplitude, 1)
 }
 
 // SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the

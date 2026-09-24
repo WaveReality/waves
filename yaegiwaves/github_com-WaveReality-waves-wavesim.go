@@ -427,6 +427,7 @@ func init() {
 		"SetParticleAt":                reflect.ValueOf(wavesim.SetParticleAt),
 		"SpinAtRest":                   reflect.ValueOf(wavesim.SpinAtRest),
 		"SpinInPotential":              reflect.ValueOf(wavesim.SpinInPotential),
+		"SpinPacket":                   reflect.ValueOf(wavesim.SpinPacket),
 		"SpinPrecession":               reflect.ValueOf(wavesim.SpinPrecession),
 		"Spinfield":                    reflect.ValueOf(wavesim.Spinfield),
 		"Spinfield0a":                  reflect.ValueOf(wavesim.Spinfield0a),

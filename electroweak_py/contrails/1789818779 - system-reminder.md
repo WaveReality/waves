@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-24 19:14:52
+- **Last Message:** 2026-09-24 20:34:00
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -172,7 +172,7 @@ I'll search, and I have a new theory from your results.
 <details>
 <summary>Tool Calls (3)</summary>
 
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
 - **WebSearch**: `Search `Claude desktop app inline LaTeX math not rendering raw dollar signs``
 - **WebSearch**: `Search `Claude Code markdown KaTeX inline math rendering bug github issue``
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -83985,7 +83985,7 @@ gosl.go is unchanged from HEAD, so its formatting state was already there before
   ```
   gosl.go
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task b0o7fx7tc, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -85188,7 +85188,7 @@ goal build 2>&1|tail -1 && go generate ./... 2>&1 | grep -icE "error" ; grep -n 
   Command did not complete within its 120s timeout and was moved to the background (ID: brtlph5aa). Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/brtlph5aa.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `command, description, timeout_ms`
+- **Monitor**: `description, timeout_ms, command`
   ```
   Monitor started (task btpwrnnou, expires in 10m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -85610,5 +85610,2194 @@ This monitor was tied to a task that's already been killed, so there's nothing l
 
 That expired monitor was watching the `cp` command I killed earlier (it had stalled on an interactive overwrite prompt) — the work it was waiting on already completed through the replacement run. Nothing outstanding; the suite is green and the changeset above is final.
 
-That expired monitor was watching the `cp` command I killed earlier (it had stalled on an interactive overwrite prompt) — the work it was waiting on already completed through the replacement run. Nothing outstanding; the suite is green and the changeset above is final.
+## 🧑 User - 2026-09-24 19:51:56
+
+<task-notification>
+<task-id>btpwrnnou</task-id>
+<tool-use-id>toolu_01QYETVUMr7r76prectqaRNo</tool-use-id>
+<status>stopped</status>
+<summary>Background shell command didn't finish before the previous session ended</summary>
+<note>No completion record was found for it in the previous session. It may have been stopped (via the UI, Monitor timeout, or agent teardown — these leave no transcript marker), or it may have been running when the previous Claude Code process exited. Check the output file for partial results before assuming it completed.</note>
+</task-notification>
+
+## 🧑 User - 2026-09-24 20:04:57
+
+we need the same standardized WavePacket init config for all equations. for example, FreePacket in Schrodinger is gaussian, not planar, and there is nothing of the sort in Dirac. And it would also be interesting to compare the gaussian wave packet vs. the planar slab packet for all cases -- gives a good visual sense of the dispersion properties.
+
+## 🤖 Assistant - 2026-09-24 20:05:16
+
+*Model: claude-opus-5*
+
+<thinking>
+I want a standardized WavePacket init config across all equations, offering both a Gaussian wave packet and a planar slab packet for every equation so dispersion properties can be compared visually. I'm surveying the existing helper packet types across equations to see what's already available to build on.
+
+I need to clarify what distinguishes these two packet types: a Gaussian packet is a 3D localized blob that spreads in every direction, while a planar slab is Gaussian only along the propagation axis and uniform transversely, so it only disperses longitudinally — a nice contrast for showing diffraction versus pure dispersion. I should look through init.goal's existing helper functions and each equation's packet implementations to find the common structure before standardizing across all of them.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "^func (ss \*Sim)\|^func " init.goal | head -60``
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "Packet\|Slab\|Pulse" *.goal | grep "^[a-z-]*\.goal:[0-9]*:func\|InitFunc{Name" | head -50``
+  ```
+  30:func (ss *Sim) CopyCurToPrev() {
+  52:func CenterI(c math32.Vector3i) math32.Vector3i {
+  70:func CenterF(c math32.Vector3) math32.Vector3 {
+  85:func CoordToFloat(c math32.Vector3i) math32.Vector3 {
+  91:func CoordToInt(c math32.Vector3) math32.Vector3i {
+  100:func CenterFull(c math32.Vector3i) math32.Vector3i {
+  117:func GaussWave(x, d, wavelength, width, phase, amp float32) float32 {
+  125:func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val float32) {
+  140:func (ss *Sim) Fill(vr enums.Enum, curPrev CurPrevBoth, val float32) {
+  164:func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off float32) {
+  185:func (ss *Sim) Gauss(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, width, amp, off float32) {
+  212:func (ss *Sim) Step(vr enums.Enum, curPrev CurPrevBoth, pos math32.Vector3, dim math32.Dims, amp, off float32) {
+  244:func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  274:func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  281:func (ss *Sim) PacketFreq(wavelength float32) float32 {
+  304:func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  337:func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  366:func (ss *Sim) ComplexPacketConfig(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  373:func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  384:func (ss *Sim) LatticeFreq(wavelength, mass float32) float32 {
+  ...
+  ```
+  ```
+  electroweak.goal:895:	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
+  electroweak.goal:896:	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+  electroweak.goal:956:func PhotonPulse(ss *Sim) {
+  electroweak.goal:979:func ZPulse(ss *Sim) {
+  kg-complex.goal:243:	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
+  kg-complex.goal:337:func ChargedPacket(ss *Sim) {
+  init.goal:244:func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  init.goal:274:func (ss *Sim) PosWavePacketConfig(vr enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  init.goal:281:func (ss *Sim) PacketFreq(wavelength float32) float32 {
+  init.goal:304:func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  init.goal:337:func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, wavelength, width, phase, amp float32) {
+  init.goal:366:func (ss *Sim) ComplexPacketConfig(posA, posB enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  init.goal:373:func (ss *Sim) MovingWavePacketConfig(posVar, velVar enums.Enum, dim math32.Dims, ctr math32.Vector3, dir, phase, amp float32) {
+  init.goal:403:func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
+  init.goal:435:func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+  init.goal:671:func (ss *Sim) ChargedPacketConfig(dim math32.Dims, amp, sign float32) {
+  schrodinger.goal:164:	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
+  schrodinger.goal:284:func FreePacket(ss *Sim) {
+  wavec.goal:185:	InitFunc{Name: "Wave C Packet", Doc: "A complex packet that moves in the direction its phase runs, with nothing in the equation to say which way", Func: WaveCPacket, Current: true},
+  wavec.goal:186:	InitFunc{Name: "Wave C Pulse", Doc: "A bare bump with no phase: it spreads both ways and smears, where the directional version carries it off whole", Func: WaveCPulse},
+  ...
+  ```
+
+</details>
+
+<thinking>
+I see there's already a rich set of helper functions like PosWavePacket, MovingWavePacket, ComplexPacket, SlabPacket, GaussWave, WeylPacket, and WeylSlab, so I want to examine each one's envelope shape—whether it's a 3D gaussian or slab—before proceeding. Let me look through init.goal around lines 110-460 to get the full picture.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 110,130p init.goal; echo "=== 240-300"; sed -n 240,310p init.goal``
+  ```
+  		c.Z += ctr.Z
+  	}
+  	return c
+  }
+  
+  // GaussWave returns value for a gaussian * cosine wave packet for given
+  // linear dimension value x and 3D distance d.
+  func GaussWave(x, d, wavelength, width, phase, amp float32) float32 {
+  	cos := amp * math32.Cos(TwoPi*((x/wavelength)+phase))
+  	d /= width
+  	gauss := math32.FastExp(-d * d)
+  	return cos * gauss
+  }
+  
+  // Point adds value to individual point, optionally for both cur and previous values.
+  func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val float32) {
+  	vri := int(vr.Int64())
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 310,465p init.goal``
+  ```
+  	om := ss.PacketFreq(wavelength)
+  	ctrf := CenterF(ctr)
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				d := CoordToFloat(c).Sub(ctrf)
+  				dd := d.Dim(dim)
+  				dl := d.Length()
+  				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
+  				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
+  				State[f.Z, f.Y, f.X, posI, cur] += pv
+  				State[f.Z, f.Y, f.X, posI, prv] += pv
+  				State[f.Z, f.Y, f.X, velI, cur] += vv
+  				State[f.Z, f.Y, f.X, velI, prv] += vv
+  			}
+  		}
+  	}
+  ...
+  ```
+
+</details>
+
+<thinking>
+Now I'm mapping out the helper family structure: Gaussian blob variants (position-only, second-order real, first-order complex) versus slab variants with uniform transverse profiles, trying to identify which physics equations each variant serves.
+
+I see the gap — there's no standardized gaussian/slab pair covering every equation. I'm working through a design to add missing counterparts: unifying SlabPacket with MovingWavePacket's approach, adding a ComplexSlabPacket, checking whether Weyl's helpers already cover both forms, and noting Dirac currently has nothing beyond a stationary blob.
+
+My plan is to give every equation two consistently-named configs, "Gaussian Packet" and "Slab Packet," which means touching 8+ equations. The elegant shortcut: GaussWave already separates the along-axis coordinate from the 3D distance, so swapping in an absolute-value distance instead of a vector length turns the same function into a slab — meaning I just need a single flag to toggle between the two envelope shapes rather than duplicating logic everywhere.
+
+Now I'm weighing whether that toggle should be separate init configs per equation or a live Config/Params flag, similar to how Diffusion was implemented as a flag on Wave. A flag feels better since it keeps the config list lean and lets you flip between gaussian and slab live in the GUI for comparison, matching the pattern the user already established.
+
+Since this only matters at init time rather than during the GPU step, it belongs on Config rather than Params, alongside Wavelength, PacketWidth, and Amplitude — so I'm considering adding a Config.PacketSlab bool with a default tag. The remaining question is whether changing that Config field should auto-trigger re-init or wait for the user to hit Init manually.
+
+I'm documenting the field so it's clear a slab lays the Gaussian along the travel direction only, avoiding the diffraction-driven width growth a full 3D blob would have. Now I'm working out how to plumb this into `GaussWave`, planning a helper that picks either the full vector length or just the single dimension's distance depending on the slab flag, and considering making it an exported utility method for reuse.
+
+I'm weighing whether to leave SlabPacket separate since its callers (Maxwell, EW) use a scalar center rather than a 3D one, which would make unifying it more invasive. The user's core request is for one standardized WavePacket config across all equations, so I need to decide how far that scope extends — including FreePacket in Schrodinger.
+
+I'll prioritize covering the wave equations (Wave, KleinGordon, WaveC, WaveCDir, Schrodinger, KleinGordonC, Weyl, Dirac) with the standard flag since Dirac currently lacks a travelling-packet option, and also try extending Maxwell/Electroweak by giving SlabPacket a 3D falloff using the box center for its transverse coordinates.
+
+I need to check how the `ctr` parameter is used across callers — constructing the center as the box center overridden along the given dimension — starting with Maxwell's PolarizedPhoton and EW's PhotonPulse, then reconciling Weyl's separate slab and packet functions under one flag before reviewing the rest of the equation configs in batch.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && echo "=== weyl 440-545"; sed -n 444,545p weyl.goal``
+  ```
+  === weyl 440-545
+  func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
+  	c1 := int(side.Int64())
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	ctr := CenterF(math32.Vec3(-1, -1, -1))
+  	wd := ss.Config.PacketWidth
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				g := (CoordToFloat(c).Dim(dim) - ctr.Dim(dim)) / wd
+  				v := amp * math32.FastExp(-g*g)
+  				State[f.Z, f.Y, f.X, c1, cur] += v
+  				State[f.Z, f.Y, f.X, c1, prv] += v
+  			}
+  		}
+  ...
+  ```
+
+</details>
+
+<thinking>
+WeylPacket is already a slab, and it explains why a blob isn't a helicity eigenstate — though supporting a blob for Weyl is still useful pedagogically since it'll visibly diffract and crawl, contrasting with the eigenstate case. Now I'm checking the remaining equation packet configs: Wave/WavePacket, WaveC, WaveCDir, Schrodinger/FreePacket, and KGC/ChargedP.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && echo "=== wave 175-195"; sed -n 172,195p wave.goal; echo "=== wavec 190-225"; sed -n 190,225p wavec.goal; echo "=== wavecdir 122-160"; sed -n 122,160p wavecdir.goal; echo "=== schrod FreePacket"; sed -n 278,300p schrodinger.goal``
+  ```
+  === wave 175-195
+  // WavePacket is a travelling wave packet along X.
+  //
+  // Under Wave it moves at c at every wavelength, up to the lattice. Under
+  // KleinGordon it does not: the mass term makes the equation DISPERSIVE, and
+  // long waves are the ones it slows. See TestWaveDispersion.
+  func WavePacket(ss *Sim) {
+  	ss.MovingWavePacketConfig(WavePos, WaveVel, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+  }
+  
+  // WavePulse is a bare gaussian bump with no velocity anywhere, and the one to
+  // run against WaveCPulse and WaveCDirPulse.
+  //
+  // It splits in half, one going each way at c, because a second-order operator
+  // contains both directions and nothing in the bump chose between them. Written
+  // to both time levels, which is what "no velocity" means in a leapfrog.
+  func WavePulse(ss *Sim) {
+  	ss.Gauss(WavePos, Both, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, 0)
+  }
+  === wavec 190-225
+  ...
+  ```
+
+</details>
+
+<thinking>
+Now I'm mapping out how the different wave packet equations relate to their configs and envelope shapes—Wave and KleinGordon share a blob envelope through WavePacket, while WaveC uses a slab envelope with its own bespoke helper.
+
+Filling in the rest of the table shows most equations already use slabs, except Wave/KG/Schrodinger which use blobs, KleinGordonC's envelope is unclear, and Dirac has none at all. This is inconsistent, so I'm thinking of adding a `Config.PacketSlab` boolean to unify things—leaning toward defaulting it to true since slabs better show motion and are already the majority. But I need to check whether flipping the default would break existing dispersion tests that rely on blob-based width calculations.
+
+Neither default preserves all current behavior, so I consider instead giving each equation two separate configs rather than a global flag, which avoids breaking anything but doesn't match the "standardize" request as cleanly. Ultimately I lean toward committing to the flag approach since it gives better UX for comparison, accepting that some test numbers will shift and planning to retune whatever breaks.
+
+I'll set the default envelope to slab, since that's already the common case, isolates longitudinal dispersion cleanly, and matches the visual band-sweeping behavior the user wants for Weyl. But I need to be careful that this flag only applies to travelling-packet helpers, not to bound-state configs like hydrogen or the oscillator, which must remain 3D gaussian/exponential blobs regardless.
+
+I'm scoping the flag to the three packet helpers plus bespoke ones, and considering whether WavePulse (currently a blob via Gauss) should also switch to a slab envelope for consistency with the other packet configs, since pulses are conceptually packets too.
+
+Now I'm designing the concrete API for a PacketDist helper — controlling whether the envelope falls off over the full 3D radius or, when a slab mode is set, only along one dimension, leaving it uniform across the other two. This distinction matters physically: a blob spreads both from dispersion and diffraction (since finite transverse extent implies a spread of transverse wavenumbers), while a slab has no transverse structure to diffract, isolating pure dispersion effects.
+
+I'm mapping out where to apply this — PosWavePacket, MovingWavePacket, and ComplexPacket cover the Wave, KG, and Schrodinger cases — while noting that the bespoke packet functions (WaveCPacketAt, WaveCDirPacketAt, WeylPacket, WeylSlab) compute their distance scalar along X only and will need the transverse falloff added in similarly.
+
+For SlabPacket, used by Maxwell/EW and also shared by StandingWave with two different center values, I can reconstruct the 3D center from the box position with the dim overridden by ctr, so this should be a straightforward change too. Next I want to standardize the config names — the user wants the same WavePacket init config used consistently across all equations.
+
+Right now the naming is inconsistent: "Wave Packet", "Wave C Packet", "Free Packet", "Charged Packet", "Neutrino/Electron Packet", "Polarized Photon", "Photon Pulse", and Dirac has no packet config at all. But collapsing all these to one generic name would lose meaningful physical distinctions, so instead the real fixes are adding the envelope flag for consistency and creating a travelling packet config for Dirac, since that's what's actually missing.
+
+I want to look at how Dirac's state and kernel are structured, then model a travelling spinor packet for it similar to how ChargedPacket works for Klein-Gordon, so I should check DiracBlob and the ChargedPacket/ChargedPacketConfig pattern before building it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 596,700p init.goal``
+  ```
+  // Spin along Z is the component-1 state on its own; along X or Y it is the
+  // equal superposition of the two, which is what a spin pointing sideways IS in
+  // this basis -- there is no third pair of variables for it to live in.
+  func (ss *Sim) DiracBlob(ctr math32.Vector3, width, amp float32, axis math32.Dims, sign float32) {
+  	h := amp / math32.Sqrt2
+  	switch axis {
+  	case math32.X:
+  		ss.Gauss(Dirac1As, Both, ctr, width, h, 0)
+  		ss.Gauss(Dirac2As, Both, ctr, width, h, 0)
+  	case math32.Y:
+  		ss.Gauss(Dirac1As, Both, ctr, width, h, 0)
+  		ss.Gauss(Dirac2Bs, Both, ctr, width, h, 0)
+  	default:
+  		ss.Gauss(Dirac1As, Both, ctr, width, amp, 0)
+  	}
+  	ss.DiracRest(sign)
+  }
+  
+  // DiracRest gives whatever is already in the Dirac position variables the
+  // velocity that makes it a charge at rest, as [Sim.ChargedRest] does for the
+  ...
+  ```
+
+</details>
+
+<thinking>
+I notice ChargedPacketConfig already follows the SlabPacket pattern for the lattice, which gives me the exact template for the Dirac fields — I'll build the four spinor component pairs (Dirac1As/1Av, Dirac1Bs/1Bv, Dirac2As/2Av, Dirac2Bs/2Bv) using the same SlabPacket calls at the lattice frequency, starting with a spin-up-along-Z configuration.
+
+For a packet travelling along X, the amplitude lives entirely in component 1 with the quarter-cycle a/b offset, leaving component 2 empty — the same structure as ChargedPacketConfig but restricted to one component, since the right-chiral 2-spinor's second component gets generated by the equation once the first is seeded with the correct frequency.
+
+Writing DiracPacketConfig... This mirrors DiracBlob's default branch with spin along Z, and using the same construction as KGC makes the spin-0 vs spin-1/2 comparison exact since everything else stays equal. Now I'm thinking through the scope of this work and how to plan it out.
+
+I'm mapping out how PacketSlab and PacketDist should route through the various packet-construction functions — PosWavePacket, MovingWavePacket, ComplexPacket, SlabPacket, WaveCPacketAt, WaveCDirPacketAt, WeylPacket, WeylSlab — converting them from hardcoded blob/slab behavior to flag-driven, while being careful not to touch Gauss since it's a shared 3D envelope used across many other bound configs; WavePulse should instead get its own dedicated envelope helper.
+
+WavePulse needs the helper too. I should also add a Dirac packet config alongside ChargedPacketConfig in init.goal, and check for full-suite verification afterward.
+
+I'm also weighing naming conventions -- should Dirac's config be called "Dirac Packet" to match "Wave Packet" and "Wave C Packet" for consistency, so the user can flip between equations and recognize the same setup.
+
+Looking across equations, the names are pretty varied: "Wave Packet", "Wave C Packet", "Free Packet", "Charged Packet", "Neutrino/Electron Packet", "Polarized Photon", "Photon Pulse". I'm leaning against a full rename since some of these names carry meaning (like "Free Packet" denoting no potential) and a mass rename risks churn beyond what was actually requested -- the real complaints were about envelope inconsistency, not naming.
+
+Re-reading their example about Schrödinger's FreePacket being Gaussian rather than planar, and Dirac lacking any packet config at all, I realize their ask for "the same standardized WavePacket init config" is really about consistent behavior and availability across equations, not consistent naming. So I'll standardize the behavior and presence of packet configs everywhere while leaving the naming as-is.
+
+Now I'm ready to start implementing, beginning with the Config field and checking how Wavelength/PacketWidth are set up in config.go.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 30,60p config.go; echo "=== defaults"; sed -n 95,115p config.go``
+  ```
+  	Size math32.Vector3i
+  
+  	// ViewInterval is how often to update the view
+  	ViewInterval int `min:"1"`
+  
+  	// Wavelength is the wavelength to use for functions that use it
+  	// (Config suffix). Allows user to manipulate the wavelength easily,
+  	// e.g., for KG and other matter waves.
+  	Wavelength float32
+  
+  	// PacketWidth is the wave packet width to use for functions that use it
+  	// (Config suffix). Allows user to manipulate the wave parameters easily,
+  	// e.g., for KG and other matter waves.
+  	PacketWidth float32
+  
+  	// Amplitude scales the peak value of wave packets made by the functions
+  	// that use it (Config suffix), whose own amp argument becomes a relative
+  	// weight, so mixing factors such as cos(theta_W) stay intact. 1 fills the
+  	// display range, and is also large enough for a massive field to push the
+  	// Higgs condensate around: turn it down for the linear regime.
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm checking whether config.go uses `default:` struct tags or explicit assignment in `Defaults()`, and it looks like the convention here is explicit assignment, so I'll add the new field and set its default value that way to stay consistent with the surrounding code.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -c 'default:"' config.go params.go``
+  ```
+  params.go:5
+  config.go:1
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='config.go'
+s=open(p).read()
+old="""	// Amplitude scales the peak value of wave packets made by the functions"""
+new="""	// PacketSlab makes every travelling-packet config lay down a planar SLAB
+	// -- gaussian along the direction of travel, uniform across the other two
+	// axes -- rather than a 3D gaussian blob. Off gives the blob.
+	//
+	// Worth flipping under each equation in turn. A blob spreads for two
+	// reasons at once: it disperses, and it DIFFRACTS, because a finite
+	// transverse extent is a spread of transverse wavenumbers. So a blob grows
+	// even under an equation with no dispersion at all, and its centroid
+	// crawls rather than tracking the group velocity. A slab has no transverse
+	// structure to diffract, leaving the dispersion on its own, which is what
+	// the Vd stat is trying to read.
+	PacketSlab bool `default:"true"`
+
+	// Amplitude scales the peak value of wave packets made by the functions"""
+assert old in s
+s=s.replace(old,new,1)
+old2="""	cfg.PacketWidth = 12
+	cfg.Amplitude = 1"""
+new2="""	cfg.PacketWidth = 12
+	cfg.PacketSlab = true
+	cfg.Amplitude = 1"""
+assert old2 in s
+s=s.replace(old2,new2,1)
+open(p,'w').write(s)
+PY
+grep -n "PacketSlab" config.go | head``
+  ```
+  45:	// PacketSlab makes every travelling-packet config lay down a planar SLAB
+  56:	PacketSlab bool `default:"true"`
+  118:	cfg.PacketSlab = true
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now the shared envelope helper and rerouting the packet functions:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='init.goal'
+s=open(p).read()
+
+# 1. PacketDist + GaussPacket helpers, right after GaussWave
+old = """// Point adds value to individual point, optionally for both cur and previous values."""
+new = """// PacketDist is the distance a travelling packet's envelope falls off with,
+// given the offset d from its center: the full 3D radius, or, when
+// [Config.PacketSlab] is set, the distance along dim alone, which leaves the
+// envelope uniform across the other two axes. Every packet config goes through
+// this, so the one switch changes them all together.
+func (ss *Sim) PacketDist(d math32.Vector3, dim math32.Dims) float32 {
+	if ss.Config.PacketSlab {
+		return math32.Abs(d.Dim(dim))
+	}
+	return d.Length()
+}
+
+// PacketEnv is the bare packet envelope at offset d from the center: the same
+// gaussian [GaussWave] puts under the carrier, with no carrier on it. For the
+// pulse configs, which are a packet with the phase left out.
+func (ss *Sim) PacketEnv(vr enums.Enum, curPrev CurPrevBoth, dim math32.Dims, ctr math32.Vector3, width, amp float32) {
+	vri := int(vr.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctrf := CenterF(ctr)
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				g := ss.PacketDist(CoordToFloat(c).Sub(ctrf), dim) / width
+				v := amp * math32.FastExp(-g*g)
+				if curPrev != Previous {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev != Current {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}
+			}
+		}
+	}
+}
+
+// Point adds value to individual point, optionally for both cur and previous values."""
+assert old in s
+s = s.replace(old, new, 1)
+
+# 2. PosWavePacket: 3D length -> PacketDist
+old = """				cv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)
+				State[f.Z, f.Y, f.X, vri, cur] += cv
+
+				ff.SetAdd(diroff)
+				d = ff.Sub(ctrf)
+				pv := GaussWave(d.Dim(dim), d.Length(), wavelength, width, phase, amp)"""
+new = """				cv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)
+				State[f.Z, f.Y, f.X, vri, cur] += cv
+
+				ff.SetAdd(diroff)
+				d = ff.Sub(ctrf)
+				pv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)"""
+assert old in s
+s = s.replace(old, new, 1)
+
+# 3. MovingWavePacket
+old = """				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := d.Length()
+				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
+				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)"""
+new = """				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := ss.PacketDist(d, dim)
+				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
+				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)"""
+assert old in s
+s = s.replace(old, new, 1)
+
+# 4. ComplexPacket
+old = """				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := d.Length()
+				av := GaussWave(dd, dl, wavelength, width, phase, amp)"""
+new = """				d := CoordToFloat(c).Sub(ctrf)
+				dd := d.Dim(dim)
+				dl := ss.PacketDist(d, dim)
+				av := GaussWave(dd, dl, wavelength, width, phase, amp)"""
+assert old in s
+s = s.replace(old, new, 1)
+open(p,'w').write(s)
+PY
+echo ok``
+  ```
+  ok
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm reworking SlabPacket to be flag-driven, computing the Gaussian envelope along the specified dimension while using the box center for the transverse offset.
+
+Now I'm second-guessing whether to rename SlabPacket, since with the flag off it's no longer really a slab and its doc comment about not diffracting would become misleading. Renaming to something like CarrierPacket is a small mechanical change across Maxwell, EW, and KGC call sites, but I still need to update the doc comment either way, which makes the rename feel worthwhile to avoid leaving something actively wrong.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='init.goal'
+s=open(p).read()
+old = """// SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
+// its velocity: a cosine carrier under a Gaussian envelope along dim, centered
+// at ctr and uniform across the other two dims. A slab, not a blob, so it does
+// not diffract and the speed stays unambiguous to the eye.
+//
+// The velocity is the point: for psi = env(d) cos(k d - om t) the initial time
+// derivative is om env sin(k d), with dir flipping the direction. Setting only
+// the position splits it into two halves running opposite ways.
+//
+// dim is normally [math32.X], the horizontal display axis; pos should then be
+// a TRANSVERSE component, normally Y, which the X-Z view draws vertically.
+// phase shifts the carrier under the envelope: two packets a quarter cycle
+// apart in orthogonal components make a circularly polarized wave.
+func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
+	pi := int(pos.Int64())
+	vi := int(vel.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	k := TwoPi / wavelength
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				d := float32(c.Dim(dim)) - ctr
+				g := d / width
+				env := amp * math32.FastExp(-g*g)"""
+new = """// CarrierPacket adds a ONE-WAY travelling wave packet to a field and its
+// velocity: a cosine carrier of the GIVEN frequency om under a gaussian
+// envelope along dim, centered at ctr along that axis and at the middle of the
+// box across the other two. [Config.PacketSlab] picks whether the envelope is
+// a slab or a blob.
+//
+// om is passed in rather than taken from [Sim.PacketFreq] because the callers
+// are fields whose dispersion the generic version does not know: a gauge
+// potential, or a complex field at its own lattice frequency.
+//
+// The velocity is the point: for psi = env(d) cos(k d - om t) the initial time
+// derivative is om env sin(k d), with dir flipping the direction. Setting only
+// the position splits it into two halves running opposite ways.
+//
+// dim is normally [math32.X], the horizontal display axis; pos should then be
+// a TRANSVERSE component, normally Y, which the X-Z view draws vertically.
+// phase shifts the carrier under the envelope: two packets a quarter cycle
+// apart in orthogonal components make a circularly polarized wave.
+func (ss *Sim) CarrierPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
+	pi := int(pos.Int64())
+	vi := int(vel.Int64())
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	sz := ss.Config.Size
+	k := TwoPi / wavelength
+	ctrf := CenterF(math32.Vec3(-1, -1, -1))
+	ctrf.SetDim(dim, ctr)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				off := CoordToFloat(c).Sub(ctrf)
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / width
+				env := amp * math32.FastExp(-g*g)"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old2 = """// SlabPacketConfig is a version of [SlabPacket] that takes its wavelength and
+// width variables from [Config]. amp is relative to [Config.Amplitude], so a
+// caller can keep a mixing weight such as cos(theta_W) in amp and leave the
+// overall size to the user.
+func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+	ss.SlabPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
+}"""
+new2 = """// CarrierPacketConfig is a version of [Sim.CarrierPacket] that takes its
+// wavelength and width variables from [Config]. amp is relative to
+// [Config.Amplitude], so a caller can keep a mixing weight such as
+// cos(theta_W) in amp and leave the overall size to the user.
+func (ss *Sim) CarrierPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+	ss.CarrierPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
+}"""
+assert old2 in s
+s = s.replace(old2, new2, 1)
+open(p,'w').write(s)
+PY
+grep -rn "SlabPacket" *.goal | grep -v "^init.goal"``
+  ```
+  electroweak.goal:963:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+  electroweak.goal:964:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:987:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:988:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+  electroweak.goal:1018:	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+  electroweak.goal:1019:	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+  maxwell.goal:350:	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+  maxwell.goal:372:	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+  maxwell.goal:373:	ss.SlabPacketConfig(opos, ovel, math32.X, cx, 1, 1, om, -0.5*math32.Pi)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -i '' 's/\bSlabPacketConfig\b/CarrierPacketConfig/g; s/\bss\.SlabPacket(/ss.CarrierPacket(/g' electroweak.goal maxwell.goal init.goal && grep -rn "SlabPacket" *.goal | head; echo "--- remaining refs ---"; grep -rn "SlabPacket" *.goal *_test.go | head``
+  ```
+  electroweak.goal:963:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+  electroweak.goal:964:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:987:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:988:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+  electroweak.goal:1018:	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+  electroweak.goal:1019:	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+  init.goal:713:// Built from [Sim.SlabPacket] at the exact lattice frequency for this mass, so
+  init.goal:724:	ss.SlabPacket(CabAs, CabAv, dim, ctr, wl, wd, amp, 1, om, 0)
+  init.goal:725:	ss.SlabPacket(CabBs, CabBv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+  maxwell.goal:350:	ss.SlabPacketConfig(pos, vel, math32.X, cx, 1, 1, om, 0)
+  --- remaining refs ---
+  electroweak.goal:963:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+  electroweak.goal:964:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:987:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.goal:988:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+  electroweak.goal:1018:	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+  electroweak.goal:1019:	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+  init.goal:713:// Built from [Sim.SlabPacket] at the exact lattice frequency for this mass, so
+  init.goal:724:	ss.SlabPacket(CabAs, CabAv, dim, ctr, wl, wd, amp, 1, om, 0)
+  init.goal:725:	ss.SlabPacket(CabBs, CabBv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+  ...
+  ```
+
+</details>
+
+<thinking>
+The sed command didn't take effect — I bet it's because BSD sed doesn't support `\b` word boundaries. I'll switch to using Python instead.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+import re
+for p in ['electroweak.goal','maxwell.goal','init.goal']:
+    s=open(p).read()
+    s=re.sub(r'\bSlabPacketConfig\b','CarrierPacketConfig',s)
+    s=re.sub(r'\bSlabPacket\b','CarrierPacket',s)
+    open(p,'w').write(s)
+PY
+grep -rn "SlabPacket" *.goal *.go *_test.go 2>/dev/null | grep -v typegen | head``
+  ```
+  electroweak.go:968:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+  electroweak.go:969:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.go:992:	ss.SlabPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  electroweak.go:993:	ss.SlabPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+  electroweak.go:1023:	ss.SlabPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
+  electroweak.go:1024:	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+  init.go:392:// SlabPacket adds a ONE-WAY travelling wave packet to a gauge potential and
+  init.go:405:func (ss *Sim) SlabPacket(pos, vel enums.Enum, dim math32.Dims, ctr, wavelength, width, amp, dir, om, phase float32) {
+  init.go:433:// SlabPacketConfig is a version of [SlabPacket] that takes its wavelength and
+  init.go:437:func (ss *Sim) SlabPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Good, only the generated .go files remain, which will be rewritten by the build step. Now I need to move on to WaveCPacketAt, WaveCDirPacketAt, WeylPacket, WeylSlab, and WavePulse — let me read through the rest of WaveCPacketAt and WaveCDirPacketAt so I can edit them.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 208,245p wavec.goal; echo "=== wavecdir"; sed -n 144,180p wavecdir.goal``
+  ```
+  // WaveCPacketAt writes a gaussian slab with the given signed wavelength into
+  // the present, then derives the past from it. Wavelength 0 means no phase.
+  func (ss *Sim) WaveCPacketAt(wavelength float32) {
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
+  	wd := ss.Config.PacketWidth
+  	amp := ss.Config.Amplitude
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				d := float32(c.X) - ctr
+  				g := d / wd
+  				en := amp * math32.FastExp(-g*g)
+  				va, vb := en, float32(0)
+  				if wavelength != 0 {
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm computing the offset from center for each coordinate, then using that to determine the packet distance and directional gradient along X, keeping the transverse components unshifted for the past envelope.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('wavec.goal').read()
+old = """// WaveCPacketAt writes a gaussian slab with the given signed wavelength into
+// the present, then derives the past from it. Wavelength 0 means no phase.
+func (ss *Sim) WaveCPacketAt(wavelength float32) {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
+	wd := ss.Config.PacketWidth
+	amp := ss.Config.Amplitude
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := float32(c.X) - ctr
+				g := d / wd
+				en := amp * math32.FastExp(-g*g)"""
+new = """// WaveCPacketAt writes a packet with the given signed wavelength into the
+// present, then derives the past from it. Wavelength 0 means no phase.
+// [Config.PacketSlab] picks the envelope shape.
+func (ss *Sim) WaveCPacketAt(wavelength float32) {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	amp := ss.Config.Amplitude
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				off := CoordToFloat(c).Sub(ctr)
+				d := off.X
+				g := ss.PacketDist(off, math32.X) / wd
+				en := amp * math32.FastExp(-g*g)"""
+assert old in s
+open('wavec.goal','w').write(s.replace(old,new,1))
+
+s=open('wavecdir.goal').read()
+old = """	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
+	wd := ss.Config.PacketWidth
+	back := ctr - ss.Params.C*ss.Params.WaveDir
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := float32(c.X) - ctr
+				e := float32(c.X) - back
+				gd := d / wd
+				ge := e / wd
+				en := amp * math32.FastExp(-gd*gd)
+				eo := amp * math32.FastExp(-ge*ge)"""
+new = """	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	back := ss.Params.C * ss.Params.WaveDir // how far upstream the past sits
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.X += back
+				d := off.X
+				e := pst.X
+				gd := ss.PacketDist(off, math32.X) / wd
+				ge := ss.PacketDist(pst, math32.X) / wd
+				en := amp * math32.FastExp(-gd*gd)
+				eo := amp * math32.FastExp(-ge*ge)"""
+assert old in s
+open('wavecdir.goal','w').write(s.replace(old,new,1))
+PY
+echo ok``
+  ```
+  ok
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now Weyl and the Wave pulse:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('weyl.goal').read()
+
+# WeylSlab -> envelope via PacketDist
+old = """	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				g := (CoordToFloat(c).Dim(dim) - ctr.Dim(dim)) / wd
+				v := amp * math32.FastExp(-g*g)"""
+new = """	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				g := ss.PacketDist(CoordToFloat(c).Sub(ctr), dim) / wd
+				v := amp * math32.FastExp(-g*g)"""
+assert old in s
+s = s.replace(old, new, 1)
+
+# WeylPacket envelope
+old = """				f := c.AddScalar(1)
+				d := CoordToFloat(c).Dim(dim) - ctr.Dim(dim)
+				g := d / wd
+				e := (d + vg) / wd // where the envelope was one step ago
+				en := amp * math32.FastExp(-g*g)
+				eo := amp * math32.FastExp(-e*e)"""
+new = """				f := c.AddScalar(1)
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.SetDim(dim, off.Dim(dim)+vg) // where it was one step ago
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / wd
+				e := ss.PacketDist(pst, dim) / wd
+				en := amp * math32.FastExp(-g*g)
+				eo := amp * math32.FastExp(-e*e)"""
+assert old in s
+s = s.replace(old, new, 1)
+
+# the doc no longer states the envelope unconditionally
+old = """// The envelope is a SLAB: gaussian along the direction of travel, flat across
+// the other two. That is not just for looks. A round blob carries transverse
+// momentum, so it is not a helicity eigenstate, it spreads sideways, and its
+// centroid crawls instead of moving at the group velocity. A slab has k purely
+// along one axis, travels rigidly, and reads on screen as bands sweeping
+// across rather than a dot that may or may not be drifting."""
+new = """// The envelope defaults to a SLAB -- gaussian along the direction of travel,
+// flat across the other two -- and that is not just for looks. A round blob
+// carries transverse momentum, so it is not a helicity eigenstate, it spreads
+// sideways, and its centroid crawls instead of moving at the group velocity. A
+// slab has k purely along one axis, travels rigidly, and reads on screen as
+// bands sweeping across rather than a dot that may or may not be drifting.
+// Clear [Config.PacketSlab] to see the blob fail at exactly that."""
+assert old in s
+s = s.replace(old, new, 1)
+open('weyl.goal','w').write(s)
+
+# WavePulse: use the packet envelope, not the always-3D Gauss
+s=open('wave.goal').read()
+old = """func WavePulse(ss *Sim) {
+	ss.Gauss(WavePos, Both, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, 0)
+}"""
+new = """func WavePulse(ss *Sim) {
+	ss.PacketEnv(WavePos, Both, math32.X, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude)
+}"""
+assert old in s
+open('wave.goal','w').write(s.replace(old,new,1))
+PY
+goal build 2>&1 | tail -3``
+  ```
+  init.goal:153: invalid operation: curPrev != Previous (mismatched types CurPrevBoth and CurPrev)
+  init.goal:156: invalid operation: curPrev != Current (mismatched types CurPrevBoth and CurPrev)
+  goal build failed: failed to run "go build: exit status 1"
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "CurPrevBoth\|CurPrev\b" init.goal | head -8; echo "=== Gauss body cur/prev handling"; sed -n 218,250p init.goal``
+  ```
+  139:func (ss *Sim) PacketEnv(vr enums.Enum, curPrev CurPrevBoth, dim math32.Dims, ctr math32.Vector3, width, amp float32) {
+  165:func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val float32) {
+  180:func (ss *Sim) Fill(vr enums.Enum, curPrev CurPrevBoth, val float32) {
+  225:func (ss *Sim) Gauss(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, width, amp, off float32) {
+  252:func (ss *Sim) Step(vr enums.Enum, curPrev CurPrevBoth, pos math32.Vector3, dim math32.Dims, amp, off float32) {
+  791:func (ss *Sim) Expo(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, decay, amp float32) {
+  819:func (ss *Sim) ExpoP(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, dim math32.Dims, decay, amp float32) {
+  848:func (ss *Sim) SineBox(vr enums.Enum, curPrev CurPrevBoth, n int32, amp float32) {
+  === Gauss body cur/prev handling
+  				State[f.Z, f.Y, f.X, vri, prv] += v
+  			}
+  		}
+  	}
+  }
+  
+  // Gauss adds gaussian values to given variable.
+  func (ss *Sim) Gauss(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, width, amp, off float32) {
+  	vri := int(vr.Int64())
+  	ctx := GetCtx(0)
+  	ctr = CenterF(ctr)
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+old="""				if curPrev != Previous {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev != Current {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}"""
+new="""				if curPrev == CurOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, cur] += v
+				}
+				if curPrev == PrevOnly || curPrev == Both {
+					State[f.Z, f.Y, f.X, vri, prv] += v
+				}"""
+assert old in s
+open('init.goal','w').write(s.replace(old,new,1))
+PY
+goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm now adding the Dirac travelling packet, setting up a DiracPacketConfig alongside ChargedPacketConfig in init.goal, plus the corresponding init function and config entry in dirac.goal. I'm checking the Dirac state variable naming pattern (Dirac1As, Dirac1Bs, Dirac1Av, Dirac1Bv, Dirac2As, etc.) to keep things consistent while configuring it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 16,48p dirac.goal``
+  ```
+  // a wave state with two complex values (1, 2),
+  // where A = real and B = complex components.
+  type DiracStates EMStates //enums:enum -trim-prefix=Dirac
+  
+  const (
+  	// Dirac1As is the wave state variable for value 1, component A: real
+  	Dirac1As DiracStates = DiracStates(EMStatesN) + iota
+  
+  	// Dirac1Bs is the wave state variable for value 1, component B: imaginary.
+  	Dirac1Bs
+  
+  	// Dirac1As is the wave state variable for value 2, component A: real
+  	Dirac2As
+  
+  	// Dirac1Bs is the wave state variable for value 2, component B: imaginary.
+  	Dirac2Bs
+  
+  	// Dirac1Av is the velocity of wave state 1A.
+  	Dirac1Av
+  
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+anchor = """// SmoothNoise seeds a state variable with a sum of a few long-wavelength modes"""
+new = """// DiracPacketConfig adds a travelling spinor packet along dim, spin along Z,
+// built exactly as [Sim.ChargedPacketConfig] builds the spin-0 one: the same
+// envelope, the same carrier, the same lattice frequency for the same mass.
+// That is the point of it. Run this against Charged Packet and the ONLY
+// difference left is the spin, so whatever the two do differently is the spin
+// doing it.
+//
+// Spin along Z means the whole amplitude sits in component 1 and component 2
+// starts empty, as in the Z branch of [Sim.DiracBlob]. The equation fills
+// component 2 in on its own wherever sigma.grad has something to act on.
+func (ss *Sim) DiracPacketConfig(dim math32.Dims, amp, sign float32) {
+	wl := ss.Config.Wavelength
+	om := ss.LatticeFreq(wl, math32.Sqrt(ss.Params.MOverHSq))
+	ctr := float32(ss.Config.Size.Dim(dim)) * 0.5
+	wd := ss.Config.PacketWidth
+	ss.CarrierPacket(Dirac1As, Dirac1Av, dim, ctr, wl, wd, amp, 1, om, 0)
+	ss.CarrierPacket(Dirac1Bs, Dirac1Bv, dim, ctr, wl, wd, amp, 1, om, -sign*0.5*math32.Pi)
+}
+
+// SmoothNoise seeds a state variable with a sum of a few long-wavelength modes"""
+assert anchor in s
+open('init.goal','w').write(s.replace(anchor,new,1))
+PY
+sed -n 385,400p dirac.goal``
+  ```
+  //////// configurations
+  
+  var DiracConfigs = []InitFunc{
+  	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
+  	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
+  	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
+  	InitFunc{Name: "Dirac Hydrogen", Doc: "A spin-1/2 electron bound in a Coulomb well in its exp(-r/a) ground state: the closest this gets to a real atom", Func: DiracHydrogen},
+  	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
+  	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
+  	InitFunc{Name: "Chiral Oscillation", Doc: "A lump started purely right-chiral: the mass turns it into the left one and back at m c^2 / hbar, which is what mass IS", Func: ChiralOscillation},
+  }
+  
+  // SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the
+  // electron, as far as this equation has one.
+  //
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('dirac.goal').read()
+old = """	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},"""
+new = """	InitFunc{Name: "Spin Packet", Doc: "A travelling spin-1/2 packet along X: the same packet the other equations get, so the mass term and the spin are the only things left that could act differently", Func: SpinPacket},
+	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old2 = """// SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the
+// electron, as far as this equation has one."""
+new2 = """// SpinPacket is the travelling packet every other equation has, on a spinor:
+// spin along +Z, moving along X at the lattice group velocity for this mass.
+//
+// It is the same construction as the spin-0 Charged Packet under KleinGordonC,
+// at the same wavelength, width and frequency, so the pair isolates what spin
+// costs. [Config.PacketSlab] switches both between a slab and a blob.
+func SpinPacket(ss *Sim) {
+	ss.Params.Update()
+	ss.DiracPacketConfig(math32.X, ss.Config.Amplitude, 1)
+}
+
+// SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the
+// electron, as far as this equation has one."""
+assert old2 in s
+open('dirac.goal','w').write(s.replace(old2,new2,1))
+PY
+goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I should check whether Config fields display automatically in SimForm, similar to how Params work, and assume it handles Config fully. Then I want to write a scratch test that runs every equation's traveling packet in both envelope modes and compares Vg/Vd to verify the comparison logic works correctly.
+
+After that quick check, I need to run go generate for typegen and yaegi since I've added new package-level exported symbols like `SpinPacket` and new Config fields, even though no new enums are involved. I'll start with the scratch comparison before running the full generate and test suite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchEnv(t *testing.T) {
+	cases := []struct {
+		name  string
+		eq    Equations
+		probe enums.Enum
+		init  func(*Sim)
+	}{
+		{"Wave", Wave, WavePos, nil},
+		{"KleinGordon", KleinGordon, WavePos, nil},
+		{"Maxwell", Maxwell, AYs, PolarizedPhoton},
+		{"WaveC", WaveC, WaveCMag, nil},
+		{"WaveCDir", WaveCDir, WaveCMag, nil},
+		{"Schrodinger", Schrodinger, CabMag, FreePacket},
+		{"KleinGordonC", KleinGordonC, CabAs, ChargedPacket},
+		{"Dirac", Dirac, DiracMag, SpinPacket},
+		{"Weyl-nu", Weyl, WeylMag, NeutrinoPacket},
+		{"Weyl-e", Weyl, WeylMag, ElectronPacket},
+		{"Electroweak", Electroweak, AYs, PhotonPulse},
+	}
+	for _, tc := range cases {
+		line := ""
+		for _, slab := range []bool{true, false} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(192, 24, 24)
+			ss.Config.Wavelength, ss.Config.PacketWidth = 16, 24
+			ss.Config.PacketSlab = slab
+			ss.ConfigSim()
+			if tc.init != nil {
+				ss.InitFunc = tc.init
+				ss.Init()
+			}
+			for range 100 {
+				ss.StepRun()
+			}
+			wd := ss.StatVals(StatWidthName(tc.probe, math32.X))
+			vg := dispMean(ss.StatVals(StatGroupVelName(tc.probe, math32.X)))
+			vd := dispMean(ss.StatVals(StatDispersionName(tc.probe, math32.X)))
+			tag := "slab"
+			if !slab {
+				tag = "blob"
+			}
+			if len(wd) == 0 {
+				line += "  " + tag + ": NO STAT"
+				continue
+			}
+			line += "  " + tag + ": " + sprintf3(vg, vd, wd[0], wd[len(wd)-1])
+		}
+		t.Logf("%-12s%s", tc.name, line)
+	}
+}
+EOF
+python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/zz_scratch_test.go'
+s=open(p).read()
+s=s.replace('sprintf3(vg, vd, wd[0], wd[len(wd)-1])','fmt.Sprintf("Vg %+.3f Vd %+.4f w %5.2f->%5.2f", vg, vd, wd[0], wd[len(wd)-1])')
+s=s.replace('import (\n\t"testing"','import (\n\t"fmt"\n\t"testing"')
+open(p,'w').write(s)
+PY
+go test -run TestScratchEnv -v ./ 2>&1 | tail -18``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  === RUN   TestScratchEnv
+      zz_scratch_test.go:62: Wave          slab: Vg +0.979 Vd +0.0182 w 12.01->12.69  blob: Vg +0.979 Vd +0.0182 w 12.01->12.69
+      zz_scratch_test.go:62: KleinGordon   slab: Vg +0.966 Vd +0.0175 w 12.01->12.68  blob: Vg +0.966 Vd +0.0175 w 12.01->12.68
+      zz_scratch_test.go:62: Maxwell       slab: Vg +0.984 Vd +0.0339 w 15.92->17.49  blob: Vg +0.983 Vd +0.0340 w 15.92->17.50
+      zz_scratch_test.go:62: WaveC         slab: Vg +0.765 Vd +0.0064 w 12.00->12.16  blob: Vg +0.765 Vd +0.0064 w 12.00->12.16
+      zz_scratch_test.go:62: WaveCDir      slab: Vg +1.014 Vd +0.0052 w 11.98->12.01  blob: Vg +1.014 Vd +0.0052 w 11.98->12.01
+      zz_scratch_test.go:62: Schrodinger   slab: Vg +0.382 Vd +0.0032 w 12.00->12.16  blob: Vg +0.382 Vd +0.0032 w 12.00->12.16
+      zz_scratch_test.go:62: KleinGordonC  slab: Vg +0.966 Vd +0.0175 w 12.01->12.67  blob: Vg +0.964 Vd +0.0184 w 12.01->12.71
+      zz_scratch_test.go:62: Dirac         slab: Vg +0.967 Vd +0.0175 w 12.00->12.67  blob: Vg +0.965 Vd +0.0184 w 12.00->12.71
+      zz_scratch_test.go:62: Weyl-nu       slab: Vg +0.966 Vd -0.0006 w 11.99->11.97  blob: Vg +0.962 Vd +0.0001 w 11.99->11.99
+      zz_scratch_test.go:62: Weyl-e        slab: Vg +0.536 Vd -0.0272 w 12.00->11.28  blob: Vg +0.536 Vd -0.0271 w 12.00->11.29
+      zz_scratch_test.go:62: Electroweak   slab: Vg +0.987 Vd +0.0289 w 11.96->13.13  blob: Vg +0.985 Vd +0.0298 w 11.96->13.17
+  --- PASS: TestScratchEnv (69.95s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	69.971s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I see why slab and blob look nearly identical: the stat only measures width along X, and since the box is 192×24×24 with a PacketWidth of 24, a blob already fills the transverse dimension almost uniformly, leaving no room to see diffraction. I'm also noticing several rows are literally duplicated across Wave, KleinGordon, WaveC, and WaveCD.
+
+Also, since the transverse envelope acts as a constant multiplier at each x, the X-marginal width is mathematically identical for slab and blob at t=0 and stays nearly so under evolution — so diffraction wouldn't show up in an X-only measurement anyway. To actually see it I'd need to look at the Y or Z width instead.
+
+That said, the near-identical numbers for Wave/WaveC-type packets vs. the slight variation in KGC/Dirac/EW/Maxwell/Weyl-nu is worth double-checking, since the flag clearly works for the CarrierPacket-based fields. I want to verify by adding a transverse width measurement along Z to confirm the blob spreads there while the slab stays flat, which would justify adding a proper transverse dispersion stat as the real fix.
+
+But then again, touching stats across all equations feels like scope creep beyond what was asked. The user's real goal was visual—seeing the diffraction happen—so the stats might be secondary to just making sure the rendered view itself shows the spreading clearly.
+
+Let me verify the blob is actually being laid down correctly by checking the Z width, then honestly note that the existing X-only dispersion stat won't capture diffraction, and offer the transverse stat as an optional follow-on rather than baking it in now.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchZ(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		eq    Equations
+		probe enums.Enum
+		init  func(*Sim)
+	}{
+		{"Wave", Wave, WavePos, nil},
+		{"Schrodinger", Schrodinger, CabMag, FreePacket},
+		{"Weyl-nu", Weyl, WeylMag, NeutrinoPacket},
+	} {
+		line := ""
+		for _, slab := range []bool{true, false} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(128, 64, 64)
+			ss.Config.Wavelength, ss.Config.PacketWidth = 16, 12
+			ss.Config.PacketSlab = slab
+			ss.ConfigSim()
+			ss.AddStat(ss.StatGroupVelMag(math32.Z, tc.probe))
+			if tc.init != nil {
+				ss.InitFunc = tc.init
+			}
+			ss.Init()
+			for range 100 {
+				ss.StepRun()
+			}
+			zw := ss.StatVals(StatWidthName(tc.probe, math32.Z))
+			xw := ss.StatVals(StatWidthName(tc.probe, math32.X))
+			tag := "slab"
+			if !slab {
+				tag = "blob"
+			}
+			line += fmt.Sprintf("  %s: Xw %5.2f->%5.2f  Zw %5.2f->%5.2f", tag,
+				xw[0], xw[len(xw)-1], zw[0], zw[len(zw)-1])
+		}
+		t.Logf("%-12s%s", tc.name, line)
+	}
+}
+EOF
+go test -run TestScratchZ -v ./ 2>&1 | tail -8``
+  ```
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  === RUN   TestScratchZ
+      zz_scratch_test.go:50: Wave          slab: Xw  6.02-> 6.97  Zw 18.48->18.48  blob: Xw  6.02-> 6.97  Zw  8.48-> 8.48
+      zz_scratch_test.go:50: Schrodinger   slab: Xw  6.00-> 7.13  Zw 18.48->18.48  blob: Xw  6.00-> 7.13  Zw  6.00-> 6.00
+      zz_scratch_test.go:50: Weyl-nu       slab: Xw  5.98-> 6.08  Zw 18.48->18.48  blob: Xw  5.98-> 7.49  Zw  6.00-> 9.13
+  --- PASS: TestScratchZ (53.98s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	54.007s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The flag is working now: the slab gives Zw = 18.48 (uniform, saturated) while the blob gives Zw = 6.00, a genuinely localized signal. But I'm noticing an issue — the wave and Schrodinger blobs show no diffraction at all, staying flat over 100 steps, while the Weyl-nu blob does diffract, with both Zw and Xw growing over time.
+
+I'm wondering if 100 steps is just too few, or maybe I need to think about diffraction timescales — for the Schrodinger case a rough estimate gives spreading over ~144 steps, so a small but nonzero change would be expected, not something exactly flat. That flatness feels suspicious. I'm also puzzling over why the Wave blob starts at Zw = 8.48 rather than 6.00 like the slab — it seems like a mismatch between amplitude width and intensity width, since squaring the amplitude should give σ = width/2 = 6, not 8.49. I'm working through whether the Z-marginal calculation is properly accounting for the squared 3D weight rather than just the envelope shape.
+
+Actually the measurement mismatch was my own test error, not a code bug — WavePos is bipolar so summing over x cancels near-cancellation at fixed z. For Schrödinger, CabMag is already intensity, so Mag semantics are correct and σ stayed at exactly 6.00, but that's suspicious since a free Schrödinger wavepacket should spread isotropically over time following σ(t) = σ₀√(1+(t/τ)²).
+
+Plugging in the numbers, I'd expect σ to grow to about 7.3 by t=100, and indeed X matched that prediction while Z stayed frozen at 6.00 — meaning Z isn't spreading at all. That points to something like Schrodinger's kernel only running in 1D unless a ThreeD flag is explicitly set, which I likely forgot in my scratch setup.
+
+Checking further, WeylConfig sets ThreeD true, which explains why Weyl-nu diffracted while Wave and Schrodinger, defaulting to ThreeD false, only used a 1D Laplacian with no transverse coupling — so no diffraction there. That's not a code bug, just a missing config flag in my test. I'll rerun with ThreeD enabled and use the correct amplitude semantics, starting with Schrodinger and Weyl.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='zz_scratch_test.go'
+s=open(p).read()
+s=s.replace("\t\t\tss.ConfigSim()\n","\t\t\tss.ConfigSim()\n\t\t\tss.Params.ThreeD.SetBool(true)\n\t\t\tss.Params.Update()\n")
+s=s.replace('{"Wave", Wave, WavePos, nil},','{"Wave", Wave, WaveEnergy, nil},')
+open(p,'w').write(s)
+PY
+go test -run TestScratchZ -v ./ 2>&1 | tail -8``
+  ```
+  github.com/WaveReality/waves/wavesim.TestScratchZ(0x14000683340)
+  	/Users/oreilly/wavereality/waves/wavesim/zz_scratch_test.go:50 +0x700
+  testing.tRunner(0x14000683340, 0x1041d4178)
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1934 +0xc8
+  created by testing.(*T).Run in goroutine 1
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1997 +0x364
+  FAIL	github.com/WaveReality/waves/wavesim	3.279s
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+WaveEnergy isn't actually part of the group-velocity stat list for X, so that lookup would come back empty and cause an index panic. I should revert to WavePos instead, and for simplicity just drop Wave from this scratch test and focus on verifying Schrodinger and Weyl only.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='zz_scratch_test.go'
+s=open(p).read()
+s=s.replace('\t\t{"Wave", Wave, WaveEnergy, nil},\n','')
+open(p,'w').write(s)
+PY
+go test -run TestScratchZ -v ./ 2>&1 | tail -6``
+  ```
+  === RUN   TestScratchZ
+      zz_scratch_test.go:51: Schrodinger   slab: Xw  6.00-> 7.17  Zw 18.48->18.48  blob: Xw  6.00-> 7.13  Zw  6.00-> 7.23
+      zz_scratch_test.go:51: Weyl-nu       slab: Xw  5.98-> 6.08  Zw 18.48->18.48  blob: Xw  5.98-> 7.49  Zw  6.00-> 9.13
+  --- PASS: TestScratchZ (56.71s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	56.737s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+This confirms the pedagogical picture: for Schrödinger's dispersive dynamics, the blob spreads equally in all directions since dispersion produces isotropic spreading everywhere, while I'm now checking the Weyl massless case where dispersion is absent and behavior should differ.
+
+I'll leave the stats as-is for now and just offer the Z-axis addition as optional rather than baking it in, since doubling the plotted lines would clutter the default view. My plan is to remove the scratch test, add a TestPacketEnvelope to dispersion_test.go capturing the diffraction-vs-dispersion contrast, update the TestDispersion docs, then run the full generate and suite — starting with designing the envelope test comparing Schrödinger and Weyl.
+
+I'm sketching strong assertions: for the Weyl case the slab's transverse width should stay flat while the blob's grows, isolating diffraction from dispersion, and for Schrödinger both slab and blob should grow similarly with isotropic spreading in the blob. Now I need to size the simulation box so the blob has enough transverse room to expand into.
+
+I'm settling on 128 cells along the propagation axis with 40-48 transverse and 80 steps, checking that the packet's drift and spreading won't hit the box edges while keeping runtime around 18-26 seconds across the four runs.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && python3 - <<'PY'
+p='dispersion_test.go'
+s=open(p).read()
+anchor = "// dispCase is one equation and the packet to measure it with."
+new = '''// TestPacketEnvelope sets the two envelopes against each other. Every
+// travelling-packet config goes through [Sim.PacketDist], so [Config.PacketSlab]
+// switches them all together: a planar slab, or a 3D gaussian blob.
+//
+// The contrast separates two things that both look like "spreading" on screen.
+// A blob has a finite transverse extent, so it is a spread of TRANSVERSE
+// wavenumbers, and it fans out whether or not the equation disperses at all.
+// A slab has none, so what is left is the dispersion.
+//
+// Massless Weyl is the case that makes the point: it has exactly no dispersion,
+// the slab holds its width to 1%, and the blob still grows by half again --
+// along the direction of travel as well, since a tilted k has less of itself
+// left along X. Schrodinger disperses isotropically instead, so its blob grows
+// the same amount every way and its slab grows by the same amount as the blob
+// does along X.
+func TestPacketEnvelope(t *testing.T) {
+	const nst = 80
+	for _, tc := range []struct {
+		name string
+		eq   Equations
+		init func(*Sim)
+		disp bool // does the equation itself disperse
+	}{
+		{name: "Weyl neutrino", eq: Weyl, init: NeutrinoPacket},
+		{name: "Schrodinger", eq: Schrodinger, init: FreePacket, disp: true},
+	} {
+		var xg, zg [2]float64 // fractional width growth, [slab] and [blob]
+		for i, slab := range []bool{true, false} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(128, 48, 48)
+			ss.Config.Wavelength, ss.Config.PacketWidth = 16, 12
+			ss.Config.PacketSlab = slab
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(true) // diffraction needs the other two axes
+			ss.Params.Update()
+			probe := CabMag
+			if tc.eq == Weyl {
+				probe = WeylMag
+			}
+			// the transverse width is not one of the standard stats: nothing
+			// travels that way, so only this comparison wants it
+			ss.AddStat(ss.StatGroupVelMag(math32.Z, probe))
+			ss.InitFunc = tc.init
+			ss.Init()
+			for range nst {
+				ss.StepRun()
+			}
+			xw := ss.StatVals(StatWidthName(probe, math32.X))
+			zw := ss.StatVals(StatWidthName(probe, math32.Z))
+			xg[i] = xw[len(xw)-1]/xw[0] - 1
+			zg[i] = zw[len(zw)-1]/zw[0] - 1
+			shape := "slab"
+			if !slab {
+				shape = "blob"
+			}
+			t.Logf("%-14s %s: X %5.2f -> %5.2f (%+5.1f%%)   Z %5.2f -> %5.2f (%+5.1f%%)",
+				tc.name, shape, xw[0], xw[len(xw)-1], 100*xg[i], zw[0], zw[len(zw)-1], 100*zg[i])
+		}
+		// the slab is uniform across Z, so its Z width sits at the saturation
+		// value and must not move; the blob is localized and must fan out
+		if math.Abs(zg[0]) > 1.0e-6 {
+			t.Errorf("%s: the slab is uniform across Z, so its Z width cannot change: %+.3f%%",
+				tc.name, 100*zg[0])
+		}
+		if zg[1] < 0.1 {
+			t.Errorf("%s: a blob of finite transverse extent must diffract, but its Z width grew only %+.1f%%",
+				tc.name, 100*zg[1])
+		}
+		if tc.disp {
+			// dispersion does not know about direction: the blob spreads the
+			// same amount every way, and along X the slab matches it
+			if math.Abs(zg[1]/xg[1]-1) > 0.1 {
+				t.Errorf("%s: dispersion is isotropic, so the blob should grow alike in X (%+.1f%%) and Z (%+.1f%%)",
+					tc.name, 100*xg[1], 100*zg[1])
+			}
+			if math.Abs(xg[0]/xg[1]-1) > 0.1 {
+				t.Errorf("%s: along X the slab (%+.1f%%) should match the blob (%+.1f%%): same dispersion, and the slab has nothing else",
+					tc.name, 100*xg[0], 100*xg[1])
+			}
+		} else {
+			// no dispersion at all: the slab holds, and everything the blob
+			// does -- including along X -- is diffraction
+			if xg[0] > 0.03 {
+				t.Errorf("%s: a slab under an equation with no dispersion must hold its width, but it grew %+.1f%%",
+					tc.name, 100*xg[0])
+			}
+			if xg[1] < 5*xg[0] {
+				t.Errorf("%s: the blob should spread along X far more than the slab (%+.1f%% vs %+.1f%%), from transverse k alone",
+					tc.name, 100*xg[1], 100*xg[0])
+			}
+		}
+	}
+}
+
+// dispCase is one equation and the packet to measure it with.'''
+assert anchor in s
+open(p,'w').write(s.replace(anchor,new,1))
+PY
+go test -run TestPacketEnvelope -v ./ 2>&1 | tail -10``
+  ```
+  # github.com/WaveReality/waves/wavesim [github.com/WaveReality/waves/wavesim.test]
+  ./dispersion_test.go:138:13: cannot use WeylMag (constant 27 of int32 type WeylStates) as CabStates value in assignment
+  FAIL	github.com/WaveReality/waves/wavesim [build failed]
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='dispersion_test.go'
+s=open(p).read()
+s=s.replace("""			probe := CabMag
+			if tc.eq == Weyl {
+				probe = WeylMag
+			}""","""			var probe enums.Enum = CabMag
+			if tc.eq == Weyl {
+				probe = WeylMag
+			}""")
+open(p,'w').write(s)
+PY
+go test -run TestPacketEnvelope -v ./ 2>&1 | tail -10``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  === RUN   TestPacketEnvelope
+      dispersion_test.go:156: Weyl neutrino  slab: X  5.98 ->  6.05 ( +1.1%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:156: Weyl neutrino  blob: X  5.98 ->  7.24 (+20.9%)   Z  6.00 ->  8.24 (+37.4%)
+      dispersion_test.go:156: Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:156: Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+  --- PASS: TestPacketEnvelope (24.48s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	24.503s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The results confirm the story clearly: the Weyl neutrino shows no dispersion, with the slab flat in X while the blob spreads from diffraction alone (20.9% X, 37.4% Z). The Schrödinger case is dispersive and isotropic, with the slab's 13.0% X growth matching the blob's spreading in both directions.
+
+Now I need to update TestDispersion's documentation to mention PacketSlab, then run the full verification suite — goal build, go generate for wavesim, yaegi generate, and the complete test suite. I also want to check that existing equation tests still pass given the envelope change, since Wave/KG/Schrodinger switch from blob to slab while Maxwell/EW/KGC stay as slabs (they already default to PacketSlab=true). Most tests use thin 1D-like geometries where blob vs slab barely matters, but 3D cube tests with traveling packets could shift slightly, so I'll run the suite to confirm.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='dispersion_test.go'
+s=open(p).read()
+old="""	// a packet several wavelengths wide, so it is narrow in k and the lattice
+	// curvature is not what is being measured
+	const wl, pw = 16, 32"""
+new="""	// a packet several wavelengths wide, so it is narrow in k and the lattice
+	// curvature is not what is being measured. Slabs, at the Config default:
+	// see TestPacketEnvelope for why a blob would not measure dispersion.
+	const wl, pw = 16, 32"""
+assert old in s
+open(p,'w').write(s.replace(old,new,1))
+PY
+gofmt -l *.go; goal build 2>&1|tail -1; go generate ./... 2>&1 | grep -iE "^error|failed" | head; echo "gen ok"; cd ../yaegiwaves && go generate ./... 2>&1|tail -1``
+  ```
+  Command running in background with ID: bakzzm8a0. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bakzzm8a0.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task buv0f2v0v, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+<thinking>
+While that runs, I'm checking that every equation now has a standardized WavePacket init config, confirming Wave, KleinGordon, WaveC, and WaveCDir are all covered, and moving on to verify Schrödinger next.
+
+Continuing down the list, I confirm Schrödinger, KleinGordonC, Maxwell, Dirac, Weyl, and Electroweak all have their packet configs assigned. Spinfield doesn't have any configs at all since it's not a user-facing equation, so I'll leave it as-is. I also consider whether the packet config should be the default for each equation, but since that wasn't requested, I'll leave the current defaults unchanged and move on to checking whether Config.PacketSlab needs to be visible.
+
+Config fields in the GUI are shown by reflection, so PacketSlab should appear automatically without extra work. I want to double check PacketEnv's curPrev parameter — WavePulse passes Both, which is correct — and confirm PacketEnv isn't used elsewhere, which fits fine as a generally useful helper. Now I'll wait for the build to finish before running the full test suite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bakzzm8a0.output 2>/dev/null``
+  ```
+  gosl.go
+  goal build succeeded
+  gen ok
+  goal run succeeded
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+Build and both generates clean. Running the full suite:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && go test ./ 2>&1 | tail -25``
+  ```
+  Command running in background with ID: bowaoga3c. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bowaoga3c.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task btgfufdmw, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Standardization is in and building clean; full suite running. Here's what changed.
+
+## One switch, every packet
+
+`Config.PacketSlab` (default **true**) routes every travelling-packet config through a single helper:
+
+```go
+func (ss *Sim) PacketDist(d math32.Vector3, dim math32.Dims) float32 {
+	if ss.Config.PacketSlab {
+		return math32.Abs(d.Dim(dim))
+	}
+	return d.Length()
+}
+```
+
+A Params-flag-style live toggle, same as you wanted for `Diffusion`. Flip it in the GUI and *all* equations change envelope together, so the comparison is apples to apples.
+
+Wired through `PosWavePacket`, `MovingWavePacket`, `ComplexPacket`, `WaveCPacketAt`, `WaveCDirPacketAt`, `WeylPacket`, `WeylSlab`, and `WavePulse` (which used the always-3D `Gauss`; it now uses a new `PacketEnv`, so the three pulse configs stay comparable as their docs claim).
+
+Before this, the envelopes were a genuine mess — Wave, KleinGordon and Schrödinger were blobs; WaveC, WaveCDir, Weyl, Maxwell and KGC were slabs. Now they're all whichever you pick.
+
+I renamed `SlabPacket` → `CarrierPacket` (and its `Config` variant). It can make a blob now, so the old name was actively wrong; the honest distinguishing feature is that it takes `om` explicitly rather than from `PacketFreq`.
+
+## Dirac's missing packet
+
+`SpinPacket` / `DiracPacketConfig`, built from exactly the same calls as KGC's `ChargedPacketConfig` — same envelope, same carrier, same lattice frequency for the same mass, spin along Z so component 1 holds everything. Run it against Charged Packet and the only difference left is the spin.
+
+## The blob/slab contrast is sharper than I expected
+
+`TestPacketEnvelope` measures both envelopes along X *and* transversely:
+
+```
+Weyl neutrino  slab: X  5.98 ->  6.05 ( +1.1%)   Z 13.86 -> 13.86 ( +0.0%)
+Weyl neutrino  blob: X  5.98 ->  7.24 (+20.9%)   Z  6.00 ->  8.24 (+37.4%)
+Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+```
+
+Massless Weyl has **exactly zero dispersion** — the slab holds to 1% — yet its blob grows 21% along X and 37% across. All of that is diffraction: a finite transverse extent is a spread of transverse wavenumbers, and a tilted **k** has less of itself left along X. Schrödinger instead spreads *isotropically*, and its slab matches its blob along X to within half a percent, because there the spreading really is dispersion.
+
+So the two envelopes cleanly separate diffraction from dispersion, which is a better answer than I expected when you suggested the comparison.
+
+One caveat worth knowing: the transverse width is **not** one of the standard stats — nothing travels that way, so only this comparison wants it, and the X-only `Vd` can't see diffraction at all. If you want it in the GUI it's one line per equation: `ss.AddStat(ss.StatGroupVelMag(math32.Z, probe))`. Say the word and I'll add it across the board.
+
+## 🧑 User - 2026-09-24 20:23:44
+
+<task-notification>
+<task-id>bowaoga3c</task-id>
+<tool-use-id>toolu_01N8qKmzLYm2jMcUSk75qKai</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bowaoga3c.output</output-file>
+<status>completed</status>
+<summary>Background command "Full test suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 20:23:47
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bowaoga3c.output``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  ok  	github.com/WaveReality/waves/wavesim	397.246s
+  
+  [exited with code 0]
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go; echo "--- test count ---"; grep -c "^func Test" *_test.go | awk -F: '{s+=$2} END {print s" test funcs"}'; echo "--- changed (non-shader) ---"; cd /Users/oreilly/wavereality/waves && git status --short | grep -v "^??" | grep -v shaders/``
+  ```
+  gosl.go
+  --- test count ---
+  72 test funcs
+  --- changed (non-shader) ---
+   M "electroweak_py/contrails/1789818779 - system-reminder.md"
+   M wavesim/config.go
+   M wavesim/dirac.go
+   M wavesim/dirac.goal
+   M wavesim/electroweak.go
+   M wavesim/electroweak.goal
+   M wavesim/init.go
+   M wavesim/init.goal
+   M wavesim/maxwell.go
+   M wavesim/maxwell.goal
+   M wavesim/typegen.go
+   M wavesim/wave.go
+   M wavesim/wave.goal
+   M wavesim/wavec.go
+   M wavesim/wavec.goal
+   M wavesim/wavecdir.go
+  ...
+  ```
+
+</details>
+
+Full suite green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  397.246s
+```
+
+72 tests pass. `goal build`, `go generate` in `wavesim/` and `yaegiwaves/`, and gofmt all clean (only the pre-existing generated `gosl.go`).
+
+Notably, switching Wave, KleinGordon and Schrödinger from blob to slab broke nothing — their existing tests run thin boxes or 1D, where the two envelopes barely differ.
+
+Every equation now has a travelling packet, and they all respond to the same switch:
+
+| equation | packet config |
+|---|---|
+| Wave / KleinGordon | Wave Packet |
+| WaveC / WaveCDir | Wave C Packet |
+| Schrodinger | Free Packet |
+| KleinGordonC | Charged Packet |
+| Maxwell | Polarized Photon |
+| **Dirac** | **Spin Packet** ← was missing |
+| Weyl | Neutrino / Electron Packet |
+| Electroweak | Photon Pulse / Z Pulse |
+
+I left the names alone. Your two examples were both about behavior and presence rather than naming, and renaming "Free Packet" or "Neutrino Packet" would lose distinctions that earn their keep. Easy to change if you'd rather they all read the same.
+
+Two things I decided without asking, both reversible:
+
+**Default is slab.** It's what most equations already did, it's what isolates longitudinal dispersion, and it's what reads as motion on screen. The blob is one checkbox away.
+
+**`SlabPacket` → `CarrierPacket`.** It can produce a blob now, so the name would have been a trap. Call sites in Maxwell, Electroweak and KGC updated.
+
+## 🧑 User - 2026-09-24 20:24:12
+
+yeah add the transverse stat across the board
+
+## 🤖 Assistant - 2026-09-24 20:24:57
+
+*Model: claude-opus-5*
+
+<thinking>
+I need to add transverse width stats across all the equations that use velocity group stat calls. Adding a full Z-axis stat group would double the plotted lines and introduce a meaningless transverse Vg value, so I need to think carefully about how to add just the width stat without cluttering the default plots.
+
+My plan is to create a dedicated wrapper — something like a packet width stat that records only Wid and Vd along a given dimension, reusing the same underlying moment-computation machinery but skipping the centroid and group velocity. Weighing whether to plot both X and Z rates by default, since that could get visually busy for multi-variable equations, so I might default the transverse rate off or find a way to keep the plot manageable.
+
+I'm settling on plotting Vd on for both transverse and longitudinal directions since together they separate diffraction from dispersion, keeping Wid off by default, and limiting the added transverse stat to just the primary/total probe variable per equation rather than every variable in the group, applied across all equations.
+
+For the transverse dimension, since travel is along X and the display view is X-Z, I'm choosing Z since it's the one visible in the display plane, matching what I used in TestPacketEnvelope — though I need to watch out for configs that run thin boxes along that axis.
+
+For thin-box configs, the Z width can be degenerate in 1D, but that just reads as zero harmlessly. For a slab, the Z width sits fixed at its saturation value with zero dispersion velocity, which is actually a good "nothing to see here" default that comes alive once switched to a blob.
+
+Now I'm planning the implementation: adding new width-tracking stat functions to stats.go, refactoring the group velocity stat to take a flag for whether to record centroid and velocity, and sorting out the naming conventions to match existing exports.
+
+With that settled, I'm mapping out where to wire in calls to these new width stats within each equation's stats function across wave.go, wavec.go, and wavecdir.go.
+
+For weyl.goal I'll use StatWidthMag with WeylMag, then for maxwell.goal I'm weighing whether to match the X group velocity call using both AYs and AZs or just keep it simple with AYs alone, since AZs would just read zero for a Y-polarized photon anyway.
+
+For consistency I'll match the X calls across weyl, maxwell, and electroweak so users can compare Vd_X and Vd_Z side by side, even though this adds several more plotted lines. But I'm now second-guessing whether Vd_Z should default on or off — with a slab configuration it'd just be a flat zero line adding no real information until someone switches to a blob geometry.
+
+Weighing it out, I'll leave Vd_Z on by default since it's the diffraction rate directly comparable to Vd_X, and a flat zero itself communicates that a slab doesn't diffract — that's the whole point of showing it across the board when the user flips to blob. For electroweak specifically, though, four extra flat lines feels like clutter, so I'm considering trimming it down to just the photon and Z variables that actually matter.
+
+Deciding to just match each equation's X call exactly so paired stats come as predictable Vd-var-X/Vd-var-Z sets, since that's simplest to reason about and the user can toggle lines off in the UI anyway. I confirm StatWidthName already folds in the dimension so Z-stats get distinct names without collisions, then move to checking what tests need updating — TestPacketEnvelope won't need its own AddStat anymore, and I need to check how the Schrodinger and Weyl probes' default width stats behave along Z.
+
+I realize I need to remove the manual AddStat call in TestPacketEnvelope since the equation will now add that stat automatically, and leaving both would create a duplicate causing doubled rows per step. Turning to implementation, I plan to refactor statGroupVel by adding a `vel bool` parameter so that when it's false, the centroid and Vg stats are skipped entirely and only the Wid and Vd stats get created — now I need to write that logic carefully, keeping the history tracking in mind.
+
+The chist wrap logic only applies when vel is true, and the negligible-share cutoff should apply in both cases. I'll restructure the function cleanly and update the doc comments to match.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 265,300p stats.goal``
+  ```
+  // StatWidthName is the stat name for the packet width of vr along dim.
+  func StatWidthName(vr enums.Enum, dim math32.Dims) string {
+  	return "Wid" + vr.String() + dim.String()
+  }
+  
+  // StatDispersionName is the stat name for the dispersion rate of vr along dim.
+  func StatDispersionName(vr enums.Enum, dim math32.Dims) string {
+  	return "Vd" + vr.String() + dim.String()
+  }
+  
+  // StatGroupVel profiles the packet in each given AMPLITUDE variable along dim:
+  // where it is, how fast it moves, how wide it is and how fast it spreads. Use
+  // [Sim.StatGroupVelMag] for variables that are already an intensity.
+  func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+  	return ss.statGroupVel(dim, true, vrs)
+  }
+  
+  // StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
+  // intensity, such as any of the Mag ones: it weights the moments by the value
+  // rather than by its square. See [StateMoments] for why that matters.
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='stats.goal'
+s=open(p).read()
+
+# exported wrappers: add the width-only pair, and thread the vel flag
+old = """// StatGroupVel profiles the packet in each given AMPLITUDE variable along dim:
+// where it is, how fast it moves, how wide it is and how fast it spreads. Use
+// [Sim.StatGroupVelMag] for variables that are already an intensity.
+func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, true, vrs)
+}
+
+// StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
+// intensity, such as any of the Mag ones: it weights the moments by the value
+// rather than by its square. See [StateMoments] for why that matters.
+func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, false, vrs)
+}"""
+new = """// StatGroupVel profiles the packet in each given AMPLITUDE variable along dim:
+// where it is, how fast it moves, how wide it is and how fast it spreads. Use
+// [Sim.StatGroupVelMag] for variables that are already an intensity.
+func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, true, true, vrs)
+}
+
+// StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
+// intensity, such as any of the Mag ones: it weights the moments by the value
+// rather than by its square. See [StateMoments] for why that matters.
+func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(dim, true, false, vrs)
+}
+
+// StatWidth records the width and the spreading rate along dim, and not the
+// centroid or the group velocity. For the TRANSVERSE axis, where nothing is
+// travelling and a centroid would be reporting its own roundoff.
+//
+// Paired with the along-travel [Sim.StatGroupVel] it separates two things that
+// both widen a packet. Vd along the direction of travel is DISPERSION: the
+// spread of speeds among the wavenumbers in the packet. Vd across it is
+// DIFFRACTION: a packet of finite transverse extent is a spread of transverse
+// wavenumbers, so it fans out whether or not the equation disperses at all.
+// A slab has no transverse extent to fan out, so it pins the transverse rate
+// at zero and leaves dispersion on its own: see [Config.PacketSlab].
+func (ss *Sim) StatWidth(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(false, true, dim, vrs)
+}
+
+// StatWidthMag is [Sim.StatWidth] for variables that are ALREADY an intensity.
+func (ss *Sim) StatWidthMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
+	return ss.statGroupVel(false, false, dim, vrs)
+}"""
+assert old in s
+s = s.replace(old, new, 1)
+open(p,'w').write(s)
+PY
+echo staged``
+  ```
+  staged
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I notice I've made the argument order inconsistent across call sites. I'm settling on a fixed signature of `statGroupVel(vel bool, square bool, dim math32.Dims, vrs []enums.Enum)` and need to fix all four call sites accordingly, then rewrite the worker function properly.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='stats.goal'
+s=open(p).read()
+s = s.replace("return ss.statGroupVel(dim, true, true, vrs)", "return ss.statGroupVel(true, true, dim, vrs)", 1)
+s = s.replace("return ss.statGroupVel(dim, true, false, vrs)", "return ss.statGroupVel(true, false, dim, vrs)", 1)
+
+old_doc = """// statGroupVel does the work of both. For each variable it records four stats:
+// the intensity centroid along dim and its width, both in cubes, and the rate
+// of change of each, both in units of C. Vg is the group velocity: how fast
+// the packet travels. Vd is the dispersion rate: how fast it spreads."""
+new_doc = """// statGroupVel does the work of all four. For each variable it records the
+// intensity width along dim in cubes and its rate of change in units of C --
+// Vd, how fast the packet spreads -- and, when vel is set, the centroid and
+// its rate too: Vg, the group velocity."""
+assert old_doc in s
+s = s.replace(old_doc, new_doc, 1)
+
+old_sig = "func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func(init bool) {"
+new_sig = "func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum) func(init bool) {"
+assert old_sig in s
+s = s.replace(old_sig, new_sig, 1)
+
+old_init = """			for _, vr := range vrs {
+				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
+				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
+				wt := ss.Stats.Float64(StatWidthName(vr, dim))
+				dt := ss.Stats.Float64(StatDispersionName(vr, dim))
+				ct.SetNumRows(0)
+				vt.SetNumRows(0)
+				wt.SetNumRows(0)
+				dt.SetNumRows(0)
+				// only the two rates are on by default: they share a scale
+				plot.SetFirstStyler(ct, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(vt, func(s *plot.Style) {
+					s.On = true
+				})
+				plot.SetFirstStyler(wt, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(dt, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
+				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
+				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
+				metadata.SetDoc(dt, "Dispersion rate of "+vr.String()+" along "+dim.String()+", in units of C: how fast the packet spreads, on the same scale as its group velocity")
+			}
+			return"""
+new_init = """			for _, vr := range vrs {
+				wt := ss.Stats.Float64(StatWidthName(vr, dim))
+				dt := ss.Stats.Float64(StatDispersionName(vr, dim))
+				wt.SetNumRows(0)
+				dt.SetNumRows(0)
+				// only the RATES are on by default: they share a scale, where
+				// a width in cubes would flatten them against the axis
+				plot.SetFirstStyler(wt, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(dt, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
+				metadata.SetDoc(dt, "Spreading rate of "+vr.String()+" along "+dim.String()+", in units of C, on the same scale as the group velocity: dispersion along the direction of travel, diffraction across it")
+				if !vel {
+					continue
+				}
+				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
+				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
+				ct.SetNumRows(0)
+				vt.SetNumRows(0)
+				plot.SetFirstStyler(ct, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(vt, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
+				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
+			}
+			return"""
+assert old_init in s
+s = s.replace(old_init, new_init, 1)
+
+old_run = """		for i, vr := range vrs {
+			vg := 0.0
+			vd := 0.0
+			if have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx {
+				d := ctrs[i] - chist[old*nv+i]
+				if d > ln/2 {
+					d -= ln
+				} else if d < -ln/2 {
+					d += ln
+				}
+				vg = d / ds / float64(ss.Params.C)
+				vd = (wids[i] - whist[old*nv+i]) / ds / float64(ss.Params.C)
+			}
+			chist[old*nv+i] = ctrs[i]
+			whist[old*nv+i] = wids[i]
+			ss.Stats.Float64(StatCentroidName(vr, dim)).AppendRowFloat(ctrs[i])
+			ss.Stats.Float64(StatGroupVelName(vr, dim)).AppendRowFloat(vg)
+			ss.Stats.Float64(StatWidthName(vr, dim)).AppendRowFloat(wids[i])
+			ss.Stats.Float64(StatDispersionName(vr, dim)).AppendRowFloat(vd)
+		}"""
+new_run = """		for i, vr := range vrs {
+			live := have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx
+			vd := 0.0
+			if live {
+				vd = (wids[i] - whist[old*nv+i]) / ds / float64(ss.Params.C)
+			}
+			whist[old*nv+i] = wids[i]
+			ss.Stats.Float64(StatWidthName(vr, dim)).AppendRowFloat(wids[i])
+			ss.Stats.Float64(StatDispersionName(vr, dim)).AppendRowFloat(vd)
+			if !vel {
+				continue
+			}
+			vg := 0.0
+			if live {
+				d := ctrs[i] - chist[old*nv+i]
+				if d > ln/2 {
+					d -= ln
+				} else if d < -ln/2 {
+					d += ln
+				}
+				vg = d / ds / float64(ss.Params.C)
+			}
+			chist[old*nv+i] = ctrs[i]
+			ss.Stats.Float64(StatCentroidName(vr, dim)).AppendRowFloat(ctrs[i])
+			ss.Stats.Float64(StatGroupVelName(vr, dim)).AppendRowFloat(vg)
+		}"""
+assert old_run in s
+s = s.replace(old_run, new_run, 1)
+open(p,'w').write(s)
+PY
+goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now wiring it into every equation:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+edits = [
+ ('wave.goal',
+  "\tss.AddStat(ss.StatGroupVel(math32.X, WavePos))",
+  "\tss.AddStat(ss.StatGroupVel(math32.X, WavePos))\n\t// across the travel: diffraction alone, and zero for a slab\n\tss.AddStat(ss.StatWidth(math32.Z, WavePos))"),
+ ('wavec.goal',
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))",
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))\n\tss.AddStat(ss.StatWidthMag(math32.Z, WaveCMag))"),
+ ('wavecdir.goal',
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))",
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))\n\tss.AddStat(ss.StatWidthMag(math32.Z, WaveCMag))"),
+ ('schrodinger.goal',
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))",
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))\n\tss.AddStat(ss.StatWidthMag(math32.Z, CabMag))"),
+ ('kg-complex.goal',
+  "\tss.AddStat(ss.StatGroupVel(math32.X, CabAs))",
+  "\tss.AddStat(ss.StatGroupVel(math32.X, CabAs))\n\tss.AddStat(ss.StatWidthMag(math32.Z, CabMag))"),
+ ('maxwell.goal',
+  "\tss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))",
+  "\tss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))\n\tss.AddStat(ss.StatWidth(math32.Z, AYs, AZs))"),
+ ('dirac.goal',
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, DiracMag))",
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, DiracMag))\n\tss.AddStat(ss.StatWidthMag(math32.Z, DiracMag))"),
+ ('weyl.goal',
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WeylMag, WeylLMag, WeylRMag))",
+  "\tss.AddStat(ss.StatGroupVelMag(math32.X, WeylMag, WeylLMag, WeylRMag))\n\tss.AddStat(ss.StatWidthMag(math32.Z, WeylMag))"),
+ ('electroweak.goal',
+  "\tss.AddStat(ss.StatGroupVel(math32.X, AYs, EWZY, EWBYs, EWW3Ys))",
+  "\tss.AddStat(ss.StatGroupVel(math32.X, AYs, EWZY, EWBYs, EWW3Ys))\n\tss.AddStat(ss.StatWidth(math32.Z, AYs, EWZY))"),
+]
+for p, old, new in edits:
+    s = open(p).read()
+    assert old in s, p
+    assert s.count(old) == 1, p
+    open(p,'w').write(s.replace(old, new, 1))
+    print("ok", p)
+PY
+goal build 2>&1 | tail -3``
+  ```
+  ok wave.goal
+  ok wavec.goal
+  ok wavecdir.goal
+  ok schrodinger.goal
+  ok kg-complex.goal
+  ok maxwell.goal
+  ok dirac.goal
+  ok weyl.goal
+  ok electroweak.goal
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I should remove the manual AddStat call in TestPacketEnvelope since it would duplicate the effect, and double check TestEquationSwitch still counts StatFuncs consistently across both passes before updating the test.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='dispersion_test.go'
+s=open(p).read()
+old="""			// the transverse width is not one of the standard stats: nothing
+			// travels that way, so only this comparison wants it
+			ss.AddStat(ss.StatGroupVelMag(math32.Z, probe))
+			ss.InitFunc = tc.init"""
+new="""			ss.InitFunc = tc.init"""
+assert old in s
+s=s.replace(old,new,1)
+old2="""// The contrast separates two things that both look like "spreading" on screen.
+// A blob has a finite transverse extent, so it is a spread of TRANSVERSE
+// wavenumbers, and it fans out whether or not the equation disperses at all.
+// A slab has none, so what is left is the dispersion."""
+new2="""// The contrast separates two things that both look like "spreading" on screen,
+// and every equation records both: Vd along X is dispersion, Vd along Z is
+// diffraction. A blob has a finite transverse extent, so it is a spread of
+// TRANSVERSE wavenumbers, and it fans out whether or not the equation
+// disperses at all. A slab has none, so what is left is the dispersion."""
+assert old2 in s
+open(p,'w').write(s.replace(old2,new2,1))
+PY
+go test -run 'TestPacketEnvelope|TestEquationSwitch|TestDispersion' -v ./ 2>&1 | grep -E "^---|dispersion_test|switch_test" | head -20``
+  ```
+      dispersion_test.go:154: Weyl neutrino  slab: X  5.98 ->  6.05 ( +1.1%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Weyl neutrino  blob: X  5.98 ->  7.24 (+20.9%)   Z  6.00 ->  8.24 (+37.4%)
+      dispersion_test.go:154: Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+  --- PASS: TestPacketEnvelope (24.22s)
+      dispersion_test.go:280: Wave           Vg +0.9801  Vd +0.01960   width 16.008 -> 17.324 (+8.2%)
+      dispersion_test.go:280: KleinGordon    Vg +0.9674  Vd +0.01909   width 16.008 -> 17.300 (+8.1%)
+      dispersion_test.go:280: Maxwell photon Vg +0.9805  Vd +0.01960   width 16.008 -> 17.324 (+8.2%)
+      dispersion_test.go:280: WaveC          Vg +0.7650  Vd +0.00415   width 16.000 -> 16.154 (+1.0%)
+      dispersion_test.go:280: WaveCDir       Vg +1.0142  Vd +0.00272   width 15.986 -> 16.012 (+0.2%)
+      dispersion_test.go:280: Schrodinger    Vg +0.3825  Vd +0.00208   width 16.000 -> 16.154 (+1.0%)
+      dispersion_test.go:280: KleinGordonC   Vg +0.9674  Vd +0.01909   width 16.008 -> 17.300 (+8.1%)
+      dispersion_test.go:280: Weyl neutrino  Vg +0.9661  Vd +0.00011   width 15.993 -> 15.985 (-0.1%)
+      dispersion_test.go:280: Weyl electron  Vg +0.5378  Vd -0.02014   width 15.998 -> 15.142 (-5.4%)
+      dispersion_test.go:280: Dirac at rest  Vg -0.0000  Vd +0.24284   width 16.000 -> 33.397 (+108.7%)  (at rest)
+  --- PASS: TestDispersion (2.15s)
+      switch_test.go:67: cycled 10 equations twice: stats and state vars stable
+  --- PASS: TestEquationSwitch (0.09s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+No duplicate-stat issue, good. I should run the full verification now—generate, yaegi, and the full test suite—since typegen needs the new StatWidth/StatWidthMag symbols even though yaegi doesn't strictly require them individually. I'll also confirm the transverse stat shows up per equation, though TestEquationSwitch already passes.
+
+Checking that the Z stat is properly populated for Wave, Maxwell, and EW cases — all use squared WavePos or AYs/AZs terms, so the values stay positive and valid. Time to run the full suite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go; go generate ./... 2>&1 | grep -iE "^error|failed" | head; echo "gen ok"; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd ../wavesim && go test ./ 2>&1 | tail -15``
+  ```
+  Command running in background with ID: bc1xb82gt. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc1xb82gt.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `timeout_ms, command, description`
+  ```
+  Monitor started (task bhxva82fp, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Added, building clean, suite running.
+
+## A width-only variant rather than a second group-velocity call
+
+A full `StatGroupVel(math32.Z, …)` would have recorded a transverse centroid and `Vg` too — and along Z nothing is travelling, so that centroid reports its own roundoff and the `Vg` is noise around zero, plotted on by default. So I split the worker:
+
+```go
+func (ss *Sim) StatWidth(dim math32.Dims, vrs ...enums.Enum) func(init bool)
+func (ss *Sim) StatWidthMag(dim math32.Dims, vrs ...enums.Enum) func(init bool)
+```
+
+Same `StateMoments` pass, same window, same units — it just skips the centroid and `Vg`. One extra plotted line per variable, not three.
+
+Wired into all nine equations, each matching its own X call:
+
+| equation | transverse probe |
+|---|---|
+| Wave, KleinGordon | `WavePos` |
+| WaveC, WaveCDir | `WaveCMag` |
+| Schrodinger | `CabMag` |
+| KleinGordonC | `CabMag` |
+| Maxwell | `AYs`, `AZs` |
+| Dirac | `DiracMag` |
+| Weyl | `WeylMag` |
+| Electroweak | `AYs`, `EWZY` |
+
+For KleinGordonC I probed `CabMag` rather than the `CabAs` its X stat uses — the intensity is the better width probe, and along Z there's no carrier to make the amplitude meaningful.
+
+## What you'll see
+
+`VdX` is dispersion, `VdZ` is diffraction, both in units of C, both plotted by default. With the slab default `VdZ` pins at exactly zero for every equation — the slab has no transverse extent to fan out. Clear `PacketSlab` and it comes alive:
+
+```
+Weyl neutrino  slab: X +1.1%   Z  +0.0%
+Weyl neutrino  blob: X +20.9%  Z +37.4%
+Schrodinger    slab: X +13.0%  Z  +0.0%
+Schrodinger    blob: X +12.4%  Z +13.4%
+```
+
+Two lines now say the whole thing. Massless Weyl: `VdX` ≈ `VdZ` ≈ 0 as a slab, both large as a blob — an equation with no dispersion whatsoever, spreading purely by diffraction. Schrödinger: `VdX` the same either way, and as a blob `VdZ` matches it — dispersion, isotropic, indifferent to the envelope.
+
+`TestPacketEnvelope` no longer needs its own `AddStat`; it reads the stats the equations now register. `TestEquationSwitch` confirms the counts stay stable across two passes, so nothing is double-registering.
+
+## 🧑 User - 2026-09-24 20:33:48
+
+<task-notification>
+<task-id>bc1xb82gt</task-id>
+<tool-use-id>toolu_0183AywNdwkp68J3jj7qStn2</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc1xb82gt.output</output-file>
+<status>completed</status>
+<summary>Background command "Generate and full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 20:33:52
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc1xb82gt.output``
+  ```
+  gosl.go
+  gen ok
+  goal run succeeded
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  ok  	github.com/WaveReality/waves/wavesim	404.026s
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+Full suite green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  404.026s
+```
+
+72 tests pass. `goal build`, `go generate` in both packages, and gofmt all clean — only the pre-existing generated `gosl.go`.
+
+The transverse stat is live in all nine equations. Every packet now reports `VdX` and `VdZ` on the same scale, so dispersion and diffraction read as separate numbers on one plot, and `PacketSlab` switches every equation's envelope together to isolate one from the other.
+
+Everything from this session is committed-ready but uncommitted — `stats.goal`, `init.goal`, `config.go`, and the nine equation files, plus the regenerated `.go`, shaders, `enumgen`, `typegen` and yaegi bindings.
+
+Full suite green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  404.026s
+```
+
+72 tests pass. `goal build`, `go generate` in both packages, and gofmt all clean — only the pre-existing generated `gosl.go`.
+
+The transverse stat is live in all nine equations. Every packet now reports `VdX` and `VdZ` on the same scale, so dispersion and diffraction read as separate numbers on one plot, and `PacketSlab` switches every equation's envelope together to isolate one from the other.
+
+Everything from this session is committed-ready but uncommitted — `stats.goal`, `init.goal`, `config.go`, and the nine equation files, plus the regenerated `.go`, shaders, `enumgen`, `typegen` and yaegi bindings.
 
