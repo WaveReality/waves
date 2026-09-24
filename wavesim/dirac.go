@@ -269,7 +269,34 @@ func DiracKernel(i uint32) { //gosl:kernel
 	State.Set(q2b, int(z), int(y), int(x), int(Dirac2Bs), int(cur))
 }
 
-// claude todo: need a Damp kernel for Dirac here!
+// DiracDampKernel is Sommerfeld damping on the boundary shell, as
+// KleinGordonCDampKernel does for one complex component and this does for two.
+//
+// The force sets the velocity instead of adding to it, which is what makes an
+// outgoing wave leave rather than reflect. The mass and the spin term are
+// both dropped here: at the boundary the only thing being asked is:
+// "let whatever is arriving carry on out at c", and both of those would fight it.
+func DiracDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	csq := Params[0].CSq
+	vo := int32(Dirac1Av) - int32(Dirac1As) // position to its velocity
+	for c := range 4 {                      // the four real components, all alike
+		vr := int32(Dirac1As) + int32(c)
+		pp := State.Value(int(z), int(y), int(x), int(vr), int(prv))
+		f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
+		v := csq * f // key damp: no +=
+		State.Set(v, int(z), int(y), int(x), int(vr+vo), int(cur))
+		State.Set(pp+v, int(z), int(y), int(x), int(vr), int(cur))
+	}
+}
 
 //gosl:end
 

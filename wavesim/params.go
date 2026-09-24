@@ -39,25 +39,26 @@ const (
 	// on a scalar wave state.
 	KleinGordon
 
-	// KleinGordonC is the Klein-Gordon massive particle wave function,
-	// on a complex wave state.
-	KleinGordonC
-
 	// Schrodinger is the Schrodinger wave function on complex state.
 	Schrodinger
 
 	// Maxwell is Maxwell's equations for electromagnetic (EM) waves.
 	Maxwell
 
-	// Dirac is Dirac's wave equation coupled with electromagnetic (EM) waves.
+	// KleinGordonC is the Klein-Gordon massive particle wave function,
+	// on a complex wave state, couples with EM (Maxwell) waves.
+	KleinGordonC
+
+	// Dirac is Dirac's wave equation coupled with EM (Maxwell) waves.
 	Dirac
 
 	// Weyl is the first-order chiral equation on a left- and a right-handed
 	// 2-spinor: a massless neutrino in one of them, and an electron when the
-	// mass term binds the two together.
+	// mass term binds the two together. Couples with EM (Maxwell) waves.
 	Weyl
 
-	// Electroweak simulates the electroweak system, including the Higgs
+	// Electroweak simulates the electroweak system, including the Higgs.
+	// Generates Maxwell values from isocharge and isospin state.
 	Electroweak
 
 	// Spinfield is the Klein-Gordon complex version of stochastic particles.

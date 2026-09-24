@@ -104,6 +104,22 @@ func GPUInit() {
 			sgp.SetNValues(1)
 		}
 		var pl *gpu.ComputePipeline
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/DiracDampKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/DiracKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -111,6 +127,19 @@ func GPUInit() {
 		pl.AddVarUsed(0, "NeighOffs")
 		pl.AddVarUsed(0, "NeighWts")
 		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesOpenKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
 		pl.AddVarUsed(1, "State0")
 		pl.AddVarUsed(1, "State1")
 		pl.AddVarUsed(1, "State2")
@@ -413,6 +442,48 @@ func GPURelease() {
 	ComputeGPU = nil
 }
 
+// RunDiracDampKernel runs the DiracDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneDiracDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunDiracDampKernel(n int) {
+	if UseGPU {
+		RunDiracDampKernelGPU(n)
+	} else {
+		RunDiracDampKernelCPU(n)
+	}
+}
+
+// RunDiracDampKernelGPU runs the DiracDampKernel kernel on the GPU. See [RunDiracDampKernel] for more info.
+func RunDiracDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["DiracDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunDiracDampKernelCPU runs the DiracDampKernel kernel on the CPU.
+func RunDiracDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, DiracDampKernel)
+}
+
+// RunOneDiracDampKernel runs the DiracDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneDiracDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunDiracDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunDiracDampKernelCPU(n)
+	}
+}
 // RunDiracKernel runs the DiracKernel kernel with given number of elements,
 // on either the CPU or GPU depending on the UseGPU variable.
 // Can call multiple Run* kernels in a row, which are then all launched
@@ -453,6 +524,48 @@ func RunOneDiracKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunDiracKernelCPU(n)
+	}
+}
+// RunEdgesOpenKernel runs the EdgesOpenKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneEdgesOpenKernel call does Run and Done for a
+// single run-and-sync case.
+func RunEdgesOpenKernel(n int) {
+	if UseGPU {
+		RunEdgesOpenKernelGPU(n)
+	} else {
+		RunEdgesOpenKernelCPU(n)
+	}
+}
+
+// RunEdgesOpenKernelGPU runs the EdgesOpenKernel kernel on the GPU. See [RunEdgesOpenKernel] for more info.
+func RunEdgesOpenKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["EdgesOpenKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunEdgesOpenKernelCPU runs the EdgesOpenKernel kernel on the CPU.
+func RunEdgesOpenKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, EdgesOpenKernel)
+}
+
+// RunOneEdgesOpenKernel runs the EdgesOpenKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneEdgesOpenKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunEdgesOpenKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunEdgesOpenKernelCPU(n)
 	}
 }
 // RunEdgesWrapKernel runs the EdgesWrapKernel kernel with given number of elements,

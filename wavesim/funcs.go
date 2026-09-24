@@ -377,6 +377,68 @@ func Curl10(x, y, z, vidx, tidx int32) math32.Vector3 {
 
 //////// Edges
 
+// EdgeDampWidth is how many cells deep the absorbing layer is, and
+// EdgeDampMax how much it takes off per step at the very edge.
+//
+// Both matter, and not monotonically. Too gentle and the wave crosses the
+// layer and bounces off the far wall; too fierce and the layer's own edge is
+// itself a wall and reflects. Measured on a Weyl packet into a 48^3 box, the
+// fraction coming back went 10.6% at 0.03, 3.9% at 0.06, 0.69% at 0.12, 0.12%
+// at 0.2, and back up to 0.26% at 0.5. These sit near the bottom of that.
+const (
+	EdgeDampWidth float32 = 8
+	EdgeDampMax   float32 = 0.25
+)
+
+// EdgeDampFactor returns the per-step attenuation for a cell: 1 through the
+// bulk, easing down to 1 - EdgeDampMax at the boundary over EdgeDampWidth
+// cells. The first-order kernels multiply their output by it when Edges is
+// EdgesDamp, which is how a wave leaves the box instead of bouncing.
+//
+// The second-order kernels do not need this. They can use Sommerfeld damping
+// at the boundary itself, where the force sets the velocity rather than adding
+// to it, and that is an outgoing-wave condition exact for a wave arriving
+// straight on at c. A first-order equation has no acceleration to leave out,
+// and a dispersive one has no single speed to be transparent to, so neither
+// can do the job in one cell. They absorb over a layer instead.
+//
+// Dimensions of size 1 are skipped: a 1D run is not near a boundary in Y.
+func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
+	d := EdgeDampWidth
+	if sz.X > 1 {
+		dx := float32(x)
+		if float32(sz.X+1-x) < dx {
+			dx = float32(sz.X + 1 - x)
+		}
+		if dx < d {
+			d = dx
+		}
+	}
+	if sz.Y > 1 {
+		dy := float32(y)
+		if float32(sz.Y+1-y) < dy {
+			dy = float32(sz.Y + 1 - y)
+		}
+		if dy < d {
+			d = dy
+		}
+	}
+	if sz.Z > 1 {
+		dz := float32(z)
+		if float32(sz.Z+1-z) < dz {
+			dz = float32(sz.Z + 1 - z)
+		}
+		if dz < d {
+			d = dz
+		}
+	}
+	if d >= EdgeDampWidth {
+		return 1
+	}
+	f := (EdgeDampWidth - d) / EdgeDampWidth
+	return 1 - EdgeDampMax*f*f
+}
+
 // EdgeInBounds1 returns true if given coordinate is >= 1 and < s.
 func EdgeInBounds1(x, y, z, sx, sy, sz int32) bool {
 	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz

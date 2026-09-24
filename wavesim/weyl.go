@@ -227,6 +227,17 @@ func WeylKernel(i uint32) { //gosl:kernel
 	r2a := or2a + 2*dr2a
 	r2b := or2b + 2*dr2b
 
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		l1a *= df
+		l1b *= df
+		l2a *= df
+		l2b *= df
+		r1a *= df
+		r1b *= df
+		r2a *= df
+		r2b *= df
+	}
 	State.Set(l1a, int(z), int(y), int(x), int(WeylL1a), int(cur))
 	State.Set(l1b, int(z), int(y), int(x), int(WeylL1b), int(cur))
 	State.Set(l2a, int(z), int(y), int(x), int(WeylL2a), int(cur))
@@ -243,7 +254,8 @@ func WeylKernel(i uint32) { //gosl:kernel
 	State.Set(nr1a*r1a+nr1b*r1b+nr2a*r2a+nr2b*r2b, int(z), int(y), int(x), int(WeylRMag), int(cur))
 }
 
-// claude todo: need a Damp kernel here!
+// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
+// update is already a velocity, so there is no acceleration to leave out.
 
 //gosl:end
 

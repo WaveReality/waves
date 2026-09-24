@@ -475,6 +475,8 @@ const  AverageWts: NeighWeights = 1;
 const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
 fn EdgeInBounds1(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32) -> bool {
 	return x >= 1 && x < sx && y >= 1 && y < sy && z >= 1 && z < sz;
 }

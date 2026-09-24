@@ -315,21 +315,24 @@ func (ss *Sim) StepRun() {
 		RunWaveCDirKernel(ns)
 	case KleinGordon:
 		RunKleinGordonKernel(ns)
+	case Schrodinger:
+		ss.RunSchrodinger(ns)
+	case Maxwell:
+		RunMaxwellKernel(ns)
 	case KleinGordonC:
 		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunKleinGordonCKernel(ns)
-	case Schrodinger:
-		ss.RunSchrodinger(ns)
-	case Maxwell:
-		RunMaxwellKernel(ns)
 	case Dirac:
 		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunDiracKernel(ns)
 	case Weyl:
+		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
+		}
 		RunWeylKernel(ns)
 	case Electroweak:
 		// No MaxwellKernel here: ElectroweakKernel writes A0s..AZs itself, as
@@ -348,26 +351,33 @@ func (ss *Sim) StepRun() {
 			switch ss.Config.Equation {
 			case Wave:
 				RunWaveDampKernel(ne)
+			case WaveC, WaveCDir:
+				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel
 			case KleinGordon:
 				RunKleinGordonDampKernel(ne)
-			case KleinGordonC:
-				RunKleinGordonCDampKernel(ne)
-				// note: there is no damping for Schrodinger
-				// case Schrodinger:
-				// 	RunSchrodingerDampKernel(ne)
+			case Schrodinger:
+				RunEdgesOpenKernel(ne)
 			case Maxwell:
 				RunMaxwellDampKernel(ne)
+			case KleinGordonC:
+				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+					RunMaxwellDampKernel(ne)
+				}
+				RunKleinGordonCDampKernel(ne)
 			case Dirac:
-				RunMaxwellDampKernel(ne)
-				// RunDiracDampKernel(ne) // todo
+				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+					RunMaxwellDampKernel(ne)
+				}
+				RunDiracDampKernel(ne)
+			case Weyl:
+				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+					RunMaxwellDampKernel(ne)
+				}
+				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel
 			case Electroweak:
-				RunMaxwellDampKernel(ne)
+				// claude todo: need EW damp kernel!?
 			case Spinfield:
 				RunKleinGordonCDampKernel(ne)
-				// no damping for Weyl either: its configs use EdgesWrap, and
-				// setting EdgesDamp there runs NOTHING, which is worse than
-				// wrapping -- the halo keeps whatever it was initialized to
-				// and the gradient stencil reads it forever.
 			}
 		}
 	}

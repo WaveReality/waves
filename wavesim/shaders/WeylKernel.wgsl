@@ -447,6 +447,43 @@ fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 		}
 	}return g;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
+fn EdgeDampFactor(x: i32,y: i32,z: i32, sz: vec3<i32>) -> f32 {
+	var d = EdgeDampWidth;
+	if (sz.x > 1) {
+		var dx = f32(x);
+		if (f32(sz.x+1-x) < dx) {
+			dx = f32(sz.x + 1 - x);
+		}
+		if (dx < d) {
+			d = dx;
+		}
+	}
+	if (sz.y > 1) {
+		var dy = f32(y);
+		if (f32(sz.y+1-y) < dy) {
+			dy = f32(sz.y + 1 - y);
+		}
+		if (dy < d) {
+			d = dy;
+		}
+	}
+	if (sz.z > 1) {
+		var dz = f32(z);
+		if (f32(sz.z+1-z) < dz) {
+			dz = f32(sz.z + 1 - z);
+		}
+		if (dz < d) {
+			d = dz;
+		}
+	}
+	if (d >= EdgeDampWidth) {
+		return f32(1);
+	}
+	var f = (EdgeDampWidth - d) / EdgeDampWidth;
+return 1 - EdgeDampMax*f*f;
+}
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
@@ -736,7 +773,17 @@ if (Params[0].EM == 1 && Params[0].WeylQ != 0) {
 ; var r1b = or1b + 2*dr1b;
 ; var r2a = or2a + 2*dr2a;
 ; var r2b = or2b + 2*dr2b;
-; StateSet(l1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1a), u32(cur)));; StateSet(l1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1b), u32(cur)));; StateSet(l2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2a), u32(cur)));; StateSet(l2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2b), u32(cur)));; StateSet(r1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1a), u32(cur)));; StateSet(r1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1b), u32(cur)));; StateSet(r2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2a), u32(cur)));; StateSet(r2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+; if (Params[0].Edges == EdgesDamp) { // the absorbing layer: see EdgeDampFactor
+	var df = EdgeDampFactor(x, y, z, vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z));
+	l1a *= df;
+	l1b *= df;
+	l2a *= df;
+	l2b *= df;
+	r1a *= df;
+	r1b *= df;
+	r2a *= df;
+	r2b *= df;
+}; StateSet(l1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1a), u32(cur)));; StateSet(l1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1b), u32(cur)));; StateSet(l2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2a), u32(cur)));; StateSet(l2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2b), u32(cur)));; StateSet(r1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1a), u32(cur)));; StateSet(r1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1b), u32(cur)));; StateSet(r2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2a), u32(cur)));; StateSet(r2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2b), u32(cur)));; StateSet(nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylLMag), u32(cur)));; StateSet(nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylRMag), u32(cur))); }
 

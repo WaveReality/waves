@@ -448,6 +448,8 @@ fn NeighValue(nidx: i32,x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> f32 {
 	TensorStrides[44], u32(z + zo), u32(y + yo), u32(x + xo), u32(vidx), u32(tidx)));
 return nv;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
 fn GetRandomNumber(index: u32, counter: su64, funIndex: u32) -> f32 {
 	return RandFloat32(counter, funIndex, index);
 }

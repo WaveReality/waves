@@ -817,6 +817,8 @@ fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 		}
 	}return g;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab

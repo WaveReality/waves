@@ -430,6 +430,8 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab

@@ -73,6 +73,11 @@ func WaveCDirKernel(i uint32) { //gosl:kernel
 	cd := 2 * Params[0].C * Params[0].WaveDir
 	pa := oa - cd*ga.X
 	pb := ob - cd*gb.X
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		pa *= df
+		pb *= df
+	}
 	State.Set(pa, int(z), int(y), int(x), int(WaveCa), int(cur))
 	State.Set(pb, int(z), int(y), int(x), int(WaveCb), int(cur))
 	// staggered, as every three-level leapfrog wants: the product of adjacent
@@ -80,7 +85,8 @@ func WaveCDirKernel(i uint32) { //gosl:kernel
 	State.Set(na*pa+nb*pb, int(z), int(y), int(x), int(WaveCMag), int(cur))
 }
 
-// claude todo: need a Damp kernel here!
+// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
+// update is already a velocity, so there is no acceleration to leave out.
 
 //gosl:end
 

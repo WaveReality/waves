@@ -430,6 +430,43 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 		avg += NeighWts[Index2D(TensorStrides[20], TensorStrides[21], u32(LaplacianWts), u32(j))] * (nv - ctr);
 	}return avg;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
+fn EdgeDampFactor(x: i32,y: i32,z: i32, sz: vec3<i32>) -> f32 {
+	var d = EdgeDampWidth;
+	if (sz.x > 1) {
+		var dx = f32(x);
+		if (f32(sz.x+1-x) < dx) {
+			dx = f32(sz.x + 1 - x);
+		}
+		if (dx < d) {
+			d = dx;
+		}
+	}
+	if (sz.y > 1) {
+		var dy = f32(y);
+		if (f32(sz.y+1-y) < dy) {
+			dy = f32(sz.y + 1 - y);
+		}
+		if (dy < d) {
+			d = dy;
+		}
+	}
+	if (sz.z > 1) {
+		var dz = f32(z);
+		if (f32(sz.z+1-z) < dz) {
+			dz = f32(sz.z + 1 - z);
+		}
+		if (dz < d) {
+			d = dz;
+		}
+	}
+	if (d >= EdgeDampWidth) {
+		return f32(1);
+	}
+	var f = (EdgeDampWidth - d) / EdgeDampWidth;
+return 1 - EdgeDampMax*f*f;
+}
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
@@ -632,7 +669,12 @@ TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(c
 } else {
 	la = Laplacian1D(x, y, z, i32(WaveCa), cur, na);
 }; var nb = pb + Params[0].C*la;
-; StateSet(nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+; if (Params[0].Edges == EdgesDamp) { // the absorbing layer: see EdgeDampFactor
+	var df = EdgeDampFactor(x, y, z, vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z));
+	na *= df;
+	nb *= df;
+	StateSet(na, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
+}; StateSet(nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(cur)));; StateSet(na*na + pb*nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCMag), u32(cur))); }
 

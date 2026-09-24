@@ -311,6 +311,54 @@ func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32
 	return -1
 }
 
+// EdgesOpenKernel is the damping boundary for the FIRST-ORDER equations, and
+// it works differently from the Sommerfeld one the second-order kernels use.
+//
+// Sommerfeld damping applies the force as a velocity instead of an
+// acceleration, which needs there to BE an acceleration to leave out. A
+// first-order equation has none: its whole update is already a velocity.
+//
+// So this does the other half of the job. It writes the nearest interior value
+// into the halo, so the boundary is not a wall. On its own that still reflects
+// a great deal -- 47% of a Weyl packet came back in testing -- because one
+// cell cannot absorb a wave. What absorbs it is [EdgeDampFactor], a layer
+// several cells deep that the first-order kernels apply to their own output.
+func EdgesOpenKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	// one cell inward along this face's normal
+	sx := x
+	sy := y
+	sz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		sx = 1
+	} else if x == p.X {
+		sx = p.X - 1
+	}
+	if y == 0 {
+		sy = 1
+	} else if y == p.Y {
+		sy = p.Y - 1
+	}
+	if z == 0 {
+		sz = 1
+	} else if z == p.Z {
+		sz = p.Z - 1
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(cur)), int(z), int(y), int(x), int(vi), int(cur))
+		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(prv)), int(z), int(y), int(x), int(vi), int(prv))
+	}
+}
+
 // EdgesWrapKernel is the kernel for wrapping edge values
 func EdgesWrapKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)

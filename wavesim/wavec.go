@@ -106,13 +106,20 @@ func WaveCBKernel(i uint32) { //gosl:kernel
 		la = Laplacian1D(x, y, z, int32(WaveCa), cur, na)
 	}
 	nb := pb + Params[0].C*la
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		na *= df
+		nb *= df
+		State.Set(na, int(z), int(y), int(x), int(WaveCa), int(cur))
+	}
 	State.Set(nb, int(z), int(y), int(x), int(WaveCb), int(cur))
 	// a and b sit half a step apart, so what is conserved is the staggered
 	// a^2 + b(t-1/2) b(t+1/2), not a^2 + b^2
 	State.Set(na*na+pb*nb, int(z), int(y), int(x), int(WaveCMag), int(cur))
 }
 
-// claude todo: need a Damp kernel here!
+// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
+// update is already a velocity, so there is no acceleration to leave out.
 
 //gosl:end
 

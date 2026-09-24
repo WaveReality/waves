@@ -514,6 +514,8 @@ fn Curl10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	c.z = dydx - dxdy;
 return c;
 }
+const  EdgeDampWidth: f32 = 8;
+const  EdgeDampMax: f32   = 0.25;
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab

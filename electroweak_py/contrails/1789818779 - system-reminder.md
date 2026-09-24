@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 23:07:28
+- **Last Message:** 2026-09-24 11:00:38
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -24925,7 +24925,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -61412,47 +61412,1537 @@ One thing to check on your end: I use `ss.StateVars.Values()[0]` rather than `ss
 
 I also can't verify the panel *count* — if an equation's `ViewAll` set `NPanels = PanelsFour` and the next one only wants one, `ViewRebuild` fills all four with the new equation's first variable but leaves `NPanels` at four. That may be what you want; if not, resetting `NPanels` in `ViewRebuild` is a one-liner.
 
-67 tests pass, everything builds clean. My mistake on Dispersion — Diffusion is much better, and it makes a sharper point than the mass term would have.
+## 🧑 User - 2026-09-24 10:39:39
 
-## `Params.Diffusion`
+I just committed your changes along with fixes needed to get the variable list to rebuild in the GUI -- there is a tree.Maker paradigm in core that builds a tree.Plan of the list of widgets to make, and it then compares that against the existing widgets to drive any updates -- this paradigm was not being used for the variable list, so it was just static. Also, the UpdateView method calls the GoUpdateView, but that blocks on a mutex lock for any GUI event-driven update like this. Everything was being updated anyway so that call was unnecessary. Then I did a major code reorg and update of the view logic and verified that everything is now working smoothly in the gui, and all tests pass, etc. You can check out the last few commits to see all the changes. I added some `// claude todo` notes for you to write the Damp kernels for equations that didn't have them.
 
-The Laplacian drives the **velocity** instead of the acceleration. Same term, same C², one derivative earlier:
+## 🤖 Assistant - 2026-09-24 10:39:54
 
-```go
-if Params[0].Diffusion.IsTrue() {
-    vel = Params[0].CSq * force
-} else {
-    vel = pvel + Params[0].CSq*force
+*Model: claude-opus-5*
+
+<thinking>
+I see the user committed a view reorg and left "claude todo" notes asking for Damp kernels on equations that lack them. I'll start by reviewing the recent commits and locating those todo notes before writing the kernels.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && git log --oneline -6; echo "==== claude todo:"; grep -rn "claude todo" --include=*.go --include=*.goal . | grep -v yaegiwaves``
+  ```
+  925fcca final few fixes for view init at startup and also reset all view params to default when SetVar(-1) is called, so it always starts fresh
+  bb50ba4 major code cleanup and reorganization, with new view init logic. each wave algorithm has its own file now, all with the same organization of functions. the user specifies their own ViewInitFunc that generally just chooses how many panels, using one of the canned available functions, while the equation sets its own variable selector function that chooses which variables to view by default, but doesn't set any other parameters. all tests are passing. set some claude todo comments for adding damping kernels for equations that don't yet have them. still a couple of bugs in gui to fix but checkpointing this before fixing those.
+  ebe4404 yeah don't need UpdateView call at all
+  3f53b2b Dispersion -> Diffusion, and the view rebuild is now working with a few changes that I made in addition to Claude's first pass attempt, to get the variable list to be a tree.Maker that dynamically rebuilds during the Update call.
+  cd63a3f added Dispersion, but meant to say Diffusion -- and wired in things for switching the equation -- not resetting variables in gui but otherwise looking pretty good.
+  033bcc2 wave configs for exploring different wave dynamics
+  ==== claude todo:
+  wavesim/wavec.go:115:// claude todo: need a Damp kernel here!
+  wavesim/dirac.goal:270:// claude todo: need a Damp kernel for Dirac here!
+  wavesim/weyl.goal:242:// claude todo: need a Damp kernel here!
+  wavesim/dirac.go:272:// claude todo: need a Damp kernel for Dirac here!
+  wavesim/wavecdir.goal:81:// claude todo: need a Damp kernel here!
+  wavesim/wavecdir.go:83:// claude todo: need a Damp kernel here!
+  wavesim/wavec.goal:113:// claude todo: need a Damp kernel here!
+  wavesim/weyl.go:246:// claude todo: need a Damp kernel here!
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I need four kernels: WaveC, WaveCDir, Dirac, and Weyl. I'm going to look at how existing damp kernels like WaveDampKernel and KleinGordonCDampKernel are structured, plus the StepRun damp switch, to understand the pattern before writing these new ones, considering the file reorganization too.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && ls wavesim/*.goal; echo "==== WaveDampKernel:"; sed -n '/^func WaveDampKernel/,/^}/p' wavesim/wave.goal; echo "==== LaplacianEdge doc:"; grep -n -B12 "^func LaplacianEdge19" wavesim/funcs.goal | head -20``
+  ```
+  wavesim/dirac.goal		wavesim/particle.goal
+  wavesim/edges.goal		wavesim/schrodinger.goal
+  wavesim/electroweak.goal	wavesim/spinfield.goal
+  wavesim/funcs.goal		wavesim/stats.goal
+  wavesim/init.goal		wavesim/wave.goal
+  wavesim/kg-complex.goal		wavesim/wavec.goal
+  wavesim/klein-gordon.goal	wavesim/wavecdir.goal
+  wavesim/maxwell.goal		wavesim/weyl.goal
+  ==== WaveDampKernel:
+  func WaveDampKernel(i uint32) { //gosl:kernel
+  	ctx := GetCtx(0)
+  	var x, y, z int32
+  	face := ctx.EdgeCoords(i, &x, &y, &z)
+  	if face < 0 {
+  		return
+  	}
+  	sz := ctx.SizePlus1() // exclude updating on edges
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	ppos := State[z, y, x, WavePos, prv]
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm working through the damping mechanism, recognizing it as a Sommerfeld-style absorbing boundary: on edge cells, velocity is set directly to CSq*force instead of accumulated with +=, letting waves exit at speed c without reflecting back into the domain.
+
+For the WaveCDir case specifically, I realize the equation is already pure advection in one direction, so damping there just means letting the wave flow out at the downstream edge naturally — the leapfrog scheme's edge neighbours fall outside the grid, so I need a one-sided update there. Looking at the existing pattern, the damp kernel runs only on edge cells, uses a Laplacian variant that skips out-of-bounds neighbours, and replaces the normal accumulation with a direct assignment on that boundary shell.
+
+For first-order equations like WaveC, WaveCDir, and Weyl, I'm weighing whether an absorbing sponge layer (attenuating the state near edges) is simpler than trying to replicate the Sommerfeld trick used for the second-order wave equation, and whether that trick even generalizes to these cases.
+
+For Schrödinger-like WaveC, since there's traditionally no clean damping kernel, I'm considering a complex absorbing potential approach — multiplying ψ by a factor slightly less than one near the boundary to make its magnitude decay outward.
+
+For Weyl and WaveCDir, since these are first-order transport equations moving at fixed speed, an outgoing condition is simpler: just restrict updates on the edge shell to in-bounds neighbors and add a damping multiplier on top. I'm settling on a sponge-layer design where each edge kernel does the interior update using only valid neighbors, then applies an attenuation factor to that result.
+
+But I'm second-guessing this — a single-cell sponge risks reflecting waves badly. Checking how the existing WaveDampKernel performs, it already uses a Sommerfeld-style outgoing condition, which is exact for normally-incident waves, so I want to see if there's a test verifying that. This makes me reconsider whether the first-order equations deserve an exact outgoing condition instead, since their simpler structure makes that tractable — for WaveCDir specifically, I'm working out a one-sided upwind scheme at the downstream edge.
+
+For Weyl the transport direction depends on the spinor, complicating things, and for WaveC there's no single wave speed at all since it's dispersive, much like Schrödinger. So a principled boundary treatment really differs equation by equation and edges into full absorbing-boundary-condition research. Stepping back, though, I remind myself the actual goal is just configs like FreePacket where waves visibly leave instead of wrapping around — it doesn't need to be perfectly non-reflecting, just good enough that it doesn't obviously bounce.
+
+A practical approach: apply an exponential sponge on the boundary shell, running the interior update with edge-safe neighbor access on edge cells, then damping by a multiplicative factor, while being upfront in documentation that it's only a one-cell sponge that attenuates rather than perfectly absorbs, with some residual reflection especially for the first-order equations. I realize a single-cell sponge is tricky though — a strong damping factor creates an impedance mismatch and reflects strongly, while a gentle one barely absorbs anything. Checking the halo setup confirms the edge shell really is just one cell wide, so I need to think through what that implies for the damping kernel design.
+
+For the advection case specifically, the outgoing condition is actually the governing equation itself — the real fix is using a one-sided difference for the gradient at outflow boundaries so the update relies only on interior data and the wave exits cleanly, while at inflow boundaries I can just set the field to zero since nothing should be entering there.
+
+For the Weyl equation, an exact treatment would mean decomposing into outgoing/incoming characteristics per face based on the spinor structure, which is doable but fiddly; a simpler approach is to apply the same one-sided-difference trick per face, using backward differences at the outflow side and the mirrored treatment at the opposite face.
+
+Actually, maybe the cleanest solution is to apply the interior update on the edge shell restricted to valid neighbors, then multiply by a damping factor. I'm checking whether an existing decay parameter could serve that role.
+
+I'll implement one-sided upwind differences at boundaries for the first-order transport equations like WaveCDir and Weyl, since that's the physically correct outgoing treatment. For Dirac, I'll mirror the KleinGordonC damp pattern across all four components since the structure matches, and I still need to work out the right approach for WaveC given its dispersive nature.
+
+Actually, I can just multiply by a damping factor instead. Let me check how KleinGordonCDampKernel is implemented to follow the existing house pattern, and see if there's already a damping-strength parameter I should reuse — I'll look at the existing damp kernels and the edges.goal file before deciding.
+
+
+</thinking>
+
+Let me read the existing damp kernels and the reorganised file layout.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^func KleinGordonCDampKernel/,/^}/p' wavesim/kg-complex.goal; echo "==== todo context wavec:"; sed -n 105,125p wavesim/wavec.goal; echo "==== todo context weyl:"; sed -n 236,252p wavesim/weyl.goal``
+  ```
+  func KleinGordonCDampKernel(i uint32) { //gosl:kernel
+  	ctx := GetCtx(0)
+  	var x, y, z int32
+  	face := ctx.EdgeCoords(i, &x, &y, &z)
+  	if face < 0 {
+  		return
+  	}
+  	sz := ctx.SizePlus1() // exclude updating on edges
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	pposA := State[z, y, x, CabAs, prv]
+  	pposB := State[z, y, x, CabBs, prv]
+  
+  	// mhsq := Params[0].MOverHSq
+  	csq := Params[0].CSq
+  
+  	forceA := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabAs), prv, pposA)
+  	forceB := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(CabBs), prv, pposB)
+  	// forceA -= mhsq * pposA // this is the only diff from standard Wave
+  	velA := csq * forceA
+  ...
+  ```
+
+</details>
+
+<thinking>
+Now I see the pattern — the KG-complex damping is the same wave damping applied to each component, but with the mass term dropped at the boundary, turning it into a pure lightspeed outgoing condition. The key insight is that the Sommerfeld trick (setting velocity to the force scaled by wave speed squared, with no accumulation) works as an outgoing-wave condition because it treats the boundary wave as massless and normally incident.
+
+Dirac is second-order with four real components, so the same structure applies straightforwardly by analogy. But WaveCDir, WaveC, and Weyl are first-order in time — there's no velocity to avoid accumulating, so the Sommerfeld trick doesn't translate directly. For WaveCDir's leapfrog advection scheme, I'd need an edge gradient function to handle the boundary, which doesn't seem to exist, meaning nothing currently runs at these edges and the halo values just persist unchanged, as I noticed earlier with Weyl.
+
+Since State.SetZeros() initializes everything to zero and nothing writes the halo afterward, it stays at zero — creating a fixed zero boundary that fully reflects waves. That's exactly the reflection problem the user wants fixed. The proper solution is zeroth-order extrapolation: copy the halo cell's value from its inward neighbour, which lets outgoing waves leave with approximately zero gradient at the boundary. This is a halo-writing operation similar to EdgesWrap rather than an interior-cell update, so the damp kernel for these wave types needs to write the halo directly instead of updating interior cells.
+
+I need to check whether EdgeCoords actually refers to halo cells or the outermost interior ring — the boundary exclusion logic and the edge-detection bounds check suggest it's tracking cells right at the boundary, but I need to verify the exact geometry by looking at how EdgeCoords and EdgesWrapKernel are defined.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/func (ctx \*Context) EdgeCoords/,/^}/p' wavesim/context.go | head -30; echo "==== EdgesWrapKernel:"; sed -n '/^func EdgesWrapKernel/,/^}/p' wavesim/edges.goal | head -30; echo "==== EdgesN:"; sed -n '/func (ctx \*Context) EdgesN/,/^}/p' wavesim/context.go``
+  ```
+  ==== EdgesWrapKernel:
+  func EdgesWrapKernel(i uint32) { //gosl:kernel
+  	ctx := GetCtx(0)
+  	var x, y, z, sx, sy, sz int32
+  	face := ctx.EdgeCoordsWrap(i, &x, &y, &z, &sx, &sy, &sz)
+  	if face < 0 {
+  		return
+  	}
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	nvars := ctx.NVars
+  	for vi := range nvars {
+  		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+  		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+  	}
+  }
+  ==== EdgesN:
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -rn "func (ctx \*Context) EdgeCoords\b\|func (ctx \*Context) EdgeCoordsWrap\|func (ctx \*Context) EdgesN" wavesim/*.goal wavesim/*.go | grep -v "\.go:.*AddType"; echo ====; sed -n '/func (ctx \*Context) EdgeCoords(/,/^}/p' wavesim/context.goal 2>/dev/null || sed -n '/func (ctx \*Context) EdgeCoords(/,/^}/p' wavesim/context.go``
+  ```
+  wavesim/edges.goal:63:func (ctx *Context) EdgesN() int32 {
+  wavesim/edges.goal:71:func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
+  wavesim/edges.goal:157:func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32 {
+  wavesim/edges.go:65:func (ctx *Context) EdgesN() int32 {
+  wavesim/edges.go:73:func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
+  wavesim/edges.go:159:func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32 {
+  ====
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 55,160p wavesim/edges.goal``
+  ```
+  	// EdgesDamp implements damping of edge values, where the force directly
+  	// sets the velocity, instead of adding to the velocity as an acceleration.
+  	// This is known as Sommerfield damping.
+  	EdgesDamp
+  )
+  
+  // EdgesN returns the number of points along the edges (and corners).
+  func (ctx *Context) EdgesN() int32 {
+  	p := ctx.SizePlus1()
+  	return 2 + 2*(p.Y*p.Z+p.X*p.Y+p.X*p.Z)
+  }
+  
+  // EdgeCoords returns the x,y,z coordinates for given index into
+  // the edge state, using non-shared edge patterns per above.
+  // returns the face / corner number we're at (0-6) or -1 for none
+  func (ctx *Context) EdgeCoords(idx uint32, x, y, z *int32) int32 {
+  	i := int32(idx)
+  	p := ctx.SizePlus1()
+  	xy := p.X * p.Y
+  	yz := p.Y * p.Z
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm working out that EdgeCoords returns halo cells at the outer ring (index 0 and Size+1), and mapping which face index corresponds to which side: face 0 is −X, face 1 is −Z, and continuing to figure out the rest.
+
+The face value gives the outward normal I need for the first-order equations. I'm planning the damp kernels per equation: DiracDampKernel follows the KG-complex pattern across four components using LaplacianEdge19 on each field with mass dropped at the edge, while WaveCDirDampKernel needs an advection-based outgoing condition that copies the upstream interior neighbour at the halo cell.
+
+For the advection boundary, the simplest uniform approach is zeroth-order extrapolation — copying the inward neighbour on every face — since setting the inflow face to zero versus copying it produces equivalent behavior in practice.
+
+This is actually a generic operation applicable to any equation, so instead of a wave-specific kernel, I should build a general `EdgesOutflowKernel` that copies inward neighbours for all variables, mirroring how `EdgesWrapKernel` handles wraparound.
+
+That said, I need to check whether zeroth-order extrapolation is truly non-reflecting for each equation: it works well for advection and approximately for Weyl transport, but for the dispersive Schrödinger-like WaveC it's problematic since different wavenumbers travel at different speeds — reflection is essentially unavoidable there, though maybe still preferable to a hard wall.
+
+I'm now leaning toward a generic outflow kernel that copies the inward neighbor into the halo across all variables and time levels, since that's the honest standard approach for the transport equations — though I need to reconcile this with the user's expectation of per-equation "Damp" kernels named to match their `// claude todo` notes in wavec.goal, wavecdir.goal, and weyl.goal.
+
+So I'll write per-equation kernels tailored to each: DiracDampKernel following the Sommerfeld pattern like KleinGordonCDampKernel but with four components, and WeylDampKernel and WaveCDirDampKernel using an edge-safe gradient to advance the halo cell with only in-bounds neighbours — which means I need to check whether `GradientEdge10`/`GradientEdge1D` already exist or if I have to write them myself.
+
+For WaveCDampKernel, I'm leaning toward using Visscher with an edge-safe Laplacian plus an explicit attenuation factor as a one-cell absorbing layer, and being upfront that this is an absorber rather than a true transparent boundary since a dispersive equation doesn't have a single outflow speed. Given how much work this is, I should first check what edge-safe helper functions already exist before writing anything new.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "^func .*Edge" wavesim/funcs.goal``
+  ```
+  373:func EdgeInBounds1(x, y, z, sx, sy, sz int32) bool {
+  378:func EdgeInBounds0(x, y, z, sx, sy, sz int32) bool {
+  386:func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+  401:func LaplacianEdge19(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I realize I still need edge-safe gradient functions, so I'll check `EdgeInBounds1/0` and `Gradient10` to build those versions. But stepping back, I think there's a simpler and better approach for the first-order equations that I keep coming back to—the halo cell's real job is just to supply the value the outermost interior cell needs for its transport update.
+
+Comparing zeroth-order extension versus linear extrapolation for setting the halo value, I work out that linear extrapolation gives the proper full one-sided upwind difference at the boundary, while simple zeroth-order extension halves the gradient magnitude and causes partial reflection—so linear extrapolation is clearly the better choice.
+
+I decide to be pragmatic: for Dirac, I'll use the full Sommerfeld damping exactly like KleinGordonC since that's clearly correct and matches the existing pattern, and I'll test it. For Weyl, WaveC, and WaveCDir, since they're first-order, the Sommerfeld trick doesn't directly apply.
+
+I'm considering a one-cell absorbing layer using edge-safe gradient stencils at the halo, then attenuating the result—but this introduces a lot of new numerics I can't fully validate, so instead I'll implement each boundary condition and test it against what actually matters: whether a wave packet leaves the domain without bouncing back, measured by how much energy reflects off the boundary. That gives a concrete, honest acceptance criterion for each method.
+
+My plan is to implement `GradientEdge10`/`GradientEdge1D` for edge-safe gradients, then build damping kernels for Dirac (Sommerfeld), Weyl, and the wave equations using each one's own RHS at the halo plus attenuation, wire it into the stepping loop, and measure reflection for each. I want to start with the simplest, most principled case first and check the existing gradient and bounds-checking utilities before writing the edge stencil.
+
+Actually, I realize there's a simpler approach for first-order equations that skips new stencils entirely: since halo cells are only read by the interior kernel, I just need to write a good extrapolated value there. Linear extrapolation from the two nearest interior cells makes the interior's centered difference behave like a one-sided upwind scheme — the standard open boundary trick — and it only needs neighbor reads along the face normal, so it's generic enough to write as a single kernel reusable across equations.
+
+I'm leaning toward writing one generic damping kernel in edges.goal that all the equations (WaveC, WaveCDir, Weyl) dispatch to, with pointer comments left at each equation file's todo site since that's where the user's notes live — though Dirac's todo note complicates this slightly since it's in its own file too.
+
+Actually, I think Dirac should get its own Sommerfeld-based kernel matching the complex KG pattern, while the others share the generic linear-extrapolation kernel. But I need to check whether linear extrapolation is even stable — it can amplify oscillatory modes, so I should weigh that risk before committing to it over a simpler zeroth-order approach.
+
+Being empirical here is the right call: I'll implement zeroth-order first since it's safer and simpler, measure its reflection, and only escalate to linear extrapolation if the results are poor. My plan is to write the Dirac damping kernel, the zeroth-order open-boundary kernel, wire both into the step runner, then run the reflection test to see how they perform.
+
+
+</thinking>
+
+No edge-safe gradient exists, so the first-order ones need a different approach than Sommerfeld. Let me build both and measure reflection.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+# --- generic open (outflow) halo, for the FIRST-ORDER equations ---
+p=base+'wavesim/edges.goal'; s=open(p).read()
+anchor = "// EdgesWrapKernel"
+blk = '''// EdgesOpenKernel is the damping boundary for the FIRST-ORDER equations, and
+// it works differently from the Sommerfeld one the second-order kernels use.
+//
+// Sommerfeld damping applies the force as a velocity instead of an
+// acceleration, which needs there to BE an acceleration to leave out. A
+// first-order equation has none: its whole update is already a velocity. What
+// it has instead is a halo that the interior stencil reads, and the job is to
+// fill that halo with the value an outgoing wave would have put there.
+//
+// This writes the nearest interior value, which makes the interior's centered
+// difference at the boundary one-sided and lets a wave leave rather than
+// bounce. It is the standard cheap open boundary. It is NOT transparent: what
+// survives is reflection of whatever does not look locally like a plane wave
+// going straight out, which for a dispersive equation is a good deal. See
+// TestEdgesOpen for how much comes back in each case.
+func EdgesOpenKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	// step one cell inward along this face's normal
+	sx, sy, sz := x, y, z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		sx = 1
+	} else if x == p.X {
+		sx = p.X - 1
+	}
+	if y == 0 {
+		sy = 1
+	} else if y == p.Y {
+		sy = p.Y - 1
+	}
+	if z == 0 {
+		sz = 1
+	} else if z == p.Z {
+		sz = p.Z - 1
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+	}
 }
+
+'''
+assert anchor in s; s=s.replace(anchor, blk+anchor, 1)
+open(p,'w').write(s)
+
+# --- Dirac: Sommerfeld, exactly as KleinGordonCDampKernel does it ---
+p=base+'wavesim/dirac.goal'; s=open(p).read()
+old = "// claude todo: need a Damp kernel for Dirac here!"
+new = '''// DiracDampKernel is Sommerfeld damping on the boundary shell, as
+// KleinGordonCDampKernel does for one complex component and this does for two.
+//
+// The force sets the velocity instead of adding to it, which is what makes an
+// outgoing wave leave rather than reflect. The mass and the spin term are
+// both dropped here: at the boundary the only thing being asked is "let
+// whatever is arriving carry on out at c", and both of those would fight it.
+func DiracDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	csq := Params[0].CSq
+	for c := range int32(4) { // the four real components, all alike
+		vr := int32(Dirac1As) + c
+		pp := State[z, y, x, vr, prv]
+		f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
+		v := csq * f // key damp: no +=
+		State[z, y, x, vr+int32(Dirac1Av)-int32(Dirac1As), cur] = v
+		State[z, y, x, vr, cur] = pp + v
+	}
+}'''
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+for f, note in [
+  ('wavesim/wavec.goal', "// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the\n// update is already a velocity, so there is no acceleration to leave out."),
+  ('wavesim/wavecdir.goal', "// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the\n// update is already a velocity, so there is no acceleration to leave out."),
+  ('wavesim/weyl.goal', "// Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the\n// update is already a velocity, so there is no acceleration to leave out."),
+]:
+    t=open(base+f).read()
+    old = "// claude todo: need a Damp kernel here!"
+    assert old in t, f
+    open(base+f,'w').write(t.replace(old,note,1)); print("noted:", f)
+PY
+python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/sim.go'; s=open(p).read()
+old = """			case Dirac:
+				RunMaxwellDampKernel(ne)
+				// RunDiracDampKernel(ne) // todo"""
+new = """			case Dirac:
+				RunMaxwellDampKernel(ne)
+				RunDiracDampKernel(ne)
+			case WaveC, WaveCDir, Weyl:
+				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel"""
+assert old in s; s=s.replace(old,new,1)
+s=s.replace("""			case Spinfield:
+				RunKleinGordonCDampKernel(ne)
+				// no damping for Weyl either: its configs use EdgesWrap, and
+				// setting EdgesDamp there runs NOTHING, which is worse than
+				// wrapping -- the halo keeps whatever it was initialized to
+				// and the gradient stencil reads it forever.
+			}""","""			case Spinfield:
+				RunKleinGordonCDampKernel(ne)
+			}""",1)
+open(p,'w').write(s); print("wired")
+PY
+cd wavesim && goal build 2>&1|tail -3; cd .. && go generate ./wavesim/ 2>&1|grep -iE "error"|head -3; echo "-- gen --"``
+  ```
+  noted: wavesim/wavec.goal
+  noted: wavesim/wavecdir.goal
+  noted: wavesim/weyl.goal
+  wired
+  ./sim.go:362:5: undefined: RunDiracDampKernel
+  ./sim.go:364:5: undefined: RunEdgesOpenKernel
+  goal build failed: failed to run "go build: exit status 1"
+  error: expected ';', found ','
+  2026/09/24 12:43:09 ERROR exit status 1 | cogentcore.org/lab/gosl/gotosl.(*State).CompileFile /Users/oreilly/go/src/cogentcore.org/lab/gosl/gotosl/translate.go:275
+  EdgesOpenKernel.wgsl:383:8 error: expected ';' for variable declaration
+  -- gen --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I see two issues: the Run*Kernel hasn't been generated yet since generation needs to succeed first, and there's a WGSL error where the transpiler doesn't support multi-variable assignment like `sx, sy, sz := x, y, z` on line 383 of EdgesOpenKernel.wgsl. I need to split that into separate declarations instead.
+
+I'm also checking whether `sz` naming conflicts elsewhere — it looks fine since DiracDampKernel uses a similar pattern with `sz` and `z` without issue. Now I need to verify `for c := range int32(4)` is valid syntax for the transpiler; safer to use `for c := range 4` and cast to int32 explicitly where needed, like `vr := int32(Dirac1As) + int32(c)`. For the velocity offset in the State indexing, I'll compute `vo := int32(Dirac1Av) - int32(Dirac1As)` once rather than hardcoding the value, then rewrite both kernels carefully to match what the transpiler supports.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/edges.goal'; s=open(p).read()
+old = """	// step one cell inward along this face's normal
+	sx, sy, sz := x, y, z
+	p := ctx.SizePlus1()
+	if x == 0 {"""
+new = """	// step one cell inward along this face's normal
+	sx := x
+	sy := y
+	sz := z
+	p := ctx.SizePlus1()
+	if x == 0 {"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+p=base+'wavesim/dirac.goal'; s=open(p).read()
+old = """	csq := Params[0].CSq
+	for c := range int32(4) { // the four real components, all alike
+		vr := int32(Dirac1As) + c
+		pp := State[z, y, x, vr, prv]
+		f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
+		v := csq * f // key damp: no +=
+		State[z, y, x, vr+int32(Dirac1Av)-int32(Dirac1As), cur] = v
+		State[z, y, x, vr, cur] = pp + v
+	}"""
+new = """	csq := Params[0].CSq
+	vo := int32(Dirac1Av) - int32(Dirac1As) // position to its velocity
+	for c := range 4 {                      // the four real components, all alike
+		vr := int32(Dirac1As) + int32(c)
+		pp := State[z, y, x, vr, prv]
+		f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
+		v := csq * f // key damp: no +=
+		State[z, y, x, vr+vo, cur] = v
+		State[z, y, x, vr, cur] = pp + v
+	}"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("fixed")
+PY
+cd wavesim && goal build 2>&1|tail -2; cd .. && go generate ./wavesim/ 2>&1|grep -iE "^error|error:"|head -3; echo "-- gen --"; cd wavesim && goal build 2>&1|tail -2``
+  ```
+  fixed
+  go build
+  goal build succeeded
+  -- gen --
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+It builds now, oddly enough — the earlier generate attempt must have partially succeeded and written the Go Run functions before erroring on WGSL. I want to verify generate runs fully clean, then set up a reflection test that sends a packet at the boundary to check how much comes back.
+
+I'll compare the total field energy remaining after the packet should have exited: near-zero means good absorption, near-one means full reflection. I'll test this across Wave, KleinGordonC, Dirac, WaveCDir, WaveC, and Weyl, using a generic sum-of-squares over all state variables so the measure works regardless of each equation's specific structure — 1D for the cheap cases, 3D for Dirac and Weyl.
+
+I'm settling on using 32³ boxes for everything with a packet moving along X, running around 120 steps to ensure it crosses the domain. Rather than build custom configs, I'll reuse each equation's existing packet presets where they exist, and for Dirac, since there's no ready-made moving packet, I'll construct one using a generic moving wave packet initializer applied to the Dirac field components.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go generate ./wavesim/ 2>&1|grep -ci error; cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func dampSim(eq Equations, sz int32, init func(*Sim)) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(sz, sz, sz)
+	ss.Config.Wavelength = 8
+	ss.Config.PacketWidth = 6
+	ss.ConfigSim()
+	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Edges = EdgesDamp
+	ss.Params.Update()
+	if init != nil {
+		ss.InitFunc = init
+	}
+	ss.Init()
+	return ss
+}
+
+// total energy-ish: sum of squares over every state variable in the interior
+func dampTot(ss *Sim) float64 {
+	var s float64
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	nv := int(ss.StateVars.Int64())
+	for z := int32(1); z <= c.Size.Z; z++ {
+		for y := int32(1); y <= c.Size.Y; y++ {
+			for x := int32(1); x <= c.Size.X; x++ {
+				for v := range nv {
+					f := float64(State.Value(int(z), int(y), int(x), v, cur))
+					s += f * f
+				}
+			}
+		}
+	}
+	return s
+}
+
+func TestScratchDamp(t *testing.T) {
+	const sz = 32
+	for _, tc := range []struct {
+		eq   Equations
+		name string
+		init func(*Sim)
+	}{
+		{Wave, "Wave (Sommerfeld)", nil},
+		{KleinGordonC, "KGComplex (Sommerfeld)", ChargedPacket},
+		{Dirac, "Dirac (Sommerfeld, new)", func(s *Sim) {
+			s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+		}},
+		{WaveCDir, "WaveCDir (open, new)", nil},
+		{WaveC, "WaveC (open, new)", nil},
+		{Weyl, "Weyl (open, new)", nil},
+	} {
+		ss := dampSim(tc.eq, sz, tc.init)
+		ss.StepRun()
+		t0 := dampTot(ss)
+		for range 200 {
+			ss.StepRun()
+		}
+		t1 := dampTot(ss)
+		fmt.Printf("%-26s remaining %7.3f%% of initial\n", tc.name, 100*t1/t0)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchDamp -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head -12``
+  ```
+  0
+  # github.com/WaveReality/waves/wavesim.test
+  Wave (Sommerfeld)          remaining   0.167% of initial
+  KGComplex (Sommerfeld)     remaining   0.010% of initial
+  Dirac (Sommerfeld, new)    remaining   0.005% of initial
+  WaveCDir (open, new)       remaining  47.175% of initial
+  WaveC (open, new)          remaining   7.848% of initial
+  Weyl (open, new)           remaining  56.304% of initial
+  --- PASS: TestScratchDamp (7.77s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	7.793s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The new Sommerfeld boundary for Dirac performs excellently at 0.005% remaining, far better than the plain wave version, while the zeroth-order open boundaries for WaveCDir, WaveC, and Weyl all reflect significantly (47%, 7.8%, and 56% respectively). This confirms the zeroth-order open boundary is inadequate for these transport equations, likely because simply copying the inward value fails to account for the wave's directional propagation.
+
+For WaveCDir specifically, since the wave moves in a single direction, the boundary should behave asymmetrically: at the inflow face, incoming value should be zero (nothing is flowing in), while at the outflow face, extrapolation is the right approach since the wave is genuinely leaving. My uniform copy-inward approach gets this backwards at the inflow boundary, creating a spurious source term that explains the poor 47% result.
+
+Let me just test linear extrapolation directly — it's a cheap one-line change using the two nearest interior cells to extrapolate the halo value.
+
+
+</thinking>
+
+Zeroth-order extrapolation reflects badly for the transport ones. Let me try the proper one-sided version.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/edges.goal'; s=open(p).read()
+old = """	// step one cell inward along this face's normal
+	sx := x
+	sy := y
+	sz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		sx = 1
+	} else if x == p.X {
+		sx = p.X - 1
+	}
+	if y == 0 {
+		sy = 1
+	} else if y == p.Y {
+		sy = p.Y - 1
+	}
+	if z == 0 {
+		sz = 1
+	} else if z == p.Z {
+		sz = p.Z - 1
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+	}"""
+new = """	// the two cells inward along this face's normal
+	ax := x
+	ay := y
+	az := z
+	bx := x
+	by := y
+	bz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		ax, bx = 1, 2
+	} else if x == p.X {
+		ax, bx = p.X-1, p.X-2
+	}
+	if y == 0 {
+		ay, by = 1, 2
+	} else if y == p.Y {
+		ay, by = p.Y-1, p.Y-2
+	}
+	if z == 0 {
+		az, bz = 1, 2
+	} else if z == p.Z {
+		az, bz = p.Z-1, p.Z-2
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = 2*State[az, ay, ax, vi, cur] - State[bz, by, bx, vi, cur]
+		State[z, y, x, vi, prv] = 2*State[az, ay, ax, vi, prv] - State[bz, by, bx, vi, prv]
+	}"""
+assert old in s; s=s.replace(old,new,1)
+s=s.replace("""// This writes the nearest interior value, which makes the interior's centered
+// difference at the boundary one-sided and lets a wave leave rather than
+// bounce.""","""// This extrapolates linearly from the two nearest interior cells, which makes
+// the interior's centered difference at the boundary a full one-sided one and
+// lets a wave leave rather than bounce. Copying the nearest value instead
+// halves that difference, and half a gradient reflects half the wave.""",1)
+open(p,'w').write(s); print("linear extrapolation")
+PY
+cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./wavesim/ 2>&1|grep -ci error; go test ./wavesim/ -run TestScratchDamp -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head -10``
+  ```
+  linear extrapolation
+  goal build succeeded
+  4
+  # github.com/WaveReality/waves/wavesim.test
+  Wave (Sommerfeld)          remaining   0.167% of initial
+  KGComplex (Sommerfeld)     remaining   0.010% of initial
+  Dirac (Sommerfeld, new)    remaining   0.005% of initial
+  WaveCDir (open, new)       remaining  37.988% of initial
+  WaveC (open, new)          remaining  12.121% of initial
+  Weyl (open, new)           remaining  76.725% of initial
+  --- PASS: TestScratchDamp (7.73s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	7.750s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Results are mixed - worse for Weyl, mixed for WaveCDir, worse for WaveC. I noticed the generate step reported 4 errors, so I need to check what's causing those, possibly related to multi-assignment syntax not being supported.
+
+Stepping back, I'm reconsidering why Weyl reflects so much — since it's a first-order transport equation, a packet moving in one direction should simply exit the domain. I'm wondering if the issue lies in how the three-level leapfrog scheme handles the boundary: combining leapfrog time-stepping with one-sided spatial differences is known to be unstable, and even with centered differences, the leapfrog's parasitic computational mode can convert energy at the boundary and send it back into the domain — which could explain the reflections I'm seeing.
+
+Given that a clean absorbing boundary is genuinely hard for these three-level equations, I'm thinking a sponge layer is the more reliable fix — attenuating the field over several cells near the boundary rather than trying to make a single halo cell transparent. The simplest way to fit this into the existing structure would be to damp the halo itself, setting it to a scaled copy of the inward neighbor: at damp=0 it behaves like a hard wall, at damp=1 it's the original extrapolation.
+
+But I realize a one-cell sponge can only do so much — for pure advection, the truly exact transparent condition isn't spatial extrapolation at all, it's a time-delayed value: the halo at the next timestep should equal the interior cell's value one wave-crossing-time earlier. That's actually something the three-level leapfrog structure, with its previous and current states, could support directly.
+
+Stepping back from the deep ABC-theory rabbit hole, I need to be pragmatic. My honest assessment: the Dirac case is excellent and principled, but the wave-type cases only reduce reflection substantially without eliminating it, so I should either ship the open boundary with honest caveats or build a proper multi-cell sponge layer instead.
+
+Since the user explicitly wants all the boundary types working, I'll build the sponge — having the interior kernel dampen the state near edges by computing distance to the boundary and applying a factor that's 1 in the bulk and tapers down near the edges, likely via a shared helper function using the grid size and coordinates.
+
+For the taper, I'll define a quadratic attenuation profile over a few cells near the boundary, parameterized by a damping strength and layer width that I can tune empirically to get a clean absorption without reflections.
+
+Budget-wise I'm in good shape, and time-wise this looks like maybe 3-4 more iterations. Putting the sponge inside the interior kernel is a departure from how the codebase usually handles damping at edges, but it seems necessary for dispersive first-order equations and I can justify it. Before committing, though, I want to try one more cheap idea for the pure-advection case — updating the halo directly using the one-sided update at the boundary rather than adding damping everywhere.
+
+Since c·dt = 0.5 cells per step, the wave moves one cell every two steps, meaning the halo value at t+1 should equal the interior cell's value one travel-time ago — specifically the value at t−1, which I still have in `cur` before it gets overwritten. That delayed copy is exactly the transparent boundary condition for c=0.5, and more generally corresponds to linear interpolation in time using 1/c step offsets.
+
+For other wave speeds I'd need to interpolate between the two available time levels, but this characteristic-based approach doesn't generalize cleanly since Weyl's transport speed varies with spin and WaveC has no single propagation speed. So I'm settling on building a sponge layer instead, since it's the one mechanism that works uniformly across all three wave types and is simple to implement.
+
+I'm sketching the design: adding damping parameters for layer width and rate, then writing a helper function that computes a per-cell damping multiplier based on distance from the domain edge.
+
+Still writing damping logic...
+
+I realize dims of size 1 (like a flat 1D case) would get falsely damped everywhere, so I need to skip those in the distance calculation. I'll test this empirically on the 3D cases and keep the zeroth-order copy kernel for the halo since it outperformed linear.
+
+Actually, since the sponge reduces reliance on the halo, I'll revert to the simpler zeroth-order copy and add the sponge on top, then check those four generate errors.
+
+
+</thinking>
+
+The extrapolation is worse, and generate reported errors. Let me check those, then build a proper absorbing layer instead.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go generate ./wavesim/ 2>&1 | grep -iE "error" | head -5``
+  ```
+  error: expected assignment or increment/decrement, found ','
+  2026/09/24 12:46:21 ERROR exit status 1 | cogentcore.org/lab/gosl/gotosl.(*State).CompileFile /Users/oreilly/go/src/cogentcore.org/lab/gosl/gotosl/translate.go:275
+  EdgesOpenKernel.wgsl:391:5 error: expected '=' for assignment
+  2026/09/24 12:46:21 ERROR exit status 1 | cogentcore.org/lab/gosl/gotosl.(*State).CompileFile /Users/oreilly/go/src/cogentcore.org/lab/gosl/gotosl/translate.go:290
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Right, multi-assign isn't supported here, so I'll revert EdgesOpenKernel back to the simpler single-cell inward copy that also performed better empirically, then add a sponge layer with an EdgeDampFactor helper in funcs.go.
+
+I'll apply that helper in WaveCKernel(B), WaveCDirKernel, and WeylKernel wherever Edges equals EdgesDamp, then measure the results. I need to be careful writing the helper for the transpiler since multi-assign isn't supported and I should check whether `min()` works on int32 or if I need explicit comparisons instead.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/edges.goal'; s=open(p).read()
+old = """	// the two cells inward along this face's normal
+	ax := x
+	ay := y
+	az := z
+	bx := x
+	by := y
+	bz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		ax, bx = 1, 2
+	} else if x == p.X {
+		ax, bx = p.X-1, p.X-2
+	}
+	if y == 0 {
+		ay, by = 1, 2
+	} else if y == p.Y {
+		ay, by = p.Y-1, p.Y-2
+	}
+	if z == 0 {
+		az, bz = 1, 2
+	} else if z == p.Z {
+		az, bz = p.Z-1, p.Z-2
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = 2*State[az, ay, ax, vi, cur] - State[bz, by, bx, vi, cur]
+		State[z, y, x, vi, prv] = 2*State[az, ay, ax, vi, prv] - State[bz, by, bx, vi, prv]
+	}"""
+new = """	// one cell inward along this face's normal
+	sx := x
+	sy := y
+	sz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		sx = 1
+	} else if x == p.X {
+		sx = p.X - 1
+	}
+	if y == 0 {
+		sy = 1
+	} else if y == p.Y {
+		sy = p.Y - 1
+	}
+	if z == 0 {
+		sz = 1
+	} else if z == p.Z {
+		sz = p.Z - 1
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+	}"""
+assert old in s; s=s.replace(old,new,1)
+old = """// This extrapolates linearly from the two nearest interior cells, which makes
+// the interior's centered difference at the boundary a full one-sided one and
+// lets a wave leave rather than bounce. Copying the nearest value instead
+// halves that difference, and half a gradient reflects half the wave.
+//
+// This writes the nearest interior value, which makes the interior's centered
+// difference at the boundary one-sided and lets a wave leave rather than
+// bounce. It is the standard cheap open boundary. It is NOT transparent: what
+// survives is reflection of whatever does not look locally like a plane wave
+// going straight out, which for a dispersive equation is a good deal. See
+// TestEdgesOpen for how much comes back in each case."""
+new = """// This writes the nearest interior value into the halo, so the boundary does
+// not act as a wall. On its own that still reflects a great deal -- 47% of a
+// Weyl packet came back in testing -- so it is only half the story: the other
+// half is [EdgeDampFactor], an absorbing layer several cells deep that the
+// first-order kernels apply. One cell cannot absorb a wave; a layer can."""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+# --- the absorbing layer ---
+p=base+'wavesim/funcs.goal'; s=open(p).read()
+anchor = "// LaplacianEdge1D computes"
+blk = '''// EdgeDampWidth is how many cells deep the absorbing layer is, and
+// EdgeDampMax how much it takes off per step at the very edge. Deep and gentle
+// beats shallow and fierce: a sharp change in attenuation reflects just as a
+// wall does, which is the whole difficulty with absorbing boundaries.
+const (
+	EdgeDampWidth float32 = 8
+	EdgeDampMax   float32 = 0.06
+)
+
+// EdgeDampFactor returns the per-step attenuation for a cell: 1 through the
+// bulk, easing down to 1 - EdgeDampMax at the boundary over EdgeDampWidth
+// cells. The first-order kernels multiply their output by it when Edges is
+// EdgesDamp, which is how a wave leaves the box instead of bouncing.
+//
+// The second-order kernels do not need this. They can use Sommerfeld damping
+// at the boundary itself, where the force sets the velocity rather than adding
+// to it, and that is an outgoing-wave condition exact for a normally incident
+// wave at c. A first-order equation has no acceleration to leave out, and a
+// dispersive one has no single speed to be transparent to, so neither can do
+// it in one cell. They absorb over a layer instead.
+//
+// Dimensions of size 1 are skipped: a 1D run is not near a boundary in Y.
+func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
+	d := EdgeDampWidth
+	if sz.X > 1 {
+		dx := float32(x)
+		if float32(sz.X+1-x) < dx {
+			dx = float32(sz.X + 1 - x)
+		}
+		if dx < d {
+			d = dx
+		}
+	}
+	if sz.Y > 1 {
+		dy := float32(y)
+		if float32(sz.Y+1-y) < dy {
+			dy = float32(sz.Y + 1 - y)
+		}
+		if dy < d {
+			d = dy
+		}
+	}
+	if sz.Z > 1 {
+		dz := float32(z)
+		if float32(sz.Z+1-z) < dz {
+			dz = float32(sz.Z + 1 - z)
+		}
+		if dz < d {
+			d = dz
+		}
+	}
+	if d >= EdgeDampWidth {
+		return 1
+	}
+	f := (EdgeDampWidth - d) / EdgeDampWidth
+	return 1 - EdgeDampMax*f*f
+}
+
+'''
+assert anchor in s; s=s.replace(anchor, blk+anchor, 1)
+open(p,'w').write(s); print("sponge helper added")
+PY
+cd wavesim && goal build 2>&1|tail -2; cd .. && go generate ./wavesim/ 2>&1|grep -ci "error"``
+  ```
+  Traceback (most recent call last):
+    File "<stdin>", line 77, in <module>
+  AssertionError
+  go build
+  goal build succeeded
+  4
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The first edit succeeded but the script aborted at the funcs.goal anchor assertion around line 77 — I need to check whether the edges.goal doc replacement actually got written before the failure, since that write happens earlier in the script.
+
+Since edges.goal was already saved, the remaining error must be from the stale funcs.goal file. I need to locate the correct anchor text there to fix it.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "LaplacianEdge1D\|^// EdgeInBounds1" wavesim/funcs.goal | head -4; grep -c "EdgesOpenKernel" wavesim/edges.goal``
+  ```
+  372:// EdgeInBounds1 returns true if given coordinate is >= 1 and < s.
+  382:// LaplacianEdge1D computes the 1D Laplacian across 2 X dim neighbors,
+  386:func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
+  2
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/funcs.goal'; s=open(p).read()
+anchor = "// EdgeInBounds1 returns true"
+blk = '''// EdgeDampWidth is how many cells deep the absorbing layer is, and
+// EdgeDampMax how much it takes off per step at the very edge. Deep and gentle
+// beats shallow and fierce: a sharp change in attenuation reflects just as a
+// wall does, which is the whole difficulty with absorbing boundaries.
+const (
+	EdgeDampWidth float32 = 8
+	EdgeDampMax   float32 = 0.06
+)
+
+// EdgeDampFactor returns the per-step attenuation for a cell: 1 through the
+// bulk, easing down to 1 - EdgeDampMax at the boundary over EdgeDampWidth
+// cells. The first-order kernels multiply their output by it when Edges is
+// EdgesDamp, which is how a wave leaves the box instead of bouncing.
+//
+// The second-order kernels do not need this. They can use Sommerfeld damping
+// at the boundary itself, where the force sets the velocity rather than adding
+// to it, and that is an outgoing-wave condition exact for a wave arriving
+// straight on at c. A first-order equation has no acceleration to leave out,
+// and a dispersive one has no single speed to be transparent to, so neither
+// can do the job in one cell. They absorb over a layer instead.
+//
+// Dimensions of size 1 are skipped: a 1D run is not near a boundary in Y.
+func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
+	d := EdgeDampWidth
+	if sz.X > 1 {
+		dx := float32(x)
+		if float32(sz.X+1-x) < dx {
+			dx = float32(sz.X + 1 - x)
+		}
+		if dx < d {
+			d = dx
+		}
+	}
+	if sz.Y > 1 {
+		dy := float32(y)
+		if float32(sz.Y+1-y) < dy {
+			dy = float32(sz.Y + 1 - y)
+		}
+		if dy < d {
+			d = dy
+		}
+	}
+	if sz.Z > 1 {
+		dz := float32(z)
+		if float32(sz.Z+1-z) < dz {
+			dz = float32(sz.Z + 1 - z)
+		}
+		if dz < d {
+			d = dz
+		}
+	}
+	if d >= EdgeDampWidth {
+		return 1
+	}
+	f := (EdgeDampWidth - d) / EdgeDampWidth
+	return 1 - EdgeDampMax*f*f
+}
+
+'''
+assert anchor in s
+open(p,'w').write(s.replace(anchor, blk+anchor, 1)); print("helper ok")
+PY
+cd wavesim && goal build 2>&1|tail -2; cd .. && go generate ./wavesim/ 2>&1|grep -i "error:" | head -3; echo "-- gen --"``
+  ```
+  helper ok
+  go build
+  goal build succeeded
+  error: expected assignment or increment/decrement, found ','
+  EdgesOpenKernel.wgsl:391:5 error: expected '=' for assignment
+  -- gen --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The generated wgsl still has the old multi-assign, so my edits to edges.goal may not have actually reverted things. I'm checking whether the kernel definition still contains the old `ax, bx = 1, 2` pattern.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "ax, bx\|sx = 1" wavesim/edges.goal wavesim/edges.go | head; echo "---- wgsl:"; sed -n 386,394p wavesim/shaders/EdgesOpenKernel.wgsl 2>/dev/null``
+  ```
+  wavesim/edges.go:346:		ax, bx = 1, 2
+  wavesim/edges.go:348:		ax, bx = p.X-1, p.X-2
+  wavesim/edges.goal:344:		ax, bx = 1, 2
+  wavesim/edges.goal:346:		ax, bx = p.X-1, p.X-2
+  ---- wgsl:
+  	var bx = x;
+  	var by = y;
+  	var bz = z;
+  	var p = Context_SizePlus1(ctx);
+  	if (x == 0) {
+  		ax, bx = 1, 2;
+  	} else if (x == p.x) {
+  		ax, bx = p.x-1, p.x-2;
+  	}
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm puzzling over why the edges.goal text is still present despite the replacement assertion passing without a traceback—the script does two sequential replace operations before writing the file, so I need to trace through which one actually failed to take effect.
+
+Ah, I see the issue: if the second assert (for the doc comment) failed, the write call never executed, leaving edges.goal completely unmodified, even though the traceback line number made it look like a different assertion. I'll redo the edit more carefully this time.
+
+
+</thinking>
+
+The edges.goal revert never landed — the doc-text match failed and aborted the write. Let me fix it directly.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/edges.goal'; s=open(p).read()
+old = """	// the two cells inward along this face's normal
+	ax := x
+	ay := y
+	az := z
+	bx := x
+	by := y
+	bz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		ax, bx = 1, 2
+	} else if x == p.X {
+		ax, bx = p.X-1, p.X-2
+	}
+	if y == 0 {
+		ay, by = 1, 2
+	} else if y == p.Y {
+		ay, by = p.Y-1, p.Y-2
+	}
+	if z == 0 {
+		az, bz = 1, 2
+	} else if z == p.Z {
+		az, bz = p.Z-1, p.Z-2
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = 2*State[az, ay, ax, vi, cur] - State[bz, by, bx, vi, cur]
+		State[z, y, x, vi, prv] = 2*State[az, ay, ax, vi, prv] - State[bz, by, bx, vi, prv]
+	}"""
+new = """	// one cell inward along this face's normal
+	sx := x
+	sy := y
+	sz := z
+	p := ctx.SizePlus1()
+	if x == 0 {
+		sx = 1
+	} else if x == p.X {
+		sx = p.X - 1
+	}
+	if y == 0 {
+		sy = 1
+	} else if y == p.Y {
+		sy = p.Y - 1
+	}
+	if z == 0 {
+		sz = 1
+	} else if z == p.Z {
+		sz = p.Z - 1
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	nvars := ctx.NVars
+	for vi := range nvars {
+		State[z, y, x, vi, cur] = State[sz, sy, sx, vi, cur]
+		State[z, y, x, vi, prv] = State[sz, sy, sx, vi, prv]
+	}"""
+assert old in s, "code"
+s=s.replace(old,new,1)
+import re
+a = s.index("// EdgesOpenKernel is the damping boundary")
+b = s.index("func EdgesOpenKernel")
+s = s[:a] + """// EdgesOpenKernel is the damping boundary for the FIRST-ORDER equations, and
+// it works differently from the Sommerfeld one the second-order kernels use.
+//
+// Sommerfeld damping applies the force as a velocity instead of an
+// acceleration, which needs there to BE an acceleration to leave out. A
+// first-order equation has none: its whole update is already a velocity.
+//
+// So this does the other half of the job. It writes the nearest interior value
+// into the halo, so the boundary is not a wall. On its own that still reflects
+// a great deal -- 47% of a Weyl packet came back in testing -- because one
+// cell cannot absorb a wave. What absorbs it is [EdgeDampFactor], a layer
+// several cells deep that the first-order kernels apply to their own output.
+""" + s[b:]
+open(p,'w').write(s); print("reverted + redocumented")
+PY
+cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./wavesim/ 2>&1|grep -ci "error:"; echo "-- gen errors above --"``
+  ```
+  reverted + redocumented
+  goal build succeeded
+  0
+  -- gen errors above --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now applying the absorbing layer in the three first-order kernels.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+E = [
+ ('wavesim/wavec.goal', """	nb := pb + Params[0].C*la
+	State[z, y, x, WaveCb, cur] = nb""",
+  """	nb := pb + Params[0].C*la
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		na *= df
+		nb *= df
+		State[z, y, x, WaveCa, cur] = na
+	}
+	State[z, y, x, WaveCb, cur] = nb"""),
+ ('wavesim/wavecdir.goal', """	State[z, y, x, WaveCa, cur] = pa
+	State[z, y, x, WaveCb, cur] = pb""",
+  """	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		pa *= df
+		pb *= df
+	}
+	State[z, y, x, WaveCa, cur] = pa
+	State[z, y, x, WaveCb, cur] = pb"""),
+ ('wavesim/weyl.goal', """	State[z, y, x, WeylL1a, cur] = l1a""",
+  """	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		l1a *= df
+		l1b *= df
+		l2a *= df
+		l2b *= df
+		r1a *= df
+		r1b *= df
+		r2a *= df
+		r2b *= df
+	}
+	State[z, y, x, WeylL1a, cur] = l1a"""),
+]
+for f, old, new in E:
+    s=open(base+f).read(); assert old in s, f
+    open(base+f,'w').write(s.replace(old,new,1)); print("layer:", f)
+PY
+cd wavesim && goal build 2>&1|tail -2; cd .. && go generate ./wavesim/ 2>&1|grep -ci "error:"; go test ./wavesim/ -run TestScratchDamp -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head -10``
+  ```
+  layer: wavesim/wavec.goal
+  layer: wavesim/wavecdir.goal
+  layer: wavesim/weyl.goal
+  go build
+  goal build succeeded
+  0
+  # github.com/WaveReality/waves/wavesim.test
+  Wave (Sommerfeld)          remaining   0.167% of initial
+  KGComplex (Sommerfeld)     remaining   0.010% of initial
+  Dirac (Sommerfeld, new)    remaining   0.005% of initial
+  WaveCDir (open, new)       remaining   5.156% of initial
+  WaveC (open, new)          remaining   0.173% of initial
+  Weyl (open, new)           remaining   3.222% of initial
+  --- PASS: TestScratchDamp (7.72s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	7.747s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm seeing a huge improvement: WaveCDir dropped from 47% to 5.2%, WaveC from 7.8% to 0.17%, and Weyl from 56% to 3.2%, while Dirac stays essentially perfect. I want to push WaveCDir and Weyl further by tuning EdgeDampMax and Width, noting that in the 32³ box the 8-cell-deep damping layer on each side covers half the domain.
+
+That's likely skewing the results since the packet starts within the layer's reach. I should test at a larger box like 48³ to get a cleaner reflection measurement, and scan EdgeDampMax values (0.03, 0.06, 0.12) with widths (6, 8, 12) for Weyl to find better settings.
+
+
+</thinking>
+
+Good improvement. Let me tune the layer — in a 32-box it covers half the domain, which may be flattering or not.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/zz_scratch_test.go'; s=open(p).read()
+s=s.replace("const sz = 32","const sz = 48").replace("for range 200 {","for range 300 {")
+open(p,'w').write(s)
+PY
+for m in 0.03 0.06 0.12; do
+  python3 - "$m" <<'PY'
+import sys,re
+p='/Users/oreilly/wavereality/waves/wavesim/funcs.goal'; s=open(p).read()
+s=re.sub(r'EdgeDampMax   float32 = [0-9.]+', f'EdgeDampMax   float32 = {sys.argv[1]}', s)
+open(p,'w').write(s)
+PY
+  (cd /Users/oreilly/wavereality/waves/wavesim && goal build >/dev/null 2>&1)
+  echo "--- EdgeDampMax = $m"
+  (cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -run TestScratchDamp -v 2>&1 | grep -E "WaveCDir|Weyl|WaveC \(")
+done``
+  ```
+  --- EdgeDampMax = 0.03
+  WaveCDir (open, new)       remaining  10.475% of initial
+  WaveC (open, new)          remaining   1.277% of initial
+  Weyl (open, new)           remaining  10.649% of initial
+  --- EdgeDampMax = 0.06
+  WaveCDir (open, new)       remaining   4.274% of initial
+  WaveC (open, new)          remaining   0.252% of initial
+  Weyl (open, new)           remaining   3.921% of initial
+  --- EdgeDampMax = 0.12
+  WaveCDir (open, new)       remaining   0.837% of initial
+  WaveC (open, new)          remaining   0.053% of initial
+  Weyl (open, new)           remaining   0.690% of initial
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+0.12 is a big improvement, with WaveCDir at 0.84%, Weyl at 0.69%, and WaveC down to 0.053%. I want to test 0.2 and 0.3 to see whether accuracy keeps improving or whether too sharp a gradient starts causing reflections, so I'll keep scanning higher values.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && for m in 0.2 0.3 0.5; do
+  python3 - "$m" <<'PY'
+import sys,re
+p='/Users/oreilly/wavereality/waves/wavesim/funcs.goal'; s=open(p).read()
+s=re.sub(r'EdgeDampMax   float32 = [0-9.]+', f'EdgeDampMax   float32 = {sys.argv[1]}', s)
+open(p,'w').write(s)
+PY
+  (cd /Users/oreilly/wavereality/waves/wavesim && goal build >/dev/null 2>&1)
+  echo "--- EdgeDampMax = $m"
+  (cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -run TestScratchDamp -v 2>&1 | grep -E "WaveCDir|Weyl|WaveC \(")
+done``
+  ```
+  --- EdgeDampMax = 0.2
+  WaveCDir (open, new)       remaining   0.137% of initial
+  WaveC (open, new)          remaining   0.051% of initial
+  Weyl (open, new)           remaining   0.122% of initial
+  --- EdgeDampMax = 0.3
+  WaveCDir (open, new)       remaining   0.056% of initial
+  WaveC (open, new)          remaining   0.056% of initial
+  Weyl (open, new)           remaining   0.107% of initial
+  --- EdgeDampMax = 0.5
+  WaveCDir (open, new)       remaining   0.074% of initial
+  WaveC (open, new)          remaining   0.077% of initial
+  Weyl (open, new)           remaining   0.256% of initial
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+0.25 looks like the best middle-ground value, sharp enough to damp without causing reflections. I'll set the damping to 0.25, measure it, then run the full test suite to confirm stability and that physics tests aren't hurt, keeping in mind the absorbing layer's 8-cell depth could matter for smaller boxes.
+
+Checking which existing tests actually use EdgesDamp with the affected equations: the Weyl hydrogen/oscillator tests use EdgesWrap so they're unaffected, but DiracHydrogen and ScalarHydrogen use EdgesDamp. Previously only the Maxwell damp kernel ran for those, leaving the Dirac variables at a fixed wall — now the Dirac damp kernel will also run, which should improve behavior by letting the wavefunction tails leave rather than reflect, but this will change the measured numbers in tests like TestDiracHydrogenBound, so I need to run the full suite to see the impact.
+
+
+</thinking>
+
+Optimum is around 0.25 — beyond that the layer's own gradient starts reflecting. Setting it and running everything.
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+import re
+p='/Users/oreilly/wavereality/waves/wavesim/funcs.goal'; s=open(p).read()
+s=re.sub(r'EdgeDampMax   float32 = [0-9.]+', 'EdgeDampMax   float32 = 0.25', s)
+s=s.replace("""// EdgeDampWidth is how many cells deep the absorbing layer is, and
+// EdgeDampMax how much it takes off per step at the very edge. Deep and gentle
+// beats shallow and fierce: a sharp change in attenuation reflects just as a
+// wall does, which is the whole difficulty with absorbing boundaries.""",
+"""// EdgeDampWidth is how many cells deep the absorbing layer is, and
+// EdgeDampMax how much it takes off per step at the very edge.
+//
+// Both matter, and not monotonically. Too gentle and the wave crosses the
+// layer and bounces off the far wall; too fierce and the layer's own edge is
+// itself a wall and reflects. Measured on a Weyl packet into a 48^3 box, the
+// fraction coming back went 10.6% at 0.03, 3.9% at 0.06, 0.69% at 0.12, 0.12%
+// at 0.2, and back up to 0.26% at 0.5. These sit near the bottom of that.""",1)
+open(p,'w').write(s)
+PY
+cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./... 2>&1|grep -ci "error:"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go test ./wavesim/ -run TestScratchDamp -v 2>&1|grep -E "remaining"``
+  ```
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  Wave (Sommerfeld)          remaining   0.189% of initial
+  KGComplex (Sommerfeld)     remaining   0.006% of initial
+  Dirac (Sommerfeld, new)    remaining   0.004% of initial
+  WaveCDir (open, new)       remaining   0.070% of initial
+  WaveC (open, new)          remaining   0.053% of initial
+  Weyl (open, new)           remaining   0.090% of initial
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && rm -f wavesim/zz_scratch_test.go && cat > wavesim/edges_test.go <<'EOF'
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import (
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func dampSim(eq Equations, sz int32, init func(*Sim)) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(sz, sz, sz)
+	ss.Config.Wavelength = 8
+	ss.Config.PacketWidth = 6
+	ss.ConfigSim()
+	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Edges = EdgesDamp
+	ss.Params.Update()
+	if init != nil {
+		ss.InitFunc = init
+	}
+	ss.Init()
+	return ss
+}
+
+// dampTot is the sum of squares over every state variable in the interior:
+// how much wave is still in the box, whatever the equation calls it.
+func dampTot(ss *Sim) float64 {
+	var s float64
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	nv := int(ss.StateVars.Int64())
+	for z := int32(1); z <= c.Size.Z; z++ {
+		for y := int32(1); y <= c.Size.Y; y++ {
+			for x := int32(1); x <= c.Size.X; x++ {
+				for v := range nv {
+					f := float64(State.Value(int(z), int(y), int(x), v, cur))
+					s += f * f
+				}
+			}
+		}
+	}
+	return s
+}
+
+// TestEdgesDamp sends a packet into the boundary in every equation that damps
+// and measures what comes back, which is the only thing a damping boundary is
+// for.
+//
+// Two mechanisms are being checked. The second-order equations use Sommerfeld
+// damping in the boundary cell, where the force sets the velocity instead of
+// adding to it. The first-order ones cannot: they have no acceleration to
+// leave out, so they use an open halo plus [EdgeDampFactor], an absorbing
+// layer several cells deep. On its own the open halo leaves nearly half a
+// Weyl packet in the box, so the layer is doing most of the work.
+func TestEdgesDamp(t *testing.T) {
+	const sz = 48
+	for _, tc := range []struct {
+		eq   Equations
+		name string
+		init func(*Sim)
+	}{
+		{Wave, "Wave", nil},
+		{KleinGordonC, "KleinGordonC", ChargedPacket},
+		{Dirac, "Dirac", func(s *Sim) {
+			s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+		}},
+		{WaveCDir, "WaveCDir", nil},
+		{WaveC, "WaveC", nil},
+		{Weyl, "Weyl", nil},
+	} {
+		ss := dampSim(tc.eq, sz, tc.init)
+		ss.StepRun()
+		t0 := dampTot(ss)
+		if t0 <= 0 {
+			t.Errorf("%s: nothing in the box to damp", tc.name)
+			continue
+		}
+		for range 300 {
+			ss.StepRun()
+		}
+		left := dampTot(ss) / t0
+		if left > 0.01 {
+			t.Errorf("%s: %.3f%% of the wave is still in the box after 300 steps -- it is reflecting",
+				tc.name, 100*left)
+		}
+		t.Logf("%-13s %.3f%% left after 300 steps", tc.name, 100*left)
+	}
+}
+EOF
+gofmt -w wavesim/edges_test.go && go test ./wavesim/ -v -timeout 900s > /tmp/ws7.txt 2>&1; echo "exit=$?"; grep -cE "^--- PASS" /tmp/ws7.txt; grep -E "^--- FAIL" /tmp/ws7.txt; echo "(no FAIL above = clean)"; grep -E "left after 300" /tmp/ws7.txt``
+  ```
+  exit=0
+  68
+  (no FAIL above = clean)
+      edges_test.go:94: Wave          0.189% left after 300 steps
+      edges_test.go:94: KleinGordonC  0.006% left after 300 steps
+      edges_test.go:94: Dirac         0.004% left after 300 steps
+      edges_test.go:94: WaveCDir      0.070% left after 300 steps
+      edges_test.go:94: WaveC         0.053% left after 300 steps
+      edges_test.go:94: Weyl          0.090% left after 300 steps
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; grep -rn "claude todo" --include=*.go --include=*.goal . | grep -v yaegiwaves; echo "(no todos above = all done)"``
+  ```
+  # github.com/WaveReality/waves
+  builds-ok
+  (no todos above = all done)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+All four `// claude todo` notes resolved. 68 tests pass, everything builds and generates clean.
+
+```
+Wave          0.189% left after 300 steps    (existing Sommerfeld, for reference)
+KleinGordonC  0.006%                          (existing)
+Dirac         0.004%    <- new
+WaveCDir      0.070%    <- new
+WaveC         0.053%    <- new
+Weyl          0.090%    <- new
 ```
 
-And it turns out to complete the picture more precisely than I expected, because **C² at the default C = 0.5 is exactly 0.25, which is `WaveCC`**. So the two are the same equation with the same coefficient, differing only by the i — and that's measurable:
+## Two mechanisms, because one doesn't fit
+
+**`DiracDampKernel`** follows the house pattern exactly — Sommerfeld damping in the boundary cell, force setting the velocity instead of adding to it, over four components. Mass and spin term both dropped at the boundary, as `KleinGordonCDampKernel` already does with its mass: the only question there is "let whatever's arriving carry on out at c", and both of those fight it. It came out best of the lot at 0.004%.
+
+**The first-order three can't use that** — Sommerfeld needs an acceleration to leave out, and their whole update is already a velocity. So they get a different thing, in two parts:
+
+- **`EdgesOpenKernel`** (generic, in `edges.goal`): writes the nearest interior value into the halo so the boundary isn't a wall.
+- **`EdgeDampFactor`** (in `funcs.goal`): an absorbing layer 8 cells deep that the kernels apply to their own output when `Edges == EdgesDamp`.
+
+## Worth knowing: the open halo alone is nearly useless
+
+My first version was just the halo fix, and it reflected badly — **47% of a WaveCDir packet and 56% of a Weyl one came back.** One cell cannot absorb a wave. I tried proper linear extrapolation instead of copying, expecting the full one-sided difference to help, and it was *worse* (Weyl went to 77%) — I assume the leapfrog's parasitic mode converting at the boundary, though I didn't chase it.
+
+The layer is what actually does the work, and its strength is not monotonic. Measured on a Weyl packet into 48³:
+
+| `EdgeDampMax` | reflected |
+|---|---|
+| 0.03 | 10.6% |
+| 0.06 | 3.9% |
+| 0.12 | 0.69% |
+| 0.2 | 0.12% |
+| 0.3 | 0.11% |
+| 0.5 | 0.26% ← rising again |
+
+Too gentle and the wave crosses the layer and hits the far wall; too fierce and **the layer's own edge becomes a wall**. 0.25 sits near the bottom. Those numbers are in the constant's doc comment so the next person doesn't have to rediscover the curve.
+
+`TestEdgesDamp` fires a packet into the boundary in all six equations and fails any that keeps more than 1%.
+
+One behaviour change to be aware of: `Dirac` with `EdgesDamp` previously ran only `MaxwellDampKernel`, leaving the Dirac variables' halo at zero — a hard wall. It now damps properly, so `DiracHydrogen` and `SpinInPotential` will lose their outer tails rather than reflecting them. All their tests still pass, but the numbers may shift slightly from what you had.
+
+All four `// claude todo` notes resolved. 68 tests pass, everything builds and generates clean.
 
 ```
-same mode, same coefficient: diffusion decays at 0.009654 per step,
-WaveC rotates at 0.009607 (C^2 khat^2 = 0.009607) -- the i is the only difference
+Wave          0.189% left after 300 steps    (existing Sommerfeld, for reference)
+KleinGordonC  0.006%                          (existing)
+Dirac         0.004%    <- new
+WaveCDir      0.070%    <- new
+WaveC         0.053%    <- new
+Weyl          0.090%    <- new
 ```
 
-Both land on C²k̂² to within 0.5%. One decays at that rate, the other turns at it. That's your "half-way to the diffusion equation except that it rotates", as a number.
+## Two mechanisms, because one doesn't fit
 
-Which fills the grid:
+**`DiracDampKernel`** follows the house pattern exactly — Sommerfeld damping in the boundary cell, force setting the velocity instead of adding to it, over four components. Mass and spin term both dropped at the boundary, as `KleinGordonCDampKernel` already does with its mass: the only question there is "let whatever's arriving carry on out at c", and both of those fight it. It came out best of the lot at 0.004%.
 
-| Laplacian drives | real field | complex field |
-|---|---|---|
-| acceleration | **Wave** — oscillates, ω = ck | — |
-| velocity | **Wave + Diffusion** — decays at C²k̂² | **WaveC** — rotates at C²k̂² |
+**The first-order three can't use that** — Sommerfeld needs an acceleration to leave out, and their whole update is already a velocity. So they get a different thing, in two parts:
 
-I dropped the mass-term flag entirely, as you said — switch to KG for that. `TestWaveDispersion` still covers the mass/dispersion point using the real KG.
+- **`EdgesOpenKernel`** (generic, in `edges.goal`): writes the nearest interior value into the halo so the boundary isn't a wall.
+- **`EdgeDampFactor`** (in `funcs.goal`): an absorbing layer 8 cells deep that the kernels apply to their own output when `Edges == EdgesDamp`.
 
-## View rebuild
+## Worth knowing: the open halo alone is nearly useless
 
-You were right that it wasn't anticipated, and there were two separate problems.
+My first version was just the halo fix, and it reflected badly — **47% of a WaveCDir packet and 56% of a Weyl one came back.** One cell cannot absorb a wave. I tried proper linear extrapolation instead of copying, expecting the full one-sided difference to help, and it was *worse* (Weyl went to 77%) — I assume the leapfrog's parasitic mode converting at the boundary, though I didn't chase it.
 
-**`VarsListUpdate` early-outs on variable *count*.** Two equations with the same number of variables would keep the old settings map entirely. Since enum keys carry their type, checking whether `vals[0]` is already a key is a reliable identity test, so it now rebuilds whenever the *set* changes rather than just the size.
+The layer is what actually does the work, and its strength is not monotonic. Measured on a Weyl packet into 48³:
 
-**Nothing re-pointed the live View.** New `Sim.ViewRebuild()`, called at the end of `ConfigEquation`: resets `Size` and `Start`, calls `SetVar(vals[0], -1)` to rebuild the settings map and refill every panel with a variable of the *new* equation, then re-runs the view init funcs and updates. It no-ops when there's no GUI, so the tests and headless runs are unaffected.
+| `EdgeDampMax` | reflected |
+|---|---|
+| 0.03 | 10.6% |
+| 0.06 | 3.9% |
+| 0.12 | 0.69% |
+| 0.2 | 0.12% |
+| 0.3 | 0.11% |
+| 0.5 | 0.26% ← rising again |
 
-One thing to check on your end: I use `ss.StateVars.Values()[0]` rather than `ss.StateVars` itself, because `StateVars` is the count sentinel (`WaveStatesN`), not a real variable. For the enums layered on `EMStatesN` that should give a valid first value, but you'll see immediately in the GUI if any equation comes up pointing somewhere odd before its `ViewInit` fires.
+Too gentle and the wave crosses the layer and hits the far wall; too fierce and **the layer's own edge becomes a wall**. 0.25 sits near the bottom. Those numbers are in the constant's doc comment so the next person doesn't have to rediscover the curve.
 
-I also can't verify the panel *count* — if an equation's `ViewAll` set `NPanels = PanelsFour` and the next one only wants one, `ViewRebuild` fills all four with the new equation's first variable but leaves `NPanels` at four. That may be what you want; if not, resetting `NPanels` in `ViewRebuild` is a one-liner.
+`TestEdgesDamp` fires a packet into the boundary in all six equations and fails any that keeps more than 1%.
+
+One behaviour change to be aware of: `Dirac` with `EdgesDamp` previously ran only `MaxwellDampKernel`, leaving the Dirac variables' halo at zero — a hard wall. It now damps properly, so `DiracHydrogen` and `SpinInPotential` will lose their outer tails rather than reflecting them. All their tests still pass, but the numbers may shift slightly from what you had.
 
