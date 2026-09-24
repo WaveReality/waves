@@ -269,7 +269,7 @@ func (ss *Sim) Init() {
 	if ss.InitFunc != nil {
 		ss.InitFunc(ss)
 	}
-	ss.RunWrapEdges()
+	ss.RunEdgesHalo()
 	ToGPUTensorStrides()
 	ToGPU(ParamsVar, CtxVar, NeighOffsVar, FaceOffsVar, NeighWtsVar, ParticlesVar, StateVar)
 	ss.RunStats(true)
@@ -375,7 +375,10 @@ func (ss *Sim) StepRun() {
 				}
 				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel
 			case Electroweak:
-				// claude todo: need EW damp kernel!?
+				// no MaxwellDampKernel: ElectroweakKernel writes A0s..AZs
+				// itself as the mixing of W^3 and B, and recomputes them from
+				// the damped gauge fields on the next step
+				RunElectroweakDampKernel(ne)
 			case Spinfield:
 				RunKleinGordonCDampKernel(ne)
 			}

@@ -371,6 +371,27 @@ fn Context_EdgeCoords(ctx: Context, idx: u32, x: ptr<function,i32>,y: ptr<functi
 		}return i32(5);
 	}return -1;
 }
+fn Context_EdgeInward(ctx: Context, x: i32,y: i32,z: i32, ix: ptr<function,i32>,iy: ptr<function,i32>,iz: ptr<function,i32>) {
+	var p = Context_SizePlus1(ctx);
+	*ix = x;
+	*iy = y;
+	*iz = z;
+	if (x == 0) {
+		*ix = i32(1);
+	} else if (x == p.x) {
+		*ix = p.x - 1;
+	}
+	if (y == 0) {
+		*iy = i32(1);
+	} else if (y == p.y) {
+		*iy = p.y - 1;
+	}
+	if (z == 0) {
+		*iz = i32(1);
+	} else if (z == p.z) {
+		*iz = p.z - 1;
+	}
+}
 fn EdgesOpenKernel(i: u32) { //gosl:kernel
 	let ctx = Ctx[0];
 	var x: i32;
@@ -380,25 +401,10 @@ fn EdgesOpenKernel(i: u32) { //gosl:kernel
 	if (face < 0) {
 		return;
 	}
-	var sx = x;
-	var sy = y;
-	var sz = z;
-	var p = Context_SizePlus1(ctx);
-	if (x == 0) {
-		sx = i32(1);
-	} else if (x == p.x) {
-		sx = p.x - 1;
-	}
-	if (y == 0) {
-		sy = i32(1);
-	} else if (y == p.y) {
-		sy = p.y - 1;
-	}
-	if (z == 0) {
-		sz = i32(1);
-	} else if (z == p.z) {
-		sz = p.z - 1;
-	}
+	var sx: i32;
+	var sy: i32;
+	var sz: i32;
+	Context_EdgeInward(ctx, x, y, z, &sx, &sy, &sz);
 	var cur = ctx.CurState;
 	var prv = Context_PrevState(ctx);
 	var nvars = ctx.NVars;

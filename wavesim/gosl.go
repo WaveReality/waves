@@ -163,6 +163,22 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ElectroweakDampKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "NeighOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/ElectroweakKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -608,6 +624,48 @@ func RunOneEdgesWrapKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunEdgesWrapKernelCPU(n)
+	}
+}
+// RunElectroweakDampKernel runs the ElectroweakDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneElectroweakDampKernel call does Run and Done for a
+// single run-and-sync case.
+func RunElectroweakDampKernel(n int) {
+	if UseGPU {
+		RunElectroweakDampKernelGPU(n)
+	} else {
+		RunElectroweakDampKernelCPU(n)
+	}
+}
+
+// RunElectroweakDampKernelGPU runs the ElectroweakDampKernel kernel on the GPU. See [RunElectroweakDampKernel] for more info.
+func RunElectroweakDampKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["ElectroweakDampKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunElectroweakDampKernelCPU runs the ElectroweakDampKernel kernel on the CPU.
+func RunElectroweakDampKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, ElectroweakDampKernel)
+}
+
+// RunOneElectroweakDampKernel runs the ElectroweakDampKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneElectroweakDampKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunElectroweakDampKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunElectroweakDampKernelCPU(n)
 	}
 }
 // RunElectroweakKernel runs the ElectroweakKernel kernel with given number of elements,

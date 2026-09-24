@@ -311,6 +311,30 @@ func (ctx *Context) EdgeCoordsWrap(idx uint32, x, y, z, xs, ys, zs *int32) int32
 	return -1
 }
 
+// EdgeInward gives the coordinates one cell inward from a halo cell, along
+// whichever face normals it sits on.
+func (ctx *Context) EdgeInward(x, y, z int32, ix, iy, iz *int32) {
+	p := ctx.SizePlus1()
+	*ix = x
+	*iy = y
+	*iz = z
+	if x == 0 {
+		*ix = 1
+	} else if x == p.X {
+		*ix = p.X - 1
+	}
+	if y == 0 {
+		*iy = 1
+	} else if y == p.Y {
+		*iy = p.Y - 1
+	}
+	if z == 0 {
+		*iz = 1
+	} else if z == p.Z {
+		*iz = p.Z - 1
+	}
+}
+
 // EdgesOpenKernel is the damping boundary for the FIRST-ORDER equations, and
 // it works differently from the Sommerfeld one the second-order kernels use.
 //
@@ -330,26 +354,8 @@ func EdgesOpenKernel(i uint32) { //gosl:kernel
 	if face < 0 {
 		return
 	}
-	// one cell inward along this face's normal
-	sx := x
-	sy := y
-	sz := z
-	p := ctx.SizePlus1()
-	if x == 0 {
-		sx = 1
-	} else if x == p.X {
-		sx = p.X - 1
-	}
-	if y == 0 {
-		sy = 1
-	} else if y == p.Y {
-		sy = p.Y - 1
-	}
-	if z == 0 {
-		sz = 1
-	} else if z == p.Z {
-		sz = p.Z - 1
-	}
+	var sx, sy, sz int32
+	ctx.EdgeInward(x, y, z, &sx, &sy, &sz)
 	cur := ctx.CurState
 	prv := ctx.PrevState()
 	nvars := ctx.NVars
@@ -389,6 +395,28 @@ func (ss *Sim) RunWrapEdges() {
 		return
 	}
 	WrapEdges()
+}
+
+// RunEdgesHalo brings the halo up to date for whichever edge mode is set. Two
+// places need it besides the end of a step: Init, and between the two passes
+// of a split kernel.
+//
+// Init zeroes the whole state and then the init function fills the INTERIOR,
+// so without this the halo is zero whatever the interior holds. Wrapping hid
+// that; damping did not, and any field with a nonzero background walked into a
+// step discontinuity of its full size on step one. The Higgs is the case that
+// matters: its vacuum is HiggsV, so a zero halo is the top of the Mexican hat
+// laid along the whole boundary, and it rolls off and rings the entire box.
+//
+// The split kernels need it because their second pass reads what the first
+// wrote at the NEIGHBORS, and on the boundary those live in the halo.
+func (ss *Sim) RunEdgesHalo() {
+	switch ss.Params.Edges {
+	case EdgesWrap:
+		WrapEdges()
+	case EdgesDamp:
+		RunEdgesOpenKernel(int(GetCtx(0).EdgesN()))
+	}
 }
 
 //gosl:end

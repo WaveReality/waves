@@ -143,7 +143,7 @@ const WaveCC float32 = 0.25
 // thirty steps in 3D, where the halo is a whole shell rather than two cells.
 func (ss *Sim) RunWaveC(n int) {
 	RunWaveCAKernel(n)
-	ss.RunWrapEdges()
+	ss.RunEdgesHalo()
 	RunWaveCBKernel(n)
 }
 

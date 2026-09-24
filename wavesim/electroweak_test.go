@@ -758,3 +758,94 @@ func discFreq(w float64) float64 { return 2 * math.Asin(w/2) }
 func lattice2(k float64) float32 {
 	return float32(4.0 * math.Sin(k/2) * math.Sin(k/2))
 }
+
+func ewDampSim(sz int32, edges Edges, init func(*Sim)) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = Electroweak
+	ss.Config.Size.Set(sz, sz, sz)
+	ss.ConfigSim()
+	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Edges = edges
+	ss.Params.Update()
+	ss.InitFunc = init
+	ss.Init()
+	return ss
+}
+
+// ewGaugeWave is how much WAVE is left in the gauge fields: the variance about
+// each variable's own mean, not its raw sum of squares.
+//
+// The mean has to come out, because a uniform offset is a k = 0 mode and a
+// k = 0 mode has zero group velocity. It cannot propagate to the boundary, so
+// no boundary condition of any kind can absorb it -- and PhotonPulse leaves a
+// small one behind, since a gaussian times a cosine does not integrate to
+// zero. Counting it makes a working boundary look 15% broken.
+//
+// The Higgs is left out for the same sort of reason: it sits at its vacuum
+// everywhere and would swamp everything else.
+func ewGaugeWave() float64 {
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	var tot float64
+	n := float64(c.Size.X * c.Size.Y * c.Size.Z)
+	for v := int(EWB0s); v <= int(EWW3Zv); v++ {
+		var sum, sq float64
+		for z := int32(1); z <= c.Size.Z; z++ {
+			for y := int32(1); y <= c.Size.Y; y++ {
+				for x := int32(1); x <= c.Size.X; x++ {
+					f := float64(State.Value(int(z), int(y), int(x), v, cur))
+					sum += f
+					sq += f * f
+				}
+			}
+		}
+		tot += sq - sum*sum/n // variance about the mean, times n
+	}
+	return tot
+}
+
+// TestElectroweakDamp: the damping boundary has to absorb the gauge fields
+// without disturbing the Higgs, which is the one equation here whose vacuum is
+// not zero.
+//
+// Damping the Higgs toward zero would lay a wall of restored symmetry along
+// the boundary, and a domain wall radiates. So it is copied from the interior
+// instead, which preserves its magnitude AND the SU(2) direction it happens to
+// be pointing -- that direction is a gauge choice, and pinning it would be a
+// gauge transformation with a gradient, which is a current.
+func TestElectroweakDamp(t *testing.T) {
+	const sz = 24
+	for _, edges := range []Edges{EdgesWrap, EdgesDamp} {
+		ss := ewDampSim(sz, edges, HiggsBroken)
+		v := float64(ss.Params.HiggsV)
+		var lo, hi = math.Inf(1), 0.0
+		for range 100 {
+			ss.StepRun()
+			c := GetCtx(0)
+			for _, p := range [][3]int{{1, 1, 1}, {sz / 2, sz / 2, sz / 2}, {sz, sz, sz}} {
+				m := math.Sqrt(float64(State.Value(p[2], p[1], p[0], int(EWHmag), int(c.CurState))))
+				lo, hi = math.Min(lo, m), math.Max(hi, m)
+			}
+		}
+		off := math.Max(math.Abs(lo-v), math.Abs(hi-v)) / v
+		if off > 0.01 {
+			t.Errorf("%v: the broken vacuum wandered to %.5f..%.5f against v = %.5f", edges, lo, hi, v)
+		}
+		t.Logf("%v: |Phi| holds at %.5f..%.5f, v = %.5f", edges, lo, hi, v)
+	}
+
+	ss := ewDampSim(48, EdgesDamp, PhotonPulse)
+	ss.StepRun()
+	g0 := ewGaugeWave()
+	for range 300 {
+		ss.StepRun()
+	}
+	left := ewGaugeWave() / g0
+	if left > 0.02 {
+		t.Errorf("photon pulse: %.2f%% of the gauge WAVE is still in the box", 100*left)
+	}
+	t.Logf("photon pulse: %.3f%% of the gauge wave left after 300 steps", 100*left)
+}

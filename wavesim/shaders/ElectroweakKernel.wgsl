@@ -741,7 +741,8 @@ fn EWGaugeStep(x: i32,y: i32,z: i32,cur: i32,prv: i32,v0: i32, csq: f32,j0: f32,
 			vc = f; // see EWWStep: the scalar potential is the gauge direction
 		}
 		StateSet(vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vv), u32(cur)));
-		StateSet(ps + vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
+		StateSet(ps + vc, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+		TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vs), u32(cur)));
 	}
 }
 

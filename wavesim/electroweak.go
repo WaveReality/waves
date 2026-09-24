@@ -783,6 +783,62 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32, noWav
 	}
 }
 
+// ElectroweakDampKernel damps the gauge fields at the boundary and leaves the
+// Higgs alone, which is the one thing this equation needs that none of the
+// others do.
+//
+// The gauge fields get Sommerfeld damping like Maxwell's, force setting the
+// velocity instead of adding to it. The Higgs cannot: it has a vacuum that is
+// not zero, and the reasons are set out where it is handled below.
+func ElectroweakDampKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	face := ctx.EdgeCoords(i, &x, &y, &z)
+	if face < 0 {
+		return
+	}
+	sz := ctx.SizePlus1() // exclude updating on edges
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	csq := Params[0].CSq
+
+	// the gauge fields: B, W1, W2, W3, each four potentials then four
+	// velocities, all damping toward zero as Maxwell's do
+	for g := range 4 {
+		base := int32(EWB0s) + int32(g)*8
+		for k := range 4 {
+			vr := base + int32(k)
+			pp := State.Value(int(z), int(y), int(x), int(vr), int(prv))
+			f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
+			v := csq * f // key damp: no +=
+			State.Set(v, int(z), int(y), int(x), int(vr+4), int(cur))
+			State.Set(pp+v, int(z), int(y), int(x), int(vr), int(cur))
+		}
+	}
+
+	// the Higgs is COPIED from the nearest interior cell, not damped.
+	//
+	// Damping it toward zero is wrong twice over. Its vacuum is |Phi| =
+	// HiggsV, so zero is a wall of restored symmetry -- and a domain wall
+	// radiates, which is the opposite of what a boundary is for. And which way
+	// the doublet points in SU(2) is a gauge choice, so pinning a direction
+	// there is a gauge transformation with a gradient, which is a current.
+	//
+	// Copying is blind to both: it carries whatever magnitude and whatever
+	// direction the interior has, so a uniform vacuum stays exactly uniform
+	// and above TempCrit, where HiggsV falls to zero, it damps to zero on its
+	// own with no special case. It is only zeroth-order open, so a Higgs wave
+	// arriving here is not fully absorbed; the gauge fields, which is what
+	// most configs are about, get the real treatment above.
+	var ix, iy, iz int32
+	ctx.EdgeInward(x, y, z, &ix, &iy, &iz)
+	for k := range 9 { // the four components, their four velocities, and Hmag
+		vr := int32(EWHsCa) + int32(k)
+		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(cur)), int(z), int(y), int(x), int(vr), int(cur))
+		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(prv)), int(z), int(y), int(x), int(vr), int(prv))
+	}
+}
+
 //gosl:end
 
 func (ss *Sim) ElectroweakConfig() {
