@@ -455,7 +455,17 @@ fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 const  EdgeDampWidth: f32 = 8;
 const  EdgeDampMax: f32   = 0.25;
 fn EdgeDampFactor(x: i32,y: i32,z: i32, sz: vec3<i32>) -> f32 {
-	var d = EdgeDampWidth;
+	var w = EdgeDampWidth;
+	if (sz.x > 1 && f32(sz.x)/4 < w) {
+		w = f32(sz.x) / 4;
+	}
+	if (sz.y > 1 && f32(sz.y)/4 < w) {
+		w = f32(sz.y) / 4;
+	}
+	if (sz.z > 1 && f32(sz.z)/4 < w) {
+		w = f32(sz.z) / 4;
+	}
+	var d = w;
 	if (sz.x > 1) {
 		var dx = f32(x);
 		if (f32(sz.x+1-x) < dx) {
@@ -483,10 +493,10 @@ fn EdgeDampFactor(x: i32,y: i32,z: i32, sz: vec3<i32>) -> f32 {
 			d = dz;
 		}
 	}
-	if (d >= EdgeDampWidth) {
+	if (d >= w) {
 		return f32(1);
 	}
-	var f = (EdgeDampWidth - d) / EdgeDampWidth;
+	var f = (w - d) / w;
 return 1 - EdgeDampMax*f*f;
 }
 

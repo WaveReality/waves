@@ -432,6 +432,51 @@ fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 }
 const  EdgeDampWidth: f32 = 8;
 const  EdgeDampMax: f32   = 0.25;
+fn EdgeDampFactor(x: i32,y: i32,z: i32, sz: vec3<i32>) -> f32 {
+	var w = EdgeDampWidth;
+	if (sz.x > 1 && f32(sz.x)/4 < w) {
+		w = f32(sz.x) / 4;
+	}
+	if (sz.y > 1 && f32(sz.y)/4 < w) {
+		w = f32(sz.y) / 4;
+	}
+	if (sz.z > 1 && f32(sz.z)/4 < w) {
+		w = f32(sz.z) / 4;
+	}
+	var d = w;
+	if (sz.x > 1) {
+		var dx = f32(x);
+		if (f32(sz.x+1-x) < dx) {
+			dx = f32(sz.x + 1 - x);
+		}
+		if (dx < d) {
+			d = dx;
+		}
+	}
+	if (sz.y > 1) {
+		var dy = f32(y);
+		if (f32(sz.y+1-y) < dy) {
+			dy = f32(sz.y + 1 - y);
+		}
+		if (dy < d) {
+			d = dy;
+		}
+	}
+	if (sz.z > 1) {
+		var dz = f32(z);
+		if (f32(sz.z+1-z) < dz) {
+			dz = f32(sz.z + 1 - z);
+		}
+		if (dz < d) {
+			d = dz;
+		}
+	}
+	if (d >= w) {
+		return f32(1);
+	}
+	var f = (w - d) / w;
+return 1 - EdgeDampMax*f*f;
+}
 
 //////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
@@ -577,6 +622,14 @@ fn SchrodingerBKernel(i: u32) { //gosl:kernel
 	}
 	var velB = hm*lap - voh*posA;
 	var posB = pposB + velB;
+	if (Params[0].Edges == EdgesDamp) {
+		var df = EdgeDampFactor(x, y, z, vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z));
+		posA *= df;
+		posB *= df;
+		velB *= df;
+		StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(cur)));
+		StateSet(df * StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(cur))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(cur)));
+	}
 	StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(cur)));
 	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));

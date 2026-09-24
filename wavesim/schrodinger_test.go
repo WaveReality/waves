@@ -148,7 +148,10 @@ func TestSchrodingerCoherent(t *testing.T) {
 // TestSchrodingerGroupVel: a free packet must travel at the de Broglie group
 // velocity hbar k / m, with the lattice correction k -> sin(k).
 func TestSchrodingerGroupVel(t *testing.T) {
-	sz := int32(48)
+	// big enough that the packet's tails stay out of the absorbing layer that
+	// FreePacket's damped edges install, which would eat one side of it and
+	// drag the centroid
+	sz := int32(96)
 	ss := scSim(sz, FreePacket)
 	for range 4 { // CabMag is written by the kernel, so let it fill in
 		scStep(ss)

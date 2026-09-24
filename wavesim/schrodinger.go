@@ -94,6 +94,20 @@ func SchrodingerBKernel(i uint32) { //gosl:kernel
 	}
 	velB := hm*lap - voh*posA
 	posB := pposB + velB
+	// the absorbing layer, as WaveCKernel does it and for the same reason:
+	// this equation is first order, so it has no acceleration for Sommerfeld
+	// damping to leave out, and it is dispersive, so no single speed for a
+	// boundary to be transparent to. An open halo alone leaves 9% of a packet
+	// in the box; with the layer it is 0.05%. Applied here in the b pass
+	// because that is where both halves are in hand. See EdgeDampFactor.
+	if Params[0].Edges == EdgesDamp {
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		posA *= df
+		posB *= df
+		velB *= df
+		State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+		State.Set(df*State.Value(int(z), int(y), int(x), int(CabAv), int(cur)), int(z), int(y), int(x), int(CabAv), int(cur))
+	}
 	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
 	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 

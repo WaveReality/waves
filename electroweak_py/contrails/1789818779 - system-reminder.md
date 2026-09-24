@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-24 11:00:38
+- **Last Message:** 2026-09-24 11:43:43
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -1020,7 +1020,7 @@ Right — let's build it. Let me check what's available first.
   numpy 2.5.3
   matplotlib 3.11.2
   ```
-- **mcp__ccd_session__mark_chapter**: `summary, title`
+- **mcp__ccd_session__mark_chapter**: `title, summary`
 - **Write**: `Created `/Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py``
   ```
   File created successfully at: /Users/oreilly/Library/Application Support/Claude/scratch-workspaces/c96e154b-9b88-4167-ac69-883556e884c2/e282c857-eff4-400f-a680-03d505db5460/scratch-2026-09-19-ecf668/higgs_gauge.py (file state is current in your context — no need to Read it back)
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -20719,7 +20719,7 @@ I'll search, and I have a new theory from your results.
 <details>
 <summary>Tool Calls (3)</summary>
 
-- **ToolSearch**: `max_results, query`
+- **ToolSearch**: `query, max_results`
 - **WebSearch**: `Search `Claude desktop app inline LaTeX math not rendering raw dollar signs``
 - **WebSearch**: `Search `Claude Code markdown KaTeX inline math rendering bug github issue``
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -24925,7 +24925,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -26662,7 +26662,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -62905,44 +62905,480 @@ Too gentle and the wave crosses the layer and hits the far wall; too fierce and 
 
 One behaviour change to be aware of: `Dirac` with `EdgesDamp` previously ran only `MaxwellDampKernel`, leaving the Dirac variables' halo at zero — a hard wall. It now damps properly, so `DiracHydrogen` and `SpinInPotential` will lose their outer tails rather than reflecting them. All their tests still pass, but the numbers may shift slightly from what you had.
 
-All four `// claude todo` notes resolved. 68 tests pass, everything builds and generates clean.
+## 🧑 User - 2026-09-24 11:28:27
+
+I just did some edits on your code, documented in the last couple of commit messages. Please verify that Schrodinger should also get the EdgesOpenKernel. Also, should it also have the the interior border damping like Weyl and the rest?
+
+## 🤖 Assistant - 2026-09-24 11:28:46
+
+*Model: claude-opus-5*
+
+<thinking>
+Schrödinger is first-order in time just like WaveC, which is essentially Schrödinger's equation with C substituted for ħ/2m -- and I already gave WaveC the EdgesOpenKernel plus EdgeDampFactor treatment, achieving 0.053% reflection. So Schrödinger should get the identical treatment.
+
+I notice the EdgesDamp switch currently has Schrödinger's case commented out with a note saying there's no damping for it, yet FreePacket sets EdgesDamp anyway -- meaning it does nothing and the packet hits a hard wall despite documentation claiming it should leave rather than bounce. That's a real bug I need to verify by measuring Schrödinger's reflection with and without the fix, so let me check the recent commits first.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && git log --oneline -3; echo "===="; git log -2 --format="%B" | head -30``
+  ```
+  bfad016 oops forgot generate!
+  fe50a99 Claude's damping solution for first-order waves: requires interior damping -- can't just do it at the edges as you can with second-order Sommerfield strategy. I reorganized the Equations enum and switch statements to use a cannonical ordering, where everything after Maxwell couples to Maxwell. added conditionality to running the Maxwell damping kernel.
+  925fcca final few fixes for view init at startup and also reset all view params to default when SetVar(-1) is called, so it always starts fresh
+  ====
+  oops forgot generate!
+  
+  Claude's damping solution for first-order waves: requires interior damping -- can't just do it at the edges as you can with second-order Sommerfield strategy. I reorganized the Equations enum and switch statements to use a cannonical ordering, where everything after Maxwell couples to Maxwell. added conditionality to running the Maxwell damping kernel.
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/case EdgesDamp:/,/^\t\t\t}/p' wavesim/sim.go; echo "==== Schrodinger damp mentions:"; grep -rn "Schrodinger" wavesim/sim.go | head``
+  ```
+  		case EdgesDamp:
+  			switch ss.Config.Equation {
+  			case Wave:
+  				RunWaveDampKernel(ne)
+  			case WaveC, WaveCDir:
+  				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel
+  			case KleinGordon:
+  				RunKleinGordonDampKernel(ne)
+  			case Schrodinger:
+  				RunEdgesOpenKernel(ne)
+  			case Maxwell:
+  				RunMaxwellDampKernel(ne)
+  			case KleinGordonC:
+  				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+  					RunMaxwellDampKernel(ne)
+  				}
+  				RunKleinGordonCDampKernel(ne)
+  			case Dirac:
+  				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+  					RunMaxwellDampKernel(ne)
+  ...
+  ```
+
+</details>
+
+<thinking>
+I've already added the open kernel case for Schrödinger, but now I'm considering whether it should also inherit the interior EdgeDampFactor — and the answer is clearly yes, since WaveC and Schrödinger share the same underlying equation and Visscher integration scheme, just with a differently named coefficient.
+
+Rather than reasoning by analogy alone, I want to measure this empirically: WaveC without the damping layer showed 7.8% reflection, while adding the layer dropped it to 0.053%, so Schrödinger with only the open halo should land near that same 7.8% baseline. I should test Schrödinger both as-is and with the layer added to confirm.
+
+I'm also noticing a flagged todo about needing a damp kernel for Electroweak, but since the user only asked about Schrödinger, I'll mention it briefly without diving in. I'm now checking how I applied the damping in WaveC's B kernel, where it multiplies both state values by the damping factor before writing them back, to make sure I replicate that same pattern correctly in Schrödinger's A and B kernels.
+
+For Schrödinger, I realize the structure differs slightly since it tracks both position and velocity state variables, plus a magnitude value computed from position — so I need to damp position and velocity for consistency, and make sure the damping happens before the magnitude is computed, otherwise the magnitude would be inconsistent with the damped values.
+
+The magnitude uses posA damped and pposB undamped, so it gets roughly df²-damped overall, which seems close enough. I should implement this and measure — first establishing a baseline with the current open-halo state, then adding the layer and comparing. I'll write a scratch test for Schrödinger reflection using FreePacket's EdgesDamp setting, noting that SchrodingerConfig normally uses EdgesFixed.
+
+
+</thinking>
+
+You already wired the open kernel. Let me measure whether that alone is enough.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+)
+
+func TestScratchSchrodDamp(t *testing.T) {
+	const sz = 48
+	for _, tc := range []struct {
+		eq   Equations
+		name string
+		init func(*Sim)
+	}{
+		{Schrodinger, "Schrodinger (FreePacket)", FreePacket},
+		{WaveC, "WaveC (same equation)", nil},
+	} {
+		ss := dampSim(tc.eq, sz, tc.init)
+		if ss.Params.Edges != EdgesDamp {
+			t.Fatalf("%s: edges are %v", tc.name, ss.Params.Edges)
+		}
+		ss.StepRun()
+		t0 := dampTot(ss)
+		for range 300 {
+			ss.StepRun()
+		}
+		fmt.Printf("%-26s %.3f%% left after 300 steps\n", tc.name, 100*dampTot(ss)/t0)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchSchrodDamp -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  Schrodinger (FreePacket)   9.242% left after 300 steps
+  WaveC (same equation)      0.053% left after 300 steps
+  --- PASS: TestScratchSchrodDamp (4.41s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	4.428s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With only the open halo, Schrödinger leaves 9.2%, nearly matching WaveC's 7.8% before its layer was added — WaveC with the layer dropped to 0.053%. So Schrödinger clearly needs that interior layer too; I'm going to check the current kernel to figure out where to add it.
+
+
+</thinking>
+
+Definitive: 9.2% vs WaveC's 0.053% — same equation, and the difference is the layer. Adding it.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n '/^func SchrodingerBKernel/,/^}/p' wavesim/schrodinger.goal | tail -22``
+  ```
+  	hbar := Params[0].Hbar
+  	hm := Params[0].HSqOver2M / hbar
+  	voh := State[z, y, x, CabV, prv] / hbar
+  
+  	var lap float32
+  	if Params[0].ThreeD.IsTrue() {
+  		lap = Laplacian19(x, y, z, int32(CabAs), cur, posA)
+  	} else {
+  		lap = Laplacian1D(x, y, z, int32(CabAs), cur, posA)
+  	}
+  	velB := hm*lap - voh*posA
+  	posB := pposB + velB
+  	State[z, y, x, CabBv, cur] = velB
+  	State[z, y, x, CabBs, cur] = posB
+  
+  	// the norm a^2 + b^2 is NOT what a staggered scheme conserves: a and b sit
+  	// half a step apart, so squaring b compares it with itself at the wrong
+  	// time and the total ripples at the level rate. What is exactly conserved
+  	// is a^2 + b(t-1/2) b(t+1/2), and this kernel holds all three.
+  	State[z, y, x, CabMag, cur] = posA*posA + pposB*posB
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/schrodinger.goal'; s=open(p).read()
+old = """	velB := hm*lap - voh*posA
+	posB := pposB + velB
+	State[z, y, x, CabBv, cur] = velB
+	State[z, y, x, CabBs, cur] = posB"""
+new = """	velB := hm*lap - voh*posA
+	posB := pposB + velB
+	// the absorbing layer, as WaveCKernel does it and for the same reason:
+	// this equation is first order, so it has no acceleration for Sommerfeld
+	// damping to leave out, and it is dispersive, so no single speed for a
+	// boundary to be transparent to. An open halo alone leaves 9% of a packet
+	// in the box; with the layer it is 0.05%. Applied here in the b pass
+	// because that is where both halves are in hand. See EdgeDampFactor.
+	if Params[0].Edges == EdgesDamp {
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		posA *= df
+		posB *= df
+		velB *= df
+		State[z, y, x, CabAs, cur] = posA
+		State[z, y, x, CabAv, cur] = df * State[z, y, x, CabAv, cur]
+	}
+	State[z, y, x, CabBv, cur] = velB
+	State[z, y, x, CabBs, cur] = posB"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("layer added")
+PY
+cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./wavesim/ 2>&1|grep -ci "error:"; go test ./wavesim/ -run TestScratchSchrodDamp -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  layer added
+  goal build succeeded
+  0
+  # github.com/WaveReality/waves/wavesim.test
+  Schrodinger (FreePacket)   0.064% left after 300 steps
+  WaveC (same equation)      0.053% left after 300 steps
+  --- PASS: TestScratchSchrodDamp (4.49s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	4.509s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Schrödinger now matches WaveC at 0.064% vs 0.053%, so I should add it to the TestEdgesDamp table and rerun the full suite to confirm the other Schrödinger tests, which use EdgesFixed by default, remain unaffected. I also want to check that "claude todo: need EW damp kernel!?" comment the user left, since they specifically asked about Schrödinger.
+
+On the electroweak damp question, the subtlety is that electroweak writes A0s..AZs itself as the mixing of W³ and B, so a MaxwellDampKernel would fight it — the same reason StepRun skips MaxwellKernel for it. A real EW damp kernel would need to damp the gauge fields plus the Higgs, but since the Higgs has a nonzero VEV, damping toward zero at the boundary is wrong — it would need to damp toward the vacuum instead. That's worth flagging as a genuine subtlety rather than guessing. I'll add Schrödinger to the test, run everything, and report back.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && rm -f wavesim/zz_scratch_test.go && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/edges_test.go'; s=open(p).read()
+old = """		{WaveCDir, "WaveCDir", nil},"""
+new = """		{Schrodinger, "Schrodinger", FreePacket},
+		{WaveCDir, "WaveCDir", nil},"""
+assert old in s; s=s.replace(old,new,1)
+s=s.replace("""// layer several cells deep. On its own the open halo leaves nearly half a
+// Weyl packet in the box, so the layer is doing most of the work.""",
+"""// layer several cells deep. On its own the open halo leaves nearly half a
+// Weyl packet in the box, and 9% of a Schrodinger one, so the layer is doing
+// most of the work in both.""",1)
+open(p,'w').write(s); print("test extended")
+PY
+gofmt -w wavesim/edges_test.go && cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./... 2>&1|grep -ci "error:"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -v -timeout 900s > /tmp/ws8.txt 2>&1; echo "exit=$?"; grep -cE "^--- PASS" /tmp/ws8.txt; grep -E "^--- FAIL" /tmp/ws8.txt; echo "(none = clean)"; grep -E "left after 300" /tmp/ws8.txt``
+  ```
+  test extended
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  exit=1
+  67
+  --- FAIL: TestSchrodingerGroupVel (0.23s)
+  (none = clean)
+      edges_test.go:96: Wave          0.189% left after 300 steps
+      edges_test.go:96: KleinGordonC  0.006% left after 300 steps
+      edges_test.go:96: Dirac         0.004% left after 300 steps
+      edges_test.go:96: Schrodinger   0.064% left after 300 steps
+      edges_test.go:96: WaveCDir      0.070% left after 300 steps
+      edges_test.go:96: WaveC         0.053% left after 300 steps
+      edges_test.go:96: Weyl          0.090% left after 300 steps
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -A6 "FAIL: TestSchrodingerGroupVel" /tmp/ws8.txt | head -8; echo "==== the config it uses:"; sed -n '/^func FreePacket/,/^}/p' wavesim/schrodinger.goal``
+  ```
+  --- FAIL: TestSchrodingerGroupVel (0.23s)
+  === RUN   TestSchrodingerBigBox
+      schrodinger_test.go:203: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by 6.24e-06 (0.000%)
+  --- PASS: TestSchrodingerBigBox (5.48s)
+  === RUN   TestSchrodingerHydrogenP
+      schrodinger_test.go:238: lobe peak 0.13533 at dz = +-5, node stays under 0.00154 (1.139% of peak) over 1000 steps
+  --- PASS: TestSchrodingerHydrogenP (6.45s)
+  ==== the config it uses:
+  func FreePacket(ss *Sim) {
+  	ss.Params.Edges = EdgesDamp // let it leave rather than bounce
+  	ss.Params.Update()
+  	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+  }
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -B2 -A6 "schrodinger_test.go:1[5-9]" /tmp/ws8.txt | head -14``
+  ```
+  --- PASS: TestSchrodingerCoherent (3.88s)
+  === RUN   TestSchrodingerGroupVel
+      schrodinger_test.go:165: group velocity 0.31784, want 0.35355 (hbar sin(k) / m)
+      schrodinger_test.go:171: StatGroupVel 0.30533, but the packet moved at 0.31784
+      schrodinger_test.go:173: group velocity 0.31784, hbar sin(k) / m = 0.35355, stat 0.30533
+  --- FAIL: TestSchrodingerGroupVel (0.23s)
+  === RUN   TestSchrodingerBigBox
+      schrodinger_test.go:203: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by 6.24e-06 (0.000%)
+  --- PASS: TestSchrodingerBigBox (5.48s)
+  === RUN   TestSchrodingerHydrogenP
+      schrodinger_test.go:238: lobe peak 0.13533 at dz = +-5, node stays under 0.00154 (1.139% of peak) over 1000 steps
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm realizing the test setup itself is flawed: with a packet width of 12, its tails already extend into the 8-cell absorbing layer at the start, so the layer asymmetrically attenuates the wavefunction and skews the measured centroid velocity, explaining the discrepancy between 0.318 and 0.348.
+
+I see two clean fixes: either enlarge the box so the packet's significant amplitude stays clear of the boundary, or switch to periodic wrapping since the test is really about the dispersion relation, not boundary absorption. Checking the numbers, a 64-cell box pushes the packet's tail amplitude at the boundary down to about 7e-4, much better than the 48-cell case — but using EdgesWrap seems like the more robust fix since the packet only travels about 10 cells over the test's 30 steps.
+
+I'm weighing whether overriding EdgesWrap after Init would actually take effect given how scStep and RunEdges interact, versus just bumping the box size to 96³, which is still cheap enough (~60M cell-ops) to run fast in the test.
+
+Actually, a fixed 8-cell absorbing layer is disproportionately large in a small 48³ box — it should probably scale with the domain, capping the width at something like a quarter of the smallest active dimension rather than a flat constant.
+
+Testing this shows scaling isn't the real fix here, though: even with a 48/4=12 cap, the width stays at 8, and a packet centered at 24 with width 12 still has meaningful amplitude bleeding into the damped edge cells, biasing the centroid. So the actual fix is to just use a larger test box, since the `FreePacket` default is fine for realistic GUI sizes like 100³+.
+
+Actually, a 16³ box with an 8-deep layer would damp everything — that's a real footgun worth guarding against. I'll add the cap since it's clearly the right call, and confirm TestEdgesDamp still passes afterward.
+
+
+</thinking>
+
+The layer is eating the packet's tails in that test's 48³ box. Two things to fix.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+# cap the layer so it cannot swallow a small box
+p=base+'wavesim/funcs.goal'; s=open(p).read()
+old = """func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
+	d := EdgeDampWidth"""
+new = """func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
+	// never more than a quarter of the smallest active dimension: eight cells
+	// is a sensible layer in a big box and the whole of a small one
+	w := EdgeDampWidth
+	if sz.X > 1 && float32(sz.X)/4 < w {
+		w = float32(sz.X) / 4
+	}
+	if sz.Y > 1 && float32(sz.Y)/4 < w {
+		w = float32(sz.Y) / 4
+	}
+	if sz.Z > 1 && float32(sz.Z)/4 < w {
+		w = float32(sz.Z) / 4
+	}
+	d := w"""
+assert old in s; s=s.replace(old,new,1)
+old = """	if d >= EdgeDampWidth {
+		return 1
+	}
+	f := (EdgeDampWidth - d) / EdgeDampWidth
+	return 1 - EdgeDampMax*f*f"""
+new = """	if d >= w {
+		return 1
+	}
+	f := (w - d) / w
+	return 1 - EdgeDampMax*f*f"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+# the group velocity test measures bulk dispersion: keep the packet out of the layer
+p=base+'wavesim/schrodinger_test.go'; s=open(p).read()
+old = """func TestSchrodingerGroupVel(t *testing.T) {
+	sz := int32(48)"""
+new = """func TestSchrodingerGroupVel(t *testing.T) {
+	// big enough that the packet's tails stay out of the absorbing layer that
+	// FreePacket's damped edges install, which would eat one side of it and
+	// drag the centroid
+	sz := int32(96)"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("ok")
+PY
+cd wavesim && goal build 2>&1|tail -1; cd .. && go generate ./wavesim/ 2>&1|grep -ci "error:"; go test ./wavesim/ -run "TestSchrodingerGroupVel|TestEdgesDamp" -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  ok
+  goal build succeeded
+  0
+  # github.com/WaveReality/waves/wavesim.test
+      edges_test.go:96: Wave          0.189% left after 300 steps
+      edges_test.go:96: KleinGordonC  0.006% left after 300 steps
+      edges_test.go:96: Dirac         0.004% left after 300 steps
+      edges_test.go:96: Schrodinger   0.064% left after 300 steps
+      edges_test.go:96: WaveCDir      0.070% left after 300 steps
+      edges_test.go:96: WaveC         0.053% left after 300 steps
+      edges_test.go:96: Weyl          0.090% left after 300 steps
+  --- PASS: TestEdgesDamp (39.68s)
+      schrodinger_test.go:176: group velocity 0.35151, hbar sin(k) / m = 0.35355, stat 0.35151
+  --- PASS: TestSchrodingerGroupVel (2.02s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	41.725s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The group velocity test now comes in at 0.35151 versus a target of 0.35355 — only 0.6% off, better than the old 0.34769, so the larger box improved accuracy too. Now let me run the full suite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && go generate ./... 2>&1|grep -ci "error:"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -v -timeout 900s > /tmp/ws9.txt 2>&1; echo "exit=$?"; grep -cE "^--- PASS" /tmp/ws9.txt; grep -E "^--- FAIL" /tmp/ws9.txt; echo "(none = clean)"``
+  ```
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  exit=0
+  68
+  (none = clean)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Verified both, and the answer to the second is yes. 68 tests pass, everything builds clean.
+
+## Schrödinger needed both, and the open kernel alone wasn't enough
+
+The open halo you wired in was right but only half of it:
 
 ```
-Wave          0.189% left after 300 steps    (existing Sommerfeld, for reference)
-KleinGordonC  0.006%                          (existing)
-Dirac         0.004%    <- new
-WaveCDir      0.070%    <- new
-WaveC         0.053%    <- new
-Weyl          0.090%    <- new
+Schrodinger, open halo only:      9.242% left after 300 steps
+WaveC, open halo + layer:         0.053%
 ```
 
-## Two mechanisms, because one doesn't fit
+Which is decisive, because **`WaveC` *is* Schrödinger** — same Laplacian-driving-velocity on a complex field, same Visscher two-kernel integration, differing only in whether the coefficient is called `C` or `ħ/2m`. Before I added the layer, WaveC measured 7.8%; Schrödinger's 9.2% is the same number. There's no mechanism by which one would need the layer and the other wouldn't.
 
-**`DiracDampKernel`** follows the house pattern exactly — Sommerfeld damping in the boundary cell, force setting the velocity instead of adding to it, over four components. Mass and spin term both dropped at the boundary, as `KleinGordonCDampKernel` already does with its mass: the only question there is "let whatever's arriving carry on out at c", and both of those fight it. It came out best of the lot at 0.004%.
+So it gets the layer too, in `SchrodingerBKernel` — the b pass, because that's where both halves are in hand. Also damps `CabAv`, which `WaveC` doesn't have to worry about since it has no velocity variables:
 
-**The first-order three can't use that** — Sommerfeld needs an acceleration to leave out, and their whole update is already a velocity. So they get a different thing, in two parts:
+```
+Schrodinger   0.064% left after 300 steps
+```
 
-- **`EdgesOpenKernel`** (generic, in `edges.goal`): writes the nearest interior value into the halo so the boundary isn't a wall.
-- **`EdgeDampFactor`** (in `funcs.goal`): an absorbing layer 8 cells deep that the kernels apply to their own output when `Edges == EdgesDamp`.
+Right alongside WaveC. `Schrodinger` is now in `TestEdgesDamp` with the rest, so it can't regress.
 
-## Worth knowing: the open halo alone is nearly useless
+## A footgun the failure exposed
 
-My first version was just the halo fix, and it reflected badly — **47% of a WaveCDir packet and 56% of a Weyl one came back.** One cell cannot absorb a wave. I tried proper linear extrapolation instead of copying, expecting the full one-sided difference to help, and it was *worse* (Weyl went to 77%) — I assume the leapfrog's parasitic mode converting at the boundary, though I didn't chase it.
+`TestSchrodingerGroupVel` broke, and it was worth breaking. `FreePacket` runs in a 48³ box with an 8-cell layer on each side — so a third of the domain is absorbing, and the packet's tails were sitting in it from step one, getting eaten asymmetrically and dragging the centroid (0.318 measured against 0.354 predicted).
 
-The layer is what actually does the work, and its strength is not monotonic. Measured on a Weyl packet into 48³:
+Two fixes:
 
-| `EdgeDampMax` | reflected |
-|---|---|
-| 0.03 | 10.6% |
-| 0.06 | 3.9% |
-| 0.12 | 0.69% |
-| 0.2 | 0.12% |
-| 0.3 | 0.11% |
-| 0.5 | 0.26% ← rising again |
+- **`EdgeDampFactor` now caps the layer at a quarter of the smallest active dimension.** Eight cells is a sensible layer in a big box and the *entirety* of a small one — a 16³ box would have been absorbing everywhere. No effect at 48³ or above, so the reflection numbers are unchanged.
+- The group-velocity test moved to 96³ so the packet stays clear of the layer. It reads **0.35151 against 0.35355 predicted** — 0.6%, better than the 0.34769 it managed before, since the bigger box also cuts the wrap contamination.
 
-Too gentle and the wave crosses the layer and hits the far wall; too fierce and **the layer's own edge becomes a wall**. 0.25 sits near the bottom. Those numbers are in the constant's doc comment so the next person doesn't have to rediscover the curve.
+Worth knowing generally: any measurement near a damped boundary is now measuring the layer as much as the physics.
 
-`TestEdgesDamp` fires a packet into the boundary in all six equations and fails any that keeps more than 1%.
+## On your `// claude todo: need EW damp kernel!?`
 
-One behaviour change to be aware of: `Dirac` with `EdgesDamp` previously ran only `MaxwellDampKernel`, leaving the Dirac variables' halo at zero — a hard wall. It now damps properly, so `DiracHydrogen` and `SpinInPotential` will lose their outer tails rather than reflecting them. All their tests still pass, but the numbers may shift slightly from what you had.
+I left that one alone — it's a harder question than the others and I didn't want to guess. Two reasons it isn't just another `MaxwellDampKernel` call:
+
+`ElectroweakKernel` writes `A0s..AZs` itself as the weak-mixing rotation of W³ and B, which is why `StepRun` doesn't run `MaxwellKernel` for it — damping those directly would fight the same way.
+
+And more awkwardly, **the Higgs has a vacuum expectation value**. Every damping scheme here attenuates toward zero, which at an electroweak boundary means driving the field to the symmetric point and creating a domain wall right where you wanted quiet. A real EW absorber would have to damp the gauge fields toward zero but the Higgs toward *v*, and above T_c those are the same thing while below they aren't.
+
+Happy to build it if you want — I'd want to check what it does to `HiggsBroken` before trusting it.
+
+Verified both, and the answer to the second is yes. 68 tests pass, everything builds clean.
+
+## Schrödinger needed both, and the open kernel alone wasn't enough
+
+The open halo you wired in was right but only half of it:
+
+```
+Schrodinger, open halo only:      9.242% left after 300 steps
+WaveC, open halo + layer:         0.053%
+```
+
+Which is decisive, because **`WaveC` *is* Schrödinger** — same Laplacian-driving-velocity on a complex field, same Visscher two-kernel integration, differing only in whether the coefficient is called `C` or `ħ/2m`. Before I added the layer, WaveC measured 7.8%; Schrödinger's 9.2% is the same number. There's no mechanism by which one would need the layer and the other wouldn't.
+
+So it gets the layer too, in `SchrodingerBKernel` — the b pass, because that's where both halves are in hand. Also damps `CabAv`, which `WaveC` doesn't have to worry about since it has no velocity variables:
+
+```
+Schrodinger   0.064% left after 300 steps
+```
+
+Right alongside WaveC. `Schrodinger` is now in `TestEdgesDamp` with the rest, so it can't regress.
+
+## A footgun the failure exposed
+
+`TestSchrodingerGroupVel` broke, and it was worth breaking. `FreePacket` runs in a 48³ box with an 8-cell layer on each side — so a third of the domain is absorbing, and the packet's tails were sitting in it from step one, getting eaten asymmetrically and dragging the centroid (0.318 measured against 0.354 predicted).
+
+Two fixes:
+
+- **`EdgeDampFactor` now caps the layer at a quarter of the smallest active dimension.** Eight cells is a sensible layer in a big box and the *entirety* of a small one — a 16³ box would have been absorbing everywhere. No effect at 48³ or above, so the reflection numbers are unchanged.
+- The group-velocity test moved to 96³ so the packet stays clear of the layer. It reads **0.35151 against 0.35355 predicted** — 0.6%, better than the 0.34769 it managed before, since the bigger box also cuts the wrap contamination.
+
+Worth knowing generally: any measurement near a damped boundary is now measuring the layer as much as the physics.
+
+## On your `// claude todo: need EW damp kernel!?`
+
+I left that one alone — it's a harder question than the others and I didn't want to guess. Two reasons it isn't just another `MaxwellDampKernel` call:
+
+`ElectroweakKernel` writes `A0s..AZs` itself as the weak-mixing rotation of W³ and B, which is why `StepRun` doesn't run `MaxwellKernel` for it — damping those directly would fight the same way.
+
+And more awkwardly, **the Higgs has a vacuum expectation value**. Every damping scheme here attenuates toward zero, which at an electroweak boundary means driving the field to the symmetric point and creating a domain wall right where you wanted quiet. A real EW absorber would have to damp the gauge fields toward zero but the Higgs toward *v*, and above T_c those are the same thing while below they aren't.
+
+Happy to build it if you want — I'd want to check what it does to `HiggsBroken` before trusting it.
 

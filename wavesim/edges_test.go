@@ -59,7 +59,8 @@ func dampTot(ss *Sim) float64 {
 // adding to it. The first-order ones cannot: they have no acceleration to
 // leave out, so they use an open halo plus [EdgeDampFactor], an absorbing
 // layer several cells deep. On its own the open halo leaves nearly half a
-// Weyl packet in the box, so the layer is doing most of the work.
+// Weyl packet in the box, and 9% of a Schrodinger one, so the layer is doing
+// most of the work in both.
 func TestEdgesDamp(t *testing.T) {
 	const sz = 48
 	for _, tc := range []struct {
@@ -72,6 +73,7 @@ func TestEdgesDamp(t *testing.T) {
 		{Dirac, "Dirac", func(s *Sim) {
 			s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
 		}},
+		{Schrodinger, "Schrodinger", FreePacket},
 		{WaveCDir, "WaveCDir", nil},
 		{WaveC, "WaveC", nil},
 		{Weyl, "Weyl", nil},

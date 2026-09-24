@@ -404,7 +404,19 @@ const (
 //
 // Dimensions of size 1 are skipped: a 1D run is not near a boundary in Y.
 func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
-	d := EdgeDampWidth
+	// never more than a quarter of the smallest active dimension: eight cells
+	// is a sensible layer in a big box and the whole of a small one
+	w := EdgeDampWidth
+	if sz.X > 1 && float32(sz.X)/4 < w {
+		w = float32(sz.X) / 4
+	}
+	if sz.Y > 1 && float32(sz.Y)/4 < w {
+		w = float32(sz.Y) / 4
+	}
+	if sz.Z > 1 && float32(sz.Z)/4 < w {
+		w = float32(sz.Z) / 4
+	}
+	d := w
 	if sz.X > 1 {
 		dx := float32(x)
 		if float32(sz.X+1-x) < dx {
@@ -432,10 +444,10 @@ func EdgeDampFactor(x, y, z int32, sz math32.Vector3i) float32 {
 			d = dz
 		}
 	}
-	if d >= EdgeDampWidth {
+	if d >= w {
 		return 1
 	}
-	f := (EdgeDampWidth - d) / EdgeDampWidth
+	f := (w - d) / w
 	return 1 - EdgeDampMax*f*f
 }
 
