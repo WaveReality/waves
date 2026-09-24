@@ -58,10 +58,15 @@ func WaveKernel(i uint32) { //gosl:kernel
 		force = Laplacian1D(x, y, z, int32(WavePos), prv, ppos)
 	}
 	force += vpot * ppos
-	if Params[0].Dispersion.IsTrue() {
-		force -= Params[0].MOverHSq * ppos // this makes it KleinGordon
+	// the ONLY difference: does the Laplacian drive the acceleration, or the
+	// velocity? Same term, same coefficient, one derivative apart -- and that
+	// is the difference between a wave and diffusion. See Params.Diffusion.
+	var vel float32
+	if Params[0].Diffusion.IsTrue() {
+		vel = Params[0].CSq * force
+	} else {
+		vel = pvel + Params[0].CSq*force
 	}
-	vel := pvel + Params[0].CSq*force
 	pos := ppos + vel
 
 	if Params[0].Energy.IsTrue() {
@@ -559,7 +564,7 @@ func WavePulse(ss *Sim) {
 }
 
 // WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Mass", "Dispersion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
 
 // Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
 func Wave1DViewAll(view *View) {

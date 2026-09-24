@@ -7,6 +7,8 @@ package wavesim
 import (
 	"math"
 	"testing"
+
+	"cogentcore.org/core/math32"
 )
 
 // wvSim builds Wave or KleinGordon on the same state with the same config, in
@@ -106,4 +108,100 @@ func TestWaveDispersion(t *testing.T) {
 	t.Logf("mass costs %.4f c at wavelength %.0f and %.4f c at wavelength %.0f: the LONG waves are the ones it slows",
 		speed[Wave][short]-speed[KleinGordon][short], short,
 		speed[Wave][long]-speed[KleinGordon][long], long)
+}
+
+// wvMode puts a single pure sine mode of the given wavelength into an
+// equation, in 1D with wrapped edges, so its one lattice wavenumber can be
+// watched on its own.
+func wvMode(eq Equations, wl float32) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(256, 1, 1)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	if eq == Wave {
+		ss.Params.Diffusion.SetBool(true)
+	}
+	ss.Params.Update()
+	ss.InitFunc = func(s *Sim) {
+		if eq == Wave {
+			s.Sine(WavePos, math32.X, wl, 0, 1, 0)
+		} else {
+			s.Sine(WaveCa, math32.X, wl, 0, 1, 0)
+		}
+	}
+	ss.Init()
+	return ss
+}
+
+// TestDiffusion is the last corner of the picture, and the one that says what
+// the i in a quantum wave is for.
+//
+// Params.Diffusion moves the Laplacian from the acceleration to the velocity
+// and nothing else: same term, same C^2. WaveC is that same first-order
+// equation with an i in front. So a mode of wavenumber k DECAYS at C^2 khat^2
+// under diffusion and ROTATES at C^2 khat^2 under WaveC -- the same rate, and
+// the i is the entire difference between heat spreading out and a wave
+// propagating.
+func TestDiffusion(t *testing.T) {
+	const wl float32 = 32
+	k := 2 * math.Pi / float64(wl)
+	kh2 := 4 * math.Sin(k/2) * math.Sin(k/2) // the 1D lattice khat^2
+	at := func(v int) float64 {
+		return float64(State.Value(1, 1, 9, v, int(GetCtx(0).CurState)))
+	}
+
+	d := wvMode(Wave, wl)
+	want := float64(d.Params.CSq) * kh2
+	a0 := at(int(WavePos))
+	const n = 60
+	for range n {
+		ctx := GetCtx(0)
+		ctx.StepInc()
+		RunWaveKernel(int(ctx.Size.X))
+		RunEdgesWrapKernel(int(ctx.EdgesN()))
+	}
+	a1 := at(int(WavePos))
+	if a1 >= a0 {
+		t.Fatalf("with Diffusion on the mode should decay, went %.4f -> %.4f", a0, a1)
+	}
+	decay := -math.Log(a1/a0) / n
+
+	w := wvMode(WaveC, wl)
+	if math.Abs(float64(w.Params.C)-float64(d.Params.CSq)) > 1e-6 {
+		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, d.Params.CSq)
+	}
+	prev := at(int(WaveCa))
+	var first, last, cnt int
+	for i := range 2000 {
+		w.RunWaveC(int(GetCtx(0).Size.X))
+		GetCtx(0).StepInc()
+		RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
+		v := at(int(WaveCa))
+		if prev > 0 && v <= 0 { // same mode, but it turns instead of dying
+			if cnt == 0 {
+				first = i
+			}
+			last, cnt = i, cnt+1
+		}
+		prev = v
+	}
+	if cnt < 2 {
+		t.Fatalf("WaveC mode did not oscillate: %d crossings", cnt)
+	}
+	rot := 2 * math.Pi / (float64(last-first) / float64(cnt-1))
+
+	for nm, got := range map[string]float64{"diffusion decay": decay, "WaveC rotation": rot} {
+		if math.Abs(got-want)/want > 0.02 {
+			t.Errorf("%s is %.6f per step, want C^2 khat^2 = %.6f", nm, got, want)
+		}
+	}
+	if math.Abs(rot/decay-1) > 0.02 {
+		t.Errorf("rotation %.6f and decay %.6f differ by more than the lattice should explain", rot, decay)
+	}
+	t.Logf("same mode, same coefficient: diffusion decays at %.6f per step, WaveC rotates at %.6f (C^2 khat^2 = %.6f) -- the i is the only difference",
+		decay, rot, want)
 }

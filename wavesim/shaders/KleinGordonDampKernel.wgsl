@@ -626,7 +626,7 @@ struct Parameters {
 	CosThetaW: f32,
 	WeylQ: f32,
 	WaveDir: f32,
-	Dispersion: i32,
+	Diffusion: i32,
 	pad: f32,
 	pad1: f32,
 	pad2: f32,

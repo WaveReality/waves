@@ -179,6 +179,7 @@ func (ss *Sim) ConfigEquation() { //types:add
 	ss.ConfigState()
 	ss.Init()
 	ss.Config.curEquation = ss.Config.Equation
+	ss.ViewRebuild()
 }
 
 // Reset clears everything an equation's Config method installs, so that
@@ -381,6 +382,31 @@ func (ss *Sim) Stopped() {
 // for specific equations (e.g., variable), added at the end.
 func (ss *Sim) ViewInit(fun func(view *View)) {
 	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
+}
+
+// ViewRebuild points the live View at the current equation's variables and
+// re-runs the view init functions. ConfigEquation calls it after a switch:
+// the View caches a settings map keyed by the variable enum and a Var per
+// panel, and every one of those belongs to the equation that is going away.
+func (ss *Sim) ViewRebuild() {
+	if !ss.GUI.Active || ss.GUI.View == nil {
+		return
+	}
+	vw := ss.GUI.View
+	vw.Size = ss.Config.Size
+	fs := ss.Config.SizeFull()
+	sd := vw.SliceDim()
+	vw.Start.X = 1
+	vw.Start.SetDim(vw.Depth, 1)
+	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
+	// SetVar with -1 is what rebuilds the settings map and fills every panel,
+	// so give it a real variable of the NEW equation -- StateVars is the count
+	// sentinel, not one of them -- before the init funcs pick their own
+	if vals := ss.StateVars.Values(); len(vals) > 0 {
+		vw.SetVar(vals[0], -1)
+	}
+	ss.callViewInit(vw)
+	// ss.GUI.View.UpdateView()
 }
 
 func (ss *Sim) callViewInit(view *View) {

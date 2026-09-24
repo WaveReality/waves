@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-23 21:29:26
+- **Last Message:** 2026-09-23 23:07:28
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -57924,7 +57924,7 @@ These two competing test runs are slowing things down. Rather than trying to sto
 <summary>Tool Calls (4)</summary>
 
 - **Read**: `Read `/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bme453gda.output``
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
 - **TaskStop**: `task_id`
   ```
   {"message":"Successfully stopped task: bt80ryxx5 (cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -v 2>&1|grep -c \"^--- PASS\"; go test ./wavesim/ -v 2>&1|grep -A3 \"^--- FAIL\"; echo \"-- no fails --\")","task_id":"bt80ryxx5","task_type":"local_bash","command":"cd /Users/oreilly/wavereality/waves && go test ./wavesim/ -v 2>&1|grep -c \"^--- PASS\"; go test ./wavesim/ -v 2>&1|grep -A3 \"^--- FAIL\"; echo \"-- no fails --\""}
@@ -60795,38 +60795,664 @@ Two GUI-side things, since I can't see it run:
 
 `waves.go`'s `ConfigFunc` also switches on the captured `eqs` rather than `sim.Config.Equation`, so it won't re-apply on a GUI switch. That's fine as-is since `ConfigFunc` isn't re-run — just worth knowing that its size/ThreeD settings are one-time.
 
-67 tests pass, everything builds clean.
+## 🧑 User - 2026-09-23 22:58:51
 
-## `Params.Dispersion`
+GUI switch is mostly working, now that I call Config.Update in the OnChange in SimForm. But the variables need to be rebuilt in the view -- that was not anticipated presumably. Also, when I said "Dispersion" I meant to say "Diffusion" -- i.e., the case in wave where it goes straight to velocity without adding via acceleration! That is the one case we don't have. We can just switch to KG when we want KG :)
 
-One flag on `Wave` that turns on the mass term — which is the whole of what separates it from KleinGordon:
+## 🤖 Assistant - 2026-09-23 22:59:48
+
+*Model: claude-opus-5*
+
+<thinking>
+I need to find where the view builds its variable list so I can add a rebuild step on equation switch. Also I realize they meant "Diffusion" not "Dispersion" — the case where the Laplacian feeds directly into velocity rather than acceleration, i.e. ∂ψ/∂t = D∇²ψ, starting with the real field.
+
+This completes the missing corner of the 2×2 picture: Wave has the Laplacian driving acceleration (non-dispersive, ω=ck), while Wave+Diffusion and WaveC both have the Laplacian driving velocity directly, differing only by whether the coefficient is real (decay) or imaginary (rotation, exactly the factor of i separating diffusion from Schrödinger). I'll replace the Dispersion flag with a Diffusion flag on Wave so the kernel updates position directly from D times the Laplacian instead of computing velocity from acceleration first.
+
+There's already a Params.Diff field used elsewhere for particle diffusion, so I'm weighing whether to reuse it or add a new flag, but I want the diffusion coefficient to be C, matching WaveC's coefficient exactly — that makes the parallel as sharp as possible: same equation, same C, differing only by i. But I need to check stability: forward Euler for the diffusion equation requires D times the max k-hat squared to stay under 2, and with the 19-point Laplacian that caps C around 0.375 in 3D (marginal even in 1D at C=0.5), so C=0.5 could go unstable.
+
+Given WaveC actually uses C=0.25, I want Diffusion's coefficient to match that value too, so the comparison stays exact — otherwise if Wave's C stays 0.5 the two setups aren't really comparable. Simplest fix is to document that with Diffusion enabled, C must be interpreted as the diffusion rate and kept under 3/8, and have users match C values across both configs for a fair comparison.
+
+But stepping back, maybe the demo doesn't need exact quantitative matching at all — its real value is qualitative, showing decay versus oscillation. Still, using the same coefficient and lattice for both would make the point even sharper, since diffusion's mode would decay exponentially where the wave's would persist.
+
+Now I want matched coefficients between the two configs — maybe setting the Wave config's C to 0.5 while noting the diffusion comparison prefers 0.25, or just documenting the correspondence directly in the flag's doc rather than trying to auto-derive it. I also want to double check stability of the diffusion update at C=0.5 before settling on that.
+
+Working through the amplification factor for the diffusion scheme, I find it's marginally stable in 1D at C=0.5 but unstable in 3D where the threshold is C<0.375. That means if someone naively enables diffusion mode with C=0.5 in 3D via the GUI, it'll blow up instantly — bad UX, so I should have the config clamp or warn based on dimensionality.
+
+I'm deciding to rename `Dispersion` to `Diffusion` as a bool flag and reuse `Params.C` for the rate, documenting the stability bound and recommending users drop C to 0.25 to match the wave speed constant, avoiding the need to repad the struct.
+
+Actually, a cleaner solution occurs to me: use `CSq` (C²) as the diffusion rate directly, since at the default C=0.5 that gives exactly 0.25 — the same coefficient already used in the wave equation's acceleration term, just applied to velocity instead. That keeps the stability bound satisfied and creates a nice symmetry between the wave and diffusion behaviors sharing one coefficient in different places.
+
+Good, confirmed C=0.5 gives CSq=0.25 matching WaveCC exactly. I'm writing the kernel logic so that when Diffusion is true, the Laplacian drives velocity directly rather than acceleration, otherwise it falls back to the standard wave update; vel naturally represents the per-step change matching WaveVel's meaning. Now I need to verify the diffusion decay rate actually matches WaveC's rotation rate in a test.
+
+For a single sine-wave mode with wavenumber k, diffusion should decay amplitude at a rate roughly proportional to CSq·k², while WaveC rotates at some frequency ω depending on its own coefficient — rather than deriving the exact dispersion relation analytically, I think it's cleaner to just measure both empirically: inject a pure sine mode into each scheme and compare the decay rate against the rotation rate to see if they line up.
+
+This feels like an elegant test — the same operator with the same coefficient should turn decay into rotation just by adding an imaginary factor, at matching rates. I want to implement this comparison directly.
+
+Next I want to move to the view variable rebuild task, starting by examining how the view constructs its variable list.
+
+
+</thinking>
+
+Let me look at how the view builds its variable list.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -n "viewInitFuncs\|VarsListUpdate\|func (vw \*View) Config\|ViewInit" wavesim/*.go | grep -v typegen | head -20; echo "==== VarsListUpdate:"; sed -n '/func (vw \*View) VarsListUpdate/,/^}/p' wavesim/view.go``
+  ```
+  wavesim/dirac.go:289:	ss.ViewInit(func(view *View) {
+  wavesim/electroweak.go:797:	ss.ViewInit(func(view *View) {
+  wavesim/maxwell.go:241:	ss.ViewInit(func(view *View) {
+  wavesim/klein-gordon.go:297:	ss.ViewInit(func(view *View) {
+  wavesim/klein-gordon.go:310:	ss.ViewInit(func(view *View) {
+  wavesim/schrodinger.go:129:	ss.ViewInit(func(view *View) {
+  wavesim/sim.go:53:	// viewInitFuncs are run at initialization of the GUI wave View.
+  wavesim/sim.go:54:	// use ViewInit method to add.
+  wavesim/sim.go:55:	viewInitFuncs []func(view *View) `display:"-"`
+  wavesim/sim.go:198:	ss.viewInitFuncs = nil
+  wavesim/sim.go:379:// ViewInit adds given function to view initialization functions.
+  wavesim/sim.go:382:func (ss *Sim) ViewInit(fun func(view *View)) {
+  wavesim/sim.go:383:	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
+  wavesim/sim.go:386:func (ss *Sim) callViewInit(view *View) {
+  wavesim/sim.go:387:	n := len(ss.viewInitFuncs)
+  wavesim/sim.go:389:		fun := ss.viewInitFuncs[i]
+  wavesim/sim.go:413:	ss.callViewInit(vw)
+  wavesim/spinfield.go:263:	ss.ViewInit(func(view *View) {
+  wavesim/view.go:174:		vw.VarsListUpdate()
+  wavesim/view.go:372:// VarsListUpdate updates the list of network variables
+  ...
+  ```
+
+</details>
+
+<thinking>
+I found the actual bug: `VarsListUpdate` has an early-out that skips rebuilding the list if the new variable count matches the old one, so switching between equations with the same number of variables leaves stale entries. It's also compounded by the map being keyed on enum values from the old enum type, so switching enum types like WaveCStates to WaveStates would misalign identities even when the rebuild does happen.
+
+The real fix is checking whether the variable's type actually changed rather than just comparing counts—since enum values compare on type plus value, checking if the first value is already a key in the settings map gives a cheap way to detect a type switch and force a rebuild.
+
+Now I also need a rebuild step after ConfigEquation that re-runs VarsListUpdate and callViewInit on the existing view along with resetting panels. Let me look at sim.go around ConfigView to see how the view is originally created.
+
+
+</thinking>
+
+Found it — `VarsListUpdate` early-outs on variable *count*, so a new equation with the same count keeps the old list.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && sed -n 375,420p wavesim/sim.go; echo "==== view field on GUI:"; grep -n "View\b" wavesim/gui.go | head -12``
+  ```
+  	}
+  	ss.GUI.Stopped()
+  }
+  
+  // ViewInit adds given function to view initialization functions.
+  // Called in reverse of order added. Equations typically set default init
+  // for specific equations (e.g., variable), added at the end.
+  func (ss *Sim) ViewInit(fun func(view *View)) {
+  	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
+  }
+  
+  func (ss *Sim) callViewInit(view *View) {
+  	n := len(ss.viewInitFuncs)
+  	for i := n - 1; i >= 0; i-- {
+  		fun := ss.viewInitFuncs[i]
+  		fun(view)
+  	}
+  }
+  
+  func (ss *Sim) ConfigGUI(b tree.Node) {
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+# --- VarsListUpdate must notice a change of variable TYPE, not just count ---
+p=base+'wavesim/view.go'; s=open(p).read()
+old = """	vals := vw.Var.Values()
+	if len(vals) == len(vw.VarSettings) {
+		return
+	}"""
+new = """	vals := vw.Var.Values()
+	// the same COUNT is not the same list: two equations can have the same
+	// number of variables and none of them in common. Enum keys carry their
+	// type, so a lookup of the first one tells us whether this is the same set.
+	if len(vals) == len(vw.VarSettings) && len(vals) > 0 {
+		if _, ok := vw.VarSettings[vals[0]]; ok {
+			return
+		}
+	}"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+# --- rebuild the view when the equation changes ---
+p=base+'wavesim/sim.go'; s=open(p).read()
+old = """func (ss *Sim) callViewInit(view *View) {"""
+new = """// ViewRebuild points the live View at the current equation's variables and
+// re-runs the view init functions. ConfigEquation calls it after a switch:
+// the View caches a settings map keyed by the variable enum and a Var per
+// panel, and every one of those belongs to the equation that is going away.
+func (ss *Sim) ViewRebuild() {
+	if !ss.GUI.Active || ss.GUI.View == nil {
+		return
+	}
+	vw := ss.GUI.View
+	vw.Size = ss.Config.Size
+	fs := ss.Config.SizeFull()
+	sd := vw.SliceDim()
+	vw.Start.X = 1
+	vw.Start.SetDim(vw.Depth, 1)
+	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
+	// SetVar with -1 is what rebuilds the settings map and fills every panel,
+	// so give it a variable of the NEW equation before the init funcs run
+	vw.SetVar(ss.StateVars, -1)
+	ss.callViewInit(vw)
+	ss.UpdateView()
+}
+
+func (ss *Sim) callViewInit(view *View) {"""
+assert old in s; s=s.replace(old,new,1)
+old = """	ss.ConfigState()
+	ss.Init()
+	ss.Config.curEquation = ss.Config.Equation
+}"""
+new = """	ss.ConfigState()
+	ss.Init()
+	ss.Config.curEquation = ss.Config.Equation
+	ss.ViewRebuild()
+}"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s); print("view rebuild ok")
+PY
+grep -n "ss.StateVars, -1" wavesim/sim.go; cd wavesim && goal build 2>&1|tail -2``
+  ```
+  view rebuild ok
+  404:	vw.SetVar(ss.StateVars, -1)
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I realize `ss.StateVars` is actually the count enum, not a valid variable — so setting Var to that count value would be out of range for display purposes, even though `.Values()` still works since it's the same enum type. That means every panel ends up set to an invalid state value once `callViewInit` runs.
+
+Fortunately, ViewInit already calls `SetVar` with a proper value afterward for most equations, so it likely self-corrects — but it's safer to explicitly grab the first valid value from `ss.StateVars.Values()` and use that instead of the raw count enum. I'll update the code to fetch `vals[0]` and pass that to `SetVar`, guarding against an empty slice.
+
+Now I'll move on to the Diffusion rename and kernel change.
+
+
+</thinking>
+
+`ss.StateVars` is the count sentinel, not a real variable — let me use the first actual one.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+base='/Users/oreilly/wavereality/waves/'
+p=base+'wavesim/sim.go'; s=open(p).read()
+old = """	// SetVar with -1 is what rebuilds the settings map and fills every panel,
+	// so give it a variable of the NEW equation before the init funcs run
+	vw.SetVar(ss.StateVars, -1)"""
+new = """	// SetVar with -1 is what rebuilds the settings map and fills every panel,
+	// so give it a real variable of the NEW equation -- StateVars is the count
+	// sentinel, not one of them -- before the init funcs pick their own
+	if vals := ss.StateVars.Values(); len(vals) > 0 {
+		vw.SetVar(vals[0], -1)
+	}"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+# --- Dispersion -> Diffusion, and make it the FIRST-ORDER case ---
+p=base+'wavesim/params.go'; s=open(p).read()
+old = """	// Dispersion turns the mass term on in the plain Wave equation, which is
+	// the whole of what separates it from KleinGordon. Off, the equation has
+	// no scale in it -- c is a ratio, not a length -- so omega can only be
+	// proportional to k, and every wavelength travels at c. On, the mass
+	// supplies the one scale there is, the Compton wavelength, and after that
+	// it cannot be proportional to anything.
+	//
+	// Note WHICH waves it slows. The Laplacian couples a cell to its
+	// neighbours and its restoring force is the DIFFERENCE from them, which
+	// fades as the wave gets longer; the mass is a spring to ground and its
+	// does not. So short waves barely notice and long ones are dominated --
+	// the opposite way round from the usual lattice error.
+	Dispersion slbool.Bool"""
+new = """	// Diffusion makes the Laplacian drive the VELOCITY in the Wave equation
+	// rather than the acceleration, which turns it into the diffusion equation
+	//
+	//	d_t psi = C^2 Lap psi
+	//
+	// and completes the set. Wave puts the Laplacian into the acceleration and
+	// gets oscillation; this puts the identical term, with the identical C^2,
+	// one derivative earlier and gets decay. Nothing else changes.
+	//
+	// It is also the real-valued half of WaveC. That equation is this one
+	// times i: same operator, same coefficient, and at the default C they are
+	// numerically the same rate. Here a mode of wavenumber k DECAYS at C^2
+	// khat^2; there it ROTATES at C^2 khat^2. The i is the whole difference
+	// between heat spreading out and a quantum wave propagating, which is
+	// worth being able to watch side by side.
+	//
+	// Stability wants C^2 khat^2 under 2, and Laplacian19 reaches 16/3, so C^2
+	// must stay under 3/8. The default 0.5 gives 0.25 and is fine.
+	Diffusion slbool.Bool"""
+assert old in s; s=s.replace(old,new,1)
+open(p,'w').write(s)
+
+p=base+'wavesim/wave.goal'; s=open(p).read()
+old = """	force += vpot * ppos
+	if Params[0].Dispersion.IsTrue() {
+		force -= Params[0].MOverHSq * ppos // this makes it KleinGordon
+	}
+	vel := pvel + Params[0].CSq*force
+	pos := ppos + vel"""
+new = """	force += vpot * ppos
+	// the ONLY difference: does the Laplacian drive the acceleration, or the
+	// velocity? Same term, same coefficient, one derivative apart -- and that
+	// is the difference between a wave and diffusion. See Params.Diffusion.
+	var vel float32
+	if Params[0].Diffusion.IsTrue() {
+		vel = Params[0].CSq * force
+	} else {
+		vel = pvel + Params[0].CSq*force
+	}
+	pos := ppos + vel"""
+assert old in s; s=s.replace(old,new,1)
+s=s.replace('"C", "Mass", "Dispersion", "VPotential"','"C", "Diffusion", "VPotential"',1)
+open(p,'w').write(s)
+
+p=base+'wavesim/klein-gordon.goal'; s=open(p).read()
+s=s.replace("\tss.Params.Dispersion.SetBool(false) // KG has its own mass term\n","",1)
+open(p,'w').write(s)
+print("diffusion ok")
+PY
+cd wavesim && goal build 2>&1|tail -2 && cd .. && go generate ./wavesim/ 2>&1|grep -iE "error|not even"|head -3; echo "-- gen --"``
+  ```
+  diffusion ok
+  go build
+  goal build succeeded
+  -- gen --
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I need to redesign the test to replace the old mass-term check with a diffusion equivalence test: verify that the amplitude decay rate of a sine mode with Diffusion enabled in Wave matches the phase rotation rate of the same mode in WaveC.
+
+I'll construct a pure sine wavenumber-k mode using a wrapped 1D setup, measure decay as amplitude(n) = amplitude(0)·(1−D k̂²)^n giving rate = −ln(ratio)/n, and for WaveC measure ω from the oscillation period of the traveling mode at a fixed point. Picking a long wavelength (32) keeps D k̂² small (~0.0096) so discrete corrections stay negligible and the two rates should closely agree.
+
+I confirm WaveC's diffusion coefficient (0.25 via WaveCC) matches Wave's CSq at C=0.5, and both use the same 4sin²(k/2) form for k̂² in 1D, so the comparison should be apples-to-apples. Now I'm planning to write a quick scratch test to sample WaveCa at a fixed cell over time and extract the oscillation period directly.
+
+Actually a cleaner approach comes to mind: seed WaveC with a pure sine eigenmode (a = sin(kx), b = 0), since that gives an analytic solution where a(t) = sin(kx)cos(ωt) and b(t) = −sin(kx)sin(ωt) with ω = Ck̂², letting me verify the frequency exactly at a single point rather than counting zero crossings.
+
+Diffusion with the same sine seed decays as e^{-Dk̂²t}, so both systems share the identical spatial mode — I can measure diffusion's decay rate via −ln(a(n)/a(0))/n and WaveC's angular frequency via the period of a(t), then check they match. I'll write the scratch test now, keeping in mind that Visscher's staggered leapfrog means a(t) ≈ sin(kx)cos(ωt) only approximately.
+
+
+</thinking>
+
+Now the test: the decay rate should equal WaveC's rotation rate.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cat > wavesim/zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func modeSim(eq Equations, wl float32) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(256, 1, 1)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	if eq == Wave {
+		ss.Params.Diffusion.SetBool(true)
+	}
+	ss.Params.Update()
+	ss.InitFunc = func(s *Sim) {
+		if eq == Wave {
+			s.Sine(WavePos, math32.X, wl, 0, 1, 0)
+		} else {
+			s.Sine(WaveCa, math32.X, wl, 0, 1, 0)
+		}
+	}
+	ss.Init()
+	return ss
+}
+
+func TestScratchDiff(t *testing.T) {
+	const wl float32 = 32
+	k := 2 * math.Pi / float64(wl)
+	kh2 := 4 * math.Sin(k/2) * math.Sin(k/2)
+
+	// diffusion: the mode decays
+	d := modeSim(Wave, wl)
+	D := float64(d.Params.CSq)
+	at := func(ss *Sim, v int) float64 {
+		return float64(State.Value(1, 1, 9, v, int(GetCtx(0).CurState)))
+	}
+	a0 := at(d, int(WavePos))
+	const n = 60
+	for range n {
+		ctx := GetCtx(0)
+		ctx.StepInc()
+		RunWaveKernel(int(ctx.Size.X))
+		RunEdgesWrapKernel(int(ctx.EdgesN()))
+	}
+	rate := -math.Log(at(d, int(WavePos))/a0) / n
+	fmt.Printf("diffusion: D=%.4f, decay %.6f per step   (D khat^2 = %.6f)\n", D, rate, D*kh2)
+
+	// WaveC: the same mode rotates
+	w := modeSim(WaveC, wl)
+	Dc := float64(w.Params.C)
+	prev := at(w, int(WaveCa))
+	var first, last, cnt int
+	for i := range 2000 {
+		w.RunWaveC(int(GetCtx(0).Size.X))
+		GetCtx(0).StepInc()
+		RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
+		v := at(w, int(WaveCa))
+		if prev > 0 && v <= 0 {
+			if cnt == 0 {
+				first = i
+			}
+			last, cnt = i, cnt+1
+		}
+		prev = v
+	}
+	if cnt >= 2 {
+		per := float64(last-first) / float64(cnt-1)
+		fmt.Printf("WaveC:     C=%.4f, rotates %.6f per step (2pi/%.1f)  (C khat^2 = %.6f)\n",
+			Dc, 2*math.Pi/per, per, Dc*kh2)
+		fmt.Printf("ratio rotation/decay = %.4f\n", (2*math.Pi/per)/rate)
+	} else {
+		fmt.Printf("WaveC: only %d crossings\n", cnt)
+	}
+}
+EOF
+gofmt -w wavesim/zz_scratch_test.go && go test ./wavesim/ -run TestScratchDiff -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  # github.com/WaveReality/waves/wavesim [github.com/WaveReality/waves/wavesim.test]
+  wavesim/switch_test.go:80:13: ss.Params.Dispersion undefined (type *Parameters has no field or method Dispersion)
+  FAIL	github.com/WaveReality/waves/wavesim [build failed]
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/switch_test.go'; s=open(p).read()
+a = s.index("// TestWaveDispersionFlag")
+s = s[:a].rstrip() + "\n"
+open(p,'w').write(s); print("removed the old flag test")
+PY
+go test ./wavesim/ -run TestScratchDiff -v 2>&1 | grep -vE "ld: warning|^=== RUN" | head``
+  ```
+  removed the old flag test
+  # github.com/WaveReality/waves/wavesim.test
+  diffusion: D=0.2500, decay 0.009654 per step   (D khat^2 = 0.009607)
+  WaveC:     C=0.2500, rotates 0.009607 per step (2pi/654.0)  (C khat^2 = 0.009607)
+  ratio rotation/decay = 0.9952
+  --- PASS: TestScratchDiff (0.21s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	0.227s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The decay rate and rotation rate match to 0.5%, both equal the predicted D·k̂², confirming it's the same operator with the same coefficient — the imaginary unit simply converts decay into rotation at that identical rate. That's the cleanest possible statement of the result, so I'll write it up as the definitive test in switch_test.go or wave_test.
+
+
+</thinking>
+
+Exact match. Writing it as the test.
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && rm -f wavesim/zz_scratch_test.go && cat >> wavesim/wave_test.go <<'EOF'
+
+// wvMode puts a single pure sine mode of the given wavelength into an
+// equation, in 1D with wrapped edges, so its one lattice wavenumber can be
+// watched on its own.
+func wvMode(eq Equations, wl float32) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(256, 1, 1)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	if eq == Wave {
+		ss.Params.Diffusion.SetBool(true)
+	}
+	ss.Params.Update()
+	ss.InitFunc = func(s *Sim) {
+		if eq == Wave {
+			s.Sine(WavePos, math32.X, wl, 0, 1, 0)
+		} else {
+			s.Sine(WaveCa, math32.X, wl, 0, 1, 0)
+		}
+	}
+	ss.Init()
+	return ss
+}
+
+// TestDiffusion is the last corner of the picture, and the one that says what
+// the i in a quantum wave is for.
+//
+// Params.Diffusion moves the Laplacian from the acceleration to the velocity
+// and nothing else: same term, same C^2. WaveC is that same first-order
+// equation with an i in front. So a mode of wavenumber k DECAYS at C^2 khat^2
+// under diffusion and ROTATES at C^2 khat^2 under WaveC -- the same rate, and
+// the i is the entire difference between heat spreading out and a wave
+// propagating.
+func TestDiffusion(t *testing.T) {
+	const wl float32 = 32
+	k := 2 * math.Pi / float64(wl)
+	kh2 := 4 * math.Sin(k/2) * math.Sin(k/2) // the 1D lattice khat^2
+	at := func(v int) float64 {
+		return float64(State.Value(1, 1, 9, v, int(GetCtx(0).CurState)))
+	}
+
+	d := wvMode(Wave, wl)
+	want := float64(d.Params.CSq) * kh2
+	a0 := at(int(WavePos))
+	const n = 60
+	for range n {
+		ctx := GetCtx(0)
+		ctx.StepInc()
+		RunWaveKernel(int(ctx.Size.X))
+		RunEdgesWrapKernel(int(ctx.EdgesN()))
+	}
+	a1 := at(int(WavePos))
+	if a1 >= a0 {
+		t.Fatalf("with Diffusion on the mode should decay, went %.4f -> %.4f", a0, a1)
+	}
+	decay := -math.Log(a1/a0) / n
+
+	w := wvMode(WaveC, wl)
+	if math.Abs(float64(w.Params.C)-float64(d.Params.CSq)) > 1e-6 {
+		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, d.Params.CSq)
+	}
+	prev := at(int(WaveCa))
+	var first, last, cnt int
+	for i := range 2000 {
+		w.RunWaveC(int(GetCtx(0).Size.X))
+		GetCtx(0).StepInc()
+		RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
+		v := at(int(WaveCa))
+		if prev > 0 && v <= 0 { // same mode, but it turns instead of dying
+			if cnt == 0 {
+				first = i
+			}
+			last, cnt = i, cnt+1
+		}
+		prev = v
+	}
+	if cnt < 2 {
+		t.Fatalf("WaveC mode did not oscillate: %d crossings", cnt)
+	}
+	rot := 2 * math.Pi / (float64(last-first) / float64(cnt-1))
+
+	for nm, got := range map[string]float64{"diffusion decay": decay, "WaveC rotation": rot} {
+		if math.Abs(got-want)/want > 0.02 {
+			t.Errorf("%s is %.6f per step, want C^2 khat^2 = %.6f", nm, got, want)
+		}
+	}
+	if math.Abs(rot/decay-1) > 0.02 {
+		t.Errorf("rotation %.6f and decay %.6f differ by more than the lattice should explain", rot, decay)
+	}
+	t.Logf("same mode, same coefficient: diffusion decays at %.6f per step, WaveC rotates at %.6f (C^2 khat^2 = %.6f) -- the i is the only difference",
+		decay, rot, want)
+}
+EOF
+gofmt -w wavesim/wave_test.go && go test ./wavesim/ -run "TestDiffusion|TestEquationSwitch" -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  # github.com/WaveReality/waves/wavesim [github.com/WaveReality/waves/wavesim.test]
+  wavesim/wave_test.go:129:20: undefined: math32
+  wavesim/wave_test.go:131:19: undefined: math32
+  FAIL	github.com/WaveReality/waves/wavesim [build failed]
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/wave_test.go'; s=open(p).read()
+s=s.replace('import (\n\t"math"\n\t"testing"\n)','import (\n\t"math"\n\t"testing"\n\n\t"cogentcore.org/core/math32"\n)',1)
+open(p,'w').write(s)
+PY
+gofmt -w wavesim/wave_test.go && go test ./wavesim/ -run "TestDiffusion|TestEquationSwitch|TestWaveDispersion" -v 2>&1 | grep -vE "ld: warning|^=== RUN"``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+      switch_test.go:67: cycled 10 equations twice: stats and state vars stable
+  --- PASS: TestEquationSwitch (0.09s)
+      wave_test.go:89: Wave         wavelength 16: 0.9939 c
+      wave_test.go:89: Wave         wavelength 64: 1.0059 c
+      wave_test.go:89: KleinGordon  wavelength 16: 0.9810 c
+      wave_test.go:89: KleinGordon  wavelength 64: 0.8618 c
+      wave_test.go:108: mass costs 0.0130 c at wavelength 16 and 0.1441 c at wavelength 64: the LONG waves are the ones it slows
+  --- PASS: TestWaveDispersion (0.12s)
+      wave_test.go:205: same mode, same coefficient: diffusion decays at 0.009654 per step, WaveC rotates at 0.009607 (C^2 khat^2 = 0.009607) -- the i is the only difference
+  --- PASS: TestDiffusion (0.20s)
+  PASS
+  ok  	github.com/WaveReality/waves/wavesim	0.432s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && cd wavesim && goal build 2>&1|tail -1 && cd .. && go generate ./... 2>&1|grep -icE "error"; cd yaegiwaves && go generate ./... 2>&1|tail -1; cd .. && gofmt -l wavesim/*.go *.go 2>/dev/null|grep -v gosl.go; echo "-- fmt ok --"; go build ./yaegiwaves/ ./wavesim/ . 2>&1|grep -v "ld: warning"; echo builds-ok; go test ./wavesim/ -v -timeout 900s > /tmp/ws6.txt 2>&1; echo "exit=$?"; grep -cE "^--- PASS" /tmp/ws6.txt; grep -E "^--- FAIL" /tmp/ws6.txt; echo "(no FAIL above = clean)"``
+  ```
+  goal build succeeded
+  0
+  goal run succeeded
+  -- fmt ok --
+  # github.com/WaveReality/waves
+  builds-ok
+  exit=0
+  67
+  (no FAIL above = clean)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+67 tests pass, everything builds clean. My mistake on Dispersion — Diffusion is much better, and it makes a sharper point than the mass term would have.
+
+## `Params.Diffusion`
+
+The Laplacian drives the **velocity** instead of the acceleration. Same term, same C², one derivative earlier:
+
+```go
+if Params[0].Diffusion.IsTrue() {
+    vel = Params[0].CSq * force
+} else {
+    vel = pvel + Params[0].CSq*force
+}
+```
+
+And it turns out to complete the picture more precisely than I expected, because **C² at the default C = 0.5 is exactly 0.25, which is `WaveCC`**. So the two are the same equation with the same coefficient, differing only by the i — and that's measurable:
 
 ```
-wavelength 64: Dispersion off 1.0059 c, on 0.7806 c -- the mass costs 0.2253 c
+same mode, same coefficient: diffusion decays at 0.009654 per step,
+WaveC rotates at 0.009607 (C^2 khat^2 = 0.009607) -- the i is the only difference
 ```
 
-Same equation, same config, one toggle, and now you can flip it mid-run and watch the packet slow. The doc on the flag carries the mechanism (Laplacian's restoring force is the *difference* from neighbours and fades with wavelength; the mass is a spring to ground and doesn't — so it's the long waves that slow). Added to `WaveShouldDisplay` along with `ThreeD`, `Mass`, `Wavelength`, `PacketWidth` and `Amplitude`, which weren't exposed before.
+Both land on C²k̂² to within 0.5%. One decays at that rate, the other turns at it. That's your "half-way to the diffusion equation except that it rotates", as a number.
 
-## Equation switching
+Which fills the grid:
 
-`ConfigSim` now ends with `ss.Config.sim = ss; ss.ConfigEquation()`, and the equation-specific work lives in:
+| Laplacian drives | real field | complex field |
+|---|---|---|
+| acceleration | **Wave** — oscillates, ω = ck | — |
+| velocity | **Wave + Diffusion** — decays at C²k̂² | **WaveC** — rotates at C²k̂² |
 
-- **`Sim.Reset()`** — clears `StatFuncs`, `initFuncs`, `viewInitFuncs`, `InitFunc`, and rebuilds the stats tree (tensorfs has no delete, so it's rebuilt, not emptied).
-- **`Sim.ConfigEquation()`** — Reset, the equation switch, `ConfigState`, `Init`, then caches `curEquation`. Both are `//types:add` so they're callable from a toolbar as a fallback.
-- **`Config.Update()`** — reconfigures when `Equation` differs from `curEquation`, setting the cache *before* reconfiguring since that path calls back through here. `Equation` lost its `edit:"-"` so it's now selectable.
+I dropped the mass-term flag entirely, as you said — switch to KG for that. `TestWaveDispersion` still covers the mass/dispersion point using the real KG.
 
-`TestEquationSwitch` cycles all ten equations **twice** through the GUI path (set field, call `Update`), and asserts the stat count and state-var count are identical on both passes. That's the failure I was most worried about: a second pass that re-registers stats would silently double every row — the same bug that bit the electroweak stats earlier.
+## View rebuild
 
-## One design call worth knowing about
+You were right that it wasn't anticipated, and there were two separate problems.
 
-**`Reset` deliberately does not touch `Params`.** If it restored defaults you'd lose `ThreeD` on every switch, which would be maddening. But that means the previous equation's `Mass` or `C` would otherwise leak into the next one — so instead **each equation's Config method now declares the params it depends on**. I filled the gaps in `WaveConfig` (C, Mass), `KleinGordonConfig` (C, Mass, Dispersion off) and `WaveCDirConfig` (C); the others already did. The test asserts `ThreeD` survives every switch.
+**`VarsListUpdate` early-outs on variable *count*.** Two equations with the same number of variables would keep the old settings map entirely. Since enum keys carry their type, checking whether `vals[0]` is already a key is a reliable identity test, so it now rebuilds whenever the *set* changes rather than just the size.
 
-## What I couldn't verify
+**Nothing re-pointed the live View.** New `Sim.ViewRebuild()`, called at the end of `ConfigEquation`: resets `Size` and `Start`, calls `SetVar(vals[0], -1)` to rebuild the settings map and refill every panel with a variable of the *new* equation, then re-runs the view init funcs and updates. It no-ops when there's no GUI, so the tests and headless runs are unaffected.
 
-Two GUI-side things, since I can't see it run:
+One thing to check on your end: I use `ss.StateVars.Values()[0]` rather than `ss.StateVars` itself, because `StateVars` is the count sentinel (`WaveStatesN`), not a real variable. For the enums layered on `EMStatesN` that should give a valid first value, but you'll see immediately in the GUI if any equation comes up pointing somewhere odd before its `ViewInit` fires.
 
-1. **Does core actually call `Config.Update()` on a field edit?** `Parameters` has an `Update()` and appears to rely on the same mechanism, so it should — but if the dropdown doesn't reconfigure, the method is there to call from a toolbar button.
-2. **The view and plot hold references** to the old `ss.Stats` node and to state vars that may no longer exist. `Reset` rebuilds the stats tree, so a plot holding the old one will show stale or empty data until it picks up `ss.Stats` again, and the view's panel vars will point at indices belonging to the previous equation until the new `ViewInit` funcs run. Those probably need a rebuild hook on your side — you'd know better than me where it belongs.
+I also can't verify the panel *count* — if an equation's `ViewAll` set `NPanels = PanelsFour` and the next one only wants one, `ViewRebuild` fills all four with the new equation's first variable but leaves `NPanels` at four. That may be what you want; if not, resetting `NPanels` in `ViewRebuild` is a one-liner.
 
-`waves.go`'s `ConfigFunc` also switches on the captured `eqs` rather than `sim.Config.Equation`, so it won't re-apply on a GUI switch. That's fine as-is since `ConfigFunc` isn't re-run — just worth knowing that its size/ThreeD settings are one-time.
+67 tests pass, everything builds clean. My mistake on Dispersion — Diffusion is much better, and it makes a sharper point than the mass term would have.
+
+## `Params.Diffusion`
+
+The Laplacian drives the **velocity** instead of the acceleration. Same term, same C², one derivative earlier:
+
+```go
+if Params[0].Diffusion.IsTrue() {
+    vel = Params[0].CSq * force
+} else {
+    vel = pvel + Params[0].CSq*force
+}
+```
+
+And it turns out to complete the picture more precisely than I expected, because **C² at the default C = 0.5 is exactly 0.25, which is `WaveCC`**. So the two are the same equation with the same coefficient, differing only by the i — and that's measurable:
+
+```
+same mode, same coefficient: diffusion decays at 0.009654 per step,
+WaveC rotates at 0.009607 (C^2 khat^2 = 0.009607) -- the i is the only difference
+```
+
+Both land on C²k̂² to within 0.5%. One decays at that rate, the other turns at it. That's your "half-way to the diffusion equation except that it rotates", as a number.
+
+Which fills the grid:
+
+| Laplacian drives | real field | complex field |
+|---|---|---|
+| acceleration | **Wave** — oscillates, ω = ck | — |
+| velocity | **Wave + Diffusion** — decays at C²k̂² | **WaveC** — rotates at C²k̂² |
+
+I dropped the mass-term flag entirely, as you said — switch to KG for that. `TestWaveDispersion` still covers the mass/dispersion point using the real KG.
+
+## View rebuild
+
+You were right that it wasn't anticipated, and there were two separate problems.
+
+**`VarsListUpdate` early-outs on variable *count*.** Two equations with the same number of variables would keep the old settings map entirely. Since enum keys carry their type, checking whether `vals[0]` is already a key is a reliable identity test, so it now rebuilds whenever the *set* changes rather than just the size.
+
+**Nothing re-pointed the live View.** New `Sim.ViewRebuild()`, called at the end of `ConfigEquation`: resets `Size` and `Start`, calls `SetVar(vals[0], -1)` to rebuild the settings map and refill every panel with a variable of the *new* equation, then re-runs the view init funcs and updates. It no-ops when there's no GUI, so the tests and headless runs are unaffected.
+
+One thing to check on your end: I use `ss.StateVars.Values()[0]` rather than `ss.StateVars` itself, because `StateVars` is the count sentinel (`WaveStatesN`), not a real variable. For the enums layered on `EMStatesN` that should give a valid first value, but you'll see immediately in the GUI if any equation comes up pointing somewhere odd before its `ViewInit` fires.
+
+I also can't verify the panel *count* — if an equation's `ViewAll` set `NPanels = PanelsFour` and the next one only wants one, `ViewRebuild` fills all four with the new equation's first variable but leaves `NPanels` at four. That may be what you want; if not, resetting `NPanels` in `ViewRebuild` is a one-liner.
 

@@ -172,11 +172,10 @@ func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 			vw.Panels[i].Var = vr
 		}
 		vw.VarsListUpdate()
-		vw.Unlock()
-		return
+	} else {
+		vw.Panels[panelNo].Var = vr
 	}
-	vw.Panels[panelNo].Var = vr
-	if vw.varsFrame == nil {
+	if vw.midFrame == nil {
 		vw.Unlock()
 		return
 	}
@@ -375,8 +374,13 @@ func (vw *View) VarsListUpdate() {
 		return
 	}
 	vals := vw.Var.Values()
-	if len(vals) == len(vw.VarSettings) {
-		return
+	// the same COUNT is not the same list: two equations can have the same
+	// number of variables and none of them in common. Enum keys carry their
+	// type, so a lookup of the first one tells us whether this is the same set.
+	if len(vals) == len(vw.VarSettings) && len(vals) > 0 {
+		if _, ok := vw.VarSettings[vals[0]]; ok {
+			return
+		}
 	}
 	vw.VarSettings = make(map[enums.Enum]*VarSettings, len(vals))
 	for _, v := range vals {
@@ -391,10 +395,6 @@ func (vw *View) VarsListUpdate() {
 
 // makeVars configures the variables
 func (vw *View) makeVars(frame *core.Frame) {
-	vw.VarsListUpdate()
-	if reflectx.IsNil(reflect.ValueOf(vw.Var)) {
-		return
-	}
 	tree.AddChildAt(frame, "vars", func(w *core.Frame) {
 		vw.varsFrame = w
 		w.Styler(func(s *styles.Style) {
@@ -405,42 +405,48 @@ func (vw *View) makeVars(frame *core.Frame) {
 			s.Min.X.Em(10)
 			s.Overflow.Y = styles.OverflowAuto
 		})
-		vals := vw.Var.Values()
-		tree.AddChildAt(w, "curprv", func(w *core.Switch) {
-			w.SetText("Current").SetChecked(true).
-				SetTooltip("Selects whether to show the current or previous state values")
-			w.OnChange(func(e events.Event) {
-				cp := Current
-				if !w.IsChecked() {
-					cp = Previous
-				}
-				vw.SetCurPrev(cp, vw.curPanel)
-			})
-			w.Updater(func() {
-				if vw.Panels[vw.curPanel].CurPrev == Current {
-					w.SetText("Current").SetChecked(true)
-				} else {
-					w.SetText("Previous").SetChecked(false)
-				}
-			})
-		})
-		for _, v := range vals {
-			vn := v.String()
-			doc := v.Desc()
-			tree.AddChildAt(w, vn, func(w *core.Button) {
-				w.SetText(vn)
-				if doc != "" {
-					w.Tooltip = v.String() + ": " + doc
-				}
-				w.SetType(core.ButtonAction)
-				w.OnClick(func(e events.Event) {
-					vw.SetVar(v, vw.curPanel)
+		vw.varsFrame.Maker(func(p *tree.Plan) {
+			vw.VarsListUpdate()
+			if reflectx.IsNil(reflect.ValueOf(vw.Var)) {
+				return
+			}
+			vals := vw.Var.Values()
+			tree.AddAt(p, "curprv", func(w *core.Switch) {
+				w.SetText("Current").SetChecked(true).
+					SetTooltip("Selects whether to show the current or previous state values")
+				w.OnChange(func(e events.Event) {
+					cp := Current
+					if !w.IsChecked() {
+						cp = Previous
+					}
+					vw.SetCurPrev(cp, vw.curPanel)
 				})
 				w.Updater(func() {
-					w.SetSelected(v == vw.Panels[vw.curPanel].Var)
+					if vw.Panels[vw.curPanel].CurPrev == Current {
+						w.SetText("Current").SetChecked(true)
+					} else {
+						w.SetText("Previous").SetChecked(false)
+					}
 				})
 			})
-		}
+			for _, v := range vals {
+				vn := v.String()
+				doc := v.Desc()
+				tree.AddAt(p, vn, func(w *core.Button) {
+					w.SetText(vn)
+					if doc != "" {
+						w.Tooltip = v.String() + ": " + doc
+					}
+					w.SetType(core.ButtonAction)
+					w.OnClick(func(e events.Event) {
+						vw.SetVar(v, vw.curPanel)
+					})
+					w.Updater(func() {
+						w.SetSelected(v == vw.Panels[vw.curPanel].Var)
+					})
+				})
+			}
+		})
 	})
 }
 

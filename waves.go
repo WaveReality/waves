@@ -24,12 +24,12 @@ func main() {
 	// threed := false
 	threed := true
 	// eqs := wavesim.WaveC
-	eqs := wavesim.WaveCDir
+	// eqs := wavesim.WaveCDir
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Schrodinger
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.Dirac
-	// eqs := wavesim.Weyl
+	eqs := wavesim.Weyl
 	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
