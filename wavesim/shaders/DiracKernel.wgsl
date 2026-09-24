@@ -444,7 +444,8 @@ var w1a = -kf * u1b;
 var w1b = kf * u1a;
 ; var w2a = -kf * u2b;
 ; var w2b = kf * u2a;
-; StateSet(w1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1As), u32(cur)));; StateSet(w1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1Bs), u32(cur)));; StateSet(w2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2As), u32(cur)));; StateSet(w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2Bs), u32(cur)));; StateSet(w1a*w1a + w1b*w1b + w2a*w2a + w2b*w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracLMag), u32(cur)));; StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracMag), u32(cur)));; StateSet(n1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Av), u32(cur)));; StateSet(n1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bv), u32(cur)));; StateSet(n2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Av), u32(cur)));; StateSet(n2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bv), u32(cur)));; StateSet(q1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1As), u32(cur)));; StateSet(q1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bs), u32(cur)));; StateSet(q2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2As), u32(cur)));; StateSet(q2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bs), u32(cur))); }
+; StateSet(w1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1As), u32(cur)));; StateSet(w1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL1Bs), u32(cur)));; StateSet(w2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2As), u32(cur)));; StateSet(w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracL2Bs), u32(cur)));; StateSet(w1a*w1a + w1b*w1b + w2a*w2a + w2b*w2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracLMag), u32(cur)));; StateSet(mag, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(DiracMag), u32(cur)));; StateSet(n1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Av), u32(cur)));; StateSet(n1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bv), u32(cur)));; StateSet(n2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Av), u32(cur)));; StateSet(n2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bv), u32(cur)));; StateSet(q1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1As), u32(cur)));; StateSet(q1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac1Bs), u32(cur)));; StateSet(q2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2As), u32(cur)));; StateSet(q2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Dirac2Bs), u32(cur))); }
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges
@@ -585,7 +586,7 @@ fn Gradient10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 	}return g;
 }
 
-//////// import: "klein-gordon.go"
+//////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
 const  CabAs: CabStates = 18;
 const  CabBs: CabStates = 19;
@@ -593,6 +594,8 @@ const  CabAv: CabStates = 20;
 const  CabBv: CabStates = 21;
 const  CabV: CabStates = 22;
 const  CabMag: CabStates = 23;
+
+//////// import: "klein-gordon.go"
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -762,10 +765,14 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+
+//////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
 const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
+
+//////// import: "wavecdir.go"
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl

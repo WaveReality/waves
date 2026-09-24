@@ -258,21 +258,25 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 func (ss *Sim) SpinfieldConfig() {
 	ParamsShouldDisplay = ParticleDisplay
 	ss.StateVars = SpinfieldStatesN
-	ss.ViewInit(func(view *View) {
-		view.SetVar(SpinfieldParticle, -1)
-	})
+	// todo: configs!
+	// ss.initFuncs = ElectroweakConfigs
+	// ss.InitFunc = HiggsBroken
+	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Edges = EdgesDamp
+	ss.Params.Mass = 0.1
+	ss.Params.Hbar = 0.1
+	ss.Params.Move.SetBool(false)
+	ss.Config.Velocity.X = 0
+	ss.SpinfieldStats()
+	ss.eqViewInitFunc = SpinfieldViewAll
 }
 
 // SpinfieldViewAll configures the View to display Spinfield values
 func SpinfieldViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
+	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = Spinfield0a
 	view.Panels[1].Var = SpinfieldDrive
-	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = CabAs
-	// view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = CabBs
 	view.Settings.TrackParticle = 0
 }

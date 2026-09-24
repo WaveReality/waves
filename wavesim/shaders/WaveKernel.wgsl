@@ -449,7 +449,7 @@ fn PotentialEnergy19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 
 	}return avg;
 }
 
-//////// import: "klein-gordon.go"
+//////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
 const  CabAs: CabStates = 18;
 const  CabBs: CabStates = 19;
@@ -457,6 +457,8 @@ const  CabAv: CabStates = 20;
 const  CabBv: CabStates = 21;
 const  CabV: CabStates = 22;
 const  CabMag: CabStates = 23;
+
+//////// import: "klein-gordon.go"
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -662,10 +664,14 @@ var vel: f32;; if (Params[0].Diffusion == 1) {
 	StateSet(kinetic + potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
 }; StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
+
+//////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
 const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
+
+//////// import: "wavecdir.go"
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl

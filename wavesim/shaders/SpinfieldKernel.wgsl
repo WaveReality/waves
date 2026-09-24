@@ -452,7 +452,7 @@ fn GetRandomNumber(index: u32, counter: su64, funIndex: u32) -> f32 {
 	return RandFloat32(counter, funIndex, index);
 }
 
-//////// import: "klein-gordon.go"
+//////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
 const  CabAs: CabStates = 18;
 const  CabBs: CabStates = 19;
@@ -460,6 +460,8 @@ const  CabAv: CabStates = 20;
 const  CabBv: CabStates = 21;
 const  CabV: CabStates = 22;
 const  CabMag: CabStates = 23;
+
+//////// import: "klein-gordon.go"
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -738,10 +740,14 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+
+//////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
 const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
+
+//////// import: "wavecdir.go"
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl

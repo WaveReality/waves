@@ -267,6 +267,8 @@ func DiracKernel(i uint32) { //gosl:kernel
 	State[z, y, x, Dirac2Bs, cur] = q2b
 }
 
+// claude todo: need a Damp kernel for Dirac here!
+
 //gosl:end
 
 func (ss *Sim) DiracConfig() {
@@ -281,31 +283,89 @@ func (ss *Sim) DiracConfig() {
 	ss.Params.Edges = EdgesWrap
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.DiracStats()
-	// the -1 is what initializes the view: it sets every panel and builds the
-	// vars list. Choosing what is actually SHOWN across panels belongs in
-	// DiracViewAll, which the app adds afterwards.
-	ss.ViewInit(func(view *View) {
-		view.SetVar(DiracMag, -1)
-	})
+	ss.eqViewInitFunc = DiracViewAll
 }
 
-// DiracShouldDisplay determines which Parameters fields to display.
 // DiracViewAll shows the two chiralities against each other, which is what
 // the mass term acts on: the right-handed half the kernel evolves, the
 // left-handed one it recovers, and the two components of the spinor.
 func DiracViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
+	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = DiracMag
 	view.Panels[1].Var = DiracLMag
 	view.Panels[2].Var = Dirac1As
 	view.Panels[3].Var = DiracL1As
 }
 
+// DiracShouldDisplay determines which Parameters fields to display.
 var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
 
+//////// stats
+
+// DiracStats adds the stats plotted over time in the GUI.
+func (ss *Sim) DiracStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(Charge))
+	ss.AddStat(ss.StatSum(DiracMag))
+	ss.AddStat(ss.StatSum(DiracLMag))
+	ss.AddStat(ss.StatDiracSpin())
+}
+
+// StatDiracSpin records the three spin components summed over the box:
+//
+//	SigX = 2 Re(chi1* chi2), SigY = 2 Im(chi1* chi2), SigZ = |chi1|^2 - |chi2|^2
+//
+// which is <psi|sigma|psi>, the direction the spin points.
+func (ss *Sim) StatDiracSpin() func(init bool) {
+	names := []string{"SigX", "SigY", "SigZ"}
+	return func(init bool) {
+		if init {
+			for _, nm := range names {
+				tsr := ss.Stats.Float64(nm)
+				tsr.SetNumRows(0)
+				plot.SetFirstStyler(tsr, func(s *plot.Style) {
+					s.On = true
+				})
+				metadata.SetDoc(tsr, "Total spin component "+nm)
+			}
+			return
+		}
+		ctx := GetCtx(0)
+		cur := ctx.CurState
+		sz := ss.Config.Size
+		var sx, sy, sz2 float64
+		var c math32.Vector3i
+		for c.Z = range sz.Z {
+			for c.Y = range sz.Y {
+				for c.X = range sz.X {
+					f := c.AddScalar(1)
+					a1 := float64(State[f.Z, f.Y, f.X, Dirac1As, cur])
+					b1 := float64(State[f.Z, f.Y, f.X, Dirac1Bs, cur])
+					a2 := float64(State[f.Z, f.Y, f.X, Dirac2As, cur])
+					b2 := float64(State[f.Z, f.Y, f.X, Dirac2Bs, cur])
+					sx += 2 * (a1*a2 + b1*b2)
+					sy += 2 * (a1*b2 - b1*a2)
+					sz2 += (a1*a1 + b1*b1) - (a2*a2 + b2*b2)
+				}
+			}
+		}
+		ss.Stats.Float64("SigX").AppendRowFloat(sx)
+		ss.Stats.Float64("SigY").AppendRowFloat(sy)
+		ss.Stats.Float64("SigZ").AppendRowFloat(sz2)
+	}
+}
+
 //////// configurations
+
+var DiracConfigs = []InitFunc{
+	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
+	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
+	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
+	InitFunc{Name: "Dirac Hydrogen", Doc: "A spin-1/2 electron bound in a Coulomb well in its exp(-r/a) ground state: the closest this gets to a real atom", Func: DiracHydrogen},
+	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
+	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
+	InitFunc{Name: "Chiral Oscillation", Doc: "A lump started purely right-chiral: the mass turns it into the left one and back at m c^2 / hbar, which is what mass IS", Func: ChiralOscillation},
+}
 
 // SpinAtRest is a gaussian lump of charge at rest with its spin along +Z: the
 // electron, as far as this equation has one.
@@ -491,67 +551,4 @@ func ChiralOscillation(ss *Sim) {
 	p.Update()
 	// no DiracRest: zero velocity is what makes it purely right-chiral
 	ss.Fill(Dirac1As, Both, ss.Config.Amplitude)
-}
-
-var DiracConfigs = []InitFunc{
-	InitFunc{Name: "Spin At Rest", Doc: "A lump of charge at rest with spin along Z; nothing happens to the spin, because a free particle has no spin term", Func: SpinAtRest, Current: true},
-	InitFunc{Name: "Spin In Potential", Doc: "An electron lump offset from a fixed 1/r well, pulled in by it: the external-field case, with SelfField off so A0 stays as set", Func: SpinInPotential},
-	InitFunc{Name: "Spin Precession", Doc: "Spin along X in a uniform B along Z: it precesses at the Larmor rate with g = 2; watch SigX and SigY", Func: SpinPrecession},
-	InitFunc{Name: "Dirac Hydrogen", Doc: "A spin-1/2 electron bound in a Coulomb well in its exp(-r/a) ground state: the closest this gets to a real atom", Func: DiracHydrogen},
-	InitFunc{Name: "Dirac Hydrogen P", Doc: "The 2p orbital with spin: it evolves rather than sitting still, because spin-orbit coupling conserves only the total j", Func: DiracHydrogenP},
-	InitFunc{Name: "Dirac Oscillator", Doc: "A coherent state swinging in a scalar harmonic well, on a spinor: identical to the scalar case, because spin needs a field to do anything", Func: DiracOscillator},
-	InitFunc{Name: "Chiral Oscillation", Doc: "A lump started purely right-chiral: the mass turns it into the left one and back at m c^2 / hbar, which is what mass IS", Func: ChiralOscillation},
-}
-
-// DiracStats adds the stats plotted over time in the GUI.
-func (ss *Sim) DiracStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(Charge))
-	ss.AddStat(ss.StatSum(DiracMag))
-	ss.AddStat(ss.StatSum(DiracLMag))
-	ss.AddStat(ss.StatDiracSpin())
-}
-
-// StatDiracSpin records the three spin components summed over the box:
-//
-//	SigX = 2 Re(chi1* chi2), SigY = 2 Im(chi1* chi2), SigZ = |chi1|^2 - |chi2|^2
-//
-// which is <psi|sigma|psi>, the direction the spin points.
-func (ss *Sim) StatDiracSpin() func(init bool) {
-	names := []string{"SigX", "SigY", "SigZ"}
-	return func(init bool) {
-		if init {
-			for _, nm := range names {
-				tsr := ss.Stats.Float64(nm)
-				tsr.SetNumRows(0)
-				plot.SetFirstStyler(tsr, func(s *plot.Style) {
-					s.On = true
-				})
-				metadata.SetDoc(tsr, "Total spin component "+nm)
-			}
-			return
-		}
-		ctx := GetCtx(0)
-		cur := ctx.CurState
-		sz := ss.Config.Size
-		var sx, sy, sz2 float64
-		var c math32.Vector3i
-		for c.Z = range sz.Z {
-			for c.Y = range sz.Y {
-				for c.X = range sz.X {
-					f := c.AddScalar(1)
-					a1 := float64(State[f.Z, f.Y, f.X, Dirac1As, cur])
-					b1 := float64(State[f.Z, f.Y, f.X, Dirac1Bs, cur])
-					a2 := float64(State[f.Z, f.Y, f.X, Dirac2As, cur])
-					b2 := float64(State[f.Z, f.Y, f.X, Dirac2Bs, cur])
-					sx += 2 * (a1*a2 + b1*b2)
-					sy += 2 * (a1*b2 - b1*a2)
-					sz2 += (a1*a1 + b1*b1) - (a2*a2 + b2*b2)
-				}
-			}
-		}
-		ss.Stats.Float64("SigX").AppendRowFloat(sx)
-		ss.Stats.Float64("SigY").AppendRowFloat(sy)
-		ss.Stats.Float64("SigZ").AppendRowFloat(sz2)
-	}
 }

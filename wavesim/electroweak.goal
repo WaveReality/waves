@@ -789,24 +789,22 @@ func (ss *Sim) ElectroweakConfig() {
 	ss.Params.Edges = EdgesWrap
 	ss.Config.Wavelength = 16
 	ss.Config.PacketWidth = 1.5 * ss.Config.Wavelength
-	ss.ViewInit(func(view *View) {
-		view.SetVar(EWHs0a, -1)
-	})
+	ss.eqViewInitFunc = ElectroweakViewAll
 }
 
 // ElectroweakViewAll configures the View to display Electroweak values
 func ElectroweakViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
+	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = EWHs0a
 	view.Panels[1].Var = AYs // the transverse component: A0s is zero for a pulse
-	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = EWBYs
-	// view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = EWW3Ys
-	// view.Settings.TrackParticle = 0
 }
+
+// ElectroweakDisplay determines which Parameters fields to display.
+var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ"}
+
+//////// stats
 
 // ElectroweakStats adds the stats plotted over time in the GUI. Each one is a
 // full pass over the state, so at 100^3 they are not free: raise
@@ -834,8 +832,15 @@ const (
 	EWHmagZStat = "HmagZ"
 )
 
-// ElectroweakDisplay determines which Parameters fields to display.
-var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ"}
+//////// configurations
+
+var ElectroweakConfigs = []InitFunc{
+	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
+	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
+	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
+	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
+}
 
 //////// initialization helpers
 
@@ -858,8 +863,6 @@ func ewVZero(ss *Sim) float32 {
 	}
 	return p.HiggsMu / math32.Sqrt(p.HiggsLambda)
 }
-
-//////// configurations
 
 // HiggsBroken initializes the vacuum is <Phi> = (0, v/sqrt2)^T, i.e.
 // the NEUTRAL (lower) component holds the VEV, with magnitude
@@ -961,10 +964,3 @@ func WCollision(ss *Sim) {
 	ss.SlabPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
 }
 
-var ElectroweakConfigs = []InitFunc{
-	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
-	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
-	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
-	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
-	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
-}

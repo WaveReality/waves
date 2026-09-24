@@ -491,7 +491,7 @@ fn LaplacianEdge19(x: i32,y: i32,z: i32,sx: i32,sy: i32,sz: i32,vidx: i32,tidx: 
 	}return avg;
 }
 
-//////// import: "klein-gordon.go"
+//////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
 const  CabAs: CabStates = 18;
 const  CabBs: CabStates = 19;
@@ -526,6 +526,8 @@ fn KleinGordonCDampKernel(i: u32) { //gosl:kernel
 	StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(cur)));
 	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));
 }
+
+//////// import: "klein-gordon.go"
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -695,10 +697,14 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+
+//////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
 const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
+
+//////// import: "wavecdir.go"
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl

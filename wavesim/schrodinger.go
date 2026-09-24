@@ -115,6 +115,10 @@ func (ss *Sim) RunSchrodinger(n int) {
 	RunSchrodingerBKernel(n)
 }
 
+// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+// at the default hbar of 1, which is comfortably inside the stability bound.
+const SchrodingerMass float32 = 2
+
 func (ss *Sim) SchrodingerConfig() {
 	ParamsShouldDisplay = SchrodingerShouldDisplay
 	ss.StateVars = CabStatesN
@@ -126,14 +130,32 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.Params.Mass = SchrodingerMass
 	ss.Params.Edges = EdgesFixed // walls at zero: a particle in a box
 	ss.Params.Update()
-	ss.ViewInit(func(view *View) {
-		view.SetVar(CabMag, -1)
-	})
+	ss.eqViewInitFunc = CabViewAll
 }
 
-// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
-// at the default hbar of 1, which is comfortably inside the stability bound.
-const SchrodingerMass float32 = 2
+// SchrodingerShouldDisplay determines which Parameters fields to display.
+var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
+
+func (ss *Sim) SchrodingerStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(CabMag))
+	// on CabMag, not a component: |chi|^2 is the envelope, while a^2 carries a
+	// ripple at twice the wavenumber that drags the centroid toward the phase
+	// velocity. A matter wave's group velocity is hbar k / m, not that.
+	ss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))
+}
+
+//////// configurations
+
+// SchrodingerConfigs are the initialization options offered in the GUI.
+var SchrodingerConfigs = []InitFunc{
+	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
+	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator, Current: true},
+	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
+	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
+	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
+	InitFunc{Name: "Hydrogen P", Doc: "The 2p orbital: two lobes of opposite phase with a node between them, stationary in the same 1/r well", Func: HydrogenP},
+}
 
 // SchrodingerVMax is the largest potential the staggered leapfrog can carry.
 // Stability needs |E| / hbar < 2 for every eigenvalue of H, and the kinetic
@@ -144,8 +166,6 @@ const SchrodingerMass float32 = 2
 func (ss *Sim) SchrodingerVMax() float32 {
 	return 2*ss.Params.Hbar - ss.Params.HSqOver2M*Laplacian19Radius
 }
-
-//////// configurations
 
 // schrodOmega returns the angular frequency of the harmonic well, in radians
 // per LEAPFROG step. A sim step advances half of one, so the period you count
@@ -253,38 +273,4 @@ func FreePacket(ss *Sim) {
 	ss.Params.Edges = EdgesDamp // let it leave rather than bounce
 	ss.Params.Update()
 	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
-}
-
-// SchrodingerConfigs are the initialization options offered in the GUI.
-var SchrodingerConfigs = []InitFunc{
-	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
-	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator, Current: true},
-	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
-	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
-	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
-	InitFunc{Name: "Hydrogen P", Doc: "The 2p orbital: two lobes of opposite phase with a node between them, stationary in the same 1/r well", Func: HydrogenP},
-}
-
-// SchrodingerShouldDisplay determines which Parameters fields to display.
-var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
-
-// Cab1DViewAll configures the View to display A and B, Cur and Prev
-func Cab1DViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	// view.SetVarMinMax(WavePos, -0.8, 0.8)
-	view.Settings.Height = 0.8
-	view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = CabBs
-	view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = CabBs
-}
-
-func (ss *Sim) SchrodingerStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(CabMag))
-	// on CabMag, not a component: |chi|^2 is the envelope, while a^2 carries a
-	// ripple at twice the wavenumber that drags the centroid toward the phase
-	// velocity. A matter wave's group velocity is hbar k / m, not that.
-	ss.AddStat(ss.StatGroupVelMag(math32.X, CabMag))
 }

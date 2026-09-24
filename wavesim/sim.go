@@ -50,9 +50,21 @@ type Sim struct {
 	// to demonstrate different aspects of a wave system.
 	initFuncs []InitFunc `display:"-"`
 
-	// viewInitFuncs are run at initialization of the GUI wave View.
-	// use ViewInit method to add.
-	viewInitFuncs []func(view *View) `display:"-"`
+	// ViewInitFunc is the user's view initialization function,
+	// which can override any defaults set by the wave equation.
+	// Canned options include: ViewInitFour, ViewInitTwo, and ViewInitOne which
+	// select the number of panels to view. The different wave equations
+	// automatically populate a reasonable set of variables for all 4 panels,
+	// but this function can also override that choice if desired.
+	// Note that the user can switch the equation in the GUI, so that will
+	// setup new default variables, so in general it is best to leave those alone.
+	ViewInitFunc func(view *View) `display:"-"`
+
+	// eqViewInitFunc is the equation's own view init function, which should
+	// set all four panel's Var settings to appropriate choices, with the
+	// single most important variable in panel 0 for a one-panel view, and
+	// the next most important in panel 1 for the two-panel.
+	eqViewInitFunc func(view *View) `display:"-"`
 
 	// StatFuncs are the stats functions that have been added.
 	StatFuncs []func(init bool) `display:"-"`
@@ -196,7 +208,6 @@ func (ss *Sim) ConfigEquation() { //types:add
 func (ss *Sim) Reset() { //types:add
 	ss.StatFuncs = nil
 	ss.initFuncs = nil
-	ss.viewInitFuncs = nil
 	ss.InitFunc = nil
 	ss.Root, _ = tensorfs.NewDir("Root")
 	tensorfs.CurRoot = ss.Root
@@ -377,13 +388,6 @@ func (ss *Sim) Stopped() {
 	ss.GUI.Stopped()
 }
 
-// ViewInit adds given function to view initialization functions.
-// Called in reverse of order added. Equations typically set default init
-// for specific equations (e.g., variable), added at the end.
-func (ss *Sim) ViewInit(fun func(view *View)) {
-	ss.viewInitFuncs = append(ss.viewInitFuncs, fun)
-}
-
 // ViewRebuild points the live View at the current equation's variables and
 // re-runs the view init functions. ConfigEquation calls it after a switch:
 // the View caches a settings map keyed by the variable enum and a Var per
@@ -409,10 +413,11 @@ func (ss *Sim) ViewRebuild() {
 }
 
 func (ss *Sim) callViewInit(view *View) {
-	n := len(ss.viewInitFuncs)
-	for i := n - 1; i >= 0; i-- {
-		fun := ss.viewInitFuncs[i]
-		fun(view)
+	if ss.eqViewInitFunc != nil {
+		ss.eqViewInitFunc(view)
+	}
+	if ss.ViewInitFunc != nil {
+		ss.ViewInitFunc(view)
 	}
 }
 
@@ -422,20 +427,13 @@ func (ss *Sim) ConfigGUI(b tree.Node) {
 	if ss.Params.ThreeD.IsFalse() {
 		vw.SetMode(Bars, -1)
 	}
-	vw.sim = ss
+	vw.Sim = ss
 	vw.Size = ss.Config.Size
-	fs := ss.Config.SizeFull()
-	// vw.Size = fs
 	// The X-Z plane, sliced at a Y level, is the standard orientation: X is
 	// horizontal in every view, so a packet travelling along X runs across the
 	// display. See [View.Depth] for the one case that wants something else.
 	vw.Depth = math32.Z
-	sd := vw.SliceDim()
-	vw.Start.X = 1
-	vw.Start.SetDim(vw.Depth, 1)
-	vw.Start.SetDim(sd, max(fs.Dim(sd)/2, 1))
-	// fmt.Println("start:", vw.Start)
-	ss.callViewInit(vw)
+	ss.ViewRebuild()
 	ss.RunStats(true)
 	ss.GUI.FinalizeGUI(false)
 }

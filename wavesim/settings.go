@@ -94,6 +94,8 @@ type Settings struct {
 	Mode ViewModes
 
 	// Height is how high the values are, in normalized units.
+	// For one or two panels, a value of 0.2 works well, and
+	// for Four panels, 0.8 is best.
 	Height float32
 
 	// Camera specifies the initial camera view to show the scene

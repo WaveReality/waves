@@ -239,7 +239,35 @@ func WeylKernel(i uint32) { //gosl:kernel
 	State[z, y, x, WeylRMag, cur] = nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
 }
 
+// claude todo: need a Damp kernel here!
+
 //gosl:end
+
+const (
+	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+	// tighter than the second-order one the other equations use.
+	WeylC float32 = 0.35
+	
+	// WeylMass is the electron mass the AT REST configs set, light enough that the
+	// L-R trade takes a watchable 50 steps: the period is pi hbar / m c^2.
+	WeylMass float32 = 0.5
+	
+	// WeylPacketMass is the heavier mass ElectronPacket sets, because the two
+	// demands pull opposite ways. Visibly slower than light needs m c^2 to be
+	// comparable to the momentum c khat, which at the default wavelength means
+	// about this; a watchable flip needs the mass SMALL, since the period goes as
+	// 1/m. A packet this heavy zitters about four times faster than it crosses a
+	// wavelength, which is the honest picture -- the trade really is that quick.
+	WeylPacketMass float32 = 2
+	
+	// WeylOscMass is the mass WeylOscillator sets. Heavier again, and for a third
+	// reason: a coherent state in this well carries 3.5 hbar omega, and unless
+	// m c^2 is well above that the thing is relativistic enough that calling it a
+	// harmonic oscillator is a stretch. At 4 the binding is 14% of the rest
+	// energy, which still shows as a lengthened period but is recognisably the
+	// Newtonian picture.
+	WeylOscMass float32 = 4
+)
 
 func (ss *Sim) WeylConfig() {
 	ParamsShouldDisplay = WeylShouldDisplay
@@ -254,47 +282,21 @@ func (ss *Sim) WeylConfig() {
 	ss.Params.Edges = EdgesWrap
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: see WeylKernel
 	ss.Params.Update()
-	ss.ViewInit(func(view *View) {
-		view.SetVar(WeylLMag, -1)
-	})
+	ss.eqViewInitFunc = WeylViewAll
 }
 
 // WeylViewAll configures the View to display Weyl values
 func WeylViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
+	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = WeylL1a
 	view.Panels[1].Var = WeylL1b
 	view.Panels[2].Var = WeylR1a
 	view.Panels[3].Var = WeylR1b
 }
 
-// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
-// tighter than the second-order one the other equations use.
-const WeylC float32 = 0.35
-
-// WeylMass is the electron mass the AT REST configs set, light enough that the
-// L-R trade takes a watchable 50 steps: the period is pi hbar / m c^2.
-const WeylMass float32 = 0.5
-
-// WeylPacketMass is the heavier mass ElectronPacket sets, because the two
-// demands pull opposite ways. Visibly slower than light needs m c^2 to be
-// comparable to the momentum c khat, which at the default wavelength means
-// about this; a watchable flip needs the mass SMALL, since the period goes as
-// 1/m. A packet this heavy zitters about four times faster than it crosses a
-// wavelength, which is the honest picture -- the trade really is that quick.
-const WeylPacketMass float32 = 2
-
-// WeylOscMass is the mass WeylOscillator sets. Heavier again, and for a third
-// reason: a coherent state in this well carries 3.5 hbar omega, and unless
-// m c^2 is well above that the thing is relativistic enough that calling it a
-// harmonic oscillator is a stretch. At 4 the binding is 14% of the rest
-// energy, which still shows as a lengthened period but is recognisably the
-// Newtonian picture.
-const WeylOscMass float32 = 4
-
 var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E", "Wavelength", "PacketWidth", "Amplitude"}
+
+//////// stats
 
 // WeylStats tracks the two chiralities separately, which is the whole point.
 func (ss *Sim) WeylStats() {
@@ -399,6 +401,18 @@ func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
 		return 0, 0
 	}
 	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
+}
+
+//////// configurations
+
+var WeylConfigs = []InitFunc{
+	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
+	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
+	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
+	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
+	InitFunc{Name: "Electron In Field", Doc: "A charged packet in a uniform electric field: it picks up momentum, and with WeylQ at 0 it is a neutrino and ignores the field", Func: ElectronInField},
+	InitFunc{Name: "Weyl Oscillator", Doc: "A coherent state in a harmonic well made of MASS: confinement here is flipping faster the further out you go", Func: WeylOscillator},
+	InitFunc{Name: "Weyl Hydrogen", Doc: "An electron bound in a Coulomb well, from the first-order chiral equation rather than the second-order one", Func: WeylHydrogen},
 }
 
 // WeylSlab fills one chirality with a gaussian slab at rest: flat across the
@@ -735,12 +749,4 @@ func WeylHydrogen(ss *Sim) {
 	ss.WeylPast(om)
 }
 
-var WeylConfigs = []InitFunc{
-	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
-	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
-	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
-	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
-	InitFunc{Name: "Electron In Field", Doc: "A charged packet in a uniform electric field: it picks up momentum, and with WeylQ at 0 it is a neutrino and ignores the field", Func: ElectronInField},
-	InitFunc{Name: "Weyl Oscillator", Doc: "A coherent state in a harmonic well made of MASS: confinement here is flipping faster the further out you go", Func: WeylOscillator},
-	InitFunc{Name: "Weyl Hydrogen", Doc: "An electron bound in a Coulomb well, from the first-order chiral equation rather than the second-order one", Func: WeylHydrogen},
-}
+

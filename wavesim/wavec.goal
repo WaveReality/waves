@@ -1,0 +1,234 @@
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import "cogentcore.org/core/math32"
+
+//gosl:start
+
+// WaveCStates are the state variables for the first-order complex wave
+// equation. There is no velocity: that is the point.
+type WaveCStates int32 //enums:enum -trim-prefix=Wave
+
+const (
+	// WaveCa is the real part of the complex wave.
+	WaveCa WaveCStates = iota
+
+	// WaveCb is the imaginary part.
+	WaveCb
+
+	// WaveCMag is |psi|^2, which for a travelling complex wave is the smooth
+	// envelope alone -- no nodes, unlike the real second-order field.
+	WaveCMag
+)
+
+// WaveC runs as TWO kernels, a then b, both within one sim step, exactly as
+// Schrodinger's equation does. The equation is
+//
+//	d_t psi = i C Lap psi
+//
+// which IS Schrodinger's equation with C in place of hbar / 2m. That swap is
+// the comparison this exists for: Schrodinger's coefficient has the mass in
+// it, and a heavier particle makes it smaller and the wave slower. Here the
+// coefficient is just the speed scale, with no mass anywhere.
+//
+// Note this is a DIFFERENT way for mass to enter than the second-order pair
+// uses. Wave becomes KG by ADDING a term, and the massless equation is still
+// there underneath it. Schrodinger has no added term: its mass sits in the
+// coefficient of the Laplacian, and taking the mass away does not give back a
+// massless wave, it gives an infinite coefficient. See WaveCDirKernel for the
+// first-order equation that really does travel at c.
+//
+// Against the second-order WaveKernel, two things:
+//
+// Both carry TWO real numbers per point. Wave carries a position s and a
+// velocity s'; this carries a real part a and an imaginary part b. That is the
+// minimum a wave needs -- one number for where the field is, and you cannot
+// know where it is going without a second.
+//
+// But a and b are the SAME KIND of thing, on the same scale: for a travelling
+// wave they are one function shifted a quarter wavelength, equal in magnitude,
+// plottable on one axis. s and s' are a quantity and its RATE, differing by
+// roughly omega, needing separate scales. A complex field is two copies of one
+// quantity; a second-order field is a quantity and how fast it is changing.
+//
+// Direction works the same way in both. Nothing in either equation says which
+// way to go: a packet moves because of how its phase is arranged across space,
+// just as a second-order packet moves because of how s' is arranged across s.
+// A bare pulse with no phase spreads BOTH ways in either.
+//
+// The integration is Visscher's, as in SchrodingerAKernel and for the same
+// reason: advance a from the old b, then b from the NEW a, which two kernel
+// dispatches can do and one cannot. It also tolerates C khat^2 up to 2 where
+// the three-level leapfrog WaveCDirKernel uses stops at 1, so it runs at twice
+// the step. Laplacian19 reaches 16/3, so C has to stay under 3/8.
+func WaveCAKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pa := State[z, y, x, WaveCa, prv]
+	pb := State[z, y, x, WaveCb, prv]
+	var lb float32
+	if Params[0].ThreeD.IsTrue() {
+		lb = Laplacian19(x, y, z, int32(WaveCb), prv, pb)
+	} else {
+		lb = Laplacian1D(x, y, z, int32(WaveCb), prv, pb)
+	}
+	State[z, y, x, WaveCa, cur] = pa - Params[0].C*lb
+}
+
+// WaveCBKernel advances b from the a that WaveCAKernel just wrote, reading it
+// at cur. See that kernel for the scheme.
+func WaveCBKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	pb := State[z, y, x, WaveCb, prv]
+	na := State[z, y, x, WaveCa, cur] // the new a: this is the whole point
+	var la float32
+	if Params[0].ThreeD.IsTrue() {
+		la = Laplacian19(x, y, z, int32(WaveCa), cur, na)
+	} else {
+		la = Laplacian1D(x, y, z, int32(WaveCa), cur, na)
+	}
+	nb := pb + Params[0].C*la
+	State[z, y, x, WaveCb, cur] = nb
+	// a and b sit half a step apart, so what is conserved is the staggered
+	// a^2 + b(t-1/2) b(t+1/2), not a^2 + b^2
+	State[z, y, x, WaveCMag, cur] = na*na + pb*nb
+}
+
+// claude todo: need a Damp kernel here!
+
+//gosl:end
+
+func (ws WaveCStates) SetVarSettings(vs *VarSettings) {
+	// todo: can set per variable here
+}
+
+// WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
+// C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
+// 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
+// Set below that with room to spare: at 0.35 the 3D norm was already drifting
+// by 11% over thirty steps, which is what running up against the bound looks
+// like before it actually blows up.
+const WaveCC float32 = 0.25
+
+// RunWaveC runs one whole step: the a kernel, the edges, then the b kernel,
+// with CurState held fixed across all three.
+//
+// The edge pass in the MIDDLE is not optional. The b kernel reads the a the
+// first pass just wrote, at the NEIGHBORS, and on a wrapped lattice an edge
+// cell's neighbors are across the box -- so the halo has to be brought up to
+// date before b runs, not only after. Leaving it out cost 8% of the norm over
+// thirty steps in 3D, where the halo is a whole shell rather than two cells.
+func (ss *Sim) RunWaveC(n int) {
+	RunWaveCAKernel(n)
+	ss.RunWrapEdges()
+	RunWaveCBKernel(n)
+}
+
+func (ss *Sim) WaveCConfig() {
+	ParamsShouldDisplay = WaveCShouldDisplay
+	ss.StateVars = WaveCStatesN
+	ss.initFuncs = WaveCConfigs
+	ss.InitFunc = WaveCPacket
+	ss.WaveCStats()
+	ss.Params.C = WaveCC
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	ss.eqViewInitFunc = WaveCViewAll
+}
+
+// WaveCViewAll shows the real and imaginary parts beside the magnitude. The
+// two parts are the same size as each other -- put the second-order WaveVel
+// next to WavePos and they are not.
+func WaveCViewAll(view *View) {
+	view.SetCurPrev(Current, -1)
+	view.Panels[0].Var = WaveCa
+	view.Panels[1].Var = WaveCb
+	view.Panels[2].Var = WaveCMag
+	view.Panels[3].Var = WaveCa
+	view.SetCurPrev(Previous, 3)
+}
+
+// WaveCShouldDisplay determines which Parameters fields to display.
+var WaveCShouldDisplay = []string{"ThreeD", "Edges", "C", "WaveDir", "Wavelength", "PacketWidth", "Amplitude"}
+
+func (ss *Sim) WaveCStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(WaveCMag))
+	ss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))
+}
+
+//////// configurations
+
+var WaveCConfigs = []InitFunc{
+	InitFunc{Name: "Wave C Packet", Doc: "A complex packet that moves in the direction its phase runs, with nothing in the equation to say which way", Func: WaveCPacket, Current: true},
+	InitFunc{Name: "Wave C Pulse", Doc: "A bare bump with no phase: it spreads both ways and smears, where the directional version carries it off whole", Func: WaveCPulse},
+}
+
+// WaveCPacket is a complex packet whose phase runs along X, and it moves that
+// way. Reverse Params.WaveDir and it goes the other way -- but note what that
+// parameter is doing here. In WaveCDir it flips the EQUATION. Here the
+// equation has no direction at all, and WaveDir only flips the phase of the
+// initial state. The motion follows the phase, exactly as a second-order
+// packet follows the arrangement of its velocity.
+func WaveCPacket(ss *Sim) {
+	ss.WaveCPacketAt(ss.Config.Wavelength * ss.Params.WaveDir)
+}
+
+// WaveCPulse is a bare bump with no phase, and the one to set against both of
+// the others. The second-order equation splits it in two, one half each way.
+// WaveCDir carries it off whole in the one direction it has. Here it spreads
+// BOTH ways and smears as it goes, because a bump is made of every wavelength
+// and in this equation they all travel at different speeds.
+func WaveCPulse(ss *Sim) {
+	ss.WaveCPacketAt(0)
+}
+
+// WaveCPacketAt writes a gaussian slab with the given signed wavelength into
+// the present, then derives the past from it. Wavelength 0 means no phase.
+func (ss *Sim) WaveCPacketAt(wavelength float32) {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
+	wd := ss.Config.PacketWidth
+	amp := ss.Config.Amplitude
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := float32(c.X) - ctr
+				g := d / wd
+				en := amp * math32.FastExp(-g*g)
+				va, vb := en, float32(0)
+				if wavelength != 0 {
+					k := TwoPi / wavelength
+					va, vb = en*math32.Cos(k*d), en*math32.Sin(k*d)
+				}
+				// both levels alike: Visscher staggers a and b in time, so
+				// there is no past to write, unlike the three-level scheme
+				State[f.Z, f.Y, f.X, WaveCa, cur] += va
+				State[f.Z, f.Y, f.X, WaveCa, prv] += va
+				State[f.Z, f.Y, f.X, WaveCb, cur] += vb
+				State[f.Z, f.Y, f.X, WaveCb, prv] += vb
+			}
+		}
+	}
+}

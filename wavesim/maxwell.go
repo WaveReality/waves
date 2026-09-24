@@ -101,23 +101,16 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	aYvp := State.Value(int(z), int(y), int(x), int(AYv), int(prv))
 	aZvp := State.Value(int(z), int(y), int(x), int(AZv), int(prv))
 
-	var f0, fX, fY, fZ, c0, cX, cY, cZ float32
-	if Params[0].ThreeD.IsTrue() {
-		f0 = Laplacian19(x, y, z, int32(A0s), prv, a0pp)
-		fX = Laplacian19(x, y, z, int32(AXs), prv, aXpp)
-		fY = Laplacian19(x, y, z, int32(AYs), prv, aYpp)
-		fZ = Laplacian19(x, y, z, int32(AZs), prv, aZpp)
+	f0 := Laplacian19(x, y, z, int32(A0s), prv, a0pp)
+	fX := Laplacian19(x, y, z, int32(AXs), prv, aXpp)
+	fY := Laplacian19(x, y, z, int32(AYs), prv, aYpp)
+	fZ := Laplacian19(x, y, z, int32(AZs), prv, aZpp)
 
-		c0 = NeighAverage27(x, y, z, int32(Charge), prv)
-		cX = NeighAverage27(x, y, z, int32(CurrentX), prv)
-		cY = NeighAverage27(x, y, z, int32(CurrentY), prv)
-		cZ = NeighAverage27(x, y, z, int32(CurrentZ), prv)
-	} else {
-		f0 = Laplacian1D(x, y, z, int32(A0s), prv, a0pp)
-		fX = Laplacian1D(x, y, z, int32(AXs), prv, aXpp)
-		fY = Laplacian1D(x, y, z, int32(AYs), prv, aYpp)
-		fZ = Laplacian1D(x, y, z, int32(AZs), prv, aZpp)
-	}
+	c0 := NeighAverage27(x, y, z, int32(Charge), prv)
+	cX := NeighAverage27(x, y, z, int32(CurrentX), prv)
+	cY := NeighAverage27(x, y, z, int32(CurrentY), prv)
+	cZ := NeighAverage27(x, y, z, int32(CurrentZ), prv)
+
 	f0 = csq*f0 + Params[0].OneoEps0*c0
 	var a0vc float32
 	if Params[0].A0NoWave.IsTrue() {
@@ -186,18 +179,11 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 	aXpp := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
 	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
 	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
-	var f0, fX, fY, fZ float32
-	if Params[0].ThreeD.IsTrue() {
-		f0 = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
-		fX = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
-		fY = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
-		fZ = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
-	} else {
-		f0 = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
-		fX = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
-		fY = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
-		fZ = LaplacianEdge1D(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
-	}
+	f0 := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
+	fX := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
+	fY := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
+	fZ := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AZs), prv, aZpp)
+
 	f0 = csq * f0
 	a0vc := f0
 	a0pc := a0pp + a0vc
@@ -235,34 +221,51 @@ func (ss *Sim) MaxwellConfig() {
 	ss.initFuncs = MaxwellConfigs
 	ss.InitFunc = ElectricPotential
 	ss.MaxwellStats()
+	ss.Params.ThreeD.SetBool(true)
 	ss.Config.Wavelength = 16
 	ss.Config.PacketWidth = 2 * ss.Config.Wavelength
 	ss.Config.Velocity.X = 0.5 * ss.Params.C
-	ss.ViewInit(func(view *View) {
-		view.SetVar(A0s, -1)
-		MaxwellViewAll(view)
-	})
+	ss.eqViewInitFunc = MaxwellViewAll
 }
 
 // MaxwellViewAll configures the View to display all Maxwell values
 func MaxwellViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
+	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = A0s
 	view.Panels[1].Var = AXs
 	view.Panels[1].Mode = Vectors
-	// view.SetCurPrev(Previous, 1)
 	view.Panels[2].Var = EX
 	view.Panels[2].Mode = Vectors
-	// view.SetCurPrev(Previous, 3)
 	view.Panels[3].Var = BX
 	view.Panels[3].Mode = Vectors
-	// view.Settings.TrackParticle = 0
 }
 
 // MaxwellShouldDisplay determines which Parameters fields to display.
 var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0NoWave"}
+
+// EMNRadii is how many Config.Wavelength steps out the radial stats sample.
+const EMNRadii = 4
+
+// MaxwellStats adds the stats plotted over time in the GUI.
+func (ss *Sim) MaxwellStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatRadial("A0", A0s, EMNRadii))
+	ss.AddStat(ss.StatRadialVec("Emag", EX, EMNRadii))
+	ss.AddStat(ss.StatRadialVec("Bmag", BX, EMNRadii))
+	ss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))
+}
+
+//////// configurations
+
+// MaxwellConfigs are the initialization options offered in the GUI.
+var MaxwellConfigs = []InitFunc{
+	InitFunc{Name: "Electric Potential", Doc: "A point charge at Config.Source: A0 relaxes to 1/r and E to 1/r^2; watch the A0 radial stats", Func: ElectricPotential, Current: true},
+	InitFunc{Name: "Charge Dipole", Doc: "Two opposite charges: the far field falls as 1/r^3 because the potentials cancel to leading order", Func: ChargeDipole},
+	InitFunc{Name: "Polarized Photon", Doc: "A linearly polarized packet along X, in the Config.Polarization transverse direction; E along it, B along the other", Func: PolarizedPhoton},
+	InitFunc{Name: "Circular Polarization", Doc: "Both transverse components a quarter cycle apart, so E turns as it travels; Config.Polarization picks the handedness", Func: CircularPolarization},
+	InitFunc{Name: "Standing Wave", Doc: "Two packets sent at each other: E and B stand still with nodes a quarter wavelength apart", Func: StandingWave},
+	InitFunc{Name: "Moving Charge", Doc: "A charged line moving along itself at Config.Velocity.X: E radial, B circling, with |B|/|E| = v/c^2", Func: MovingCharge},
+}
 
 //////// initialization helpers
 
@@ -281,8 +284,6 @@ func emTransverse(ss *Sim) (pos, vel, orthoPos, orthoVel EMStates) {
 	}
 	return AYs, AYv, AZs, AZv
 }
-
-//////// configurations
 
 // ElectricPotential puts a point charge at [Config.Source] and lets the scalar
 // potential build up around it: A0 falls off as 1/r, and E = -grad A0 as 1/r^2.
@@ -428,25 +429,3 @@ func MovingCharge(ss *Sim) {
 		State.SetAdd(q*v, int(c.Z), int(c.Y), int(x), int(CurrentX), int(prv))
 	}
 }
-
-// MaxwellConfigs are the initialization options offered in the GUI.
-var MaxwellConfigs = []InitFunc{
-	InitFunc{Name: "Electric Potential", Doc: "A point charge at Config.Source: A0 relaxes to 1/r and E to 1/r^2; watch the A0 radial stats", Func: ElectricPotential, Current: true},
-	InitFunc{Name: "Charge Dipole", Doc: "Two opposite charges: the far field falls as 1/r^3 because the potentials cancel to leading order", Func: ChargeDipole},
-	InitFunc{Name: "Polarized Photon", Doc: "A linearly polarized packet along X, in the Config.Polarization transverse direction; E along it, B along the other", Func: PolarizedPhoton},
-	InitFunc{Name: "Circular Polarization", Doc: "Both transverse components a quarter cycle apart, so E turns as it travels; Config.Polarization picks the handedness", Func: CircularPolarization},
-	InitFunc{Name: "Standing Wave", Doc: "Two packets sent at each other: E and B stand still with nodes a quarter wavelength apart", Func: StandingWave},
-	InitFunc{Name: "Moving Charge", Doc: "A charged line moving along itself at Config.Velocity.X: E radial, B circling, with |B|/|E| = v/c^2", Func: MovingCharge},
-}
-
-// MaxwellStats adds the stats plotted over time in the GUI.
-func (ss *Sim) MaxwellStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatRadial("A0", A0s, EMNRadii))
-	ss.AddStat(ss.StatRadialVec("Emag", EX, EMNRadii))
-	ss.AddStat(ss.StatRadialVec("Bmag", BX, EMNRadii))
-	ss.AddStat(ss.StatGroupVel(math32.X, AYs, AZs))
-}
-
-// EMNRadii is how many Config.Wavelength steps out the radial stats sample.
-const EMNRadii = 4

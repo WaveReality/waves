@@ -48,7 +48,7 @@ func vwCode(x, y, z int32) float32 {
 
 func vwView(ss *Sim, vr EWStates, depth math32.Dims, slice int32) *View {
 	vw := &View{}
-	vw.sim = ss
+	vw.Sim = ss
 	vw.Settings.Defaults()
 	vw.colorMap = colormap.AvailableMaps[string(vw.Settings.ColorMap)]
 	vw.Size = ss.Config.Size

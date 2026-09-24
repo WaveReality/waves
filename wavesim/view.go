@@ -27,6 +27,42 @@ import (
 	"cogentcore.org/core/xyz"
 )
 
+// Canned ViewInitFunc functions that the user can select.
+
+// ViewInitBars1D sets the mode to Bars for 1D configurations.
+func ViewInitBars1D(view *View) {
+	if view.Sim.Params.ThreeD.IsFalse() {
+		view.SetMode(Bars, -1)
+	}
+}
+
+// ViewInitFour sets a four-panel view with the camera = 2 to provide
+// a good angle of viewing for this configuration. This is the default.
+func ViewInitFour(view *View) {
+	view.Settings.NPanels = PanelsFour
+	view.Settings.Camera = 2
+	view.Settings.Height = 0.8
+	ViewInitBars1D(view)
+}
+
+// ViewInitTwo sets a two-panel view with the camera = 1 to provide
+// a good angle of viewing for this configuration.
+func ViewInitTwo(view *View) {
+	view.Settings.NPanels = PanelsTwo
+	view.Settings.Camera = 1
+	view.Settings.Height = 0.2
+	ViewInitBars1D(view)
+}
+
+// ViewInitOne sets a one-panel view with the camera = 1 to provide
+// a good angle of viewing for this configuration.
+func ViewInitOne(view *View) {
+	view.Settings.NPanels = PanelsOne
+	view.Settings.Camera = 1
+	view.Settings.Height = 0.2
+	ViewInitBars1D(view)
+}
+
 // PanelView for what each panel in the View renders.
 type PanelView struct {
 	// Variable to display.
@@ -87,7 +123,7 @@ type View struct {
 
 	selCube math32.Vector3i
 
-	sim      *Sim
+	Sim      *Sim
 	midFrame *core.Frame
 	scene    *Scene
 	// SceneDBG  *Scene
@@ -207,9 +243,16 @@ func (vw *View) SetMode(mode ViewModes, panelNo int) {
 	vw.UpdateView()
 }
 
-// SetCurPrev sets the current vs. previous state viewing
+// SetCurPrev sets the current vs. previous state viewing.
+// if panelNo < 0 then it sets all of them.
 func (vw *View) SetCurPrev(curprv CurPrev, panelNo int) {
-	vw.Panels[panelNo].CurPrev = curprv
+	if panelNo < 0 {
+		for i := range 4 {
+			vw.Panels[i].CurPrev = curprv
+		}
+	} else {
+		vw.Panels[panelNo].CurPrev = curprv
+	}
 	vw.UpdateView()
 }
 

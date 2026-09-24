@@ -115,402 +115,7 @@ func WaveDampKernel(i uint32) { //gosl:kernel
 	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
-// WaveCStates are the state variables for the first-order complex wave
-// equation. There is no velocity: that is the point.
-type WaveCStates int32 //enums:enum -trim-prefix=Wave
-
-const (
-	// WaveCa is the real part of the complex wave.
-	WaveCa WaveCStates = iota
-
-	// WaveCb is the imaginary part.
-	WaveCb
-
-	// WaveCMag is |psi|^2, which for a travelling complex wave is the smooth
-	// envelope alone -- no nodes, unlike the real second-order field.
-	WaveCMag
-)
-
-// WaveC runs as TWO kernels, a then b, both within one sim step, exactly as
-// Schrodinger's equation does. The equation is
-//
-//	d_t psi = i C Lap psi
-//
-// which IS Schrodinger's equation with C in place of hbar / 2m. That swap is
-// the comparison this exists for: Schrodinger's coefficient has the mass in
-// it, and a heavier particle makes it smaller and the wave slower. Here the
-// coefficient is just the speed scale, with no mass anywhere.
-//
-// Note this is a DIFFERENT way for mass to enter than the second-order pair
-// uses. Wave becomes KG by ADDING a term, and the massless equation is still
-// there underneath it. Schrodinger has no added term: its mass sits in the
-// coefficient of the Laplacian, and taking the mass away does not give back a
-// massless wave, it gives an infinite coefficient. See WaveCDirKernel for the
-// first-order equation that really does travel at c.
-//
-// Against the second-order WaveKernel, two things:
-//
-// Both carry TWO real numbers per point. Wave carries a position s and a
-// velocity s'; this carries a real part a and an imaginary part b. That is the
-// minimum a wave needs -- one number for where the field is, and you cannot
-// know where it is going without a second.
-//
-// But a and b are the SAME KIND of thing, on the same scale: for a travelling
-// wave they are one function shifted a quarter wavelength, equal in magnitude,
-// plottable on one axis. s and s' are a quantity and its RATE, differing by
-// roughly omega, needing separate scales. A complex field is two copies of one
-// quantity; a second-order field is a quantity and how fast it is changing.
-//
-// Direction works the same way in both. Nothing in either equation says which
-// way to go: a packet moves because of how its phase is arranged across space,
-// just as a second-order packet moves because of how s' is arranged across s.
-// A bare pulse with no phase spreads BOTH ways in either.
-//
-// The integration is Visscher's, as in SchrodingerAKernel and for the same
-// reason: advance a from the old b, then b from the NEW a, which two kernel
-// dispatches can do and one cannot. It also tolerates C khat^2 up to 2 where
-// the three-level leapfrog WaveCDirKernel uses stops at 1, so it runs at twice
-// the step. Laplacian19 reaches 16/3, so C has to stay under 3/8.
-func WaveCAKernel(i uint32) { //gosl:kernel
-	ctx := GetCtx(0)
-	var x, y, z int32
-	ok := ctx.StateCoords(i, &x, &y, &z)
-	if !ok {
-		return
-	}
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	pa := State.Value(int(z), int(y), int(x), int(WaveCa), int(prv))
-	pb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
-	var lb float32
-	if Params[0].ThreeD.IsTrue() {
-		lb = Laplacian19(x, y, z, int32(WaveCb), prv, pb)
-	} else {
-		lb = Laplacian1D(x, y, z, int32(WaveCb), prv, pb)
-	}
-	State.Set(pa-Params[0].C*lb, int(z), int(y), int(x), int(WaveCa), int(cur))
-}
-
-// WaveCBKernel advances b from the a that WaveCAKernel just wrote, reading it
-// at cur. See that kernel for the scheme.
-func WaveCBKernel(i uint32) { //gosl:kernel
-	ctx := GetCtx(0)
-	var x, y, z int32
-	ok := ctx.StateCoords(i, &x, &y, &z)
-	if !ok {
-		return
-	}
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	pb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
-	na := State.Value(int(z), int(y), int(x), int(WaveCa), int(cur)) // the new a: this is the whole point
-	var la float32
-	if Params[0].ThreeD.IsTrue() {
-		la = Laplacian19(x, y, z, int32(WaveCa), cur, na)
-	} else {
-		la = Laplacian1D(x, y, z, int32(WaveCa), cur, na)
-	}
-	nb := pb + Params[0].C*la
-	State.Set(nb, int(z), int(y), int(x), int(WaveCb), int(cur))
-	// a and b sit half a step apart, so what is conserved is the staggered
-	// a^2 + b(t-1/2) b(t+1/2), not a^2 + b^2
-	State.Set(na*na+pb*nb, int(z), int(y), int(x), int(WaveCMag), int(cur))
-}
-
-// WaveCDirKernel is the plain wave equation written FIRST order in time, on a
-// complex field, to set against WaveKernel doing the same physics second
-// order:
-//
-//	d_t psi = -c dir d_x psi
-//
-// which is the massless Hamiltonian H = c p. Strip the spin off a Weyl wave
-// and this is what is left; give it a mass term and it becomes one.
-//
-// Three things differ from the second-order version, and they are the whole
-// reason this is here.
-//
-// It needs HALF the state. A second-order equation has to be told where the
-// field is and how fast it is moving; this one carries that in the complex
-// phase, so psi alone is the entire state and there is no velocity variable.
-//
-// It goes ONE way. In 1D the second-order operator factors,
-//
-//	d_tt - c^2 d_xx = (d_t - c d_x)(d_t + c d_x)
-//
-// so the familiar wave equation is exactly two of these back to back, one for
-// each direction -- which is why a bump in it splits in half and a bump here
-// does not. Params.WaveDir picks which factor this is. That factorization is
-// the same move that splits a Dirac wave into two Weyl ones.
-//
-// And |psi|^2 is SMOOTH. A real field travelling as cos(kx - wt) has its
-// intensity flickering at 2k; a complex one has |psi|^2 equal to the envelope
-// and nothing else, which is what makes it the natural description of a
-// quantum wave.
-//
-// Integration is the three-level leapfrog the two buffers already hold: cur is
-// two steps back before it is written, prv is one. Stability wants c khat
-// under 1, so C below 1 in 1D and below 1/sqrt(3) in 3D, where the gradient
-// stencil reaches further along a diagonal.
-//
-// Note the real and imaginary parts never mix. The operator is real, so this
-// is two copies of one real advection, and the complex structure earns its
-// keep in the initial condition rather than in the dynamics.
-func WaveCDirKernel(i uint32) { //gosl:kernel
-	ctx := GetCtx(0)
-	var x, y, z int32
-	ok := ctx.StateCoords(i, &x, &y, &z)
-	if !ok {
-		return
-	}
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	oa := State.Value(int(z), int(y), int(x), int(WaveCa), int(cur)) // psi(t-1), not yet overwritten
-	ob := State.Value(int(z), int(y), int(x), int(WaveCb), int(cur))
-	na := State.Value(int(z), int(y), int(x), int(WaveCa), int(prv)) // psi(t)
-	nb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
-
-	var ga, gb math32.Vector3
-	if Params[0].ThreeD.IsTrue() {
-		ga = Gradient10(x, y, z, int32(WaveCa), prv)
-		gb = Gradient10(x, y, z, int32(WaveCb), prv)
-	} else {
-		ga = Gradient1D(x, y, z, int32(WaveCa), prv)
-		gb = Gradient1D(x, y, z, int32(WaveCb), prv)
-	}
-	cd := 2 * Params[0].C * Params[0].WaveDir
-	pa := oa - cd*ga.X
-	pb := ob - cd*gb.X
-	State.Set(pa, int(z), int(y), int(x), int(WaveCa), int(cur))
-	State.Set(pb, int(z), int(y), int(x), int(WaveCb), int(cur))
-	// staggered, as every three-level leapfrog wants: the product of adjacent
-	// levels is what is conserved, and squaring one alone ripples instead
-	State.Set(na*pa+nb*pb, int(z), int(y), int(x), int(WaveCMag), int(cur))
-}
-
 //gosl:end
-
-func (ws WaveCStates) SetVarSettings(vs *VarSettings) {
-	// todo: can set per variable here
-}
-
-// WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
-// C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
-// 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
-// Set below that with room to spare: at 0.35 the 3D norm was already drifting
-// by 11% over thirty steps, which is what running up against the bound looks
-// like before it actually blows up.
-const WaveCC float32 = 0.25
-
-// RunWaveC runs one whole step: the a kernel, the edges, then the b kernel,
-// with CurState held fixed across all three.
-//
-// The edge pass in the MIDDLE is not optional. The b kernel reads the a the
-// first pass just wrote, at the NEIGHBORS, and on a wrapped lattice an edge
-// cell's neighbors are across the box -- so the halo has to be brought up to
-// date before b runs, not only after. Leaving it out cost 8% of the norm over
-// thirty steps in 3D, where the halo is a whole shell rather than two cells.
-func (ss *Sim) RunWaveC(n int) {
-	RunWaveCAKernel(n)
-	ss.RunWrapEdges()
-	RunWaveCBKernel(n)
-}
-
-func (ss *Sim) WaveCConfig() {
-	ParamsShouldDisplay = WaveCShouldDisplay
-	ss.StateVars = WaveCStatesN
-	ss.initFuncs = WaveCConfigs
-	ss.InitFunc = WaveCPacket
-	ss.WaveCStats()
-	ss.Params.C = WaveCC
-	ss.Params.Edges = EdgesWrap
-	ss.Params.Update()
-	ss.ViewInit(func(view *View) {
-		view.SetVar(WaveCa, -1)
-	})
-}
-
-// WaveCShouldDisplay determines which Parameters fields to display.
-var WaveCShouldDisplay = []string{"ThreeD", "Edges", "C", "WaveDir", "Wavelength", "PacketWidth", "Amplitude"}
-
-// WaveCViewAll shows the real and imaginary parts beside the magnitude. The
-// two parts are the same size as each other -- put the second-order WaveVel
-// next to WavePos and they are not.
-func WaveCViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
-	view.Panels[0].Var = WaveCa
-	view.Panels[1].Var = WaveCb
-	view.Panels[2].Var = WaveCMag
-	view.Panels[3].Var = WaveCa
-	view.SetCurPrev(Previous, 3)
-}
-
-func (ss *Sim) WaveCStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(WaveCMag))
-	ss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))
-}
-
-// WaveCPacket is a complex packet whose phase runs along X, and it moves that
-// way. Reverse Params.WaveDir and it goes the other way -- but note what that
-// parameter is doing here. In WaveCDir it flips the EQUATION. Here the
-// equation has no direction at all, and WaveDir only flips the phase of the
-// initial state. The motion follows the phase, exactly as a second-order
-// packet follows the arrangement of its velocity.
-func WaveCPacket(ss *Sim) {
-	ss.WaveCPacketAt(ss.Config.Wavelength * ss.Params.WaveDir)
-}
-
-// WaveCPulse is a bare bump with no phase, and the one to set against both of
-// the others. The second-order equation splits it in two, one half each way.
-// WaveCDir carries it off whole in the one direction it has. Here it spreads
-// BOTH ways and smears as it goes, because a bump is made of every wavelength
-// and in this equation they all travel at different speeds.
-func WaveCPulse(ss *Sim) {
-	ss.WaveCPacketAt(0)
-}
-
-// WaveCPacketAt writes a gaussian slab with the given signed wavelength into
-// the present, then derives the past from it. Wavelength 0 means no phase.
-func (ss *Sim) WaveCPacketAt(wavelength float32) {
-	ctx := GetCtx(0)
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
-	wd := ss.Config.PacketWidth
-	amp := ss.Config.Amplitude
-	sz := ss.Config.Size
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				d := float32(c.X) - ctr
-				g := d / wd
-				en := amp * math32.FastExp(-g*g)
-				va, vb := en, float32(0)
-				if wavelength != 0 {
-					k := TwoPi / wavelength
-					va, vb = en*math32.Cos(k*d), en*math32.Sin(k*d)
-				}
-				// both levels alike: Visscher staggers a and b in time, so
-				// there is no past to write, unlike the three-level scheme
-				State.SetAdd(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
-				State.SetAdd(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
-				State.SetAdd(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
-				State.SetAdd(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
-			}
-		}
-	}
-}
-
-var WaveCConfigs = []InitFunc{
-	InitFunc{Name: "Wave C Packet", Doc: "A complex packet that moves in the direction its phase runs, with nothing in the equation to say which way", Func: WaveCPacket, Current: true},
-	InitFunc{Name: "Wave C Pulse", Doc: "A bare bump with no phase: it spreads both ways and smears, where the directional version carries it off whole", Func: WaveCPulse},
-}
-
-func (ss *Sim) WaveCDirConfig() {
-	ParamsShouldDisplay = WaveCDirShouldDisplay
-	ss.StateVars = WaveCStatesN
-	ss.initFuncs = WaveCDirConfigs
-	ss.InitFunc = WaveCDirPacket
-	ss.WaveCDirStats()
-	ss.Params.C = 0.5 // under 1 in 1D, under 1/sqrt(3) in 3D
-	ss.Params.Edges = EdgesWrap
-	ss.Params.Update()
-	ss.ViewInit(func(view *View) {
-		view.SetVar(WaveCa, -1)
-	})
-}
-
-// WaveCDirShouldDisplay determines which Parameters fields to display.
-var WaveCDirShouldDisplay = []string{"ThreeD", "Edges", "C", "WaveDir", "Wavelength", "PacketWidth", "Amplitude"}
-
-// WaveCDirViewAll shows the two parts against the magnitude: the parts oscillate
-// and the magnitude does not, which is the difference from a real field.
-func WaveCDirViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.Settings.Height = 0.8
-	view.Panels[0].Var = WaveCa
-	view.Panels[1].Var = WaveCb
-	view.Panels[2].Var = WaveCMag
-	view.Panels[3].Var = WaveCa
-	view.SetCurPrev(Previous, 3)
-}
-
-func (ss *Sim) WaveCDirStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(WaveCMag))
-	// massless and one-way: this should sit at c, up to the lattice
-	ss.AddStat(ss.StatGroupVelMag(math32.X, WaveCMag))
-}
-
-// WaveCDirPacket is a complex wave packet: a gaussian slab times exp(i k x),
-// which travels rigidly at c in the direction Params.WaveDir picks.
-//
-// Watch WaveCMag while it goes. It is the bare envelope, perfectly smooth,
-// because |exp(i k x)| is 1 -- where the same packet in the real second-order
-// equation has its intensity flickering at twice the wavenumber.
-func WaveCDirPacket(ss *Sim) {
-	ss.WaveCDirPacketAt(ss.Config.Wavelength, ss.Config.Amplitude)
-}
-
-// WaveCDirPulse is a bare gaussian bump with no phase at all, and the one to run
-// beside the second-order Wave equation.
-//
-// There it splits in half, one going each way, because the second-order
-// operator contains both factors. Here it just leaves, in one piece, in the
-// one direction this equation has. Nothing about the bump chose that -- the
-// equation did.
-func WaveCDirPulse(ss *Sim) {
-	ss.WaveCDirPacketAt(0, ss.Config.Amplitude) // 0 wavelength: no phase, just the envelope
-}
-
-// WaveCDirPacketAt writes the packet into both time levels, the earlier one
-// shifted back by one step's travel. The leapfrog reads its own past, and for
-// this equation that past is exactly the packet one step upstream.
-func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
-	ctx := GetCtx(0)
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	ctr := CenterF(math32.Vec3(-1, -1, -1)).X
-	wd := ss.Config.PacketWidth
-	back := ctr - ss.Params.C*ss.Params.WaveDir
-	sz := ss.Config.Size
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				d := float32(c.X) - ctr
-				e := float32(c.X) - back
-				gd := d / wd
-				ge := e / wd
-				en := amp * math32.FastExp(-gd*gd)
-				eo := amp * math32.FastExp(-ge*ge)
-				var na, nb, oa, ob float32
-				if wavelength > 0 {
-					k := TwoPi / wavelength
-					na, nb = en*math32.Cos(k*d), en*math32.Sin(k*d)
-					oa, ob = eo*math32.Cos(k*e), eo*math32.Sin(k*e)
-				} else {
-					na, oa = en, eo
-				}
-				State.SetAdd(na, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
-				State.SetAdd(nb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
-				State.SetAdd(oa, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
-				State.SetAdd(ob, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
-			}
-		}
-	}
-}
-
-var WaveCDirConfigs = []InitFunc{
-	InitFunc{Name: "Wave C Packet", Doc: "A complex packet travelling one way at c, whose magnitude is the bare envelope with no flicker in it", Func: WaveCDirPacket, Current: true},
-	InitFunc{Name: "Wave C Pulse", Doc: "A bare bump with no phase: it leaves in one piece, where the second-order equation would split it in half", Func: WaveCDirPulse},
-}
 
 func (ws WaveStates) SetVarSettings(vs *VarSettings) {
 	// todo: can set per variable here
@@ -527,10 +132,33 @@ func (ss *Sim) WaveConfig() {
 	ss.Params.C = 0.5
 	ss.Params.Mass = 0.125
 	ss.Params.Update()
-	ss.ViewInit(func(view *View) {
-		view.SetVar(WavePos, -1)
-	})
+	ss.eqViewInitFunc = WaveViewAll
 }
+
+// WaveViewAll configures the View to display Pos and Vel, Cur and Prev
+func WaveViewAll(view *View) {
+	view.SetCurPrev(Current, -1)
+	view.Panels[0].Var = WavePos
+	view.Panels[1].Var = WavePos
+	view.SetCurPrev(Previous, 1)
+	view.Panels[2].Var = WaveVel
+	view.Panels[3].Var = WaveVel
+	view.SetCurPrev(Previous, 3)
+}
+
+// WaveShouldDisplay determines which Parameters fields to display.
+var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+
+func (ss *Sim) WaveStats() {
+	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(WaveKinetic))
+	ss.AddStat(ss.StatSum(WavePotential))
+	ss.AddStat(ss.StatSum(WaveEnergy))
+	// a massless packet: should sit at c, up to the lattice cos(k/2)
+	ss.AddStat(ss.StatGroupVel(math32.X, WavePos))
+}
+
+//////// configurations
 
 // WavePacket and WavePulse are shared by Wave and KleinGordon, which use the
 // same state variables. That sharing is the point: pick the same config under
@@ -561,28 +189,4 @@ func WavePacket(ss *Sim) {
 // to both time levels, which is what "no velocity" means in a leapfrog.
 func WavePulse(ss *Sim) {
 	ss.Gauss(WavePos, Both, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude, 0)
-}
-
-// WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
-
-// Wave1DViewAll configures the View to display Pos and Vel, Cur and Prev
-func Wave1DViewAll(view *View) {
-	view.Settings.NPanels = PanelsFour
-	view.Settings.Camera = 2
-	view.SetVarMinMax(WavePos, -0.8, 0.8)
-	view.Settings.Height = 0.8
-	view.SetCurPrev(Previous, 1)
-	view.Panels[2].Var = WaveVel
-	view.SetCurPrev(Previous, 3)
-	view.Panels[3].Var = WaveVel
-}
-
-func (ss *Sim) WaveStats() {
-	ss.AddStat(ss.StatStep())
-	ss.AddStat(ss.StatSum(WaveKinetic))
-	ss.AddStat(ss.StatSum(WavePotential))
-	ss.AddStat(ss.StatSum(WaveEnergy))
-	// a massless packet: should sit at c, up to the lattice cos(k/2)
-	ss.AddStat(ss.StatGroupVel(math32.X, WavePos))
 }

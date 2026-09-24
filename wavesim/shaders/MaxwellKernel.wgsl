@@ -420,12 +420,6 @@ const  AverageWts: NeighWeights = 1;
 const  Grad10Wts: NeighWeights = 2;
 const  Average27Sum = f32(20.104084);
 const  OneoAverage27Sum = 0.049741138;
-fn Laplacian1D(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
-	var m1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x - 1), u32(vidx), u32(tidx)));
-	var p1 = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-	u32(z), u32(y), u32(x + 1), u32(vidx), u32(tidx)));
-return (m1 + p1) - 2*ctr;
-}
 fn Laplacian19(x: i32,y: i32,z: i32,vidx: i32,tidx: i32, ctr: f32) -> f32 {
 	var avg = f32(0);
 	for (var j=0; j<NLapNeigh; j++) {
@@ -521,7 +515,7 @@ fn Curl10(x: i32,y: i32,z: i32,vidx: i32,tidx: i32) -> vec3<f32> {
 return c;
 }
 
-//////// import: "klein-gordon.go"
+//////// import: "kg-complex.go"
 alias CabStates = EMStates; //enums:enum -trim-prefix=Cab
 const  CabAs: CabStates = 18;
 const  CabBs: CabStates = 19;
@@ -529,6 +523,8 @@ const  CabAv: CabStates = 20;
 const  CabBv: CabStates = 21;
 const  CabV: CabStates = 22;
 const  CabMag: CabStates = 23;
+
+//////// import: "klein-gordon.go"
 
 //////// import: "maxwell.go"
 alias EMStates = i32; //enums:enum
@@ -570,29 +566,14 @@ fn MaxwellKernel(i: u32) { //gosl:kernel
 	var aXvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AXv), u32(prv)));
 	var aYvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AYv), u32(prv)));
 	var aZvp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(AZv), u32(prv)));
-	var f0: f32;
-	var fX: f32;
-	var fY: f32;
-	var fZ: f32;
-	var c0: f32;
-	var cX: f32;
-	var cY: f32;
-	var cZ: f32;
-	if (Params[0].ThreeD == 1) {
-		f0 = Laplacian19(x, y, z, i32(A0s), prv, a0pp);
-		fX = Laplacian19(x, y, z, i32(AXs), prv, aXpp);
-		fY = Laplacian19(x, y, z, i32(AYs), prv, aYpp);
-		fZ = Laplacian19(x, y, z, i32(AZs), prv, aZpp);
-		c0 = NeighAverage27(x, y, z, i32(Charge), prv);
-		cX = NeighAverage27(x, y, z, i32(CurrentX), prv);
-		cY = NeighAverage27(x, y, z, i32(CurrentY), prv);
-		cZ = NeighAverage27(x, y, z, i32(CurrentZ), prv);
-	} else {
-		f0 = Laplacian1D(x, y, z, i32(A0s), prv, a0pp);
-		fX = Laplacian1D(x, y, z, i32(AXs), prv, aXpp);
-		fY = Laplacian1D(x, y, z, i32(AYs), prv, aYpp);
-		fZ = Laplacian1D(x, y, z, i32(AZs), prv, aZpp);
-	}
+	var f0 = Laplacian19(x, y, z, i32(A0s), prv, a0pp);
+	var fX = Laplacian19(x, y, z, i32(AXs), prv, aXpp);
+	var fY = Laplacian19(x, y, z, i32(AYs), prv, aYpp);
+	var fZ = Laplacian19(x, y, z, i32(AZs), prv, aZpp);
+	var c0 = NeighAverage27(x, y, z, i32(Charge), prv);
+	var cX = NeighAverage27(x, y, z, i32(CurrentX), prv);
+	var cY = NeighAverage27(x, y, z, i32(CurrentY), prv);
+	var cZ = NeighAverage27(x, y, z, i32(CurrentZ), prv);
 	f0 = csq*f0 + Params[0].OneoEps0*c0;
 	var a0vc: f32;
 	if (Params[0].A0NoWave == 1) {
@@ -776,10 +757,14 @@ const  WaveV: WaveStates = 3;
 const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
+
+//////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave
 const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
+
+//////// import: "wavecdir.go"
 
 //////// import: "weyl.go"
 alias WeylStates = EMStates; //enums:enum -trim-prefix=Weyl
