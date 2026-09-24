@@ -406,7 +406,6 @@ func (ss *Sim) ViewRebuild() {
 		vw.SetVar(vals[0], -1)
 	}
 	ss.callViewInit(vw)
-	// ss.GUI.View.UpdateView()
 }
 
 func (ss *Sim) callViewInit(view *View) {
