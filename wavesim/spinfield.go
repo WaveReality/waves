@@ -275,7 +275,6 @@ func (ss *Sim) SpinfieldConfig() {
 
 // SpinfieldViewAll configures the View to display Spinfield values
 func SpinfieldViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = Spinfield0a
 	view.Panels[1].Var = SpinfieldDrive
 	view.Panels[2].Var = CabAs

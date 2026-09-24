@@ -228,7 +228,6 @@ func (ss *Sim) MaxwellConfig() {
 
 // MaxwellViewAll configures the View to display all Maxwell values
 func MaxwellViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = A0s
 	view.Panels[1].Var = AXs
 	view.Panels[1].Mode = Vectors

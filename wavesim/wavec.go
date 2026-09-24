@@ -158,7 +158,6 @@ func (ss *Sim) WaveCConfig() {
 // two parts are the same size as each other -- put the second-order WaveVel
 // next to WavePos and they are not.
 func WaveCViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = WaveCa
 	view.Panels[1].Var = WaveCb
 	view.Panels[2].Var = WaveCMag

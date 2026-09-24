@@ -215,7 +215,6 @@ func (ss *Sim) KleinGordonCConfig() {
 
 // CabViewAll configures the View to display A and B, Cur and Prev
 func CabViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = CabAs
 	view.Panels[1].Var = CabAs
 	view.SetCurPrev(Previous, 1)

@@ -291,7 +291,6 @@ func (ss *Sim) WeylConfig() {
 
 // WeylViewAll configures the View to display Weyl values
 func WeylViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = WeylL1a
 	view.Panels[1].Var = WeylL1b
 	view.Panels[2].Var = WeylR1a

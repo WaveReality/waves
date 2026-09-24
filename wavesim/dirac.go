@@ -292,7 +292,6 @@ func (ss *Sim) DiracConfig() {
 // the mass term acts on: the right-handed half the kernel evolves, the
 // left-handed one it recovers, and the two components of the spinor.
 func DiracViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = DiracMag
 	view.Panels[1].Var = DiracLMag
 	view.Panels[2].Var = Dirac1As

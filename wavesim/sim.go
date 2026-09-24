@@ -393,7 +393,7 @@ func (ss *Sim) Stopped() {
 // the View caches a settings map keyed by the variable enum and a Var per
 // panel, and every one of those belongs to the equation that is going away.
 func (ss *Sim) ViewRebuild() {
-	if !ss.GUI.Active || ss.GUI.View == nil {
+	if ss.GUI.View == nil {
 		return
 	}
 	vw := ss.GUI.View

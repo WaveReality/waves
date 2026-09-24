@@ -79,6 +79,12 @@ type PanelView struct {
 	Offset math32.Vector3i
 }
 
+func (pv *PanelView) Defaults() {
+	pv.CurPrev = Current
+	pv.Mode = Plane
+	pv.Offset = math32.Vec3i(0, 0, 0)
+}
+
 // View is a Cogent Core Widget that provides a 3D view into state.
 type View struct {
 	core.Frame
@@ -205,6 +211,7 @@ func (vw *View) SetVar(vr enums.Enum, panelNo int) {
 	if panelNo < 0 {
 		vw.Var = vr
 		for i := range 4 {
+			vw.Panels[i].Defaults()
 			vw.Panels[i].Var = vr
 		}
 		vw.VarsListUpdate()
@@ -312,6 +319,9 @@ func (vw *View) RebuildView() {
 
 // UpdateImpl does the guts of updating -- backend for Update or GoUpdate
 func (vw *View) UpdateImpl() {
+	if vw.Var == nil {
+		return
+	}
 	vw.Lock()
 	if vw.Settings.TrackParticle >= 0 {
 		_, _, pos, _ := GetParticleAt(int32(vw.Settings.TrackParticle))
@@ -413,10 +423,13 @@ func (vw *View) GetVarSettingsPanel(panelNo int) (*VarSettings, error) {
 
 // VarsListUpdate updates the list of network variables
 func (vw *View) VarsListUpdate() {
-	if reflectx.IsNil(reflect.ValueOf(vw.Var)) {
+	if vw.Sim == nil {
 		return
 	}
-	vals := vw.Var.Values()
+	if reflectx.IsNil(reflect.ValueOf(vw.Sim.StateVars)) {
+		return
+	}
+	vals := vw.Sim.StateVars.Values()
 	// the same COUNT is not the same list: two equations can have the same
 	// number of variables and none of them in common. Enum keys carry their
 	// type, so a lookup of the first one tells us whether this is the same set.
@@ -450,10 +463,10 @@ func (vw *View) makeVars(frame *core.Frame) {
 		})
 		vw.varsFrame.Maker(func(p *tree.Plan) {
 			vw.VarsListUpdate()
-			if reflectx.IsNil(reflect.ValueOf(vw.Var)) {
+			if vw.Sim == nil || reflectx.IsNil(reflect.ValueOf(vw.Sim.StateVars)) {
 				return
 			}
-			vals := vw.Var.Values()
+			vals := vw.Sim.StateVars.Values()
 			tree.AddAt(p, "curprv", func(w *core.Switch) {
 				w.SetText("Current").SetChecked(true).
 					SetTooltip("Selects whether to show the current or previous state values")

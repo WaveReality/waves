@@ -135,7 +135,6 @@ func (ss *Sim) WaveConfig() {
 
 // WaveViewAll configures the View to display Pos and Vel, Cur and Prev
 func WaveViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = WavePos
 	view.Panels[1].Var = WavePos
 	view.SetCurPrev(Previous, 1)

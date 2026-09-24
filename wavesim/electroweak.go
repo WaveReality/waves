@@ -799,7 +799,6 @@ func (ss *Sim) ElectroweakConfig() {
 
 // ElectroweakViewAll configures the View to display Electroweak values
 func ElectroweakViewAll(view *View) {
-	view.SetCurPrev(Current, -1)
 	view.Panels[0].Var = EWHs0a
 	view.Panels[1].Var = AYs // the transverse component: A0s is zero for a pulse
 	view.Panels[2].Var = EWBYs
