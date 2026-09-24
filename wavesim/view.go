@@ -434,7 +434,7 @@ func (vw *View) VarsListUpdate() {
 	// number of variables and none of them in common. Enum keys carry their
 	// type, so a lookup of the first one tells us whether this is the same set.
 	if len(vals) == len(vw.VarSettings) && len(vals) > 0 {
-		if _, ok := vw.VarSettings[vals[0]]; ok {
+		if _, ok := vw.VarSettings[vals[len(vals)-1]]; ok {
 			return
 		}
 	}
@@ -467,6 +467,7 @@ func (vw *View) makeVars(frame *core.Frame) {
 				return
 			}
 			vals := vw.Sim.StateVars.Values()
+			valtype := vw.Sim.StateVars.String()
 			tree.AddAt(p, "curprv", func(w *core.Switch) {
 				w.SetText("Current").SetChecked(true).
 					SetTooltip("Selects whether to show the current or previous state values")
@@ -488,7 +489,7 @@ func (vw *View) makeVars(frame *core.Frame) {
 			for _, v := range vals {
 				vn := v.String()
 				doc := v.Desc()
-				tree.AddAt(p, vn, func(w *core.Button) {
+				tree.AddAt(p, valtype+vn, func(w *core.Button) {
 					w.SetText(vn)
 					if doc != "" {
 						w.Tooltip = v.String() + ": " + doc

@@ -282,7 +282,6 @@ func HydrogenP(ss *Sim) {
 // it travels at the group velocity and spreads, which is the one thing a free
 // quantum particle reliably does.
 func FreePacket(ss *Sim) {
-	ss.Params.Edges = EdgesDamp // let it leave rather than bounce
 	ss.Params.Update()
 	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
 }
