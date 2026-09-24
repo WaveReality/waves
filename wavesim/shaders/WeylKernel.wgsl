@@ -403,7 +403,7 @@ const NPanelsN: NPanels = 3;
 const SpinfieldStatesN: SpinfieldStates = 43;
 const WaveStatesN: WaveStates = 7;
 const WaveCStatesN: WaveCStates = 3;
-const WeylStatesN: WeylStates = 29;
+const WeylStatesN: WeylStates = 30;
 
 //////// import: "funcs.go"
 alias MinusPlusOne = i32; //enums:enum
@@ -694,8 +694,9 @@ const  WeylR1b: WeylStates = 23;
 const  WeylR2a: WeylStates = 24;
 const  WeylR2b: WeylStates = 25;
 const  WeylV: WeylStates = 26;
-const  WeylLMag: WeylStates = 27;
-const  WeylRMag: WeylStates = 28;
+const  WeylMag: WeylStates = 27;
+const  WeylLMag: WeylStates = 28;
+const  WeylRMag: WeylStates = 29;
 fn WeylKernel(i: u32) { //gosl:kernel
 let ctx = Ctx[0];; var x: i32;
 var y: i32;
@@ -794,7 +795,9 @@ if (Params[0].EM == 1 && Params[0].WeylQ != 0) {
 	r2a *= df;
 	r2b *= df;
 }; StateSet(l1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1a), u32(cur)));; StateSet(l1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL1b), u32(cur)));; StateSet(l2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2a), u32(cur)));; StateSet(l2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylL2b), u32(cur)));; StateSet(r1a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1a), u32(cur)));; StateSet(r1b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR1b), u32(cur)));; StateSet(r2a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2a), u32(cur)));; StateSet(r2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2b), u32(cur)));; StateSet(nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylLMag), u32(cur)));; StateSet(nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylR2b), u32(cur)));; var lm = nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b;
+; var rm = nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b;
+; StateSet(lm + rm, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylMag), u32(cur)));; StateSet(lm, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylLMag), u32(cur)));; StateSet(rm, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
 TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WeylRMag), u32(cur))); }
 
 //////// import: "slrand.wgsl"

@@ -52,10 +52,16 @@ const (
 	// shifts the phase instead and cannot confine at all: see WeylOscillator.
 	WeylV
 
+	// WeylMag is |psi_L|^2 + |psi_R|^2, the conserved total. This is the one
+	// to measure a whole electron with: the mass trades the two halves back
+	// and forth, so each of them alone rises and falls at m c^2 / hbar even
+	// when nothing is happening to the particle.
+	WeylMag
+
 	// WeylLMag is |psi_L|^2.
 	WeylLMag
 
-	// WeylRMag is |psi_R|^2. The conserved total is this plus WeylLMag.
+	// WeylRMag is |psi_R|^2. Their sum is WeylMag.
 	WeylRMag
 )
 
@@ -250,8 +256,11 @@ func WeylKernel(i uint32) { //gosl:kernel
 	// the STAGGERED magnitude u(t).u(t+1), not |u(t+1)|^2: a three-level
 	// leapfrog conserves the product of adjacent levels exactly, the same way
 	// Visscher's scheme does, and squaring one level alone ripples instead.
-	State.Set(nl1a*l1a+nl1b*l1b+nl2a*l2a+nl2b*l2b, int(z), int(y), int(x), int(WeylLMag), int(cur))
-	State.Set(nr1a*r1a+nr1b*r1b+nr2a*r2a+nr2b*r2b, int(z), int(y), int(x), int(WeylRMag), int(cur))
+	lm := nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
+	rm := nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
+	State.Set(lm+rm, int(z), int(y), int(x), int(WeylMag), int(cur))
+	State.Set(lm, int(z), int(y), int(x), int(WeylLMag), int(cur))
+	State.Set(rm, int(z), int(y), int(x), int(WeylRMag), int(cur))
 }
 
 // Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
@@ -316,11 +325,14 @@ var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E
 // WeylStats tracks the two chiralities separately, which is the whole point.
 func (ss *Sim) WeylStats() {
 	ss.AddStat(ss.StatStep())
+	ss.AddStat(ss.StatSum(WeylMag))
 	ss.AddStat(ss.StatSum(WeylLMag))
 	ss.AddStat(ss.StatSum(WeylRMag))
-	// both chiralities: for the neutrino only L moves, and for an electron the
-	// two must track each other, since they are halves of one particle
-	ss.AddStat(ss.StatGroupVelMag(math32.X, WeylLMag, WeylRMag))
+	// the total first: a half on its own spreads or shrinks as the mass trades
+	// it away, so only WeylMag reads the packet itself. Then both chiralities:
+	// for the neutrino only L moves, and for an electron the two must track
+	// each other, since they are halves of one particle
+	ss.AddStat(ss.StatGroupVelMag(math32.X, WeylMag, WeylLMag, WeylRMag))
 	ss.AddStat(ss.StatWeylHelicity(math32.X))
 }
 

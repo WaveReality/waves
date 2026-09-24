@@ -149,28 +149,75 @@ func StateMean(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	return StateSum(sz, vr, curPrv) / float64(n)
 }
 
-// StateCentroids computes the intensity-weighted centroid of each of the given
-// variables along dim, into ctrs, with the total weight into wts.
+// CircularWidthMax is the standard deviation of a uniform distribution over a
+// span of 1: the largest width [CircularWidth] can report.
+const CircularWidthMax = 0.28867513459481288225 // 1/sqrt(12)
+
+// CircularWidth returns the standard deviation of a distribution on a ring of
+// circumference ln, given the intensity-weighted mean cosine and sine of its
+// angle. It is exact for a wrapped Gaussian, and saturates at the uniform
+// value rather than diverging as the distribution fills the ring.
+func CircularWidth(mc, ms float64, ln int) float64 {
+	l := float64(ln)
+	mx := CircularWidthMax * l
+	r := math.Sqrt(mc*mc + ms*ms)
+	if r <= 0 {
+		return mx
+	}
+	if r >= 1 {
+		return 0
+	}
+	return min(l/(2*math.Pi)*math.Sqrt(-2*math.Log(r)), mx)
+}
+
+// StateMoments computes, for each of the given variables along dim: the
+// intensity-weighted centroid into ctrs, the rms width into wids, and the
+// total intensity into wts.
 //
 // square says whether to weight by the value squared. An AMPLITUDE variable
 // wants that, since the intensity is its square. A variable that is already an
 // intensity -- any of the Mag ones -- does NOT: squaring it again weights by
 // |psi|^4, which tracks the peak instead of the envelope and reads several
 // percent slow on a packet that is dispersing at all.
-func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, square bool, vrs []enums.Enum, ctrs, wts []float64) {
+//
+// The WIDTH, and only the width, clamps the weight at zero. A Mag written as a
+// STAGGERED product, as WeylLMag is, is conserved in the sum but carries small
+// negative lobes locally, and a negative weight is not a density: left in, it
+// drives the total below the partial sums, the mean resultant runs past 1 and
+// the width is meaningless. The centroid keeps the signed weight, because those
+// lobes sit at a fixed CARRIER phase -- dropping them ties the centroid to the
+// phase velocity instead of the group velocity, and it reads visibly slow.
+//
+// The width is the CIRCULAR standard deviation: the spread of the intensity
+// taken as a distribution on a ring of circumference L. A packet straddling a
+// wrapped edge is half at each end of the axis, and a linear second moment
+// would read that as nearly the width of the whole box. See [CircularWidth].
+func StateMoments(sz math32.Vector3i, dim math32.Dims, curPrv int32, square bool, vrs []enums.Enum, ctrs, wids, wts []float64) {
 	nv := len(vrs)
 	vris := make([]int, nv)
 	num := make([]float64, nv)
 	den := make([]float64, nv)
+	pos := make([]float64, nv) // clamped weight, for the width alone
+	csum := make([]float64, nv)
+	ssum := make([]float64, nv)
 	for i, vr := range vrs {
 		vris[i] = int(vr.Int64())
+	}
+	ln := int(sz.Dim(dim))
+	cosd := make([]float64, ln)
+	sind := make([]float64, ln)
+	for d := range ln {
+		th := 2 * math.Pi * float64(d) / float64(ln)
+		cosd[d] = math.Cos(th)
+		sind[d] = math.Sin(th)
 	}
 	var c math32.Vector3i
 	for c.Z = range sz.Z {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				d := float64(c.Dim(dim))
+				di := int(c.Dim(dim))
+				d := float64(di)
 				for i := range nv {
 					w := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(vris[i]), int(curPrv)))
 					if square {
@@ -178,16 +225,25 @@ func StateCentroids(sz math32.Vector3i, dim math32.Dims, curPrv int32, square bo
 					}
 					num[i] += w * d
 					den[i] += w
+					if w > 0 {
+						pos[i] += w
+						csum[i] += w * cosd[di]
+						ssum[i] += w * sind[di]
+					}
 				}
 			}
 		}
 	}
 	for i := range nv {
 		wts[i] = den[i]
+		wids[i] = 0
 		if den[i] == 0 {
-			ctrs[i] = float64(sz.Dim(dim)) / 2
-		} else {
-			ctrs[i] = num[i] / den[i]
+			ctrs[i] = float64(ln) / 2
+			continue
+		}
+		ctrs[i] = num[i] / den[i]
+		if pos[i] > 0 {
+			wids[i] = CircularWidth(csum[i]/pos[i], ssum[i]/pos[i], ln)
 		}
 	}
 }
@@ -209,29 +265,46 @@ func StatGroupVelName(vr enums.Enum, dim math32.Dims) string {
 	return "Vg" + vr.String() + dim.String()
 }
 
-// StatGroupVel records the group velocity of each given AMPLITUDE variable
-// along dim, in units of C, as the centroid of its intensity over a trailing
-// window of StatGroupVelWindow steps. Use [Sim.StatGroupVelMag] for variables
-// that are already an intensity.
+// StatWidthName is the stat name for the packet width of vr along dim.
+func StatWidthName(vr enums.Enum, dim math32.Dims) string {
+	return "Wid" + vr.String() + dim.String()
+}
+
+// StatDispersionName is the stat name for the dispersion rate of vr along dim.
+func StatDispersionName(vr enums.Enum, dim math32.Dims) string {
+	return "Vd" + vr.String() + dim.String()
+}
+
+// StatGroupVel profiles the packet in each given AMPLITUDE variable along dim:
+// where it is, how fast it moves, how wide it is and how fast it spreads. Use
+// [Sim.StatGroupVelMag] for variables that are already an intensity.
 func (ss *Sim) StatGroupVel(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
 	return ss.statGroupVel(dim, true, vrs)
 }
 
 // StatGroupVelMag is [Sim.StatGroupVel] for variables that are ALREADY an
-// intensity, such as any of the Mag ones: it weights the centroid by the value
-// rather than by its square. See StateCentroids for why that matters.
+// intensity, such as any of the Mag ones: it weights the moments by the value
+// rather than by its square. See [StateMoments] for why that matters.
 func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init bool) {
 	return ss.statGroupVel(dim, false, vrs)
 }
 
-// statGroupVel does the work of both. For each variable it records the
-// intensity centroid along dim and the speed of that centroid in units of C:
-// the group velocity of a wave packet. Both are recorded; only the velocity is
-// plotted by default.
+// statGroupVel does the work of both. For each variable it records four stats:
+// the intensity centroid along dim and its width, both in cubes, and the rate
+// of change of each, both in units of C. Vg is the group velocity: how fast
+// the packet travels. Vd is the dispersion rate: how fast it spreads.
 //
-// The shift is measured over [StatGroupVelWindow] samples, so the first that
-// many read zero. A packet crossing a wrapped edge is taken the short way
-// round the box, so it does not register as a jump.
+// The two rates share a scale on purpose, so a single plot says how far a
+// packet gets before it smears out. A non-dispersive wave holds Vd at zero. A
+// free Schrodinger packet settles at the spread of group velocities within it,
+// hbar/(2 m sigma0), and holds that: the width grows linearly. Diffusion has
+// no carrier to hold together, so its Vd decays as 1/sqrt(t) -- a width going
+// as sqrt(t) is the signature that separates spreading from propagating.
+//
+// Only the centroid moves off zero on the first step; both rates are measured
+// over [StatGroupVelWindow] samples, so the first that many read zero. A
+// packet crossing a wrapped edge is taken the short way round the box, so it
+// does not register as a jump.
 //
 // A variable carrying a negligible share of the intensity in the group reads
 // zero rather than the centroid of its own roundoff, which would otherwise be
@@ -241,36 +314,51 @@ func (ss *Sim) StatGroupVelMag(dim math32.Dims, vrs ...enums.Enum) func(init boo
 func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func(init bool) {
 	nv := len(vrs)
 	ctrs := make([]float64, nv)
+	wids := make([]float64, nv)
 	wts := make([]float64, nv)
-	var hist []float64
+	var chist, whist []float64
 	var steps []int
 	var n, win int
 	return func(init bool) {
 		ctx := GetCtx(0)
 		if init {
 			win = max(StatGroupVelWindow, 1)
-			hist = make([]float64, win*nv)
+			chist = make([]float64, win*nv)
+			whist = make([]float64, win*nv)
 			steps = make([]int, win)
 			n = 0
 			for _, vr := range vrs {
 				ct := ss.Stats.Float64(StatCentroidName(vr, dim))
 				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
+				wt := ss.Stats.Float64(StatWidthName(vr, dim))
+				dt := ss.Stats.Float64(StatDispersionName(vr, dim))
 				ct.SetNumRows(0)
 				vt.SetNumRows(0)
+				wt.SetNumRows(0)
+				dt.SetNumRows(0)
+				// only the two rates are on by default: they share a scale
 				plot.SetFirstStyler(ct, func(s *plot.Style) {
 					s.On = false
 				})
 				plot.SetFirstStyler(vt, func(s *plot.Style) {
 					s.On = true
 				})
+				plot.SetFirstStyler(wt, func(s *plot.Style) {
+					s.On = false
+				})
+				plot.SetFirstStyler(dt, func(s *plot.Style) {
+					s.On = true
+				})
 				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
 				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
+				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
+				metadata.SetDoc(dt, "Dispersion rate of "+vr.String()+" along "+dim.String()+", in units of C: how fast the packet spreads, on the same scale as its group velocity")
 			}
 			return
 		}
 		sz := ss.Config.Size
 		ln := float64(sz.Dim(dim))
-		StateCentroids(sz, dim, ctx.CurState, square, vrs, ctrs, wts)
+		StateMoments(sz, dim, ctx.CurState, square, vrs, ctrs, wids, wts)
 		mx := 0.0
 		for i := range nv {
 			if wts[i] > mx {
@@ -283,18 +371,23 @@ func (ss *Sim) statGroupVel(dim math32.Dims, square bool, vrs []enums.Enum) func
 		ds := float64(int(ctx.Step) - steps[old])
 		for i, vr := range vrs {
 			vg := 0.0
+			vd := 0.0
 			if have && ds > 0 && ss.Params.C > 0 && wts[i] > 1.0e-6*mx {
-				d := ctrs[i] - hist[old*nv+i]
+				d := ctrs[i] - chist[old*nv+i]
 				if d > ln/2 {
 					d -= ln
 				} else if d < -ln/2 {
 					d += ln
 				}
 				vg = d / ds / float64(ss.Params.C)
+				vd = (wids[i] - whist[old*nv+i]) / ds / float64(ss.Params.C)
 			}
-			hist[old*nv+i] = ctrs[i]
+			chist[old*nv+i] = ctrs[i]
+			whist[old*nv+i] = wids[i]
 			ss.Stats.Float64(StatCentroidName(vr, dim)).AppendRowFloat(ctrs[i])
 			ss.Stats.Float64(StatGroupVelName(vr, dim)).AppendRowFloat(vg)
+			ss.Stats.Float64(StatWidthName(vr, dim)).AppendRowFloat(wids[i])
+			ss.Stats.Float64(StatDispersionName(vr, dim)).AppendRowFloat(vd)
 		}
 		steps[old] = int(ctx.Step)
 		n++

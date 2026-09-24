@@ -334,6 +334,8 @@ func (ss *Sim) DiracStats() {
 	ss.AddStat(ss.StatSum(Charge))
 	ss.AddStat(ss.StatSum(DiracMag))
 	ss.AddStat(ss.StatSum(DiracLMag))
+	// massive, so dispersive: watch Vd against the other equations
+	ss.AddStat(ss.StatGroupVelMag(math32.X, DiracMag))
 	ss.AddStat(ss.StatDiracSpin())
 }
 
