@@ -8,12 +8,6 @@ import "cogentcore.org/core/math32"
 
 // Config contains overall simulation configuration options.
 type Config struct {
-	// GPU determines whether to use the GPU.
-	GPU bool `default:"true"`
-
-	// GUI determines whether to show the GUI.
-	GUI bool `default:"true"`
-
 	// Equation to run. Changing this reconfigures the whole simulation for the
 	// new equation, via [Sim.ConfigEquation].
 	Equation Equations
@@ -21,6 +15,12 @@ type Config struct {
 	// curEquation is the one actually configured, so that Update can tell when
 	// Equation has been changed out from under it.
 	curEquation Equations `display:"-"`
+
+	// GPU determines whether to use the GPU.
+	GPU bool `default:"true"`
+
+	// GUI determines whether to show the GUI.
+	GUI bool `display:"-"`
 
 	// sim is what to reconfigure when Equation changes. Set by ConfigSim.
 	sim *Sim `display:"-"`

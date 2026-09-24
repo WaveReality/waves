@@ -29,11 +29,11 @@ var MemoryReport = false
 
 // Sim contains everything for the simulation.
 type Sim struct {
-	// Params contains the current simulation parameters.
-	Params *Parameters `display:"add-fields"`
-
 	// Config contains the broader running configuration.
 	Config *Config `display:"add-fields"`
+
+	// Params contains the current simulation parameters.
+	Params *Parameters `display:"add-fields"`
 
 	// Units convert between real-world SI units and per-cube computational units.
 	Units Units `new-window:"+" display:"no-inline"`
