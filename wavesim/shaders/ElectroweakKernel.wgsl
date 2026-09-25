@@ -403,6 +403,7 @@ const  EWWMag: EWStates = 88;
 const YPhi = 0.5;
 const YLep = -0.5;
 const YER = -1.0;
+const Sqrt2 = 1.41421356237309504880;
 const InvSqrt2 = 0.70710678118654752440;
 fn EWGaugeAct(w1: f32,w2: f32,w3: f32,b: f32, psi: vec4<f32>) -> vec4<f32> {
 	return EWGaugeActY(w1, w2, w3, b, YPhi, psi);
@@ -420,6 +421,45 @@ fn EWGaugeActY(w1: f32,w2: f32,w3: f32,b: f32,yhyp: f32, psi: vec4<f32>) -> vec4
 	o.z = or*psi.y - oi*psi.x + dd*psi.w;
 	o.w = -(or*psi.x + oi*psi.y + dd*psi.z);
 return o;
+}
+fn EWSpinBilinear(mu: i32, p1: vec2<f32>,p2: vec2<f32>,c1: vec2<f32>,c2: vec2<f32>) -> vec2<f32> {
+	var a1 = vec2<f32>(p1.x*c1.x+p1.y*c1.y, p1.x*c1.y-p1.y*c1.x);
+	var a2 = vec2<f32>(p2.x*c2.x+p2.y*c2.y, p2.x*c2.y-p2.y*c2.x);
+	var x1 = vec2<f32>(p1.x*c2.x+p1.y*c2.y, p1.x*c2.y-p1.y*c2.x);
+	var x2 = vec2<f32>(p2.x*c1.x+p2.y*c1.y, p2.x*c1.y-p2.y*c1.x);
+	if (mu == 1) {
+		return vec2<f32>(x1.x+x2.x, x1.y+x2.y);
+	}
+	if (mu == 2) { // -i x1 + i x2
+		return vec2<f32>(x1.y-x2.y, x2.x-x1.x);
+	}
+	if (mu == 3) {
+		return vec2<f32>(a1.x-a2.x, a1.y-a2.y);
+	}return vec2<f32>(a1.x+a2.x, a1.y+a2.y);
+}
+fn EWLeptonCurrent(x: i32,y: i32,z: i32,prv: i32,mu: i32) -> vec4<f32> {
+	var n1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu1b), u32(prv))));
+	var n2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu2b), u32(prv))));
+	var l1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1b), u32(prv))));
+	var l2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2b), u32(prv))));
+	var r1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1b), u32(prv))));
+	var r2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2b), u32(prv))));
+	var nn = EWSpinBilinear(mu, n1, n2, n1, n2);
+	var ee = EWSpinBilinear(mu, l1, l2, l1, l2);
+	var ne = EWSpinBilinear(mu, n1, n2, l1, l2);
+	var rr = EWSpinBilinear(mu, r1, r2, r1, r2);
+	var sl = f32(1);
+	if (mu > 0) {
+		sl = f32(-1);
+	}
+	var hg = 0.5 * Params[0].GW;
+	var gp = Params[0].GpW;
+	var j: vec4<f32>;
+	j.x = sl * 2 * hg * ne.x; // L^dag tau^1 L / 2 = Re(nu^dag e)
+	j.y = sl * 2 * hg * ne.y; // L^dag tau^2 L / 2 = Im(nu^dag e)
+	j.z = sl * hg * (nn.x - ee.x);
+	j.w = gp * (sl*YLep*(nn.x+ee.x) + YER*rr.x);
+return j;
 }
 fn EWCurrent(psi: vec4<f32>,d: vec4<f32>) -> vec4<f32> {
 	var hg = 0.5 * Params[0].GW;
@@ -588,10 +628,32 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 	var vfac = musq - lambda*mag;
 	var hf = vec4<f32>(csq*(cov.x+vfac*psi.x), csq*(cov.y+vfac*psi.y),
 		csq*(cov.z+vfac*psi.z), csq*(cov.w+vfac*psi.w));
+	if (Params[0].SelfField == 1) {
+		var nu1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu1b), u32(prv))));
+		var nu2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWNu2b), u32(prv))));
+		var el1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1b), u32(prv))));
+		var el2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2b), u32(prv))));
+		var er1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1b), u32(prv))));
+		var er2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
+		u32(z), u32(y), u32(x), u32(EWER2b), u32(prv))));
+		var re = EWSpinBilinear(i32(i32(0)), er1, er2, el1, el2);
+		var rn = EWSpinBilinear(i32(i32(0)), er1, er2, nu1, nu2); // e_R^dag nu_L
+		var yh = -csq * Sqrt2 * Params[0].YukawaE;
+		hf.x += yh * rn.x;
+		hf.y += yh * rn.y;
+		hf.z += yh * re.x;
+		hf.w += yh * re.y;
+	}
 	var j0 = EWCurrent(psi, d0);
 	var jx = EWCurrent(psi, dX);
 	var jy = EWCurrent(psi, dY);
 	var jz = EWCurrent(psi, dZ);
+	if (Params[0].SelfField == 1) {
+		j0 = j0+(EWLeptonCurrent(x, y, z, prv, i32(i32(0))));
+		jx = jx+(EWLeptonCurrent(x, y, z, prv, i32(i32(1))));
+		jy = jy+(EWLeptonCurrent(x, y, z, prv, i32(i32(2))));
+		jz = jz+(EWLeptonCurrent(x, y, z, prv, i32(i32(3))));
+	}
 	var ym0: vec3<f32>;
 	var ymx: vec3<f32>;
 	var ymy: vec3<f32>;

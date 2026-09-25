@@ -401,6 +401,7 @@ const  EWWMag: EWStates = 88;
 const YPhi = 0.5;
 const YLep = -0.5;
 const YER = -1.0;
+const Sqrt2 = 1.41421356237309504880;
 const InvSqrt2 = 0.70710678118654752440;
 fn EWGaugeActY(w1: f32,w2: f32,w3: f32,b: f32,yhyp: f32, psi: vec4<f32>) -> vec4<f32> {
 	var hg = 0.5 * Params[0].GW;

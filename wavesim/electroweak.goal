@@ -262,6 +262,10 @@ const YPhi = 0.5
 const YLep = -0.5
 const YER = -1.0
 
+// Sqrt2 is sqrt(2), the stored-doublet to Phi conversion. Spelled out rather
+// than taken from math32: gosl has no WGSL for that constant.
+const Sqrt2 = 1.41421356237309504880
+
 // InvSqrt2 is 1/sqrt(2), the normalization of the W^+/W^- basis.
 const InvSqrt2 = 0.70710678118654752440
 
@@ -310,6 +314,76 @@ func EWGaugeActY(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4
 func EWGaugeMul(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4 {
 	o := EWGaugeActY(w1, w2, w3, b, yhyp, psi)
 	return math32.Vec4(-o.Y, o.X, -o.W, o.Z) // times i
+}
+
+// EWSpinBilinear returns psi^dag S chi for two 2-spinors, each given as its
+// pair of complex components, where S is the identity at mu = 0 and
+// sigma^x, sigma^y, sigma^z at mu = 1, 2, 3. The result is complex.
+//
+// These four are every bilinear a Weyl current is built from: the identity one
+// is the density and the three sigma ones are the flux.
+func EWSpinBilinear(mu int32, p1, p2, c1, c2 math32.Vector2) math32.Vector2 {
+	// conj(p) * c for each component
+	a1 := math32.Vec2(p1.X*c1.X+p1.Y*c1.Y, p1.X*c1.Y-p1.Y*c1.X)
+	a2 := math32.Vec2(p2.X*c2.X+p2.Y*c2.Y, p2.X*c2.Y-p2.Y*c2.X)
+	x1 := math32.Vec2(p1.X*c2.X+p1.Y*c2.Y, p1.X*c2.Y-p1.Y*c2.X)
+	x2 := math32.Vec2(p2.X*c1.X+p2.Y*c1.Y, p2.X*c1.Y-p2.Y*c1.X)
+	if mu == 1 {
+		return math32.Vec2(x1.X+x2.X, x1.Y+x2.Y)
+	}
+	if mu == 2 { // -i x1 + i x2
+		return math32.Vec2(x1.Y-x2.Y, x2.X-x1.X)
+	}
+	if mu == 3 {
+		return math32.Vec2(a1.X-a2.X, a1.Y-a2.Y)
+	}
+	return math32.Vec2(a1.X+a2.X, a1.Y+a2.Y)
+}
+
+// EWLeptonCurrent returns the four gauge currents the leptons put into the
+// gauge fields at spacetime index mu, in the same (W^1, W^2, W^3, B) layout
+// EWCurrent uses:
+//
+//	j^a_mu = g  Lbar gamma_mu T^a L                     (a = 1,2,3)
+//	j^Y_mu = g' [ Y_L Lbar gamma_mu L + Y_R eRbar gamma_mu e_R ]
+//
+// A left-handed Weyl field has four-current (psi^dag psi, -psi^dag sigma psi)
+// and a right-handed one (psi^dag psi, +psi^dag sigma psi): they stream
+// opposite ways, which is what chirality is. So a massive electron's net flux
+// is |e_L|^2 - |e_R|^2 against a density of |e_L|^2 + |e_R|^2, and their ratio
+// is the group velocity -- the same relation the free Weyl equation gives.
+//
+// Projecting onto the photon, sinTheta_W j^3 + cosTheta_W j^Y, the
+// hypercharges collapse the whole thing to -e(|e_L|^2 + |e_R|^2) with nothing
+// at all from the neutrino. The charge the leptons SOURCE is the same charge
+// they FEEL, and neither was written down.
+func EWLeptonCurrent(x, y, z, prv, mu int32) math32.Vector4 {
+	n1 := math32.Vec2(State[z, y, x, EWNu1a, prv], State[z, y, x, EWNu1b, prv])
+	n2 := math32.Vec2(State[z, y, x, EWNu2a, prv], State[z, y, x, EWNu2b, prv])
+	l1 := math32.Vec2(State[z, y, x, EWEL1a, prv], State[z, y, x, EWEL1b, prv])
+	l2 := math32.Vec2(State[z, y, x, EWEL2a, prv], State[z, y, x, EWEL2b, prv])
+	r1 := math32.Vec2(State[z, y, x, EWER1a, prv], State[z, y, x, EWER1b, prv])
+	r2 := math32.Vec2(State[z, y, x, EWER2a, prv], State[z, y, x, EWER2b, prv])
+
+	nn := EWSpinBilinear(mu, n1, n2, n1, n2)
+	ee := EWSpinBilinear(mu, l1, l2, l1, l2)
+	ne := EWSpinBilinear(mu, n1, n2, l1, l2)
+	rr := EWSpinBilinear(mu, r1, r2, r1, r2)
+
+	// the flux of a left-handed field runs against its spin; a right-handed
+	// one runs with it. At mu = 0 both are just the density.
+	sl := float32(1)
+	if mu > 0 {
+		sl = -1
+	}
+	hg := 0.5 * Params[0].GW
+	gp := Params[0].GpW
+	var j math32.Vector4
+	j.X = sl * 2 * hg * ne.X // L^dag tau^1 L / 2 = Re(nu^dag e)
+	j.Y = sl * 2 * hg * ne.Y // L^dag tau^2 L / 2 = Im(nu^dag e)
+	j.Z = sl * hg * (nn.X - ee.X)
+	j.W = gp * (sl*YLep*(nn.X+ee.X) + YER*rr.X)
+	return j
 }
 
 // EWCurrent returns the four gauge currents that a doublet Psi with covariant
@@ -628,11 +702,57 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	hf := math32.Vec4(csq*(cov.X+vfac*psi.X), csq*(cov.Y+vfac*psi.Y),
 		csq*(cov.Z+vfac*psi.Z), csq*(cov.W+vfac*psi.W))
 
+	// ---- the Yukawa term seen from the Higgs side -------------------------
+	//
+	// Params.SelfField again: the same -y (Lbar Phi e_R + h.c.) that gives the
+	// electron its mass is a force on the Higgs, and this is the other end of
+	// it. Varying that term by Phi^dag rather than by the fermion leaves the
+	// fermion bilinear behind:
+	//
+	//	source(phi^0) = -sqrt(2) y (e_R^dag e_L)
+	//	source(phi^+) = -sqrt(2) y (e_R^dag nu_L)
+	//
+	// and it enters the acceleration where the Laplacian does, since both come
+	// from the same box operator. The sqrt(2) is the stored doublet being
+	// sqrt(2) Phi, as EWCurrent notes; there is no further factor, because the
+	// coupling is the one y and nothing else.
+	//
+	// Without this the condensate is an infinite reservoir: it hands out mass
+	// and never notices. With it, a dense enough lump of electron pushes |Phi|
+	// down where it sits, which lowers its own mass there -- the field and the
+	// particle finally arguing with each other.
+	if Params[0].SelfField.IsTrue() {
+		nu1 := math32.Vec2(State[z, y, x, EWNu1a, prv], State[z, y, x, EWNu1b, prv])
+		nu2 := math32.Vec2(State[z, y, x, EWNu2a, prv], State[z, y, x, EWNu2b, prv])
+		el1 := math32.Vec2(State[z, y, x, EWEL1a, prv], State[z, y, x, EWEL1b, prv])
+		el2 := math32.Vec2(State[z, y, x, EWEL2a, prv], State[z, y, x, EWEL2b, prv])
+		er1 := math32.Vec2(State[z, y, x, EWER1a, prv], State[z, y, x, EWER1b, prv])
+		er2 := math32.Vec2(State[z, y, x, EWER2a, prv], State[z, y, x, EWER2b, prv])
+		re := EWSpinBilinear(0, er1, er2, el1, el2) // e_R^dag e_L
+		rn := EWSpinBilinear(0, er1, er2, nu1, nu2) // e_R^dag nu_L
+		yh := -csq * Sqrt2 * Params[0].YukawaE
+		hf.X += yh * rn.X
+		hf.Y += yh * rn.Y
+		hf.Z += yh * re.X
+		hf.W += yh * re.Y
+	}
+
 	// ---- currents, one per spacetime index --------------------------------
 	j0 := EWCurrent(psi, d0)
 	jx := EWCurrent(psi, dX)
 	jy := EWCurrent(psi, dY)
 	jz := EWCurrent(psi, dZ)
+
+	// Params.SelfField: the leptons source the gauge fields as well as feeling
+	// them. Read at prv, like everything else here, so EWFermionKernel can run
+	// either side of this one. Off, they are test fields -- they move in the
+	// electroweak background and leave no trace in it.
+	if Params[0].SelfField.IsTrue() {
+		j0 = j0.Add(EWLeptonCurrent(x, y, z, prv, 0))
+		jx = jx.Add(EWLeptonCurrent(x, y, z, prv, 1))
+		jy = jy.Add(EWLeptonCurrent(x, y, z, prv, 2))
+		jz = jz.Add(EWLeptonCurrent(x, y, z, prv, 3))
+	}
 
 	// ---- Yang-Mills self-coupling -----------------------------------------
 	// Adjoint 3-vectors: for each spacetime index mu, the SU(2) triplet

@@ -267,3 +267,292 @@ func TestEWLeptonDamp(t *testing.T) {
 		t.Errorf("%.3f%% of the leptons are still in the box: they are reflecting", 100*left)
 	}
 }
+
+// ewfLeptonJ sums a component of the lepton current over the interior.
+func ewfLeptonJ(sz int32, mu int32, comp int) float64 {
+	c := GetCtx(0)
+	prv := c.PrevState()
+	var s float64
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				j := EWLeptonCurrent(x, y, z, prv, mu)
+				switch comp {
+				case 2:
+					s += float64(j.Z) // W^3
+				case 3:
+					s += float64(j.W) // B
+				}
+			}
+		}
+	}
+	return s
+}
+
+// TestEWLeptonCurrentCharge: the charge the leptons SOURCE has to be the same
+// charge they FEEL, and for the same reason -- Q = T^3 + Y.
+//
+// Project the current they put into the gauge fields onto the photon,
+// sinTheta_W j^3 + cosTheta_W j^Y. The hypercharges collapse it to
+// -e(|e_L|^2 + |e_R|^2), exactly, with nothing from the neutrino. That is the
+// other half of TestEWFermionCharge: one says the photon does not push the
+// neutrino, this says the neutrino does not make a photon.
+func TestEWLeptonCurrentCharge(t *testing.T) {
+	const sz = 8
+	const amp = 0.5
+	for _, tc := range []struct {
+		name string
+		base EWStates
+		want float64 // charge in units of e
+	}{
+		{"neutrino", EWNu1a, 0},
+		{"e_L", EWEL1a, -1},
+		{"e_R", EWER1a, -1},
+	} {
+		ss := ewfSim(sz, func(s *Sim) {
+			s.Fill(tc.base, Both, amp)
+		})
+		ss.StepRun() // so prv holds the field
+		p := ss.Params
+		sw, cw := float64(p.SinThetaW), float64(p.CosThetaW)
+		e := float64(p.GW*p.GpW) / math.Sqrt(float64(p.GW*p.GW+p.GpW*p.GpW))
+		// the density the packet has, to normalize against
+		n := float64(sz*sz*sz) * amp * amp
+		rho := sw*ewfLeptonJ(sz, 0, 2) + cw*ewfLeptonJ(sz, 0, 3)
+		got := rho / (e * n)
+		t.Logf("%-9s photon-direction charge density %+.6f, as a charge %+.6f", tc.name, rho, got)
+		if math.Abs(got-tc.want) > 1e-5 {
+			t.Errorf("%s sources charge %+.6f, want %+.1f", tc.name, got, tc.want)
+		}
+	}
+}
+
+// ewfMaxAbs is the largest magnitude of a variable over the interior.
+func ewfMaxAbs(sz int32, vr EWStates) float64 {
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	var m float64
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				m = math.Max(m, math.Abs(float64(State.Value(int(z), int(y), int(x), int(vr), cur))))
+			}
+		}
+	}
+	return m
+}
+
+// TestEWSelfFieldNeutrino is the back-reaction seen from the other side, and
+// the sharpest statement of neutrality this model can make.
+//
+// With Params.SelfField on, a lepton sources the gauge fields. Put a lump of
+// electron in an empty box and an electromagnetic field appears around it. Put
+// a lump of neutrino in the same box and A stays at exactly zero -- not small,
+// zero -- because every term that could have sourced it cancels in the
+// Q = T^3 + Y combination.
+//
+// The neutrino does still source the Z, which is the whole reason it interacts
+// at all. Neutral is not the same as inert.
+func TestEWSelfFieldNeutrino(t *testing.T) {
+	const sz = 16
+	const nst = 30
+	got := map[string]float64{}
+	for _, tc := range []struct {
+		name  string
+		base  EWStates
+		wantA bool // does it make an electromagnetic field
+	}{
+		{"electron", EWEL1a, true},
+		{"neutrino", EWNu1a, false},
+	} {
+		ss := ewfSim(sz, func(s *Sim) {
+			s.Params.SelfField.SetBool(true)
+			s.Params.EM.SetBool(true)
+			s.Params.Update()
+			// no Higgs at all: the leptons are the only source in the box
+			s.Gauss(tc.base, Both, math32.Vec3(-1, -1, -1), s.Config.PacketWidth, 0.5, 0)
+		})
+		for range nst {
+			ss.StepRun()
+		}
+		a0 := ewfMaxAbs(sz, EWStates(A0s))
+		z0 := ewfMaxAbs(sz, EWZ0)
+		t.Logf("%-9s after %d steps: max |A0| %.3e, max |Z0| %.3e", tc.name, nst, a0, z0)
+		got[tc.name] = a0
+		if tc.wantA && a0 <= 0 {
+			t.Errorf("%s sourced no electromagnetic field at all", tc.name)
+		}
+		if z0 <= 0 {
+			t.Errorf("%s sourced no Z field: neutral is not the same as inert", tc.name)
+		}
+	}
+	// The cancellation is exact in the algebra but happens in float32 here,
+	// between two terms of order the electron's own field, so what is left is
+	// epsilon times that and not a hard zero. Measured against the charged
+	// case rather than against nothing.
+	r := got["neutrino"] / got["electron"]
+	t.Logf("the neutrino's electromagnetic field is %.2e of the electron's", r)
+	if r > 1e-5 {
+		t.Errorf("the neutrino sourced %.2e of the electron's field: it has no electric charge", r)
+	}
+}
+
+// TestEWLeptonCurrentVelocity: the flux the leptons source, divided by the
+// density, is the speed they travel at.
+//
+// A left-handed field streams one way and a right-handed one the other, so a
+// massive electron's photon current goes as |e_L|^2 - |e_R|^2 against a
+// density of |e_L|^2 + |e_R|^2. Their ratio is v/c -- the same relation the
+// free Weyl equation gives, arrived at here through the gauge current instead.
+func TestEWLeptonCurrentVelocity(t *testing.T) {
+	const nst = 100
+	ss := ewfSimBox(math32.Vec3i(192, 8, 8), LeptonPackets)
+	p := ss.Params
+	sw, cw := float64(p.SinThetaW), float64(p.CosThetaW)
+	c := float64(p.C)
+	ss.StepRun()
+	for range nst {
+		ss.StepRun()
+	}
+	sz := ss.Config.Size
+	var rho, jx float64
+	ctx := GetCtx(0)
+	prv := ctx.PrevState()
+	for z := int32(1); z <= sz.Z; z++ {
+		for y := int32(1); y <= sz.Y; y++ {
+			for x := int32(1); x <= sz.X; x++ {
+				j0 := EWLeptonCurrent(x, y, z, prv, 0)
+				j1 := EWLeptonCurrent(x, y, z, prv, 1)
+				rho += sw*float64(j0.Z) + cw*float64(j0.W)
+				jx += sw*float64(j1.Z) + cw*float64(j1.W)
+			}
+		}
+	}
+	vj := jx / rho
+	vg := dispMean(ss.StatVals(StatGroupVelName(EWEMag, math32.X)))
+	t.Logf("photon current / density = %.4f, packet group velocity = %.4f c", vj, vg)
+	if math.Abs(vj-vg) > 0.05 {
+		t.Errorf("the current says the electron moves at %.4f c but the packet moves at %.4f c", vj, vg)
+	}
+	_ = c
+}
+
+// ewfPhiAt is |Phi| at a cell, from the stored doublet.
+func ewfPhiAt(x, y, z int32) float64 {
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	return math.Sqrt(float64(State.Value(int(z), int(y), int(x), int(EWHmag), cur)))
+}
+
+// TestEWHiggsBackReaction: the Yukawa term runs both ways.
+//
+// Without it the condensate is an infinite reservoir -- it hands out mass and
+// never notices. With Params.SelfField on, a lump of electron pushes |Phi|
+// where it sits, and the push is LOCAL to the lump and LINEAR in the coupling,
+// which is what -sqrt(2) y (e_R^dag e_L) says it should be.
+//
+// A neutrino cannot do this at all. The bilinear it would need is e_R^dag
+// nu_L, and with no charged Higgs to speak of in the broken vacuum there is
+// nothing for it to push on.
+//
+// The gauge back-reaction plays no part in this: with e_R absent, or the
+// couplings zeroed, |Phi| does not move at all. It is the Yukawa term alone.
+//
+// The push is DOWNWARD, and that is the right sign: the mass term costs energy
+// proportional to |Phi|, so a dense enough lump of fermion pays for itself by
+// melting the condensate it sits in and becoming lighter. That is the same
+// effect that restores the symmetry at high density.
+func TestEWHiggsBackReaction(t *testing.T) {
+	const sz = 24
+	// Two steps, which is one step of motion: EWHmag is written from the
+	// position the kernel read, so it lags the update by one. The Higgs starts
+	// at rest, so that single step of displacement IS the force -- no
+	// propagation, no feedback, no restoring term yet.
+	const nst = 2
+	const ctr = sz / 2 // as a FULL index: interior coord ctr-1
+
+	var ss0 *Sim
+	run := func(yuk float32, self bool, lept EWStates, both bool) (mid, far, v float64) {
+		ss := ewfSim(sz, func(s *Sim) {
+			HiggsBroken(s)
+			s.Params.YukawaE = yuk
+			s.Params.SelfField.SetBool(self)
+			s.Params.Update()
+			// a SMALL lump. The source goes as y times the fermion density,
+			// and at the default amplitude of 1 that density is enormous
+			// against a condensate of v = 0.123: it drives |Phi| through zero
+			// in a few steps. One particle spread over a box is nothing like
+			// that dense, so the linear regime is the physical one.
+			a := float32(0.01)
+			s.Gauss(lept, Both, math32.Vec3(-1, -1, -1), s.Config.PacketWidth, a, 0)
+			if both { // the partner the Yukawa needs to have something to pair with
+				s.Gauss(EWER1a, Both, math32.Vec3(-1, -1, -1), s.Config.PacketWidth, a, 0)
+			}
+		})
+		ss0 = ss
+		v = float64(ss.Params.HiggsV)
+		for range nst {
+			ss.StepRun()
+		}
+		return ewfPhiAt(ctr, ctr, ctr), ewfPhiAt(1, 1, 1), v
+	}
+
+	// the control: no back-reaction, so the condensate cannot move
+	m0, f0, v := run(EWDemoYukawa, false, EWEL1a, true)
+	t.Logf("SelfField off: |Phi| at the lump %.6f, in the corner %.6f  (v = %.6f)", m0, f0, v)
+	if math.Abs(m0/v-1) > 1e-4 {
+		t.Errorf("without back-reaction the condensate moved by %.2e at the lump", m0/v-1)
+	}
+
+	// and with it, at one coupling and at double
+	m1, f1, _ := run(EWDemoYukawa, true, EWEL1a, true)
+	m2, f2, _ := run(2*EWDemoYukawa, true, EWEL1a, true)
+	d1, d2 := m1-v, m2-v
+	t.Logf("SelfField on,  y = %4.1f: |Phi| at the lump %.6f (%+.3e), corner %.6f (%+.3e)",
+		EWDemoYukawa, m1, d1, f1, f1-v)
+	t.Logf("SelfField on,  y = %4.1f: |Phi| at the lump %.6f (%+.3e), corner %.6f (%+.3e)",
+		2*EWDemoYukawa, m2, d2, f2, f2-v)
+	if d1 == 0 {
+		t.Fatalf("the electron did not move the condensate at all")
+	}
+	if d1 > 0 {
+		t.Errorf("the condensate rose by %.2e at the lump: a mass term costs energy, so a "+
+			"dense fermion should melt the field it sits in, not build it up", d1)
+	}
+	// The shift must TRACE the fermion bilinear, cell by cell, because that is
+	// what the source is. Both e_L and e_R are gaussians of width w, so their
+	// product falls as exp(-2 d^2 / w^2) -- and the corner of a box this size
+	// is still well inside a lump that wide, which is why it moves at all.
+	// ewfPhiAt takes FULL indices, so the two reads sit at interior coords
+	// ctr-1 and 0, against a lump centred at interior ctr.
+	w := float64(ss0.Config.PacketWidth)
+	gw := func(ic float64) float64 {
+		d2 := 3 * (ic - ctr) * (ic - ctr) // same offset on all three axes
+		return math.Exp(-2 * d2 / (w * w))
+	}
+	want := gw(0) / gw(ctr-1)
+	gotr := (f1 - v) / d1
+	t.Logf("corner is %.4f of the peak shift; the fermion bilinear there is %.4f of its value at the peak (w = %.0f)",
+		gotr, want, w)
+	if math.Abs(gotr/want-1) > 0.03 {
+		t.Errorf("the shift falls off as %.4f but the fermion bilinear does as %.4f: "+
+			"the source is not the local density", gotr, want)
+	}
+	// the source is linear in y, so at fixed fermion state doubling y doubles it
+	// The source is linear in y, so at a frozen fermion state doubling y
+	// doubles it. It is not quite frozen -- doubling y also doubles the mass,
+	// so the fermions evolve differently over even these few steps -- which is
+	// why this is a few percent over 2 rather than exactly 2.
+	r := d2 / d1
+	t.Logf("doubling the coupling scaled the push by %.3fx (a source linear in y wants 2)", r)
+	if math.Abs(r-2) > 0.2 {
+		t.Errorf("the push scaled by %.3fx, not the 2x a source linear in y must give", r)
+	}
+
+	// a neutrino has no partner in the broken vacuum: nothing to push with
+	mn, _, _ := run(EWDemoYukawa, true, EWNu1a, false)
+	t.Logf("neutrino lump: |Phi| %.6f (%+.3e)", mn, mn-v)
+	if math.Abs(mn-v) > 0.02*math.Abs(d1) {
+		t.Errorf("a neutrino moved the condensate by %.2e: it has no Yukawa partner", mn-v)
+	}
+}

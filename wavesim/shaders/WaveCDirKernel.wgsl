@@ -401,6 +401,7 @@ const  EWWMag: EWStates = 88;
 const YPhi = 0.5;
 const YLep = -0.5;
 const YER = -1.0;
+const Sqrt2 = 1.41421356237309504880;
 const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
