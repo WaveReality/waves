@@ -142,6 +142,59 @@ const (
 	// EWW3Zv is the W weak isospin 3 vector potential Z velocity.
 	EWW3Zv
 
+	//////// Lepton fields: one generation, as Weyl 2-spinors.
+	//
+	// The left-handed fields are an SU(2) DOUBLET (nu_L, e_L) carrying
+	// hypercharge Y = -1/2. The right-handed electron is a SINGLET: Y = -1 and
+	// no SU(2) coupling at all. There is no nu_R, and that absence is the
+	// whole reason the neutrino has no mass here -- the Yukawa term simply has
+	// nothing to couple it to.
+	//
+	// Q = T^3 + Y then hands out the charges: nu_L at T^3 = +1/2 gets 0, e_L
+	// at T^3 = -1/2 gets -1, e_R at T^3 = 0 gets -1. Neutrality is a RESULT of
+	// the gauge structure rather than a number anyone typed in, which is
+	// exactly what Params.WeylQ could not do in the standalone Weyl equation.
+	//
+	// Each field is a two-component Weyl spinor, so a, b are the real and
+	// imaginary parts of each component, as in WeylStates.
+
+	// EWNu1a, EWNu1b are the left-handed neutrino spinor, component 1.
+	EWNu1a
+	EWNu1b
+
+	// EWNu2a, EWNu2b are the neutrino spinor, component 2.
+	EWNu2a
+	EWNu2b
+
+	// EWEL1a, EWEL1b are the left-handed electron, component 1. This is the
+	// lower half of the same doublet the neutrino is the upper half of, and
+	// the one the Yukawa term ties to the Higgs.
+	EWEL1a
+	EWEL1b
+
+	// EWEL2a, EWEL2b are the left-handed electron, component 2.
+	EWEL2a
+	EWEL2b
+
+	// EWER1a, EWER1b are the right-handed electron, component 1.
+	EWER1a
+	EWER1b
+
+	// EWER2a, EWER2b are the right-handed electron, component 2.
+	EWER2a
+	EWER2b
+
+	// EWNuMag is |psi_nu|^2.
+	EWNuMag
+
+	// EWELMag is |e_L|^2, and EWERMag is |e_R|^2: the two halves the Higgs
+	// trades back and forth, neither of which is conserved on its own.
+	EWELMag
+	EWERMag
+
+	// EWEMag is |e_L|^2 + |e_R|^2, the whole electron, which is.
+	EWEMag
+
 	//////// Derived mass-eigenstate views.
 	//
 	// These are not evolved: the dynamics lives entirely in (W^1, W^2, W^3, B),
@@ -196,6 +249,19 @@ const (
 // Q = 0 there, so the photon does not couple to the vacuum and stays massless.
 const YPhi = 0.5
 
+// YLep is the weak hypercharge of the left-handed lepton doublet and YER that
+// of the right-handed electron singlet, in the same Q = T^3 + Y convention as
+// YPhi. With T^3 = +1/2 above and -1/2 below, YLep = -1/2 gives the neutrino
+// Q = 0 and the left electron Q = -1; YER = -1 on a singlet with T^3 = 0 gives
+// the right electron Q = -1 as well.
+//
+// That the two chiralities come out with the SAME charge is not decoration: a
+// mass term joins them, and a term joining two fields of different charge
+// would not be electrically neutral, so no such mass could exist. The Yukawa
+// term is allowed precisely because these two numbers agree.
+const YLep = -0.5
+const YER = -1.0
+
 // InvSqrt2 is 1/sqrt(2), the normalization of the W^+/W^- basis.
 const InvSqrt2 = 0.70710678118654752440
 
@@ -215,8 +281,15 @@ const InvSqrt2 = 0.70710678118654752440
 // EWGaugeAct(W_mu, B_mu, Psi), and the covariant Laplacian composes from it.
 // Psi is the doublet as four reals, (X + iY, Z + iW) = sqrt(2) Phi.
 func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
+	return EWGaugeActY(w1, w2, w3, b, YPhi, psi)
+}
+
+// EWGaugeActY is [EWGaugeAct] for a doublet of any weak hypercharge: the
+// Higgs has Y = +1/2, the lepton doublet Y = -1/2, and that sign is the whole
+// difference between a field the photon ignores and one it does not.
+func EWGaugeActY(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4 {
 	hg := 0.5 * Params[0].GW
-	gy := Params[0].GpW * YPhi
+	gy := Params[0].GpW * yhyp
 	du := hg*w3 + gy*b
 	dd := -hg*w3 + gy*b
 	or := hg * w1
@@ -227,6 +300,16 @@ func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
 	o.Z = or*psi.Y - oi*psi.X + dd*psi.W
 	o.W = -(or*psi.X + oi*psi.Y + dd*psi.Z)
 	return o
+}
+
+// EWGaugeMul returns G_mu Psi itself rather than the -i G_mu Psi that a
+// covariant derivative wants. The second-order Higgs equation only ever needs
+// the covariant derivative, but the first-order lepton equation has to put the
+// potential inside its own sigma contraction first, and multiply by i at the
+// end of all of it.
+func EWGaugeMul(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4 {
+	o := EWGaugeActY(w1, w2, w3, b, yhyp, psi)
+	return math32.Vec4(-o.Y, o.X, -o.W, o.Z) // times i
 }
 
 // EWCurrent returns the four gauge currents that a doublet Psi with covariant
@@ -785,6 +868,281 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32, noWav
 // The gauge fields get Sommerfeld damping like Maxwell's, force setting the
 // velocity instead of adding to it. The Higgs cannot: it has a vacuum that is
 // not zero, and the reasons are set out where it is handled below.
+// EWFermionKernel evolves one generation of leptons in the electroweak
+// background: the left-handed doublet (nu_L, e_L) and the right-handed
+// singlet e_R, each a Weyl 2-spinor.
+//
+//	d_t nu_L = +c sigma.D nu_L - i y phi^+  e_R
+//	d_t e_L  = +c sigma.D e_L  - i y phi^0  e_R
+//	d_t e_R  = -c sigma.D e_R  - i y (phi^+* nu_L + phi^0* e_L)
+//
+// It is [WeylKernel] with two things taken out of the parameter list and put
+// into the fields. The mass is not a number: it is the Yukawa coupling times
+// the HIGGS, so it varies in space, it responds to the condensate, and it
+// vanishes when the symmetry is restored. And the charge is not a number
+// either: it is the gauge structure, through which component of the doublet a
+// field sits in.
+//
+// In the broken vacuum phi^+ = 0 and phi^0 = v, so the only surviving term is
+// -i (y v / sqrt(2)) between e_L and e_R, and this reduces EXACTLY to
+// WeylKernel at Omega0 = m_e. The neutrino keeps nothing at all, because the
+// upper component's partner would be a nu_R and there isn't one. Excite the
+// charged Higgs and phi^+ coupling switches on, which is the same term doing
+// what it does in a W decay.
+//
+// Runs after [ElectroweakKernel] in the same step and reads only prv, which
+// that kernel does not write, so the order between them does not matter.
+func EWFermionKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+
+	// the three-level leapfrog: cur still holds u(t-1) until we write it
+	on1a := State[z, y, x, EWNu1a, cur]
+	on1b := State[z, y, x, EWNu1b, cur]
+	on2a := State[z, y, x, EWNu2a, cur]
+	on2b := State[z, y, x, EWNu2b, cur]
+	ol1a := State[z, y, x, EWEL1a, cur]
+	ol1b := State[z, y, x, EWEL1b, cur]
+	ol2a := State[z, y, x, EWEL2a, cur]
+	ol2b := State[z, y, x, EWEL2b, cur]
+	or1a := State[z, y, x, EWER1a, cur]
+	or1b := State[z, y, x, EWER1b, cur]
+	or2a := State[z, y, x, EWER2a, cur]
+	or2b := State[z, y, x, EWER2b, cur]
+
+	// u(t), where the right-hand side is evaluated
+	nn1a := State[z, y, x, EWNu1a, prv]
+	nn1b := State[z, y, x, EWNu1b, prv]
+	nn2a := State[z, y, x, EWNu2a, prv]
+	nn2b := State[z, y, x, EWNu2b, prv]
+	nl1a := State[z, y, x, EWEL1a, prv]
+	nl1b := State[z, y, x, EWEL1b, prv]
+	nl2a := State[z, y, x, EWEL2a, prv]
+	nl2b := State[z, y, x, EWEL2b, prv]
+	nr1a := State[z, y, x, EWER1a, prv]
+	nr1b := State[z, y, x, EWER1b, prv]
+	nr2a := State[z, y, x, EWER2a, prv]
+	nr2b := State[z, y, x, EWER2b, prv]
+
+	gn1a := Gradient10(x, y, z, int32(EWNu1a), prv)
+	gn1b := Gradient10(x, y, z, int32(EWNu1b), prv)
+	gn2a := Gradient10(x, y, z, int32(EWNu2a), prv)
+	gn2b := Gradient10(x, y, z, int32(EWNu2b), prv)
+	gl1a := Gradient10(x, y, z, int32(EWEL1a), prv)
+	gl1b := Gradient10(x, y, z, int32(EWEL1b), prv)
+	gl2a := Gradient10(x, y, z, int32(EWEL2a), prv)
+	gl2b := Gradient10(x, y, z, int32(EWEL2b), prv)
+	gr1a := Gradient10(x, y, z, int32(EWER1a), prv)
+	gr1b := Gradient10(x, y, z, int32(EWER1b), prv)
+	gr2a := Gradient10(x, y, z, int32(EWER2a), prv)
+	gr2b := Gradient10(x, y, z, int32(EWER2b), prv)
+
+	// sigma.grad on a 2-spinor, component by component, exactly as WeylKernel
+	sn1a := gn1a.Z + gn2a.X + gn2b.Y
+	sn1b := gn1b.Z + gn2b.X - gn2a.Y
+	sn2a := gn1a.X - gn1b.Y - gn2a.Z
+	sn2b := gn1b.X + gn1a.Y - gn2b.Z
+	sl1a := gl1a.Z + gl2a.X + gl2b.Y
+	sl1b := gl1b.Z + gl2b.X - gl2a.Y
+	sl2a := gl1a.X - gl1b.Y - gl2a.Z
+	sl2b := gl1b.X + gl1a.Y - gl2b.Z
+	sr1a := gr1a.Z + gr2a.X + gr2b.Y
+	sr1b := gr1b.Z + gr2b.X - gr2a.Y
+	sr2a := gr1a.X - gr1b.Y - gr2a.Z
+	sr2b := gr1b.X + gr1a.Y - gr2b.Z
+
+	cc := Params[0].C
+	// left streams one way, right the other: that is all chirality is
+	dn1a := cc * sn1a
+	dn1b := cc * sn1b
+	dn2a := cc * sn2a
+	dn2b := cc * sn2b
+	dl1a := cc * sl1a
+	dl1b := cc * sl1b
+	dl2a := cc * sl2a
+	dl2b := cc * sl2b
+	dr1a := -cc * sr1a
+	dr1b := -cc * sr1b
+	dr2a := -cc * sr2a
+	dr2b := -cc * sr2b
+
+	// ---- the Yukawa term, which is the mass ------------------------------
+	//
+	// The stored doublet is sqrt(2) Phi, as EWCurrent notes, so the coupling
+	// carried around here is y / sqrt(2) and m_e = y v / sqrt(2) comes out of
+	// the vacuum value directly.
+	//
+	// -i M psi with COMPLEX M takes (a, b) to (Ma b + Mb a, Mb b - Ma a), and
+	// the conjugate M* flips the sign of Mb. That pairing is what conserves
+	// |nu|^2 + |e_L|^2 + |e_R|^2: the term moves amplitude between them and
+	// creates none.
+	// the c is the same one c sigma.grad carries: the stored Higgs is a 1/cube
+	// quantity, so y phi is an inverse Compton length and c y phi is the rate
+	// per step that L and R actually trade at. Params.MassE is the former.
+	ye := Params[0].YukawaE * InvSqrt2 * cc
+	hca := ye * State[z, y, x, EWHsCa, prv]
+	hcb := ye * State[z, y, x, EWHsCb, prv]
+	h0a := ye * State[z, y, x, EWHs0a, prv]
+	h0b := ye * State[z, y, x, EWHs0b, prv]
+
+	dn1a += hca*nr1b + hcb*nr1a
+	dn1b += hcb*nr1b - hca*nr1a
+	dn2a += hca*nr2b + hcb*nr2a
+	dn2b += hcb*nr2b - hca*nr2a
+	dl1a += h0a*nr1b + h0b*nr1a
+	dl1b += h0b*nr1b - h0a*nr1a
+	dl2a += h0a*nr2b + h0b*nr2a
+	dl2b += h0b*nr2b - h0a*nr2a
+	dr1a += (hca*nn1b - hcb*nn1a) + (h0a*nl1b - h0b*nl1a)
+	dr1b += (-hcb*nn1b - hca*nn1a) + (-h0b*nl1b - h0a*nl1a)
+	dr2a += (hca*nn2b - hcb*nn2a) + (h0a*nl2b - h0b*nl2a)
+	dr2b += (-hcb*nn2b - hca*nn2a) + (-h0b*nl2b - h0a*nl2a)
+
+	// ---- gauge coupling -------------------------------------------------
+	//
+	// The same minimal coupling WeylKernel has, with the charge promoted from
+	// a number to a matrix: G_mu = g W^a_mu T^a + g' Y B_mu, acting on the
+	// WEAK index while sigma acts on the spin index. The two commute, so the
+	// potential is applied first and contracted with sigma afterwards, in the
+	// identical component pattern the gradient uses.
+	//
+	//	d_t psi_L += i c (G_0 + sigma.G) psi_L
+	//	d_t psi_R += i c (G_0 - sigma.G) psi_R
+	//
+	// The c is not decoration. G here is the same object the Higgs kernel puts
+	// in its covariant derivative, so it is a 1/cube quantity like a gradient,
+	// and d_t is per step: the free term c sigma.grad carries exactly the same
+	// factor. Leaving it out makes the coupling 1/c too strong.
+	//
+	// The left doublet sees all of it. The right electron is an SU(2) singlet,
+	// so its G is g' Y B alone -- no W at all, which is what "the weak force
+	// only touches left-handed fields" means in the equation rather than in
+	// words.
+	if Params[0].EM.IsTrue() {
+		w10 := State[z, y, x, EWW10s, prv]
+		w1x := State[z, y, x, EWW1Xs, prv]
+		w1y := State[z, y, x, EWW1Ys, prv]
+		w1z := State[z, y, x, EWW1Zs, prv]
+		w20 := State[z, y, x, EWW20s, prv]
+		w2x := State[z, y, x, EWW2Xs, prv]
+		w2y := State[z, y, x, EWW2Ys, prv]
+		w2z := State[z, y, x, EWW2Zs, prv]
+		w30 := State[z, y, x, EWW30s, prv]
+		w3x := State[z, y, x, EWW3Xs, prv]
+		w3y := State[z, y, x, EWW3Ys, prv]
+		w3z := State[z, y, x, EWW3Zs, prv]
+		b0 := State[z, y, x, EWB0s, prv]
+		bx := State[z, y, x, EWBXs, prv]
+		by := State[z, y, x, EWBYs, prv]
+		bz := State[z, y, x, EWBZs, prv]
+
+		// the doublet at each spin component: (nu real, nu imag, e real, e imag)
+		p1 := math32.Vec4(nn1a, nn1b, nl1a, nl1b)
+		p2 := math32.Vec4(nn2a, nn2b, nl2a, nl2b)
+		q01 := EWGaugeMul(w10, w20, w30, b0, YLep, p1)
+		qx1 := EWGaugeMul(w1x, w2x, w3x, bx, YLep, p1)
+		qy1 := EWGaugeMul(w1y, w2y, w3y, by, YLep, p1)
+		qz1 := EWGaugeMul(w1z, w2z, w3z, bz, YLep, p1)
+		q02 := EWGaugeMul(w10, w20, w30, b0, YLep, p2)
+		qx2 := EWGaugeMul(w1x, w2x, w3x, bx, YLep, p2)
+		qy2 := EWGaugeMul(w1y, w2y, w3y, by, YLep, p2)
+		qz2 := EWGaugeMul(w1z, w2z, w3z, bz, YLep, p2)
+
+		// (G_0 + sigma.G) Psi, in the sigma pattern of sn/sl above
+		u1a := q01.X + qz1.X + qx2.X + qy2.Y
+		u1b := q01.Y + qz1.Y + qx2.Y - qy2.X
+		u2a := q02.X + qx1.X - qy1.Y - qz2.X
+		u2b := q02.Y + qx1.Y + qy1.X - qz2.Y
+		v1a := q01.Z + qz1.Z + qx2.Z + qy2.W
+		v1b := q01.W + qz1.W + qx2.W - qy2.Z
+		v2a := q02.Z + qx1.Z - qy1.W - qz2.Z
+		v2b := q02.W + qx1.W + qy1.Z - qz2.W
+
+		// multiplying by i takes (a, b) to (-b, a)
+		dn1a -= cc * u1b
+		dn1b += cc * u1a
+		dn2a -= cc * u2b
+		dn2b += cc * u2a
+		dl1a -= cc * v1b
+		dl1b += cc * v1a
+		dl2a -= cc * v2b
+		dl2b += cc * v2a
+
+		// the singlet: hypercharge only, and the other chirality sign
+		gb := Params[0].GpW * YER
+		rb0 := gb * b0
+		rbx := gb * bx
+		rby := gb * by
+		rbz := gb * bz
+		qr1a := rb0*nr1a - (rbz*nr1a + rbx*nr2a + rby*nr2b)
+		qr1b := rb0*nr1b - (rbz*nr1b + rbx*nr2b - rby*nr2a)
+		qr2a := rb0*nr2a - (rbx*nr1a - rby*nr1b - rbz*nr2a)
+		qr2b := rb0*nr2b - (rbx*nr1b + rby*nr1a - rbz*nr2b)
+		dr1a -= cc * qr1b
+		dr1b += cc * qr1a
+		dr2a -= cc * qr2b
+		dr2b += cc * qr2a
+	}
+
+	n1a := on1a + 2*dn1a
+	n1b := on1b + 2*dn1b
+	n2a := on2a + 2*dn2a
+	n2b := on2b + 2*dn2b
+	l1a := ol1a + 2*dl1a
+	l1b := ol1b + 2*dl1b
+	l2a := ol2a + 2*dl2a
+	l2b := ol2b + 2*dl2b
+	r1a := or1a + 2*dr1a
+	r1b := or1b + 2*dr1b
+	r2a := or2a + 2*dr2a
+	r2b := or2b + 2*dr2b
+
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		n1a *= df
+		n1b *= df
+		n2a *= df
+		n2b *= df
+		l1a *= df
+		l1b *= df
+		l2a *= df
+		l2b *= df
+		r1a *= df
+		r1b *= df
+		r2a *= df
+		r2b *= df
+	}
+
+	State[z, y, x, EWNu1a, cur] = n1a
+	State[z, y, x, EWNu1b, cur] = n1b
+	State[z, y, x, EWNu2a, cur] = n2a
+	State[z, y, x, EWNu2b, cur] = n2b
+	State[z, y, x, EWEL1a, cur] = l1a
+	State[z, y, x, EWEL1b, cur] = l1b
+	State[z, y, x, EWEL2a, cur] = l2a
+	State[z, y, x, EWEL2b, cur] = l2b
+	State[z, y, x, EWER1a, cur] = r1a
+	State[z, y, x, EWER1b, cur] = r1b
+	State[z, y, x, EWER2a, cur] = r2a
+	State[z, y, x, EWER2b, cur] = r2b
+
+	// the STAGGERED magnitudes, as WeylKernel uses: a three-level leapfrog
+	// conserves the product of adjacent levels, not the square of one
+	nm := nn1a*n1a + nn1b*n1b + nn2a*n2a + nn2b*n2b
+	lm := nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
+	rm := nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
+	State[z, y, x, EWNuMag, cur] = nm
+	State[z, y, x, EWELMag, cur] = lm
+	State[z, y, x, EWERMag, cur] = rm
+	State[z, y, x, EWEMag, cur] = lm + rm
+}
+
 func ElectroweakDampKernel(i uint32) { //gosl:kernel
 	ctx := GetCtx(0)
 	var x, y, z int32
@@ -832,6 +1190,16 @@ func ElectroweakDampKernel(i uint32) { //gosl:kernel
 		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
 		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
 	}
+	// The leptons are FIRST order, so Sommerfeld damping has nothing to leave
+	// out: they get the open halo of EdgesOpenKernel instead, which is the
+	// same copy-from-inward, plus the absorbing layer EWFermionKernel applies
+	// in the interior. Done here rather than by running that kernel as well,
+	// because it would fight this one over the gauge edge cells.
+	for k := range 16 { // three spinors, then the four magnitudes
+		vr := int32(EWNu1a) + int32(k)
+		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
+		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
+	}
 }
 
 //gosl:end
@@ -876,6 +1244,13 @@ func (ss *Sim) ElectroweakStats() {
 	ss.AddStat(ss.StatSumSq(EWW3SqStat, EWW30s, EWW3Xs, EWW3Ys, EWW3Zs))
 	// what a Z packet does to the condensate it travels through.
 	ss.AddStat(ss.StatWeightedMean(EWHmagZStat, EWHmag, EWZY))
+	// the leptons: the neutrino runs at c and the electron does not, and the
+	// only difference between them is which half of the doublet they sit in
+	ss.AddStat(ss.StatSum(EWNuMag))
+	ss.AddStat(ss.StatSum(EWEMag))
+	ss.AddStat(ss.StatSum(EWELMag))
+	ss.AddStat(ss.StatSum(EWERMag))
+	ss.AddStat(ss.StatGroupVelMag(math32.X, EWNuMag, EWEMag))
 }
 
 // Stat names that are not built from a variable and a dimension.
@@ -894,6 +1269,7 @@ var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
 	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
 	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+	InitFunc{Name: "Lepton Packets", Doc: "A neutrino and an electron as the same wave in the two halves of one doublet: the Higgs gives one of them a mass and cannot touch the other", Func: LeptonPackets},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
 }
 
@@ -926,6 +1302,54 @@ func ewVZero(ss *Sim) float32 {
 // and give the photon a mass.
 func HiggsBroken(ss *Sim) {
 	ss.Fill(EWHs0a, Both, ss.Params.HiggsV)
+}
+
+// EWDemoYukawa is the Yukawa coupling LeptonPackets sets, in place of the real
+// 2.9e-6 that Parameters.Defaults carries. It puts the electron's inverse
+// Compton length near the carrier wavenumber at the default wavelength, which
+// is the one regime where a mass is visible: much lighter and the electron is
+// a neutrino, much heavier and it does not move.
+//
+// It is absurd as a Yukawa -- larger than the top quark's -- and that IS the
+// physical content. The electron is light because its coupling to the Higgs is
+// tiny, not because anything else about it is small, and the only way to see
+// the mechanism work on a lattice is to wind that one number up.
+const EWDemoYukawa float32 = 8
+
+// LeptonPackets puts a neutrino and an electron in the broken vacuum, side by
+// side, as the same wave in different halves of the same doublet.
+//
+// Both start purely left-handed and identical. The neutrino stays that way and
+// travels at c: the Yukawa term needs a nu_R to couple it to and there isn't
+// one. The electron does not, because the lower component of the doublet is
+// the one the Higgs talks to -- it picks up a right-handed half within a few
+// steps and settles into a packet that is visibly slower.
+//
+// Nothing was set differently between the two. There is no mass parameter, no
+// charge parameter, and no switch. The condensate is doing it.
+func LeptonPackets(ss *Sim) {
+	HiggsBroken(ss)
+	p := ss.Params
+	p.YukawaE = EWDemoYukawa
+	p.Update()
+	a := ss.Config.Amplitude
+	wl := ss.Config.Wavelength
+
+	// the neutrino: massless, so nothing joins the chiralities
+	omn, vgn := ss.ChiralDispersion(wl, 0)
+	ss.ChiralSlab(EWNu1a, math32.X, -1, a, omn, vgn, 0)
+
+	// the electron: both halves at one helicity, in the ratio a positive
+	// energy state has, exactly as ElectronPacket does for the free equation
+	om0 := p.C * p.MassE
+	ome, vge := ss.ChiralDispersion(wl, om0)
+	ck := p.C * math32.Sin(TwoPi/wl)
+	rr := float32(0)
+	if om0 > 0 {
+		rr = (ome - ck) / om0
+	}
+	ss.ChiralSlab(EWEL1a, math32.X, -1, a, ome, vge, 0)
+	ss.ChiralSlab(EWER1a, math32.X, -1, a*rr, ome, vge, 0)
 }
 
 // HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,

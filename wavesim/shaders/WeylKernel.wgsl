@@ -369,26 +369,44 @@ const  EWW30v: EWStates = 56;
 const  EWW3Xv: EWStates = 57;
 const  EWW3Yv: EWStates = 58;
 const  EWW3Zv: EWStates = 59;
-const  EWZ0: EWStates = 60;
-const  EWZX: EWStates = 61;
-const  EWZY: EWStates = 62;
-const  EWZZ: EWStates = 63;
-const  EWWPr0: EWStates = 64;
-const  EWWPrX: EWStates = 65;
-const  EWWPrY: EWStates = 66;
-const  EWWPrZ: EWStates = 67;
-const  EWWPi0: EWStates = 68;
-const  EWWPiX: EWStates = 69;
-const  EWWPiY: EWStates = 70;
-const  EWWPiZ: EWStates = 71;
-const  EWWMag: EWStates = 72;
+const  EWNu1a: EWStates = 60;
+const  EWNu1b: EWStates = 61;
+const  EWNu2a: EWStates = 62;
+const  EWNu2b: EWStates = 63;
+const  EWEL1a: EWStates = 64;
+const  EWEL1b: EWStates = 65;
+const  EWEL2a: EWStates = 66;
+const  EWEL2b: EWStates = 67;
+const  EWER1a: EWStates = 68;
+const  EWER1b: EWStates = 69;
+const  EWER2a: EWStates = 70;
+const  EWER2b: EWStates = 71;
+const  EWNuMag: EWStates = 72;
+const  EWELMag: EWStates = 73;
+const  EWERMag: EWStates = 74;
+const  EWEMag: EWStates = 75;
+const  EWZ0: EWStates = 76;
+const  EWZX: EWStates = 77;
+const  EWZY: EWStates = 78;
+const  EWZZ: EWStates = 79;
+const  EWWPr0: EWStates = 80;
+const  EWWPrX: EWStates = 81;
+const  EWWPrY: EWStates = 82;
+const  EWWPrZ: EWStates = 83;
+const  EWWPi0: EWStates = 84;
+const  EWWPiX: EWStates = 85;
+const  EWWPiY: EWStates = 86;
+const  EWWPiZ: EWStates = 87;
+const  EWWMag: EWStates = 88;
 const YPhi = 0.5;
+const YLep = -0.5;
+const YER = -1.0;
 const InvSqrt2 = 0.70710678118654752440;
 
 //////// import: "enumgen.go"
 const DiracStatesN: DiracStates = 33;
 const EdgesN: Edges = 3;
-const EWStatesN: EWStates = 73;
+const EWStatesN: EWStates = 89;
 const MinusPlusOneN: MinusPlusOne = 2;
 const NeighWeightsN: NeighWeights = 3;
 const GPUVarsN: GPUVars = 7;
@@ -594,9 +612,9 @@ struct Parameters {
 	WeylQ: f32,
 	WaveDir: f32,
 	Diffusion: i32,
+	YukawaE: f32,
+	MassE: f32,
 	pad: f32,
-	pad1: f32,
-	pad2: f32,
 }
 
 //////// import: "particle.go"

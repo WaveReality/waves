@@ -409,16 +409,7 @@ func (ss *Sim) StatWeylHelicity(dim math32.Dims) func(init bool) {
 // period to five digits. Both corrections matter: at wavelength 8 the naive
 // c k overstates the frequency by 13%.
 func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
-	k := TwoPi / wavelength
-	c := ss.Params.C
-	o0 := ss.Params.Omega0
-	sk := math32.Sin(k)
-	ss2 := c*c*sk*sk + o0*o0
-	rs := math32.Sqrt(ss2)
-	if rs <= 0 {
-		return 0, 0
-	}
-	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
+	return ss.ChiralDispersion(wavelength, ss.Params.Omega0)
 }
 
 //////// configurations
@@ -481,61 +472,12 @@ func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
 // pulled back by one step of GROUP velocity and its phase advanced by one step
 // of omega, which are the same thing only when the wave is massless.
 func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float32) {
-	c1 := int(side.Int64())
-	// the spinor with sigma.khat = helicity, for khat along +dim
-	s1, s2 := float32(1)/math32.Sqrt2, helicity/math32.Sqrt2 // +X: sigma_x
-	if dim == math32.Z {                                     // +Z: sigma_z is already diagonal
-		s1, s2 = 0, 1
-		if helicity > 0 {
-			s1, s2 = 1, 0
-		}
-	}
-	wl := ss.Config.Wavelength
-	wd := ss.Config.PacketWidth
-	om, vg := ss.WeylDispersion(wl)
-	k := TwoPi / wl
-	// the LOCAL potential belongs in the phase advance too, as it does in
-	// [Sim.ChargedRest]: a wave at rest in a potential turns at a rate shifted
-	// by q A0 / hbar, and a past written without it is a past of the wrong
-	// wave -- which shows up as an admixture of the other energy sign,
-	// dragging the packet backwards in proportion to A0.
+	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
 	eoh := float32(0)
 	if ss.Params.EM.IsTrue() {
 		eoh = ss.Params.WeylQ * ss.Params.E / ss.Params.Hbar
 	}
-	ctx := GetCtx(0)
-	cur := ctx.CurState
-	prv := ctx.PrevState()
-	ctr := CenterF(math32.Vec3(-1, -1, -1))
-	sz := ss.Config.Size
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				off := CoordToFloat(c).Sub(ctr)
-				pst := off
-				pst.SetDim(dim, off.Dim(dim)+vg) // where it was one step ago
-				d := off.Dim(dim)
-				g := ss.PacketDist(off, dim) / wd
-				e := ss.PacketDist(pst, dim) / wd
-				en := amp * math32.FastExp(-g*g)
-				eo := amp * math32.FastExp(-e*e)
-				ph := k * d
-				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
-				po := om + eoh*State[f.Z, f.Y, f.X, A0s, prv]
-				oa, ob := eo*math32.Cos(ph+po), eo*math32.Sin(ph+po)
-				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
-				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
-				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
-				State[f.Z, f.Y, f.X, c1+3, prv] += s2 * nb
-				State[f.Z, f.Y, f.X, c1, cur] += s1 * oa
-				State[f.Z, f.Y, f.X, c1+1, cur] += s1 * ob
-				State[f.Z, f.Y, f.X, c1+2, cur] += s2 * oa
-				State[f.Z, f.Y, f.X, c1+3, cur] += s2 * ob
-			}
-		}
-	}
+	ss.ChiralSlab(side, dim, helicity, amp, om, vg, eoh)
 }
 
 // NeutrinoPacket is a massless left-handed wave and nothing else. With Mass at

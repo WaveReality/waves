@@ -137,6 +137,22 @@ func GPUInit() {
 		pl.AddVarUsed(1, "State7")
 		pl.AddVarUsed(1, "State8")
 		pl.AddVarUsed(1, "State9")
+		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EWFermionKernel.wgsl", sy)
+		pl.AddVarUsed(0, "TensorStrides")
+		pl.AddVarUsed(1, "Ctx")
+		pl.AddVarUsed(0, "FaceOffs")
+		pl.AddVarUsed(0, "NeighWts")
+		pl.AddVarUsed(0, "Params")
+		pl.AddVarUsed(1, "State0")
+		pl.AddVarUsed(1, "State1")
+		pl.AddVarUsed(1, "State2")
+		pl.AddVarUsed(1, "State3")
+		pl.AddVarUsed(1, "State4")
+		pl.AddVarUsed(1, "State5")
+		pl.AddVarUsed(1, "State6")
+		pl.AddVarUsed(1, "State7")
+		pl.AddVarUsed(1, "State8")
+		pl.AddVarUsed(1, "State9")
 		pl = gpu.NewComputePipelineShaderFS(shaders, "shaders/EdgesOpenKernel.wgsl", sy)
 		pl.AddVarUsed(0, "TensorStrides")
 		pl.AddVarUsed(1, "Ctx")
@@ -540,6 +556,48 @@ func RunOneDiracKernel(n int, syncVars ...GPUVars) {
 		RunDone(syncVars...)
 	} else {
 		RunDiracKernelCPU(n)
+	}
+}
+// RunEWFermionKernel runs the EWFermionKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// Can call multiple Run* kernels in a row, which are then all launched
+// in the same command submission on the GPU, which is by far the most efficient.
+// MUST call RunDone (with optional vars to sync) after all Run calls.
+// Alternatively, a single-shot RunOneEWFermionKernel call does Run and Done for a
+// single run-and-sync case.
+func RunEWFermionKernel(n int) {
+	if UseGPU {
+		RunEWFermionKernelGPU(n)
+	} else {
+		RunEWFermionKernelCPU(n)
+	}
+}
+
+// RunEWFermionKernelGPU runs the EWFermionKernel kernel on the GPU. See [RunEWFermionKernel] for more info.
+func RunEWFermionKernelGPU(n int) {
+	sy := GPUSystem
+	pl := sy.ComputePipelines["EWFermionKernel"]
+	ce, _ := sy.BeginComputePass()
+	pl.Dispatch1D(ce, n, 64)
+}
+
+// RunEWFermionKernelCPU runs the EWFermionKernel kernel on the CPU.
+func RunEWFermionKernelCPU(n int) {
+	gpu.VectorizeFunc(0, n, EWFermionKernel)
+}
+
+// RunOneEWFermionKernel runs the EWFermionKernel kernel with given number of elements,
+// on either the CPU or GPU depending on the UseGPU variable.
+// This version then calls RunDone with the given variables to sync
+// after the Run, for a single-shot Run-and-Done call. If multiple kernels
+// can be run in sequence, it is much more efficient to do multiple Run*
+// calls followed by a RunDone call.
+func RunOneEWFermionKernel(n int, syncVars ...GPUVars) {
+	if UseGPU {
+		RunEWFermionKernelGPU(n)
+		RunDone(syncVars...)
+	} else {
+		RunEWFermionKernelCPU(n)
 	}
 }
 // RunEdgesOpenKernel runs the EdgesOpenKernel kernel with given number of elements,

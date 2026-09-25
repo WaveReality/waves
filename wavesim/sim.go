@@ -339,6 +339,9 @@ func (ss *Sim) StepRun() {
 		// the weak-mixing-angle rotation of (W^3, B). Letting MaxwellKernel
 		// also evolve those by the free wave equation would fight it.
 		RunElectroweakKernel(ns)
+		// the leptons read only prv, which the kernel above does not write,
+		// so this order is a choice of convenience rather than correctness
+		RunEWFermionKernel(ns)
 	case Spinfield:
 		RunSpinfieldKernel(ns)
 	}

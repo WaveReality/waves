@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-25 20:13:41
+- **Last Message:** 2026-09-25 21:24:25
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -85188,7 +85188,7 @@ goal build 2>&1|tail -1 && go generate ./... 2>&1 | grep -icE "error" ; grep -n 
   Command did not complete within its 120s timeout and was moved to the background (ID: brtlph5aa). Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/brtlph5aa.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `description, timeout_ms, command`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task btpwrnnou, expires in 10m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -85254,7 +85254,7 @@ grep -n "Weyl neutrino\|Weyl electron" dispersion_test.go; goal build 2>&1|tail 
   ```
   (Bash completed with no output)
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task brqrljk6x, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -90617,7 +90617,7 @@ cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686
   ```
   Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
   ```
-- **Monitor**: `description, timeout_ms, command`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task b9ifz3d3p, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -92402,41 +92402,2807 @@ Each of those is now expressed in terms of the thing it depends on, so the next 
 
 **`WaveCDir`'s packet speed is unexplained.** 0.996 c at C=0.5 falling to 0.765 c at C=0.25, not matching `dω/dk` for the relation the scheme should obey, not k-spread, not the initialization. It's written up in the test doc with everything I ruled out. Worth a look if you ever lean on that equation quantitatively.
 
+## 🧑 User - 2026-09-25 20:33:54
+
+ok, everything is committed and the gui is all working well. really the last major step is to now integrate the Weyl equation for electron / neutrino into the electroweak kernel. don't hesitate to ask me relevant questions about how to do this if there is any uncertainty. I'm assuming we can't directly use the existing Weyl kernel for example.
+
+## 🤖 Assistant - 2026-09-25 20:34:20
+
+*Model: claude-opus-5*
+
+<thinking>
+This is a substantial design task, so I want to first explore the electroweak kernel's structure before formulating specific questions. I need to understand the state layout and whether adding roughly 16 fermion variables is feasible, how the EW kernel orders its updates across Higgs and gauge fields, and how its second-order leapfrog integration compares to the Weyl kernel's three-level leapfrog scheme.
+
+Physically, integrating a lepton doublet means treating the left-handed doublet (ν_L, e_L) as an SU(2) doublet with hypercharge -1/2, the right-handed electron as a singlet with hypercharge -1, and omitting a right-handed neutrino so the neutrino stays massless. The covariant derivatives couple these fields to the W and B gauge bosons, and the Yukawa coupling to the Higgs generates the electron mass after symmetry breaking — meaning the mass term in the Weyl equations becomes dynamical, proportional to the Higgs field rather than a fixed constant.
+
+In the broken vacuum, Φ†L reduces to (v+h)/√2 · e_L, so only e_L couples to e_R with mass m_e = y_e v/√2, while ν_L gets no mass term — which is exactly why the neutrino stays massless.
+
+I should clarify scope with the user: likely just one generation (ν_e, e), fermions probably treated as test particles without back-reacting on the gauge fields or Higgs (at least initially, similar to how self-field is turned off in the Dirac setup), and this would likely be implemented as a separate kernel.
+
+I'm also wondering whether the electron Yukawa coupling should use a realistic (tiny, unwatchable) value or a demo-scale one, and confirming that the neutrino should be exactly massless since there's no ν_R. Before asking more, I want to look at the actual electroweak code and goal file so my questions are grounded in what's already there rather than redundant.
+
+
+</thinking>
+
+Let me understand the electroweak kernel's structure before asking anything.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 1,120p electroweak.goal``
+  ```
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  import (
+  	"cogentcore.org/core/math32"
+  	"cogentcore.org/lab/gosl/slmath"
+  )
+  
+  //gosl:start
+  //gosl:import "cogentcore.org/lab/gosl/slmath"
+  
+  // EWStates are the state variables for the Electroweak Model.
+  type EWStates EMStates //enums:enum -trim-prefix=EW
+  
+  const (
+  	// EWHsCa is the Higgs doublet charged state Ca (real)
+  	EWHsCa EWStates = EWStates(EMStatesN) + iota
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 120,200p electroweak.goal``
+  ```
+  	// EWW30s is the W weak isospin 3 scalar potential 0 component.
+  	EWW30s
+  
+  	// EWW3Xs is the W weak isospin 3 vector potential X component.
+  	EWW3Xs
+  
+  	// EWW3Ys is the W weak isospin 3 vector potential Y component.
+  	EWW3Ys
+  
+  	// EWW3Zs is the W weak isospin 3 vector potential Z component.
+  	EWW3Zs
+  
+  	// EWW30v is the W weak isospin 3 scalar potential 0 velocity.
+  	EWW30v
+  
+  	// EWW3Xv is the W weak isospin 3 vector potential X velocity.
+  	EWW3Xv
+  
+  	// EWW3Yv is the W weak isospin 3 vector potential Y velocity.
+  	EWW3Yv
+  ...
+  ```
+
+</details>
+
+<thinking>
+I want to examine the ElectroweakKernel's update structure, particularly the Higgs covariant derivative since it serves as the template for the fermion covariant derivative and its gauge treatment.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func ElectroweakKernel" -A 60 electroweak.goal | head -70``
+  ```
+  399:func ElectroweakKernel(i uint32) { //gosl:kernel
+  400-	ctx := GetCtx(0)
+  401-	var x, y, z int32
+  402-	ok := ctx.StateCoords(i, &x, &y, &z)
+  403-	if !ok {
+  404-		return
+  405-	}
+  406-	cur := ctx.CurState
+  407-	prv := ctx.PrevState()
+  408-	csq := Params[0].CSq
+  409-	oc := 1.0 / Params[0].C
+  410-	boris := Params[0].Boris.IsTrue()
+  411-	musq := Params[0].HiggsMuSq
+  412-	lambda := Params[0].HiggsLambda
+  413-
+  414-	// ---- Higgs doublet and its velocity ----------------------------------
+  415-	psi := math32.Vec4(State[z, y, x, EWHsCa, prv], State[z, y, x, EWHsCb, prv],
+  416-		State[z, y, x, EWHs0a, prv], State[z, y, x, EWHs0b, prv])
+  417-	psv := math32.Vec4(State[z, y, x, EWHvCa, prv], State[z, y, x, EWHvCb, prv],
+  418-		State[z, y, x, EWHv0a, prv], State[z, y, x, EWHv0b, prv])
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func EWGaugeAct" -A 35 electroweak.goal | head -45; echo "=== params: couplings ==="; grep -n "HiggsV\|GaugeG\|Gp\b\|ThetaW\|Yukawa\|MZ\|MW" params.go | head -25``
+  ```
+  217:func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
+  218-	hg := 0.5 * Params[0].GW
+  219-	gy := Params[0].GpW * YPhi
+  220-	du := hg*w3 + gy*b
+  221-	dd := -hg*w3 + gy*b
+  222-	or := hg * w1
+  223-	oi := -hg * w2
+  224-	var o math32.Vector4
+  225-	o.X = du*psi.Y + or*psi.W + oi*psi.Z
+  226-	o.Y = -(du*psi.X + or*psi.Z - oi*psi.W)
+  227-	o.Z = or*psi.Y - oi*psi.X + dd*psi.W
+  228-	o.W = -(or*psi.X + oi*psi.Y + dd*psi.Z)
+  229-	return o
+  230-}
+  231-
+  232-// EWCurrent returns the four gauge currents that a doublet Psi with covariant
+  233-// derivative d = D_mu Psi puts into the gauge fields at spacetime index mu:
+  234-//
+  235-//	X,Y,Z = j^a_mu = 2 g  Im[Phi^dag T^a D_mu Phi]   (a = 1,2,3, sourcing W^a)
+  236-//	W     = j^Y_mu = 2 g' Y Im[Phi^dag D_mu Phi]     (sourcing B)
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm now examining the EW kernel's leapfrog time integration for Higgs and gauge fields, checking how many state variables it currently tracks, and considering whether the fermion sector needs its own scheme. The key concern is that the existing Weyl kernel can't be reused directly because of how its state layout reads and writes the field components.
+
+Beyond that, the coupling structure differs entirely: WeylKernel couples to a single EM charge, while EW requires SU(2) and U(1)_Y couplings acting on the doublet differently for left- and right-handed fields. Similarly, the mass term isn't a constant like Omega0 but a dynamical Yukawa-Higgs coupling that only touches the lower component of the left doublet. I still need to verify whether both kernels agree on which buffer represents "now" versus the next timestep before assuming compatibility.
+
+Checking the buffer scheme, I confirm the EW kernel reads prv as current and writes cur, while Weyl reads cur as the prior step and prv as current, also writing cur — so they're compatible enough to combine into one kernel or run separately within the same step. This means I can't reuse the existing Weyl kernel directly, but its leapfrog scheme carries over, so I'll need a new EWFermionKernel or fold this into ElectroweakKernel. The bigger open question is whether fermions should back-react on the gauge and Higgs fields, or simply act as test particles that feel the EW fields without sourcing them — the latter being simpler and matching how Dirac handles it with self-field disabled.
+
+Beyond that, I'm weighing whether to use a realistic tiny electron Yukawa coupling (invisible on lattice scales) versus a tuned demo value that makes the mass observable, leaning toward the demo approach with a `YukawaE` parameter, and I still need to decide which fermion fields to include for the first generation — ν_L, e_L, e_R.
+
+For field content, I'm counting 12 state variables for the doublet plus e_R, deciding against including a right-handed neutrino since its absence is actually the interesting physics point here. For implementation, I'm leaning toward a separate `EWFermionKernel` run right after `ElectroweakKernel` in the same step, since the fermion just needs the gauge field values at time t which the EW kernel doesn't disturb.
+
+I want to double-check that ElectroweakKernel writes only cur and never touches prv, so the two kernels can run in either order safely. On charge assignment, Q = T³ + Y checks out cleanly: with Y = −1/2 for the doublet, ν_L comes out neutral and e_L has charge −1, while e_R with Y = −1 also gives charge −1 — so neutrino neutrality falls right out of the gauge structure.
+
+This is exactly the demonstration the user was hoping for earlier, showing how EM charge neutrality for the neutrino emerges automatically from how Q is built from the hypercharge and weak isospin. I should also double check the state variable count for the electroweak sector, since adding Yukawa couplings and the extra fermion states means I need the Parameters struct size to stay a multiple of 16.
+
+Before laying out my questions to the user, I want to verify two facts first: the current EWStatesN count, and whether the EW kernel writes to prv. Let me confirm those quickly.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "^const EWStatesN\|^const WeylStatesN" enumgen.go; echo "=== does EW kernel write prv? ==="; sed -n 399,700p electroweak.goal | grep -c "prv\] = "; echo "=== EW kernel writes to cur: ==="; sed -n 399,700p electroweak.goal | grep -c "cur\] = "; echo "=== GW/GpW params ==="; grep -n "GW \|GpW " params.go | head -6``
+  ```
+  112:const EWStatesN EWStates = 73
+  827:const WeylStatesN WeylStates = 30
+  === does EW kernel write prv? ===
+  0
+  === EW kernel writes to cur: ===
+  16
+  === GW/GpW params ===
+  183:	// GW is g, the SU(2)_L weak isospin gauge coupling, which couples the
+  186:	GW float32
+  188:	// GpW is g', the U(1)_Y weak hypercharge gauge coupling, which couples
+  191:	GpW float32
+  292:	// MW = GW * HiggsV / 2 is the W boson mass in 1/cube. Nothing in the
+  384:	pr.MW = pr.GW * pr.HiggsV / 2.0
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I've confirmed EWStatesN grows to 87 fine, and the EW kernel's read/write pattern means a separate fermion kernel reading prv gauge fields stays order-independent. Now I'm forming the key questions, starting with why the Weyl kernel can't just be reused directly—different enum offsets between WeylStates and EWStates being the first reason.
+
+The bigger reasons are physical: EW coupling is SU(2)×U(1)_Y acting on a doublet (versus Weyl's single U(1)), the mass term comes from a dynamical Yukawa×Higgs field rather than a constant Omega0 and only connects e_L↔e_R leaving ν_L massless, and the spinor structure itself differs (a doublet of 2-spinors versus a single one). Still, the three-level leapfrog integration and buffer convention carry over cleanly.
+
+Now I'm settling on which questions to actually ask via AskUserQuestion — back-reaction (test field vs sourcing the gauge/Higgs fields), the Yukawa coupling scale (demo-visible vs realistic), whether to include a right-handed neutrino, and whether the fermion should be a separate kernel or folded into the ElectroweakKernel.
+
+I'm deciding I can settle the kernel-separation question myself (separate is clearly better) and skip asking. Same with the ν_R question — I'm fairly confident the answer is no, since its absence is the whole point per the user's framing, so I'll state that as an assumption rather than ask.
+
+I'm also weighing a fourth question about which demo scenario to target first — a neutrino passing through unchanged, an electron gaining mass from the condensate, beta-decay-style W exchange converting e↔ν, or restoring symmetry above T_c — since that choice determines how much machinery is actually needed.
+
+I'll settle on asking three concrete questions: back-reaction, Yukawa scale, and which demo to target first, with my own recommendations attached to each so they're easy to answer.
+
+
+</thinking>
+
+I've mapped the structure. You're right that the Weyl kernel can't be reused — four reasons, only one of which is cosmetic:
+
+1. **Different enum offsets** — `WeylStates` vs `EWStates` (73 vars already). Cosmetic.
+2. **Coupling structure** — Weyl has one U(1) charge (`WeylQ × A_μ`). The EW doublet needs SU(2) acting on its *weak* index via T^a plus U(1)_Y, and `e_R` needs a completely different rule: hypercharge only, no SU(2) at all.
+3. **Spinor shape** — Weyl's L is one 2-spinor (4 reals). The EW doublet is (ν_L, e_L), two 2-spinors = 8 reals, plus 4 for `e_R`.
+4. **Mass** — Weyl's `Omega0` is a constant. Here the L↔R coupling is `y_e Φ†L e_R`: a *field*, position-dependent and dynamical, and it touches only the lower doublet component. That asymmetry is exactly why ν_L stays massless.
+
+The *scheme* transfers directly, though, and the buffers are compatible — `ElectroweakKernel` reads `prv` and writes only `cur`, so a separate `EWFermionKernel` reading `prv` gauge fields is order-independent. I'll do that rather than growing the 300-line EW kernel.
+
+The payoff is the thing you asked about earlier in the session: Q = T³ + Y with Y = −1/2 gives ν_L T³=+1/2 → **Q = 0**, e_L T³=−1/2 → Q = −1, and e_R (T³=0, Y=−1) → Q = −1. Neutrino neutrality stops being an input and becomes a result.
+
+Four things I'd rather not guess at:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **AskUserQuestion**: `questions`
+  ```
+  The user answered: "Should the leptons source the electroweak fields, or just feel them?"="full back-reaction but using the existing EM and Self-Field flags to toggle these aspects, so you can get the full range of phenomena. It is fine to start with only the test fields and add these harder cases later.", "What should the electron's Yukawa coupling be set to?"="Tunable, defaulting to realistic", "Include a right-handed neutrino?"="No — its absence is the point (Recommended)", "Which demo should I build first?"="Electron vs neutrino in the condensate". Read the answers carefully — they may request clarification, changes, or that you not proceed — and follow what they actually say.
+  ```
+
+</details>
+
+<thinking>
+I'm settling on full back-reaction eventually, gated by the existing EM and SelfField flags, starting with test fields before tackling harder cases. The Yukawa coupling should be tunable but default to realistic values, there's no ν_R, and the first demo will compare electron versus neutrino behavior in the condensate — though I realize a "realistic" default might make the effect too subtle to see clearly.
+
+Working through the actual physics: with the Higgs sector using HiggsV in 1/cube units, the realistic electron Yukawa coupling comes out to about 2.94e-6, which given HiggsV ≈ 0.123 produces an electron mass so tiny it's essentially negligible for demo purposes. So the demo config itself will need to set a larger, more visible Yukawa value rather than relying on the physically realistic default.
+
+Now I'm thinking through how the existing `EM` and `SelfField` flags should map onto the electroweak case — `EM` likely toggles whether leptons couple to the gauge fields at all (covariant derivative on/off), while `SelfField` controls whether leptons back-react on and source the W/B fields themselves.
+
+I'll start with leptons just feeling test gauge fields (governed by EM), and defer sourcing/back-reaction to the SelfField flag. Now I'm laying out the state variables needed: the left-handed doublet's neutrino and electron spinor components, each with two spinor indices and real/imaginary parts, as the foundation for the implementation.
+
+Then I need the right-handed electron spinor components similarly, bringing the total to 12 evolved fields, plus derived magnitude diagnostics for the neutrino, left electron, and right electron (with a combined electron magnitude too), pushing the total state count up to 89. For naming, I'm following the existing Weyl convention but need to distinguish both chirality and weak-isospin index, so I'm settling on a scheme like EWNuL for the neutrino component.
+
+I'll settle on `EWNu1a/1b/2a/2b`, `EWEL1a...`, `EWER1a...` naming, noting that Nu is left-handed by construction. For the kernel, I'm sketching the three-level leapfrog structure — reading the previous timestep, writing the current one, computing σ·∇ via Gradient10 for each 2-spinor component, with chirality determining the sign on that term for left versus right fields.
+
+Now I'm working out the gauge coupling terms: the left doublet's covariant derivative includes both SU(2) and hypercharge pieces with Y_L = −1/2 and T^a = τ^a/2 acting on (ν, e), while e_R only couples through hypercharge with Y_R = −1. Then I'm setting up the Yukawa mass term −y_e(L̄Φe_R + h.c.) that mixes e_L and e_R through the Higgs doublet, working out how L̄Φ decomposes into ν̄_Lφ⁺ + ē_Lφ⁰ and what that contributes to the e_R equation of motion.
+
+In the broken vacuum with φ⁺=0 and φ⁰=v/√2, only e_L couples to e_R as expected and ν_L is left alone, but in the unbroken/general case with a nonzero charged Higgs component, ν_L actually does couple to e_R through φ⁺ — this is correct physics worth preserving. For integration, I'm planning to add a call to RunEWFermionKernel right after RunElectroweakKernel in the step sequence.
+
+Beyond the kernel, ElectroweakDampKernel needs updating to handle the new first-order fermion variables with the same open halo and absorbing layer treatment as the Weyl case, and I should extend the stats/view to include magnitudes, group velocity, and helicity, plus add a "Lepton Packets" config showing a neutrino and electron packet side by side. This is substantial work, so I want to build it incrementally: first the state variables, parameters, and mass-deriving update logic, then a kernel with free propagation only to verify it matches Weyl behavior, then layer in the Yukawa coupling for mass generation from the Higgs field.
+
+Now I need to add the gauge coupling next, followed by config, stats, view, and damping — and I should double-check that the Parameters struct size stays a multiple of 16 for padding reasons. Before writing anything, I want to look closely at the existing Weyl kernel body to mirror its structure and check how its Params struct is padded.
+
+
+</thinking>
+
+Good — that gives me a clear path. Starting with test fields (feel, don't source), `EM`/`SelfField` wired for the harder cases later, `YukawaE` tunable with the realistic default and the demo config setting its own, and no ν_R.
+
+Let me study the Weyl kernel body I'll be mirroring:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 106,175p weyl.goal``
+  ```
+  func WeylKernel(i uint32) { //gosl:kernel
+  	ctx := GetCtx(0)
+  	var x, y, z int32
+  	ok := ctx.StateCoords(i, &x, &y, &z)
+  	if !ok {
+  		return
+  	}
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  
+  	// the three-level leapfrog: cur still holds u(t-1) until we write it
+  	ol1a := State[z, y, x, WeylL1a, cur]
+  	ol1b := State[z, y, x, WeylL1b, cur]
+  	ol2a := State[z, y, x, WeylL2a, cur]
+  	ol2b := State[z, y, x, WeylL2b, cur]
+  	or1a := State[z, y, x, WeylR1a, cur]
+  	or1b := State[z, y, x, WeylR1b, cur]
+  	or2a := State[z, y, x, WeylR2a, cur]
+  	or2b := State[z, y, x, WeylR2b, cur]
+  
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 175,250p weyl.goal``
+  ```
+  	//
+  	//	d_t psi_L += i (q/hbar) [A0 + sigma.A] psi_L
+  	//	d_t psi_R += i (q/hbar) [A0 - sigma.A] psi_R
+  	//
+  	// sigma.A has the identical component structure to sigma.grad above, with
+  	// the potential in place of the derivative, and carries the same sign as
+  	// it does for each chirality -- both are halves of one sigma.D.
+  	//
+  	// Cheaper than the second-order version in two ways that are not
+  	// accidents. There is no (qA)^2 term, which only exists because squaring
+  	// the operator makes one. And there is no Boris push: in the second-order
+  	// equation A0 multiplies the VELOCITY, so it rotates it and has to be
+  	// applied exactly, while here it is one more term in the right-hand side.
+  	//
+  	// Params.WeylQ is the charge, and 0 is a neutrino. Nothing here derives
+  	// that -- see the WeylQ doc for where it does become a result.
+  	//
+  	// Keep |q A0 / hbar| well under the free omega. A constant A0 is pure
+  	// gauge and ought to change nothing, and on this lattice it very nearly
+  	// does: a couple of percent at A0 of 0.1 against a free omega of 0.36.
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm now designing the electroweak fermion kernel with three 2-spinor fields (left-handed neutrino, left-handed electron, right-handed electron), each carrying four real components, and setting up their free chiral evolution equations using Pauli-matrix coupled derivatives.
+
+For the mass term, I'm implementing the Yukawa coupling that gives the electron its mass through the Higgs doublet, working out how a complex mass parameter M = y·φ acts on the spinors via the −iMψ structure, splitting the complex multiplication into real and imaginary update rules for each component.
+
+I'm double-checking this against the earlier Weyl kernel form by setting the imaginary part of M to zero and confirming it reduces to the known update rule, then extending to the conjugate coupling for e_R while being careful that the whole thing stays Hermitian so the total probability (norm squared across ν, e_L, e_R) is conserved.
+
+Good, the second term also gives −ui, so the sum is zero and the norm is conserved, confirming the pairing rule d_t ψ_R = −i M* ψ_L is consistent. This tells me the mass matrices are M_ν = y_e φ⁺ coupling ν_L to e_R, and M_e = y_e φ⁰ coupling e_L to e_R, with e_R's equation involving both conjugated couplings. In the broken vacuum with φ⁺=0 and φ⁰ real, M_e reduces to the real electron mass m_e = y_e v/√2.
+
+Now I'm tracing through the code's Higgs field representation — the charged and neutral components stored as real/imaginary pairs, with a normalization factor of √2 relating the stored field to the physical Φ. I'm checking how the vacuum expectation value v is extracted as the square root of the squared magnitude, and tracing the parameter definitions that relate HiggsV to the underlying mass-squared and coupling parameters.
+
+With M_W = g v/2 confirmed as the standard relation and the test showing sqrt(EWHmag) = v directly, I conclude the stored doublet magnitude equals v itself (not v/√2), meaning the code's Ψ = √2 Φ, matching the earlier comment I noticed. So the electron mass formula becomes m_e = y_e |Ψ|/√2.
+
+Now I turn to the gauge coupling for the lepton doublet — with hypercharge Y_L = -1/2, I'm checking how the covariant derivative's gauge terms compare to the Higgs sector's convention where Y_Φ = +1/2.
+
+Since the lepton doublet carries a spin index in addition to the weak isospin index, unlike the scalar Higgs doublet, I realize I can apply the same SU(2) doublet gauge-action structure separately for each spin component — treating (ν_L^s, e_L^s) as its own doublet for s = 1, 2.
+
+For the gauge coupling itself, I'm working out how it generalizes: rather than a simple abelian phase, the covariant derivative now involves the full non-abelian combination G_μ = gW^a_μT^a + g'YB_μ, entering as d_tψ_L += i[G_0 + σ·**G**]ψ_L, analogous to how the abelian charge×A_μ term worked in the Weyl equation before.
+
+Since the weak-isospin matrix and the spin matrices act on separate indices, they commute, so I can apply them sequentially — first the weak-space matrix on the doublet, then contract with σ in spin space. I'm planning to reuse the existing EWGaugeAct helper structure, adjusting the hypercharge value to Y_L = −0.5 for the lepton doublet case, since it only differs from the YPhi coupling by that sign.
+
+Checking the sign convention in the diagonal case confirms o = −i·du·Ψ, matching ax = −iG_xΨ and D_x = ∂_x − iG_x as expected. This means I can reuse the same helper for the leptons with Y_L, and now I'm working out the weak-space covariant structure for the left doublet at each spin component.
+
+I'm assembling the gauge-covariant σ·D term across the spatial directions plus the time part, mirroring the free Weyl equation but replacing ∇ with the full covariant derivative including the −iG contribution.
+
+I notice the sign convention: the Weyl kernel structure adds +i(q/ħ)(A0+σ·A)ψ, but minimal coupling ∇→∇−i(q/ħc)A would instead give a −i(q/ħ)σ·A term, so I need to check this sign discrepancy carefully before finalizing the coupling term.
+
+For the electroweak case, I want to follow the same gauge convention already used and tested in the Higgs coupling code (D_μ = ∂_μ − iG_μ) to avoid introducing sign errors, since that convention correctly reproduces the W/Z boson masses. I'm cross-referencing the existing Higgs code's time-component structure to make sure the analogous G_0 term in the fermion equation follows the same pattern.
+
+Rather than re-deriving the Weyl equation from scratch and risking a sign mistake, my safest path is to mirror the existing WeylKernel code exactly, just swapping in the appropriate coupling term.
+
+I'm working out that the gauge contribution in WeylKernel corresponds to the matrix form G_0 + σ·G, where G_μ collects the weak and hypercharge gauge fields. Since EWGaugeAct returns −iGψ, I realize I can build the piece I need by simply negating that function's output rather than deriving a new formula.
+
+Now I'm figuring out how to extend this to the σ·A pattern used for spatial components, matching the way σ·∇ mixes spin components in the Weyl equation -- so I need G_μ applied to the doublet at each spin index before combining them with the same σ pattern.
+
+That's 8 EWGaugeActY calls for the left doublet total, plus a cheaper abelian term for the right singlet. The tricky part is handling the complex combination (G_x − iG_y)ψ_2 correctly, since the gauge action returns Vector4 real/imag pairs and I'll need to treat the extra −i as a component swap. It's intricate but manageable if I build it up carefully.
+
+Writing gauge multiplication helper...
+
+Now I need to handle the σ·G structure mirroring σ·∇, then figure out the e_R coupling: since it's abelian with G_μ = g'Y_R B_μ and Y_R = −1, the right-handed electron just picks up this simpler hypercharge-only term.
+
+I'm planning to build the implementation incrementally, starting with the state variables and parameters, and I need to double-check the Parameters struct's alignment once YukawaE is added.
+
+
+</thinking>
+
+I have the full template now. Let me start with the state variables and the coupling parameter:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "pad\b\|pad1\|pad2\|pad3" params.go | head; echo "=== size check ==="; cat > /tmp/szcheck.go <<'EOF'
+package main
+EOF
+go test -run TestParamsSize ./ 2>&1 | head -3; grep -rn "unsafe.Sizeof\|Parameters{}" *_test.go | head -3``
+  ```
+  348:	pad, pad1, pad2 float32
+  === size check ===
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  ok  	github.com/WaveReality/waves/wavesim	0.021s [no tests to run]
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 330,352p params.go``
+  ```
+  	//	d_t psi = C^2 Lap psi
+  	//
+  	// and completes the set. Wave puts the Laplacian into the acceleration and
+  	// gets oscillation; this puts the identical term, with the identical C^2,
+  	// one derivative earlier and gets decay. Nothing else changes.
+  	//
+  	// It is also the real-valued half of WaveC. That equation is this one
+  	// times i: same operator, same coefficient, and at the default C they are
+  	// numerically the same rate. Here a mode of wavenumber k DECAYS at C^2
+  	// khat^2; there it ROTATES at C^2 khat^2. The i is the whole difference
+  	// between heat spreading out and a quantum wave propagating, which is
+  	// worth being able to watch side by side.
+  	//
+  	// Stability wants C^2 khat^2 under 2, and Laplacian19 reaches 16/3, so C^2
+  	// must stay under 3/8. The default 0.5 gives 0.25 and is fine.
+  	Diffusion slbool.Bool
+  
+  	// gosl requires the total struct size to be a multiple of 16 bytes.
+  	pad, pad1, pad2 float32
+  }
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm planning to add a `YukawaE` input field plus a derived `MassE` field computed from YukawaE times HiggsV over root two, which fits within the available pad slots. Now I'm figuring out where to insert these into the state vars and params structs.
+
+Since the enumgen tool means insertion order can break things, I'll place the new lepton fields right after the gauge fields and before the derived mass-eigenstate views section, keeping evolved fields grouped together logically for the GUI. I'm now writing the comment block describing the lepton Weyl 2-spinor fields, noting the SU(2) doublet structure and hypercharge assignments for left and right-handed components.
+
+Adding neutrino, electron field variables...
+
+Now I'm counting up the new variables — 16 in total, bringing EWStatesN from 73 to 89 — and figuring out where in the file to insert them: right after EWW3Zv and before the derived mass-eigenstate views section.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+anchor = """	//////// Derived mass-eigenstate views."""
+new = '''	//////// Lepton fields: one generation, as Weyl 2-spinors.
+	//
+	// The left-handed fields are an SU(2) DOUBLET (nu_L, e_L) carrying
+	// hypercharge Y = -1/2. The right-handed electron is a SINGLET: Y = -1 and
+	// no SU(2) coupling at all. There is no nu_R, and that absence is the
+	// whole reason the neutrino has no mass here -- the Yukawa term simply has
+	// nothing to couple it to.
+	//
+	// Q = T^3 + Y then hands out the charges: nu_L at T^3 = +1/2 gets 0, e_L
+	// at T^3 = -1/2 gets -1, e_R at T^3 = 0 gets -1. Neutrality is a RESULT of
+	// the gauge structure rather than a number anyone typed in, which is
+	// exactly what Params.WeylQ could not do in the standalone Weyl equation.
+	//
+	// Each field is a two-component Weyl spinor, so a, b are the real and
+	// imaginary parts of each component, as in WeylStates.
+
+	// EWNu1a, EWNu1b are the left-handed neutrino spinor, component 1.
+	EWNu1a
+	EWNu1b
+
+	// EWNu2a, EWNu2b are the neutrino spinor, component 2.
+	EWNu2a
+	EWNu2b
+
+	// EWEL1a, EWEL1b are the left-handed electron, component 1. This is the
+	// lower half of the same doublet the neutrino is the upper half of, and
+	// the one the Yukawa term ties to the Higgs.
+	EWEL1a
+	EWEL1b
+
+	// EWEL2a, EWEL2b are the left-handed electron, component 2.
+	EWEL2a
+	EWEL2b
+
+	// EWER1a, EWER1b are the right-handed electron, component 1.
+	EWER1a
+	EWER1b
+
+	// EWER2a, EWER2b are the right-handed electron, component 2.
+	EWER2a
+	EWER2b
+
+	// EWNuMag is |psi_nu|^2.
+	EWNuMag
+
+	// EWELMag is |e_L|^2, and EWERMag is |e_R|^2: the two halves the Higgs
+	// trades back and forth, neither of which is conserved on its own.
+	EWELMag
+	EWERMag
+
+	// EWEMag is |e_L|^2 + |e_R|^2, the whole electron, which is.
+	EWEMag
+
+	//////// Derived mass-eigenstate views.'''
+assert anchor in s
+open('electroweak.goal','w').write(s.replace(anchor, new, 1))
+PY
+python3 - <<'PY'
+s=open('/Users/oreilly/wavereality/waves/wavesim/params.go').read()
+old = """	// gosl requires the total struct size to be a multiple of 16 bytes.
+	pad, pad1, pad2 float32"""
+new = """	// YukawaE is y_e, the coupling between the Higgs doublet and the electron
+	// in the term -y_e (Lbar Phi e_R + h.c.). It is the ONLY place an electron
+	// mass can come from here: there is no mass parameter in the lepton
+	// kernel, and m_e = y_e v / sqrt(2) appears because Phi is not zero.
+	//
+	// The default is the real one, which is tiny: the electron is 0.511 MeV
+	// against v = 246 GeV, so y_e is about 3e-6 and the mass it makes is far
+	// below anything visible on a lattice whose Higgs Compton length is 16
+	// cubes. The lepton configs raise it to something watchable and say so.
+	// Nothing else in the model changes when you do -- which is the point.
+	YukawaE float32
+
+	// MassE = YukawaE * HiggsV / sqrt(2) is the electron mass it produces, in
+	// 1/cube. Derived, and the number to compare a measured L-R flip rate
+	// against. It goes to zero with HiggsV above the transition.
+	MassE float32 `edit:"-"`
+
+	// gosl requires the total struct size to be a multiple of 16 bytes.
+	pad float32"""
+assert old in s
+s = s.replace(old, new, 1)
+old2 = """	pr.MW = pr.GW * pr.HiggsV / 2.0"""
+new2 = """	pr.MassE = pr.YukawaE * pr.HiggsV * InvSqrt2
+	pr.MW = pr.GW * pr.HiggsV / 2.0"""
+assert old2 in s
+s = s.replace(old2, new2, 1)
+old3 = """	pr.HiggsV = 0"""
+assert old3 in s
+open('/Users/oreilly/wavereality/waves/wavesim/params.go','w').write(s)
+PY
+grep -n "YukawaE\|MassE" params.go | head``
+  ```
+  347:	// YukawaE is y_e, the coupling between the Higgs doublet and the electron
+  357:	YukawaE float32
+  359:	// MassE = YukawaE * HiggsV / sqrt(2) is the electron mass it produces, in
+  362:	MassE float32 `edit:"-"`
+  401:	pr.MassE = pr.YukawaE * pr.HiggsV * InvSqrt2
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I need to compute the default electron Yukawa coupling as √2 m_e/v, giving roughly 2.935e-6, and set it in the Defaults() function near where the other EW parameters like HiggsV are defaulted. I should also check that InvSqrt2 is accessible in params.go since it's currently defined within the electroweak goal file's gosl block.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "pr.GW = \|pr.GpW = \|pr.HiggsLambda = \|pr.HiggsMuSq = " params.go | head``
+  ```
+  392:	pr.HiggsMuSq = pr.HiggsMu*pr.HiggsMu - pr.ThermalC*pr.Temp*pr.Temp
+  447:	pr.HiggsLambda = 0.1291
+  450:	pr.GW = 0.6533
+  451:	pr.GpW = 0.3500
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('params.go').read()
+old = """	pr.GW = 0.6533
+	pr.GpW = 0.3500"""
+new = """	pr.GW = 0.6533
+	pr.GpW = 0.3500
+	// the real one: sqrt(2) * 0.511 MeV / 246.22 GeV. It makes an electron
+	// mass six orders below the W, which on this lattice is nothing at all --
+	// see the YukawaE doc, and the lepton configs, which raise it.
+	pr.YukawaE = 2.935e-6"""
+assert old in s
+open('params.go','w').write(s.replace(old, new, 1))
+PY
+goal build 2>&1 | tail -2 && go generate ./... 2>&1 | grep -iE "^error|failed" | head; grep -n "^const EWStatesN" enumgen.go``
+  ```
+  Command running in background with ID: bawpjc780. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bawpjc780.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+
+</details>
+
+<thinking>
+While that runs, I'm sketching out the kernel: I need a generalized gauge action function that EWGaugeAct calls with the hypercharge value, a gauge multiplication function returning G·ψ, and the electroweak fermion kernel itself. Writing kernel structure...
+
+Writing Yukawa coupling terms...
+
+Still deriving update equations...
+
+Checking the vacuum limit confirms it: with φ⁺=0 and φ⁰=v real, so hca=hcb=0 and h0a=m_e, h0b=0, the equations collapse exactly onto the Weyl kernel form with om=m_e — both the l and r updates match, and the neutrino correctly picks up nothing. That's a solid consistency check.
+
+Now for the gauge coupling, I'll gate it on Params[0].EM. Given the scope, I'll stage this incrementally: first build and test the kernel with just free propagation plus Yukawa coupling (no gauge), verify it reproduces Weyl exactly, then layer in the gauge fields afterward — this matches what the user said was fine to start with, even though feeling the gauge fields is the eventual goal. Writing the kernel now...
+
+I need to find where to insert this into electroweak.goal, right after the ElectroweakKernel and before the damp kernel, staying inside the //gosl:start block, then make the file edit.
+
+
+</thinking>
+
+While that generates, let me write the kernel. First, checking where it goes:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "^func ElectroweakDampKernel\|^//gosl:end\|^func ElectroweakKernel" electroweak.goal``
+  ```
+  452:func ElectroweakKernel(i uint32) { //gosl:kernel
+  841:func ElectroweakDampKernel(i uint32) { //gosl:kernel
+  890://gosl:end
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bawpjc780.output``
+  ```
+  go build
+  goal build succeeded
+  112:const EWStatesN EWStates = 89
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+<thinking>
+The EWStatesN check confirms at 89, and generation ran cleanly. Now I'm planning the kernel: I'll start with free streaming plus Yukawa coupling, gate the gauge coupling structure behind the EM parameter, and test that piece before adding the full gauge implementation to reduce risk.
+
+
+</thinking>
+
+`EWStatesN = 89`. Now the kernel — free chiral streaming plus the Yukawa mass:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+anchor = "func ElectroweakDampKernel(i uint32) { //gosl:kernel"
+new = '''// EWFermionKernel evolves one generation of leptons in the electroweak
+// background: the left-handed doublet (nu_L, e_L) and the right-handed
+// singlet e_R, each a Weyl 2-spinor.
+//
+//	d_t nu_L = +c sigma.D nu_L - i y phi^+  e_R
+//	d_t e_L  = +c sigma.D e_L  - i y phi^0  e_R
+//	d_t e_R  = -c sigma.D e_R  - i y (phi^+* nu_L + phi^0* e_L)
+//
+// It is [WeylKernel] with two things taken out of the parameter list and put
+// into the fields. The mass is not a number: it is the Yukawa coupling times
+// the HIGGS, so it varies in space, it responds to the condensate, and it
+// vanishes when the symmetry is restored. And the charge is not a number
+// either: it is the gauge structure, through which component of the doublet a
+// field sits in.
+//
+// In the broken vacuum phi^+ = 0 and phi^0 = v, so the only surviving term is
+// -i (y v / sqrt(2)) between e_L and e_R, and this reduces EXACTLY to
+// WeylKernel at Omega0 = m_e. The neutrino keeps nothing at all, because the
+// upper component's partner would be a nu_R and there isn't one. Excite the
+// charged Higgs and phi^+ coupling switches on, which is the same term doing
+// what it does in a W decay.
+//
+// Runs after [ElectroweakKernel] in the same step and reads only prv, which
+// that kernel does not write, so the order between them does not matter.
+func EWFermionKernel(i uint32) { //gosl:kernel
+	ctx := GetCtx(0)
+	var x, y, z int32
+	ok := ctx.StateCoords(i, &x, &y, &z)
+	if !ok {
+		return
+	}
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+
+	// the three-level leapfrog: cur still holds u(t-1) until we write it
+	on1a := State[z, y, x, EWNu1a, cur]
+	on1b := State[z, y, x, EWNu1b, cur]
+	on2a := State[z, y, x, EWNu2a, cur]
+	on2b := State[z, y, x, EWNu2b, cur]
+	ol1a := State[z, y, x, EWEL1a, cur]
+	ol1b := State[z, y, x, EWEL1b, cur]
+	ol2a := State[z, y, x, EWEL2a, cur]
+	ol2b := State[z, y, x, EWEL2b, cur]
+	or1a := State[z, y, x, EWER1a, cur]
+	or1b := State[z, y, x, EWER1b, cur]
+	or2a := State[z, y, x, EWER2a, cur]
+	or2b := State[z, y, x, EWER2b, cur]
+
+	// u(t), where the right-hand side is evaluated
+	nn1a := State[z, y, x, EWNu1a, prv]
+	nn1b := State[z, y, x, EWNu1b, prv]
+	nn2a := State[z, y, x, EWNu2a, prv]
+	nn2b := State[z, y, x, EWNu2b, prv]
+	nl1a := State[z, y, x, EWEL1a, prv]
+	nl1b := State[z, y, x, EWEL1b, prv]
+	nl2a := State[z, y, x, EWEL2a, prv]
+	nl2b := State[z, y, x, EWEL2b, prv]
+	nr1a := State[z, y, x, EWER1a, prv]
+	nr1b := State[z, y, x, EWER1b, prv]
+	nr2a := State[z, y, x, EWER2a, prv]
+	nr2b := State[z, y, x, EWER2b, prv]
+
+	gn1a := Gradient10(x, y, z, int32(EWNu1a), prv)
+	gn1b := Gradient10(x, y, z, int32(EWNu1b), prv)
+	gn2a := Gradient10(x, y, z, int32(EWNu2a), prv)
+	gn2b := Gradient10(x, y, z, int32(EWNu2b), prv)
+	gl1a := Gradient10(x, y, z, int32(EWEL1a), prv)
+	gl1b := Gradient10(x, y, z, int32(EWEL1b), prv)
+	gl2a := Gradient10(x, y, z, int32(EWEL2a), prv)
+	gl2b := Gradient10(x, y, z, int32(EWEL2b), prv)
+	gr1a := Gradient10(x, y, z, int32(EWER1a), prv)
+	gr1b := Gradient10(x, y, z, int32(EWER1b), prv)
+	gr2a := Gradient10(x, y, z, int32(EWER2a), prv)
+	gr2b := Gradient10(x, y, z, int32(EWER2b), prv)
+
+	// sigma.grad on a 2-spinor, component by component, exactly as WeylKernel
+	sn1a := gn1a.Z + gn2a.X + gn2b.Y
+	sn1b := gn1b.Z + gn2b.X - gn2a.Y
+	sn2a := gn1a.X - gn1b.Y - gn2a.Z
+	sn2b := gn1b.X + gn1a.Y - gn2b.Z
+	sl1a := gl1a.Z + gl2a.X + gl2b.Y
+	sl1b := gl1b.Z + gl2b.X - gl2a.Y
+	sl2a := gl1a.X - gl1b.Y - gl2a.Z
+	sl2b := gl1b.X + gl1a.Y - gl2b.Z
+	sr1a := gr1a.Z + gr2a.X + gr2b.Y
+	sr1b := gr1b.Z + gr2b.X - gr2a.Y
+	sr2a := gr1a.X - gr1b.Y - gr2a.Z
+	sr2b := gr1b.X + gr1a.Y - gr2b.Z
+
+	cc := Params[0].C
+	// left streams one way, right the other: that is all chirality is
+	dn1a := cc * sn1a
+	dn1b := cc * sn1b
+	dn2a := cc * sn2a
+	dn2b := cc * sn2b
+	dl1a := cc * sl1a
+	dl1b := cc * sl1b
+	dl2a := cc * sl2a
+	dl2b := cc * sl2b
+	dr1a := -cc * sr1a
+	dr1b := -cc * sr1b
+	dr2a := -cc * sr2a
+	dr2b := -cc * sr2b
+
+	// ---- the Yukawa term, which is the mass ------------------------------
+	//
+	// The stored doublet is sqrt(2) Phi, as EWCurrent notes, so the coupling
+	// carried around here is y / sqrt(2) and m_e = y v / sqrt(2) comes out of
+	// the vacuum value directly.
+	//
+	// -i M psi with COMPLEX M takes (a, b) to (Ma b + Mb a, Mb b - Ma a), and
+	// the conjugate M* flips the sign of Mb. That pairing is what conserves
+	// |nu|^2 + |e_L|^2 + |e_R|^2: the term moves amplitude between them and
+	// creates none.
+	ye := Params[0].YukawaE * InvSqrt2
+	hca := ye * State[z, y, x, EWHsCa, prv]
+	hcb := ye * State[z, y, x, EWHsCb, prv]
+	h0a := ye * State[z, y, x, EWHs0a, prv]
+	h0b := ye * State[z, y, x, EWHs0b, prv]
+
+	dn1a += hca*nr1b + hcb*nr1a
+	dn1b += hcb*nr1b - hca*nr1a
+	dn2a += hca*nr2b + hcb*nr2a
+	dn2b += hcb*nr2b - hca*nr2a
+	dl1a += h0a*nr1b + h0b*nr1a
+	dl1b += h0b*nr1b - h0a*nr1a
+	dl2a += h0a*nr2b + h0b*nr2a
+	dl2b += h0b*nr2b - h0a*nr2a
+	dr1a += (hca*nn1b - hcb*nn1a) + (h0a*nl1b - h0b*nl1a)
+	dr1b += (-hcb*nn1b - hca*nn1a) + (-h0b*nl1b - h0a*nl1a)
+	dr2a += (hca*nn2b - hcb*nn2a) + (h0a*nl2b - h0b*nl2a)
+	dr2b += (-hcb*nn2b - hca*nn2a) + (-h0b*nl2b - h0a*nl2a)
+
+	n1a := on1a + 2*dn1a
+	n1b := on1b + 2*dn1b
+	n2a := on2a + 2*dn2a
+	n2b := on2b + 2*dn2b
+	l1a := ol1a + 2*dl1a
+	l1b := ol1b + 2*dl1b
+	l2a := ol2a + 2*dl2a
+	l2b := ol2b + 2*dl2b
+	r1a := or1a + 2*dr1a
+	r1b := or1b + 2*dr1b
+	r2a := or2a + 2*dr2a
+	r2b := or2b + 2*dr2b
+
+	if Params[0].Edges == EdgesDamp { // the absorbing layer: see EdgeDampFactor
+		df := EdgeDampFactor(x, y, z, ctx.Size.V())
+		n1a *= df
+		n1b *= df
+		n2a *= df
+		n2b *= df
+		l1a *= df
+		l1b *= df
+		l2a *= df
+		l2b *= df
+		r1a *= df
+		r1b *= df
+		r2a *= df
+		r2b *= df
+	}
+
+	State[z, y, x, EWNu1a, cur] = n1a
+	State[z, y, x, EWNu1b, cur] = n1b
+	State[z, y, x, EWNu2a, cur] = n2a
+	State[z, y, x, EWNu2b, cur] = n2b
+	State[z, y, x, EWEL1a, cur] = l1a
+	State[z, y, x, EWEL1b, cur] = l1b
+	State[z, y, x, EWEL2a, cur] = l2a
+	State[z, y, x, EWEL2b, cur] = l2b
+	State[z, y, x, EWER1a, cur] = r1a
+	State[z, y, x, EWER1b, cur] = r1b
+	State[z, y, x, EWER2a, cur] = r2a
+	State[z, y, x, EWER2b, cur] = r2b
+
+	// the STAGGERED magnitudes, as WeylKernel uses: a three-level leapfrog
+	// conserves the product of adjacent levels, not the square of one
+	nm := nn1a*n1a + nn1b*n1b + nn2a*n2a + nn2b*n2b
+	lm := nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
+	rm := nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
+	State[z, y, x, EWNuMag, cur] = nm
+	State[z, y, x, EWELMag, cur] = lm
+	State[z, y, x, EWERMag, cur] = rm
+	State[z, y, x, EWEMag, cur] = lm + rm
+}
+
+'''
+assert anchor in s
+open('electroweak.goal','w').write(s.replace(anchor, new + anchor, 1))
+PY
+goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I need to wire this into StepRun and write a test verifying it reduces exactly to WeylKernel in the broken vacuum, so I'm locating the Electroweak case within StepRun first.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "RunElectroweakKernel" sim.go``
+  ```
+  341:		RunElectroweakKernel(ns)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 336,346p sim.go``
+  ```
+  		RunWeylKernel(ns)
+  	case Electroweak:
+  		// No MaxwellKernel here: ElectroweakKernel writes A0s..AZs itself, as
+  		// the weak-mixing-angle rotation of (W^3, B). Letting MaxwellKernel
+  		// also evolve those by the free wave equation would fight it.
+  		RunElectroweakKernel(ns)
+  	case Spinfield:
+  		RunSpinfieldKernel(ns)
+  	}
+  	if ss.Params.Edges != EdgesFixed {
+  		ne := int(ctx.EdgesN())
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('sim.go').read()
+old = """		RunElectroweakKernel(ns)
+	case Spinfield:"""
+new = """		RunElectroweakKernel(ns)
+		// the leptons read only prv, which the kernel above does not write,
+		// so this order is a choice of convenience rather than correctness
+		RunEWFermionKernel(ns)
+	case Spinfield:"""
+assert old in s
+open('sim.go','w').write(s.replace(old, new, 1))
+PY
+cat > ewfermion_test.go <<'EOF'
+// Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package wavesim
+
+import (
+	"math"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+// ewfSim builds an electroweak sim with the leptons in it.
+func ewfSim(sz int32, init func(*Sim)) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = Electroweak
+	ss.Config.Size.Set(sz, sz, sz)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	ss.Params.Update()
+	ss.InitFunc = init
+	ss.Init()
+	return ss
+}
+
+// ewfSums returns the summed staggered magnitudes of the three lepton fields.
+func ewfSums() (nu, el, er float64) {
+	c := GetCtx(0)
+	sz := c.Size.V()
+	return StateSum(sz, EWNuMag, c.CurState), StateSum(sz, EWELMag, c.CurState),
+		StateSum(sz, EWERMag, c.CurState)
+}
+
+// TestEWFermionVsWeyl is the reduction that says the lepton kernel is the Weyl
+// kernel with the mass moved into a field. In the broken vacuum the charged
+// Higgs is zero and the neutral one is v, so the only Yukawa term left is
+// -i (y v / sqrt(2)) between e_L and e_R -- which is exactly Omega0 in
+// WeylKernel. Run the same initial spinor under both and the two must agree
+// step for step.
+//
+// The neutrino is the other half of the statement: the same field, in the
+// upper component of the doublet, where the Yukawa has no partner for it. It
+// must come out of the identical box with its magnitude untouched.
+func TestEWFermionVsWeyl(t *testing.T) {
+	const sz = 16
+	const amp = 0.5
+	const nst = 200
+
+	// the electroweak side: leptons at rest in the broken vacuum
+	ew := ewfSim(sz, func(s *Sim) {
+		HiggsBroken(s)
+		s.Params.YukawaE = 0.8 // a watchable mass, not the real 3e-6
+		s.Params.Update()
+		s.Fill(EWEL1a, Both, amp) // e_L, purely left to start
+		s.Fill(EWNu1a, Both, amp) // and a neutrino alongside it
+	})
+	me := float64(ew.Params.MassE)
+	if me <= 0 {
+		t.Fatalf("no electron mass: YukawaE %g, HiggsV %g", ew.Params.YukawaE, ew.Params.HiggsV)
+	}
+
+	// the Weyl side: the same spinor, with that mass as a constant
+	wy := wySim(sz, func(s *Sim) {
+		s.Params.Mass = 0 // set Omega0 directly instead
+		s.Params.Update()
+		s.Params.Omega0 = float32(me)
+		s.Fill(WeylL1a, Both, amp)
+	})
+
+	nu0, el0, _ := ewfSums()
+	var worst, nuWorst float64
+	for i := range nst {
+		ew.StepRun()
+		wyStep(wy)
+		nu, el, er := ewfSums()
+		wl, wr := wySums()
+		// the electron halves must track the Weyl ones
+		if el0 > 0 {
+			worst = math.Max(worst, math.Abs(el-wl)/el0)
+			worst = math.Max(worst, math.Abs(er-wr)/el0)
+		}
+		nuWorst = math.Max(nuWorst, math.Abs(nu/nu0-1))
+		if i == nst-1 {
+			t.Logf("after %d steps: e_L %.5f (Weyl %.5f), e_R %.5f (Weyl %.5f), nu %.5f (start %.5f)",
+				nst, el, wl, er, wr, nu, nu0)
+		}
+	}
+	t.Logf("m_e = %.5f from y = %.3f and v = %.5f; e vs Weyl differs by at most %.2e, nu by %.2e",
+		me, ew.Params.YukawaE, ew.Params.HiggsV, worst, nuWorst)
+	if worst > 1e-5 {
+		t.Errorf("the electron does not track WeylKernel at the same mass: off by %.2e", worst)
+	}
+	if nuWorst > 1e-9 {
+		t.Errorf("the neutrino picked up %.2e: with no nu_R the Yukawa has nothing to couple it to", nuWorst)
+	}
+	_ = math32.X
+}
+EOF
+goal build 2>&1|tail -1 && go test -run TestEWFermionVsWeyl -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic" | head -12``
+  ```
+  goal build failed: failed to run "go build: exit status 1"
+  FAIL	github.com/WaveReality/waves/wavesim [build failed]
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && goal build 2>&1 | head -10``
+  ```
+  go build
+  # github.com/WaveReality/waves/wavesim
+  ./sim.go:344:3: undefined: RunEWFermionKernel
+  goal build failed: failed to run "go build: exit status 1"
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+RunEWFermionKernel is normally generated by go generate via gosl, but that creates a chicken-and-egg problem since the transpile step already produced the .go files even though the build failed later. I'm considering whether running go generate directly could still work since gosl parses the existing sources.
+
+I think the cleanest approach is to revert my sim.go edit first, run go generate to regenerate the kernel wrapper, then reapply my changes afterward.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('sim.go').read()
+s=s.replace("\t\tRunEWFermionKernel(ns)\n","\t\t// RunEWFermionKernel(ns)\n",1)
+open('sim.go','w').write(s)
+PY
+goal build 2>&1|tail -1 && go generate ./... 2>&1 | grep -iE "^error|failed|EWFermion" | head -5; grep -n "func RunEWFermionKernel" gosl.go | head -2``
+  ```
+  Command running in background with ID: bqc307b4j. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bqc307b4j.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bd47p7gch, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bqc307b4j.output``
+  ```
+  goal build succeeded
+  Translating Kernel file: EWFermionKernel  NVars: 15 (atomic: 0)
+  naga output for: EWFermionKernel.wgsl
+  tint output for: EWFermionKernel.wgsl
+  568:func RunEWFermionKernel(n int) {
+  577:func RunEWFermionKernelGPU(n int) {
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+The kernel translates and validates on both naga and tint. Now wiring it in and running the reduction test:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('sim.go').read()
+s=s.replace("\t\t// RunEWFermionKernel(ns)\n","\t\tRunEWFermionKernel(ns)\n",1)
+open('sim.go','w').write(s)
+PY
+goal build 2>&1|tail -1 && go test -run TestEWFermionVsWeyl -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic|undefined" | head -12``
+  ```
+  goal build succeeded
+  panic: runtime error: index out of range [349920] with length 349920
+  FAIL	github.com/WaveReality/waves/wavesim	0.033s
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+That index math reveals the issue: 349920 comes from 5832 cells × 30 vars × 2, meaning the state tensor was sized for the Weyl config (30 variables) but the EW kernel is trying to index up to 89. The bug traces back to test setup order—creating the EW sim first, then the Weyl sim, which reconfigures state dimensions via ConfigState.
+
+Since State is a global, I can't run both sims simultaneously—every test in this codebase runs one sim at a time. My test design needs restructuring: run the EW sim first, recording its trajectory per step into a slice, then separately build and run the Weyl sim recording its own series, and finally compare the two recorded outputs rather than running them concurrently.
+
+
+</thinking>
+
+Global `State` — two sims can't coexist. Restructuring to run them sequentially:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('ewfermion_test.go').read()
+old = s[s.index("func TestEWFermionVsWeyl"):]
+new = '''func TestEWFermionVsWeyl(t *testing.T) {
+	const sz = 16
+	const amp = 0.5
+	const nst = 200
+	const yuk = 0.8 // a watchable mass, not the real 3e-6
+
+	// State is global, so the two runs cannot be alive at once: record the
+	// electroweak trajectory first, then replay it under Weyl.
+	ewL := make([]float64, nst)
+	ewR := make([]float64, nst)
+	ewNu := make([]float64, nst)
+	ew := ewfSim(sz, func(s *Sim) {
+		HiggsBroken(s)
+		s.Params.YukawaE = yuk
+		s.Params.Update()
+		s.Fill(EWEL1a, Both, amp) // e_L, purely left to start
+		s.Fill(EWNu1a, Both, amp) // and a neutrino alongside it
+	})
+	me := float64(ew.Params.MassE)
+	v := float64(ew.Params.HiggsV)
+	if me <= 0 {
+		t.Fatalf("no electron mass: YukawaE %g, HiggsV %g", ew.Params.YukawaE, ew.Params.HiggsV)
+	}
+	for i := range nst {
+		ew.StepRun()
+		ewNu[i], ewL[i], ewR[i] = ewfSums()
+	}
+
+	// the same spinor under WeylKernel, with that mass as a constant Omega0
+	wyL := make([]float64, nst)
+	wyR := make([]float64, nst)
+	wy := wySim(sz, func(s *Sim) {
+		s.Fill(WeylL1a, Both, amp)
+	})
+	wy.Params.Omega0 = float32(me)
+	for i := range nst {
+		wyStep(wy)
+		wyL[i], wyR[i] = wySums()
+	}
+
+	el0 := ewL[0]
+	nu0 := ewNu[0]
+	var worst, nuWorst float64
+	for i := range nst {
+		worst = math.Max(worst, math.Abs(ewL[i]-wyL[i])/el0)
+		worst = math.Max(worst, math.Abs(ewR[i]-wyR[i])/el0)
+		nuWorst = math.Max(nuWorst, math.Abs(ewNu[i]/nu0-1))
+	}
+	t.Logf("m_e = %.5f from y = %.2f and v = %.5f", me, yuk, v)
+	t.Logf("after %d steps: e_L %.5f (Weyl %.5f), e_R %.5f (Weyl %.5f)",
+		nst, ewL[nst-1], wyL[nst-1], ewR[nst-1], wyR[nst-1])
+	t.Logf("electron tracks Weyl to %.2e; neutrino moved by %.2e", worst, nuWorst)
+	if ewR[nst-1] <= 0 {
+		t.Errorf("the Higgs never made any e_R: the Yukawa term is not doing anything")
+	}
+	if worst > 1e-5 {
+		t.Errorf("the electron does not track WeylKernel at the same mass: off by %.2e", worst)
+	}
+	if nuWorst > 1e-9 {
+		t.Errorf("the neutrino picked up %.2e: with no nu_R the Yukawa has nothing to couple it to", nuWorst)
+	}
+	_ = math32.X
+}
+'''
+open('ewfermion_test.go','w').write(s.replace(old, new, 1))
+PY
+go test -run TestEWFermionVsWeyl -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic" | head -12``
+  ```
+      ewfermion_test.go:96: m_e = 0.06958 from y = 0.80 and v = 0.12300
+      ewfermion_test.go:97: after 200 steps: e_L 39.79467 (Weyl 39.79527), e_R 984.20593 (Weyl 984.20514)
+      ewfermion_test.go:99: electron tracks Weyl to 1.55e-06; neutrino moved by 0.00e+00
+  --- PASS: TestEWFermionVsWeyl (2.10s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The reduction checks out: the electron mass matches 0.8 × 0.123/√2 exactly, and the left/right electron values track the Weyl kernel with only 1.55e-6 float32 roundoff error. The neutrino stayed at exactly zero since the Yukawa coupling has nothing to act on it, confirming the core physics is correct and the remaining discrepancy is just numerical noise.
+
+Next I need to look at gauge coupling for SU(2) × U(1)_Y, set up a lepton packets config, add stats/viewing, and verify damping. Checking ElectroweakDampKernel — it damps the 32 electroweak boson vars and copies the 9 Higgs vars, but doesn't touch the leptons at all. Since leptons are first-order, they need the open boundary halo plus the interior absorbing layer the fermion kernel already applies. I'm now tracing through StepRun's damp switch statement to confirm EdgesOpenKernel actually runs during the Electroweak case, since the leptons depend on that boundary handling being present.
+
+I'm noting that the switch case for Electroweak only calls RunElectroweakDampKernel, with no separate open-halo call, so the leptons currently miss that treatment — I'll revisit this after handling the gauge coupling, which is the bigger task now.
+
+For the gauge coupling, I'm generalizing the EWGaugeAct function to accept a hypercharge parameter and adding an EWGaugeMul function computing G·ψ. In the fermion kernel, when the electroweak flag is enabled, I need separate treatment for the left doublet (weak isospin action across spin components and directions) versus the right-handed electron (simple abelian coupling with g'·Y_R·B_μ). I'm working out the mirrored Weyl-equation term: the left doublet's time derivative gains an i(G_0 + σ·G)ψ_L contribution, while the right-handed field gets i(G_0 − σ·G)ψ_R, and now I'm implementing this for the left doublet component by component.
+
+Computing the projections...
+
+This confirms the pattern matches the (G_x − iG_y)ψ_2 structure using derivative operators. I'm now mapping this onto the Vector4 layout convention in EWGaugeAct, where the components represent (upper real, upper imag, lower real, lower imag) of the doublet, so qz1.X specifically refers to the upper-real component of G_z applied to the spin-1 doublet.
+
+Now I'm working out the full set of real and imaginary components for both neutrino and electron parts across spin states, combining the qz, qx, and qy contributions with appropriate signs to match the σ·G structure.
+
+After computing these terms, I add in G_0 to get the total spinor contribution, then fold this into the equation of motion by taking the imaginary part into the real update and the real part into the imaginary update, mirroring the same pattern used in the Weyl fermion code where the eoh factor gets absorbed into G. For the right-handed electron, I set up the analogous gauge coupling using B_μ with the YER hypercharge, applying the same structure but with a sign flip for right chirality, consistent with the Weyl right-handed treatment.
+
+Now I'm writing the EWGaugeActY function that computes the electroweak gauge action for a doublet with a given hypercharge, returning -i G_μ Ψ where G_μ combines the weak SU(2) coupling with the T^a generators and the hypercharge coupling with B_μ.
+
+Now I'm defining EWGaugeAct as a wrapper calling EWGaugeActY with the hypercharge fixed to lepton doublet value, then writing EWGaugeMul which returns the raw gauge action G·ψ (undressed by the -i factor) so it can be used directly in the first-order lepton equation's sigma contraction.
+
+Verifying the multiplication-by-i identity holds for the imaginary unit convention used here. Then I'm assembling the doublet spinor components at each spin state as four-vectors of (neutrino real, neutrino imaginary, electron real, electron imaginary), and applying EWGaugeMul with the different gauge field configurations (base, and perturbed in x-direction) to these doublets...
+
+Combining these gauge-multiplied results into the components of (G_0 + sigma·G)Psi for each spinor entry...
+
+I need to double-check that the sigma-pattern mapping is consistent across upper and lower halves of the doublet, matching how real/imaginary parts combine at each spin index.
+
+Confirming those match, then updating the derivative accumulators for the doublet components using u1, u2, v1, v2, before moving on to the abelian e_R hypercharge sector...
+
+Writing gauge coupling code...
+
+I'm noting that w10 through bz need to be read from the previous state within the fermion kernel, then double-checking the sign convention against the Weyl basis.
+
+Comparing against Weyl's formulation, the coupling constants are already embedded in EWGaugeMul, so no extra factor is needed—and neither kernel divides by Hbar, so that's consistent. Now I'm working through whether the electron's electric charge comes out correctly via Q = T³ + Y, tracing how the photon field (a mixture of W³ and B weighted by the Weinberg angle) picks up the right coefficient e·Q for the left-handed electron.
+
+Checking the remaining fermions: e_L gives Q=−1, ν_L gives Q=0, and e_R gives Q=−1, all matching expectations. I want to test this by applying a uniform A-field and verifying the neutrino stays unresponsive while both electron chiralities react identically, then move on to implementing the gauge coupling itself, keeping in mind that large A-field values could threaten stability under the leapfrog scheme just as in Weyl's EM case.
+
+I also need to check whether the `EM` flag is already being used elsewhere — it seems to gate the gauge coupling in KGC/Dirac/Weyl, so it makes sense to reuse it for the lepton coupling in EW too. Let me check its default value and whether existing EW configs set it, then implement and test.
+
+
+</thinking>
+
+The reduction holds exactly:
+
+```
+m_e = 0.06958 from y = 0.80 and v = 0.12300
+after 200 steps: e_L 39.79467 (Weyl 39.79527), e_R 984.20593 (Weyl 984.20514)
+electron tracks Weyl to 1.55e-06; neutrino moved by 0.00e+00
+```
+
+Float32 noise on the electron, and the neutrino is untouched to **exactly zero**. Now the gauge coupling:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+
+# generalize EWGaugeAct over hypercharge, and add the undressed G.Psi
+old = """func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
+	hg := 0.5 * Params[0].GW
+	gy := Params[0].GpW * YPhi"""
+new = """func EWGaugeAct(w1, w2, w3, b float32, psi math32.Vector4) math32.Vector4 {
+	return EWGaugeActY(w1, w2, w3, b, YPhi, psi)
+}
+
+// EWGaugeActY is [EWGaugeAct] for a doublet of any weak hypercharge: the
+// Higgs has Y = +1/2, the lepton doublet Y = -1/2, and that sign is the whole
+// difference between a field the photon ignores and one it does not.
+func EWGaugeActY(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4 {
+	hg := 0.5 * Params[0].GW
+	gy := Params[0].GpW * yhyp"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old2 = """// EWCurrent returns the four gauge currents"""
+new2 = """// EWGaugeMul returns G_mu Psi itself rather than the -i G_mu Psi that a
+// covariant derivative wants. The second-order Higgs equation only ever needs
+// the covariant derivative, but the first-order lepton equation has to put the
+// potential inside its own sigma contraction first, and multiply by i at the
+// end of all of it.
+func EWGaugeMul(w1, w2, w3, b, yhyp float32, psi math32.Vector4) math32.Vector4 {
+	o := EWGaugeActY(w1, w2, w3, b, yhyp, psi)
+	return math32.Vec4(-o.Y, o.X, -o.W, o.Z) // times i
+}
+
+// EWCurrent returns the four gauge currents"""
+assert old2 in s
+s = s.replace(old2, new2, 1)
+
+# hypercharges
+old3 = """// InvSqrt2 is 1/sqrt(2), the normalization of the W^+/W^- basis."""
+new3 = """// YLep is the weak hypercharge of the left-handed lepton doublet and YER that
+// of the right-handed electron singlet, in the same Q = T^3 + Y convention as
+// YPhi. With T^3 = +1/2 above and -1/2 below, YLep = -1/2 gives the neutrino
+// Q = 0 and the left electron Q = -1; YER = -1 on a singlet with T^3 = 0 gives
+// the right electron Q = -1 as well.
+//
+// That the two chiralities come out with the SAME charge is not decoration: a
+// mass term joins them, and a term joining two fields of different charge
+// would not be electrically neutral, so no such mass could exist. The Yukawa
+// term is allowed precisely because these two numbers agree.
+const YLep = -0.5
+const YER = -1.0
+
+// InvSqrt2 is 1/sqrt(2), the normalization of the W^+/W^- basis."""
+assert new3.count("YLep") > 0 and old3 in s
+s = s.replace(old3, new3, 1)
+open('electroweak.goal','w').write(s)
+PY
+goal build 2>&1 | tail -2``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+old = """	n1a := on1a + 2*dn1a
+	n1b := on1b + 2*dn1b"""
+new = '''	// ---- gauge coupling -------------------------------------------------
+	//
+	// The same minimal coupling WeylKernel has, with the charge promoted from
+	// a number to a matrix: G_mu = g W^a_mu T^a + g' Y B_mu, acting on the
+	// WEAK index while sigma acts on the spin index. The two commute, so the
+	// potential is applied first and contracted with sigma afterwards, in the
+	// identical component pattern the gradient uses.
+	//
+	//	d_t psi_L += i (G_0 + sigma.G) psi_L
+	//	d_t psi_R += i (G_0 - sigma.G) psi_R
+	//
+	// The left doublet sees all of it. The right electron is an SU(2) singlet,
+	// so its G is g' Y B alone -- no W at all, which is what "the weak force
+	// only touches left-handed fields" means in the equation rather than in
+	// words.
+	if Params[0].EM.IsTrue() {
+		w10 := State[z, y, x, EWW10s, prv]
+		w1x := State[z, y, x, EWW1Xs, prv]
+		w1y := State[z, y, x, EWW1Ys, prv]
+		w1z := State[z, y, x, EWW1Zs, prv]
+		w20 := State[z, y, x, EWW20s, prv]
+		w2x := State[z, y, x, EWW2Xs, prv]
+		w2y := State[z, y, x, EWW2Ys, prv]
+		w2z := State[z, y, x, EWW2Zs, prv]
+		w30 := State[z, y, x, EWW30s, prv]
+		w3x := State[z, y, x, EWW3Xs, prv]
+		w3y := State[z, y, x, EWW3Ys, prv]
+		w3z := State[z, y, x, EWW3Zs, prv]
+		b0 := State[z, y, x, EWB0s, prv]
+		bx := State[z, y, x, EWBXs, prv]
+		by := State[z, y, x, EWBYs, prv]
+		bz := State[z, y, x, EWBZs, prv]
+
+		// the doublet at each spin component: (nu real, nu imag, e real, e imag)
+		p1 := math32.Vec4(nn1a, nn1b, nl1a, nl1b)
+		p2 := math32.Vec4(nn2a, nn2b, nl2a, nl2b)
+		q01 := EWGaugeMul(w10, w20, w30, b0, YLep, p1)
+		qx1 := EWGaugeMul(w1x, w2x, w3x, bx, YLep, p1)
+		qy1 := EWGaugeMul(w1y, w2y, w3y, by, YLep, p1)
+		qz1 := EWGaugeMul(w1z, w2z, w3z, bz, YLep, p1)
+		q02 := EWGaugeMul(w10, w20, w30, b0, YLep, p2)
+		qx2 := EWGaugeMul(w1x, w2x, w3x, bx, YLep, p2)
+		qy2 := EWGaugeMul(w1y, w2y, w3y, by, YLep, p2)
+		qz2 := EWGaugeMul(w1z, w2z, w3z, bz, YLep, p2)
+
+		// (G_0 + sigma.G) Psi, in the sigma pattern of sn/sl above
+		u1a := q01.X + qz1.X + qx2.X + qy2.Y
+		u1b := q01.Y + qz1.Y + qx2.Y - qy2.X
+		u2a := q02.X + qx1.X - qy1.Y - qz2.X
+		u2b := q02.Y + qx1.Y + qy1.X - qz2.Y
+		v1a := q01.Z + qz1.Z + qx2.Z + qy2.W
+		v1b := q01.W + qz1.W + qx2.W - qy2.Z
+		v2a := q02.Z + qx1.Z - qy1.W - qz2.Z
+		v2b := q02.W + qx1.W + qy1.Z - qz2.W
+
+		// multiplying by i takes (a, b) to (-b, a)
+		dn1a -= u1b
+		dn1b += u1a
+		dn2a -= u2b
+		dn2b += u2a
+		dl1a -= v1b
+		dl1b += v1a
+		dl2a -= v2b
+		dl2b += v2a
+
+		// the singlet: hypercharge only, and the other chirality sign
+		gb := Params[0].GpW * YER
+		rb0 := gb * b0
+		rbx := gb * bx
+		rby := gb * by
+		rbz := gb * bz
+		qr1a := rb0*nr1a - (rbz*nr1a + rbx*nr2a + rby*nr2b)
+		qr1b := rb0*nr1b - (rbz*nr1b + rbx*nr2b - rby*nr2a)
+		qr2a := rb0*nr2a - (rbx*nr1a - rby*nr1b - rbz*nr2a)
+		qr2b := rb0*nr2b - (rbx*nr1b + rby*nr1a - rbz*nr2b)
+		dr1a -= qr1b
+		dr1b += qr1a
+		dr2a -= qr2b
+		dr2b += qr2a
+	}
+
+	n1a := on1a + 2*dn1a
+	n1b := on1b + 2*dn1b'''
+assert old in s
+open('electroweak.goal','w').write(s.replace(old, new, 1))
+PY
+goal build 2>&1 | tail -2 && go test -run TestEWFermionVsWeyl -v ./ 2>&1 | grep -E "^---|_test.go:" | head -5``
+  ```
+  go build
+  goal build succeeded
+      ewfermion_test.go:96: m_e = 0.06958 from y = 0.80 and v = 0.12300
+      ewfermion_test.go:97: after 200 steps: e_L 39.79467 (Weyl 39.79527), e_R 984.20593 (Weyl 984.20514)
+      ewfermion_test.go:99: electron tracks Weyl to 1.55e-06; neutrino moved by 0.00e+00
+  --- PASS: TestEWFermionVsWeyl (2.10s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The Weyl reduction still checks out either way since the gauge fields vanish in HiggsBroken, so EM coupling being on or off doesn't matter. Now I want to verify the key neutrality test: with Q = T³ + Y, a uniform photon field should leave the neutrino unaffected while both electron chiralities respond to it.
+
+To construct a pure photon field I need A_μ = sinθ_W W³_μ + cosθ_W B_μ with the Z combination zeroed out, so I should check the actual mixing convention the kernel uses when writing the gauge field components — let me grep for where that happens.
+
+A uniform A0 acts like a potential shift, rotating the phase of charged fields at a rate proportional to their charge Q, while leaving neutral fields untouched — but that phase effect is invisible in field magnitudes alone. A cleaner test would use a uniform gradient in A0, i.e. an electric field, which accelerates charges directly, similar to the ElectronInField setup from the Weyl test. Alternatively I could measure the phase rotation rate itself for a charge-Q field under uniform A0.
+
+Let me grep for how EWZ0 and A0s are actually computed in the code to nail down the convention.
+
+
+</thinking>
+
+Now the real payoff test — charge from Q = T³ + Y. Let me check the photon/Z mixing convention:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "A0s, cur\]\|EWZ0, cur\]" -B 6 electroweak.goal | head -24``
+  ```
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "A0s\b" electroweak.goal | head; echo "---"; grep -n "SinThetaW\|CosThetaW" electroweak.goal | head``
+  ```
+  206:	// state variables A0s..AZs instead, because it is the electromagnetic
+  751:	// electromagnetic field, so A0s..AZs is where it belongs. Nothing here is
+  762:		State[z, y, x, int32(A0s)+ki, cur] = sw*w3s + cw*bs
+  1203:	view.Panels[1].Var = AYs // the transverse component: A0s is zero for a pulse
+  ---
+  754:	sw := Params[0].SinThetaW
+  755:	cw := Params[0].CosThetaW
+  1313:	ss.CarrierPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.SinThetaW, 1, om, 0)
+  1314:	ss.CarrierPacketConfig(EWBYs, EWBYv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  1337:	ss.CarrierPacketConfig(EWW3Ys, EWW3Yv, math32.X, cx, p.CosThetaW, 1, om, 0)
+  1338:	ss.CarrierPacketConfig(EWBYs, EWBYv, math32.X, cx, -p.SinThetaW, 1, om, 0)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Confirming that the photon field decomposes as sinθ_W times W³ plus cosθ_W times B, matching how PhotonPulse assigns amplitudes to each component — so a uniform photon potential of magnitude A gives W³_0 = sw·A and B_0 = cw·A. Now I'm working out the expected phase rotation rate this induces.
+
+Computing the coupling G_0 for each field: for the neutrino, the weak and hypercharge contributions cancel exactly using sw = g'/√(g²+g'²) and cw = g/√(g²+g'²), giving zero. For left-handed and right-handed electrons, both reduce identically to −eA where e = gg'/√(g²+g'²) is the electric charge — confirming both have charge Q=−1, which is a nice consistency check that the setup correctly reproduces electromagnetic coupling. This gives me a clean test case: with a uniform photon potential and zero Yukawa coupling, the neutrino phase shouldn't rotate at all while both electron components should rotate at the identical rate −eA.
+
+I'm now thinking through how to actually measure this rotation rate in the simulation — tracking the imaginary part growth from an initial real amplitude, since db/dt = G_0·a. But I need to be careful about the three-level leapfrog scheme: for a uniform field with no spatial gradients, the field just undergoes pure phase rotation, and I'm checking whether initializing current and previous timesteps as equal introduces spurious behavior in that leapfrog update.
+
+The most robust approach is to measure the total phase angle via atan2 of summed real and imaginary parts across many steps and unwrap it, comparing rates for ν, e_L, and e_R against the predicted arcsin(G_0)≈G_0 rate per step. I'm picking a coupling strength A so that e·A stays small (~0.02 rad/step), computing e = gg'/√(g²+g'²) from the weak mixing parameters.
+
+I'm setting up the test with uniform gauge fields and initializing the three lepton fields with a real amplitude in one component, but I need to check whether the gauge fields will drift over time due to backreaction from the Higgs or fermion current, which could contaminate the measurement.
+
+To keep things clean, I decide to set the Higgs to exactly zero, which removes the current and any Yukawa coupling, leaving a uniform gauge potential static since there are no gradients driving it — though I need to verify the zero Higgs stays at its unstable equilibrium rather than rolling off during the simulation.
+
+Filling in the gauge boson and lepton fields, then measuring phase by summing real and imaginary components over the box and using atan2. I should also make sure to explicitly enable EM in the params rather than assume it's on by default.
+
+
+</thinking>
+
+The algebra says this should be exact: for ν_L, `g·sinθ_W − g'·cosθ_W = 0` identically. Let me test it:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat >> ewfermion_test.go <<'EOF'
+
+// ewfPhase is the phase angle of a lepton spinor's component 1, summed over
+// the box: how far it has rotated.
+func ewfPhase(ar, ai EWStates) float64 {
+	c := GetCtx(0)
+	sz := c.Size.V()
+	return math.Atan2(StateSum(sz, ai, c.CurState), StateSum(sz, ar, c.CurState))
+}
+
+// TestEWFermionCharge is the point of putting the leptons in here at all.
+//
+// Nothing in the lepton kernel names an electric charge. What it has is a
+// hypercharge per field and a weak isospin per doublet component, and the
+// photon is the sinTheta_W W^3 + cosTheta_W B combination. Q = T^3 + Y then
+// falls out of the algebra: for the neutrino the two terms are
+//
+//	g sinTheta_W / 2 - g' cosTheta_W / 2 = (g g' - g' g) / 2 sqrt(g^2+g'^2) = 0
+//
+// exactly, for any couplings. The neutrino is not neutral because anyone set
+// it to zero -- it is neutral because those two numbers cancel.
+//
+// Both electron chiralities must come out at the SAME rate despite reaching it
+// differently: e_L from T^3 = -1/2 with Y = -1/2, e_R from hypercharge alone at
+// Y = -1 and no SU(2) at all. If they did not agree there could be no mass
+// term joining them.
+//
+// Run with the Higgs at zero, where there is no Yukawa to mix the chiralities
+// and no current to move the gauge fields, so a uniform potential just sits
+// there and rotates whatever carries charge.
+func TestEWFermionCharge(t *testing.T) {
+	const sz = 8
+	const amp = 0.5
+	const nst = 50
+	const a0 = 0.0648 // gives the electron about 0.02 rad per step
+
+	ss := ewfSim(sz, func(s *Sim) {
+		s.Params.EM.SetBool(true)
+		s.Params.YukawaE = 0 // isolate the gauge response
+		s.Params.Update()
+		sw, cw := s.Params.SinThetaW, s.Params.CosThetaW
+		s.Fill(EWW30s, Both, sw*a0) // a pure photon: no Z admixture
+		s.Fill(EWB0s, Both, cw*a0)
+		s.Fill(EWNu1a, Both, amp)
+		s.Fill(EWEL1a, Both, amp)
+		s.Fill(EWER1a, Both, amp)
+	})
+	p := ss.Params
+	// e = g g' / sqrt(g^2 + g'^2) is the electric charge the mixing leaves
+	e := float64(p.GW*p.GpW) / math.Sqrt(float64(p.GW*p.GW+p.GpW*p.GpW))
+	want := e * a0
+	for range nst {
+		ss.StepRun()
+	}
+	nu := ewfPhase(EWNu1a, EWNu1b) / nst
+	el := ewfPhase(EWEL1a, EWEL1b) / nst
+	er := ewfPhase(EWER1a, EWER1b) / nst
+	t.Logf("phase rate per step: nu %+.6f, e_L %+.6f, e_R %+.6f   (e A0 = %.6f)", nu, el, er, want)
+	t.Logf("as charges: nu %+.4f, e_L %+.4f, e_R %+.4f", nu/want, el/want, er/want)
+	if math.Abs(nu) > 1e-6 {
+		t.Errorf("the neutrino rotated at %.2e in a photon field: Q = T^3 + Y should cancel exactly", nu)
+	}
+	if math.Abs(math.Abs(el/want)-1) > 0.02 {
+		t.Errorf("e_L came out at charge %.4f, want -1 or +1 in magnitude", el/want)
+	}
+	if math.Abs(er/el-1) > 0.02 {
+		t.Errorf("the two chiralities have different charge, %.4f vs %.4f: no mass term could join them",
+			er/want, el/want)
+	}
+}
+EOF
+go test -run TestEWFermionCharge -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic" | head -10``
+  ```
+      ewfermion_test.go:167: phase rate per step: nu +0.000000, e_L -0.020280, e_R -0.020280   (e A0 = 0.019992)
+      ewfermion_test.go:168: as charges: nu +0.0000, e_L -1.0144, e_R -1.0144
+  --- PASS: TestEWFermionCharge (0.07s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The result comes out to exactly zero for the neutrino and −1.0144 for both electrons, matching perfectly since e_L and e_R are identical. That small 1.4% excess above −1 traces back to the leapfrog's arcsin effect, consistent with the couple-percent deviation noted in the Weyl kernel documentation at A0 of 0.1.
+
+Wait, actually the arcsin correction computes to only about 0.007% (arcsin(0.019992)≈0.0199933, giving a ratio of just 1.00007), not the 1.4% I'm seeing — so that's not the source of the discrepancy. I suspect it's actually a transient artifact from the initial leapfrog step, where setting cur=prv contaminates the solution with the wrong branch and doesn't fully average out over 50 steps. I'm double-checking the formula for e_L against the code's convention, confirming that G_0 = −A·e as expected, then plugging in GW=0.6533 and GpW=0.35 to verify the normalization.
+
+I compute e = 0.30853 and want = 0.019993, but the measured value is 0.020280, giving a ratio of 1.0144 — still unexplained by the arcsin correction. Since the test's 2% tolerance covers this discrepancy, and the exact equality of e_L and e_R along with the exactly-zero neutrino coupling are the real physics claims being tested, I don't think I need to fully resolve the 1.4% gap, though I want to be upfront about it rather than sweep it under the rug. I consider checking if it's a transient effect by skipping the first few steps or measuring over a longer run.
+
+If the discrepancy is a fixed phase offset accumulated at the start, running longer should shrink its relative contribution — dividing a constant offset by more steps reduces the excess rate proportionally. At N=50 the excess is 0.000288, implying a transient phase of 0.0144 rad; if I quadruple N to 200, the excess should drop to about 0.0000720, a ratio of 1.0036. Testing this would confirm whether it's a startup artifact worth documenting, and a cleaner fix might be to measure the rate between two later time points instead of from t=0, which would cancel out any initial phase offset entirely.
+
+
+</thinking>
+
+Exactly zero for the neutrino, and the two chiralities identical. The 1.4% excess looks like a startup offset — let me measure the rate between two later times instead of from t=0, which removes it:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('ewfermion_test.go').read()
+old = """	want := e * a0
+	for range nst {
+		ss.StepRun()
+	}
+	nu := ewfPhase(EWNu1a, EWNu1b) / nst
+	el := ewfPhase(EWEL1a, EWEL1b) / nst
+	er := ewfPhase(EWER1a, EWER1b) / nst"""
+new = """	want := e * a0
+	// measure BETWEEN two later times, not from rest: the three-level
+	// leapfrog is given cur = prv here, which is not its own past, and that
+	// leaves a fixed phase offset in the first few steps. It biases a rate
+	// taken from zero and cancels out of a difference.
+	const skip = 20
+	for range skip {
+		ss.StepRun()
+	}
+	nu0 := ewfPhase(EWNu1a, EWNu1b)
+	el0 := ewfPhase(EWEL1a, EWEL1b)
+	er0 := ewfPhase(EWER1a, EWER1b)
+	for range nst {
+		ss.StepRun()
+	}
+	nu := (ewfPhase(EWNu1a, EWNu1b) - nu0) / nst
+	el := (ewfPhase(EWEL1a, EWEL1b) - el0) / nst
+	er := (ewfPhase(EWER1a, EWER1b) - er0) / nst"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace("if math.Abs(math.Abs(el/want)-1) > 0.02 {", "if math.Abs(math.Abs(el/want)-1) > 0.005 {", 1)
+s = s.replace("if math.Abs(er/el-1) > 0.02 {", "if math.Abs(er/el-1) > 1e-6 {", 1)
+open('ewfermion_test.go','w').write(s)
+PY
+go test -run TestEWFermionCharge -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL" | head -8``
+  ```
+      ewfermion_test.go:178: phase rate per step: nu +0.000000, e_L -0.020321, e_R -0.020321   (e A0 = 0.019992)
+      ewfermion_test.go:179: as charges: nu +0.0000, e_L -1.0165, e_R -1.0165
+      ewfermion_test.go:184: e_L came out at charge -1.0165, want -1 or +1 in magnitude
+  --- FAIL: TestEWFermionCharge (0.09s)
+  FAIL
+  FAIL	github.com/WaveReality/waves/wavesim	0.114s
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+This isn't a startup transient after all — the rate settles at a steady 1.65% above e·A0, pointing to some systematic factor rather than noise. I'm checking the EWGaugeAct diagonal term to verify the weak isospin coupling coefficient for the lepton doublet's upper component matches the expected GW*(+1/2).
+
+Working through the neutrino and electron field equations, both e_L and e_R should rotate at exactly −A·e = −0.019992, but the measured value is −0.020321 for both — consistently 1.65% high, suggesting a shared systematic cause rather than independent errors. One possibility I'm considering: the uniform field configuration might not actually be staying uniform, and the gauge fields themselves could be evolving under the Higgs dynamics.
+
+Now thinking about the measurement itself: the three-level leapfrog scheme actually has two modes, a physical one at frequency arcsin(Ω) and a spurious parasitic mode near π−ω that alternates sign each step. Starting with cur=prv excites both, so the parasitic contamination could wobble the measured phase via atan2 of the sum, though it seems more like an oscillation than a steady bias — unless the mode mixing produces some effective rate over the 50 steps.
+
+I want to check whether the discrepancy is systematic by trying different skip and nst values to see if the 1.65% factor stays stable. Testing whether this ratio ties back to something like Hbar or the constant C, though Hbar=1 makes that unlikely to matter here.
+
+Wait, I think I found the real issue — the EM coupling term lacks the c factor on the σ·A part that should be there from minimal coupling, unlike the free term which has cc·sl1a. Working through Weyl's minimal coupling substitution ∇ → ∇ − i(q/ħc)A confirms the σ·A term should carry a coefficient that's missing here.
+
+Actually checking more carefully, the c cancels against the 1/c already built into the coupling, so Weyl's kernel is consistent after all. Now I'm looking at the EW case, where the Higgs kernel's covariant derivative combines the gradient with a gauge term G_x in 1/c units — so the spatial gauge term should also carry a factor of c, similar to before, and I need to check whether the time component (built from velocity/c) is handled consistently.
+
+This reveals that both spatial and time gauge terms should carry a factor of c, which I didn't include in my kernel — that's the bug. But checking the numbers, if I add the c factor the prediction becomes 4x too small rather than matching, so the measured rate actually agrees with the no-c version to within 1.65%, meaning the kernel's missing c isn't actually causing a discrepancy here.
+
+Comparing conventions: Weyl's formulation uses no c on the gauge term, with E/Hbar serving as the conversion factor, and it passes its gauge invariance test at 1.91%. For the electroweak Higgs case, the covariant derivative is dimensionally different since it's gradient-like, whereas the fermion equation would naturally place c on the gauge term if written as d_t ψ = c σ·(∇ − iG)ψ. So I need to figure out which convention is actually correct here.
+
+For consistency with the Higgs sector's covariant derivative — where MW = g·v/2 checks out against Z/photon speed tests — G_μ needs to be a 1/cube quantity, meaning the fermion's spatial gauge term should carry a factor of c to properly match c·σ·∇. Working through the time component too, starting from the free Weyl equation ∂_t ψ = cσ·∇ψ and adding the potential term analogous to the Dirac equation, I get that with G_0 defined as qA_0/(ħc), that term should also carry a factor of c — so both gauge terms need the c factor to stay consistent with the Higgs sector.
+
+With that fix, the predicted electron rate becomes c·e·A0 = 0.25 × 0.019992 ≈ 0.0049981. I want to check whether the measured rate now matches this to within 1%, though that alone won't explain the separate 1.65% discrepancy — that seems to be a ratio issue I should investigate independently after fixing the c factor. I'm also double-checking whether that 1.65% could be a measurement artifact from the phase-averaging routine, but since all cells are uniform, the phase calculation should just reduce to the value at any single cell, so that's not the source.
+
+Let me test whether the excess scales with A0³ (suggesting an arcsin-type correction) or stays constant (suggesting a units factor) by rerunning with a much smaller A0. The arcsin series correction is too small to explain 1.65%, so that's ruled out. I'm now wondering if the leapfrog initialization, where cur equals prv, splits the amplitude between the physical mode and a parasitic mode, which could account for the discrepancy.
+
+Actually, this splitting between the physical and spurious mode would create a phase that advances at some blended rate over time, producing exactly the kind of constant systematic bias I'm seeing. The proper fix is to initialize prv and cur so they correctly represent consecutive time steps of the physical mode alone, which should eliminate the parasitic contribution and give an exact rate—this mirrors the same lesson learned from the WeylPacket case. I want to make the test robust without presupposing the answer, so I'm considering fitting the rate empirically over a window rather than assuming it from theory.
+
+The real substantive claims worth testing are that the neutrino charge is exactly zero and that e_L equals e_R exactly—both hold to machine precision, while the deviation of |Q| from 1.0 looks like an artifact of how the sequence was initialized rather than a physics error. My plan is to first fix the genuine units bug with the c factor, then correctly seed the initial past values so the measured rate comes out clean, and tighten the assertion to |Q|=1. Before doing that, I want to sanity-check that adding the c factor doesn't change the gauge coupling physics incorrectly, so I'm comparing against the known Weyl kernel case.
+
+Since a constant A0 is pure gauge either way, that alone doesn't tell me whether the c factor is needed—I need to trace units carefully: the EW G is expressed in momentum units while A0 is in energy units, so converting requires multiplying by c. To confirm this is right, I'm now thinking through how the electron's charge relates to the W/Z masses via the Higgs coupling, since that uses the same covariant derivative and could serve as an independent check.
+
+That off-by-4 in the numbers confirms it — I need to add the missing factor of c.
+
+
+</thinking>
+
+The 1.65% isn't a transient — and checking the units, I have a real bug: the gauge term needs a factor of **c**.
+
+`∂_t ψ = c σ·∇ψ` has units [ψ]/step, and `G` is a 1/cube quantity in the Higgs sector's convention, so `c σ·G ψ` is required for dimensional consistency. Without it the term is off by 1/c:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+old = """	//	d_t psi_L += i (G_0 + sigma.G) psi_L
+	//	d_t psi_R += i (G_0 - sigma.G) psi_R
+	//"""
+new = """	//	d_t psi_L += i c (G_0 + sigma.G) psi_L
+	//	d_t psi_R += i c (G_0 - sigma.G) psi_R
+	//
+	// The c is not decoration. G here is the same object the Higgs kernel puts
+	// in its covariant derivative, so it is a 1/cube quantity like a gradient,
+	// and d_t is per step: the free term c sigma.grad carries exactly the same
+	// factor. Leaving it out makes the coupling 1/c too strong.
+	//"""
+assert old in s
+s = s.replace(old, new, 1)
+old2 = """		// multiplying by i takes (a, b) to (-b, a)
+		dn1a -= u1b
+		dn1b += u1a
+		dn2a -= u2b
+		dn2b += u2a
+		dl1a -= v1b
+		dl1b += v1a
+		dl2a -= v2b
+		dl2b += v2a"""
+new2 = """		// multiplying by i takes (a, b) to (-b, a)
+		dn1a -= cc * u1b
+		dn1b += cc * u1a
+		dn2a -= cc * u2b
+		dn2b += cc * u2a
+		dl1a -= cc * v1b
+		dl1b += cc * v1a
+		dl2a -= cc * v2b
+		dl2b += cc * v2a"""
+assert old2 in s
+s = s.replace(old2, new2, 1)
+old3 = """		dr1a -= qr1b
+		dr1b += qr1a
+		dr2a -= qr2b
+		dr2b += qr2a"""
+new3 = """		dr1a -= cc * qr1b
+		dr1b += cc * qr1a
+		dr2a -= cc * qr2b
+		dr2b += cc * qr2a"""
+assert old3 in s
+open('electroweak.goal','w').write(s.replace(old3, new3, 1))
+PY
+python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/ewfermion_test.go'
+s=open(p).read()
+s=s.replace("\twant := e * a0\n","\twant := float64(p.C) * e * a0 // the c that goes with c sigma.grad\n",1)
+open(p,'w').write(s)
+PY
+goal build 2>&1|tail -1 && go test -run TestEWFermionCharge -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL" | head -8``
+  ```
+  goal build succeeded
+      ewfermion_test.go:178: phase rate per step: nu +0.000000, e_L -0.005009, e_R -0.005009   (e A0 = 0.004998)
+      ewfermion_test.go:179: as charges: nu +0.0000, e_L -1.0022, e_R -1.0022
+  --- PASS: TestEWFermionCharge (0.09s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With the c factor applied, the neutrino comes out exactly 0 while e_L and e_R sit at −1.0022, just 0.22% off −1 — much smaller than the 1.65% deviation seen at the 4× larger rate, and roughly consistent with a rate-dependent scheme error scaling with rate. This points to leapfrog or parasitic-mode artifacts as the source.
+
+That's a clean story: charge comes out at −1.000 up to a scheme error vanishing with the step rate, and the test passes within 0.5% tolerance. Next I want to re-run the Weyl reduction test to check whether the c factor or EM/Higgs gauge field settings affect it, build a demo config comparing electron and neutrino packets in the condensate, add stats/view/damping, and run the full suite. For the config I'll need a helper to construct Weyl-style slab packets for the EW leptons, using the massless dispersion for the neutrino and incorporating the Higgs mass for the electron.
+
+I'm weighing whether to generalize the existing WeylPacket function to also write EW variables, or write a separate EWLeptonPacket function — leaning toward extracting the shared spinor-slab math into a general exported helper so both use cases can share it, consistent with keeping generally useful code centralized.
+
+I'll write a `ChiralSlab` helper in init.goal that handles the packet construction generically, leaving the existing WeylPacket untouched to avoid regressions since it has an extra term the EW case doesn't need yet. Now I'm working out the electroweak lepton dispersion relation to determine the frequency formula for the packet.
+
+Comparing this to `WeylDispersion`, which uses Omega0 derived from Mass·C²/Hbar, I'm checking whether the EW Yukawa mass term (Ye·φ⁰) plays the same role — the effective mass-like quantity there is MassE = YukawaE·HiggsV·InvSqrt2, and I'm tracking its units since HiggsV is expressed in inverse cube units.
+
+This means dimensional consistency likely requires an extra factor of c on the Yukawa term, since d_t ψ scales per step while MassE·ψ scales per cube. I realize my Weyl-reduction test only matched because I forced Weyl's Omega0 to equal MassE directly, so it validated the structure rather than confirming the units — meaning the missing c factor in the Yukawa term is still an open question.
+
+This confirms mc²/ħ = μ·c², so Omega0 = μ·c where μ is the inverse Compton length. Applying the same logic to the electroweak case: MassE = YukawaE·HiggsV/√2 is also in units of 1/cube, meaning the d_t term needs an extra factor of c — so the Yukawa term has the same missing-c bug.
+
+I'll fix the Yukawa term by adding the speed-of-light factor, then clarify the docstring for MassE to note it's an inverse Compton length while the actual flip rate is c·MassE. I also need to update the Weyl-reduction test, since comparing Weyl's Omega0 directly to MassE isn't apples-to-apples — Omega0 is a rate while MassE is an inverse length, so the test should compare Omega0 to c·MassE instead. Good catch from the dimensional analysis; let me apply both fixes and re-verify.
+
+
+</thinking>
+
+Same dimensional bug in the Yukawa term. `MassE` is an inverse Compton length (1/cube, like `HiggsV`), but the flip *rate* in `d_t` must be `c·MassE` — exactly as Weyl's `Omega0 = Mass·C²/ħ = μ·c`:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+old = """	ye := Params[0].YukawaE * InvSqrt2"""
+new = """	// the c is the same one c sigma.grad carries: the stored Higgs is a 1/cube
+	// quantity, so y phi is an inverse Compton length and c y phi is the rate
+	// per step that L and R actually trade at. Params.MassE is the former.
+	ye := Params[0].YukawaE * InvSqrt2 * cc"""
+assert old in s
+s = s.replace(old, new, 1)
+old2 = """	// MassE = YukawaE * HiggsV / sqrt(2) is the electron mass it produces, in
+	// 1/cube. Derived, and the number to compare a measured L-R flip rate
+	// against. It goes to zero with HiggsV above the transition."""
+new2 = """	// MassE = YukawaE * HiggsV / sqrt(2) is the electron mass it produces, in
+	// 1/cube: an inverse Compton length, the same units HiggsV, MW and MZ are
+	// in. The L-R flip RATE is C times this, as Omega0 = Mass * C^2 is for the
+	// standalone Weyl equation. It goes to zero with HiggsV above the
+	// transition, which is the whole point of it being derived."""
+assert old2 in open('params.go').read()
+ps=open('params.go').read()
+open('params.go','w').write(ps.replace(old2,new2,1))
+open('electroweak.goal','w').write(s)
+PY
+python3 - <<'PY'
+p='/Users/oreilly/wavereality/waves/wavesim/ewfermion_test.go'
+s=open(p).read()
+s=s.replace("""	wy.Params.Omega0 = float32(me)""","""	// Omega0 is a RATE and MassE an inverse length: c is the conversion
+	wy.Params.Omega0 = float32(me) * ew.Params.C""",1)
+s=s.replace('t.Logf("m_e = %.5f from y = %.2f and v = %.5f", me, yuk, v)',
+            't.Logf("m_e = %.5f (1/cube) from y = %.2f and v = %.5f; flip rate c m_e = %.5f", me, yuk, v, me*float64(ew.Params.C))',1)
+open(p,'w').write(s)
+PY
+goal build 2>&1|tail -1 && go test -run 'TestEWFermion' -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL" | head -12``
+  ```
+  goal build succeeded
+      ewfermion_test.go:97: m_e = 0.06958 (1/cube) from y = 0.80 and v = 0.12300; flip rate c m_e = 0.01739
+      ewfermion_test.go:98: after 200 steps: e_L 911.67181 (Weyl 911.67181), e_R 112.32796 (Weyl 112.32777)
+      ewfermion_test.go:100: electron tracks Weyl to 3.58e-07; neutrino moved by 0.00e+00
+  --- PASS: TestEWFermionVsWeyl (2.11s)
+      ewfermion_test.go:179: phase rate per step: nu +0.000000, e_L -0.005009, e_R -0.005009   (e A0 = 0.004998)
+      ewfermion_test.go:180: as charges: nu +0.0000, e_L -1.0022, e_R -1.0022
+  --- PASS: TestEWFermionCharge (0.09s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Both checks pass, with the Weyl agreement now at 3.58e-07. Next I want to build the demo config comparing electron and neutrino in the condensate, add stats and viewing, incorporate damping via an EdgesOpenKernel for the electroweak sector, then run the full suite and generate output. I'm starting on the config, which needs a chiral slab packet helper built around the spinor structure satisfying σ·k̂ = helicity.
+
+I'm working out the physics: the neutrino is purely left-handed with helicity −1 and massless dispersion, while the electron mixes left and right components weighted by a ratio depending on the mass term. I'm writing an exported ChiralSlab function that injects a gaussian envelope traveling packet of a given chirality into the state variables across both time levels, shifting the past step back by the group velocity and advancing its phase accordingly. I also need a companion dispersion helper generalized beyond the standalone Weyl equation's Omega0 to handle the electroweak lepton mass scale.
+
+Writing dispersion and packet code...
+
+I check that this matches WeylPacket's ElectronPacket structure, since both left and right components need to share the same group velocity — confirming both use the massive dispersion consistently. Now I'm working through the numbers for EWDemoYukawa, calculating om0 from the Higgs vacuum value and coupling constant to pick a mass that's easy to observe, comparing it against the equivalent Weyl mass case.
+
+I'm getting a Yukawa coupling of about 5.75, which feels too large compared to realistic values like the top quark's coupling near 1. I try targeting a scenario where the electron is visibly slower than the neutrino without being absurd, testing at wavelength 8 and finding y≈8.3 — still quite large, likely because HiggsV=0.123 is small relative to the lattice momentum scale.
+
+I consider raising HiggsV using the demo scale knob (ewDemoScale) instead, checking how it's used in the Z pulse test with a scale factor of 0.388. But I decide to keep things simple: set the Yukawa coupling so the electron's mass is comparable to k̂, using μ_e = y·v/√2 ≈ 0.7 (matching the Weyl electron reference case), which gives y ≈ 8.05 — so I'll go with y≈8, acknowledging it's large for a demo but noting the doc can clarify the real value is much smaller (~3e-6).
+
+I check leapfrog stability with y=8: computing om0 = c·μ_e ≈ 0.175 and c·ĝ at k=0.785 ≈ 0.177, giving sqrt(0.0313+0.0306) ≈ 0.249, well under the required threshold of 1 — so it's stable with plenty of margin.
+
+I decide to set EWDemoYukawa = 8, considering briefly whether to define the demo by target mass instead of the Yukawa constant directly, but conclude a fixed constant is simpler and I'll just document it clearly before writing everything up.
+
+Now I turn to implementing this: I need to add ChiralDispersion/ChiralSlab as a general utility, refactor WeylDispersion to use it, add config, stats, and view, then test. I'm cautious about touching WeylPacket since it reads A0s for phase calculations and Weyl tests are sensitive to changes — I decide to leave WeylPacket untouched and only add new general helpers, accepting some duplication rather than risk breaking existing behavior.
+
+Then WeylPacket just computes om, vg, eoh and calls ChiralSlab, with the existing Weyl tests confirming nothing broke. Time to implement it.
+
+
+</thinking>
+
+Both pass, with the Weyl agreement now at 3.58e-07. Let me factor out the shared packet construction and build the demo:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+anchor = "// BoundStateMass is the mass the relativistic bound-state configs set"
+new = '''// ChiralDispersion returns the lattice angular frequency and group velocity of
+// a first-order chiral packet at the given carrier wavelength, whose two
+// chiralities trade at rate om0:
+//
+//	sin(omega) = sqrt(c^2 sin^2(k) + om0^2)
+//
+// om0 = 0 is the massless case, where the packet travels at essentially c.
+// [Sim.WeylDispersion] is this with om0 = Params.Omega0, and the electroweak
+// leptons use it with c times Params.MassE, since there the rate comes from
+// the Higgs rather than from a parameter.
+func (ss *Sim) ChiralDispersion(wavelength, om0 float32) (float32, float32) {
+	k := TwoPi / wavelength
+	c := ss.Params.C
+	sk := math32.Sin(k)
+	ss2 := c*c*sk*sk + om0*om0
+	rs := math32.Sqrt(ss2)
+	if rs <= 0 {
+		return 0, 0
+	}
+	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
+}
+
+// ChiralSlab writes a travelling slab packet of ONE chirality into the four
+// state variables starting at base, which must be the (1a, 1b, 2a, 2b)
+// components of a Weyl 2-spinor.
+//
+// The envelope is a slab: gaussian along dim, flat across the other two. A
+// round blob carries transverse momentum, so it is not a helicity eigenstate,
+// it spreads sideways and its centroid crawls instead of tracking the group
+// velocity. See TestPacketEnvelope for that contrast measured.
+//
+// Both time levels are written. A three-level leapfrog reads its own past, and
+// a wave given no past goes both ways at once: the earlier one has its
+// envelope pulled back by one step of GROUP velocity and its phase advanced by
+// one step of om, which are the same thing only when the wave is massless.
+//
+// eoh scales a LOCAL contribution to that phase advance from A0s, for the case
+// where the packet sits in a potential: a wave at rest in one turns at a rate
+// shifted by q A0 / hbar, and a past written without it is the past of a
+// different wave. Pass 0 where there is no such field.
+func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, vg, eoh float32) {
+	c1 := int(base.Int64())
+	// the spinor with sigma.khat = helicity, for khat along +dim
+	s1, s2 := float32(1)/math32.Sqrt2, helicity/math32.Sqrt2 // +X: sigma_x
+	if dim == math32.Z {                                     // +Z: sigma_z is already diagonal
+		s1, s2 = 0, 1
+		if helicity > 0 {
+			s1, s2 = 1, 0
+		}
+	}
+	k := TwoPi / ss.Config.Wavelength
+	wd := ss.Config.PacketWidth
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				d := CoordToFloat(c).Dim(dim) - ctr.Dim(dim)
+				g := d / wd
+				e := (d + vg) / wd // where the envelope was one step ago
+				en := amp * math32.FastExp(-g*g)
+				eo := amp * math32.FastExp(-e*e)
+				ph := k * d
+				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
+				po := om + eoh*State[f.Z, f.Y, f.X, A0s, prv]
+				oa, ob := eo*math32.Cos(ph+po), eo*math32.Sin(ph+po)
+				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
+				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
+				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
+				State[f.Z, f.Y, f.X, c1+3, prv] += s2 * nb
+				State[f.Z, f.Y, f.X, c1, cur] += s1 * oa
+				State[f.Z, f.Y, f.X, c1+1, cur] += s1 * ob
+				State[f.Z, f.Y, f.X, c1+2, cur] += s2 * oa
+				State[f.Z, f.Y, f.X, c1+3, cur] += s2 * ob
+			}
+		}
+	}
+}
+
+// BoundStateMass is the mass the relativistic bound-state configs set'''
+assert anchor in s
+open('init.goal','w').write(s.replace(anchor, new, 1))
+PY
+python3 - <<'PY'
+import re
+s=open('/Users/oreilly/wavereality/waves/wavesim/weyl.goal').read()
+# WeylDispersion delegates
+old = """func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
+	k := TwoPi / wavelength
+	c := ss.Params.C
+	o0 := ss.Params.Omega0
+	sk := math32.Sin(k)
+	ss2 := c*c*sk*sk + o0*o0
+	rs := math32.Sqrt(ss2)
+	if rs <= 0 {
+		return 0, 0
+	}
+	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
+}"""
+new = """func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
+	return ss.ChiralDispersion(wavelength, ss.Params.Omega0)
+}"""
+assert old in s
+s = s.replace(old, new, 1)
+# WeylPacket delegates its body
+m = re.search(r"(func \(ss \*Sim\) WeylPacket\(side WeylStates, dim math32\.Dims, helicity, amp float32\) \{).*?\n\}\n", s, re.S)
+assert m
+body = """func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float32) {
+	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
+	eoh := float32(0)
+	if ss.Params.EM.IsTrue() {
+		eoh = ss.Params.WeylQ * ss.Params.E / ss.Params.Hbar
+	}
+	ss.ChiralSlab(side, dim, helicity, amp, om, vg, eoh)
+}
+"""
+s = s[:m.start()] + body + s[m.end():]
+open('/Users/oreilly/wavereality/waves/wavesim/weyl.goal','w').write(s)
+PY
+goal build 2>&1|tail -2 && go test -run 'TestWeyl' ./ 2>&1 | tail -4``
+  ```
+  go build
+  goal build succeeded
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  ok  	github.com/WaveReality/waves/wavesim	61.777s
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With all Weyl tests passing after the refactor, I'm moving on to the config, stats, and view for the new setup. I need to add a LeptonPackets config to EW, checking the EWConfigs list and the stats/view functions, then define the EWDemoYukawa constant, the LeptonPackets(ss *Sim) config, stats for sums and group velocity on EWNuMag and EWEMag, and the corresponding view panels.
+
+
+</thinking>
+
+All Weyl tests still pass after the refactor. Now the demo config and its stats:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 1289,1300p electroweak.goal; echo "=== stats ==="; grep -n "func (ss \*Sim) ElectroweakStats" -A 16 electroweak.goal``
+  ```
+  // HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,
+  // and lets the field fall off the top of the Mexican hat into the broken vacuum.
+  // Any deviation of \Phi off of 0 is enough to knock it off of the unstable maximum.
+  //
+  // Adjusting Temp around TempCrit changes the shape of the potential: if above
+  // TempCrit then it is symmetric and the zero remains stable, not unstable.
+  //
+  // EWHmag climbs from 0 to v^2, but overshoots and rings rather than settling,
+  // because nothing here dissipates. In the early universe Hubble
+  // expansion drained it, and there is no equivalent in a fixed box.
+  // Note: it takes a while, around 700 time steps at default params.
+  func HiggsSymmetric(ss *Sim) {
+  === stats ===
+  1224:func (ss *Sim) ElectroweakStats() {
+  1225-	ss.AddStat(ss.StatStep())
+  1226-	ss.AddStat(ss.StatMean(EWHmag)) // directly comparable to v^2
+  1227-	ss.AddStat(ss.StatSum(EWHV))
+  1228-	// the pulse configs: photon vs Z, and the two fields they are mixed from.
+  1229-	// The photon runs at ~c and the Z visibly slower, while W^3 and B each show
+  1230-	// whichever of the two they currently carry.
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+
+# stats
+old = """	// what a Z packet does to the condensate it travels through.
+	ss.AddStat(ss.StatWeightedMean(EWHmagZStat, EWHmag, EWZY))
+}"""
+new = """	// what a Z packet does to the condensate it travels through.
+	ss.AddStat(ss.StatWeightedMean(EWHmagZStat, EWHmag, EWZY))
+	// the leptons: the neutrino runs at c and the electron does not, and the
+	// only difference between them is which half of the doublet they sit in
+	ss.AddStat(ss.StatSum(EWNuMag))
+	ss.AddStat(ss.StatSum(EWEMag))
+	ss.AddStat(ss.StatSum(EWELMag))
+	ss.AddStat(ss.StatSum(EWERMag))
+	ss.AddStat(ss.StatGroupVelMag(math32.X, EWNuMag, EWEMag))
+}"""
+assert old in s
+s = s.replace(old, new, 1)
+
+# the demo Yukawa and the config
+old2 = """// HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,"""
+new2 = '''// EWDemoYukawa is the Yukawa coupling LeptonPackets sets, in place of the real
+// 2.9e-6 that Parameters.Defaults carries. It puts the electron's inverse
+// Compton length near the carrier wavenumber at the default wavelength, which
+// is the one regime where a mass is visible: much lighter and the electron is
+// a neutrino, much heavier and it does not move.
+//
+// It is absurd as a Yukawa -- larger than the top quark's -- and that IS the
+// physical content. The electron is light because its coupling to the Higgs is
+// tiny, not because anything else about it is small, and the only way to see
+// the mechanism work on a lattice is to wind that one number up.
+const EWDemoYukawa float32 = 8
+
+// LeptonPackets puts a neutrino and an electron in the broken vacuum, side by
+// side, as the same wave in different halves of the same doublet.
+//
+// Both start purely left-handed and identical. The neutrino stays that way and
+// travels at c: the Yukawa term needs a nu_R to couple it to and there isn't
+// one. The electron does not, because the lower component of the doublet is
+// the one the Higgs talks to -- it picks up a right-handed half within a few
+// steps and settles into a packet that is visibly slower.
+//
+// Nothing was set differently between the two. There is no mass parameter, no
+// charge parameter, and no switch. The condensate is doing it.
+func LeptonPackets(ss *Sim) {
+	HiggsBroken(ss)
+	p := ss.Params
+	p.YukawaE = EWDemoYukawa
+	p.Update()
+	a := ss.Config.Amplitude
+	wl := ss.Config.Wavelength
+
+	// the neutrino: massless, so nothing joins the chiralities
+	omn, vgn := ss.ChiralDispersion(wl, 0)
+	ss.ChiralSlab(EWNu1a, math32.X, -1, a, omn, vgn, 0)
+
+	// the electron: both halves at one helicity, in the ratio a positive
+	// energy state has, exactly as ElectronPacket does for the free equation
+	om0 := p.C * p.MassE
+	ome, vge := ss.ChiralDispersion(wl, om0)
+	ck := p.C * math32.Sin(TwoPi/wl)
+	rr := float32(0)
+	if om0 > 0 {
+		rr = (ome - ck) / om0
+	}
+	ss.ChiralSlab(EWEL1a, math32.X, -1, a, ome, vge, 0)
+	ss.ChiralSlab(EWER1a, math32.X, -1, a*rr, ome, vge, 0)
+}
+
+// HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,'''
+assert old2 in s
+s = s.replace(old2, new2, 1)
+
+old3 = """	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower because the condensate gives it mass; watch ZY", Func: ZPulse},"""
+if old3 not in s:
+    import re
+    m = re.search(r'\tInitFunc\{Name: "Z Pulse".*?\},\n', s)
+    assert m, "z pulse entry"
+    old3 = m.group(0).rstrip("\n")
+new3 = old3 + """
+	InitFunc{Name: "Lepton Packets", Doc: "A neutrino and an electron as the same wave in the two halves of one doublet: the Higgs gives one of them a mass and cannot touch the other", Func: LeptonPackets},"""
+s = s.replace(old3, new3, 1)
+open('electroweak.goal','w').write(s)
+PY
+goal build 2>&1|tail -2``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat >> ewfermion_test.go <<'EOF'
+
+// TestEWLeptonPackets is the demo, measured: the same wave in the two halves
+// of one doublet, and the Higgs can only slow one of them down.
+func TestEWLeptonPackets(t *testing.T) {
+	const sz = 64
+	const nst = 150
+	ss := ewfSim(sz, LeptonPackets)
+	p := ss.Params
+	me := float64(p.MassE)
+	c := float64(p.C)
+	nu0, el0, er0 := ewfSums()
+	for range nst {
+		ss.StepRun()
+	}
+	nu1, el1, er1 := ewfSums()
+	vnu := dispMean(ss.StatVals(StatGroupVelName(EWNuMag, math32.X)))
+	ve := dispMean(ss.StatVals(StatGroupVelName(EWEMag, math32.X)))
+	t.Logf("y = %.1f gives m_e = %.4f (1/cube), flip rate c m_e = %.4f", p.YukawaE, me, c*me)
+	t.Logf("neutrino: |nu|^2 %.3f -> %.3f, R/L never exists, speed %.4f c", nu0, nu1, vnu)
+	t.Logf("electron: L %.3f -> %.3f, R %.3f -> %.3f, speed %.4f c", el0, el1, er0, er1, ve)
+	if er0 <= 0 {
+		t.Errorf("the electron started with no right-handed half: the Higgs should have given it one")
+	}
+	if vnu < 0.9 {
+		t.Errorf("the neutrino should travel at essentially c, got %.4f c", vnu)
+	}
+	if ve >= vnu-0.05 {
+		t.Errorf("the electron at %.4f c should lag the neutrino at %.4f c: that lag IS the mass",
+			ve, vnu)
+	}
+}
+EOF
+go test -run TestEWLeptonPackets -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic" | head -10``
+  ```
+      ewfermion_test.go:209: y = 8.0 gives m_e = 0.6958 (1/cube), flip rate c m_e = 0.1739
+      ewfermion_test.go:210: neutrino: |nu|^2 0.000 -> 121693.694, R/L never exists, speed -0.1129 c
+      ewfermion_test.go:211: electron: L 0.000 -> 121288.821, R 0.000 -> 41514.640, speed 0.2958 c
+      ewfermion_test.go:213: the electron started with no right-handed half: the Higgs should have given it one
+      ewfermion_test.go:216: the neutrino should travel at essentially c, got -0.1129 c
+      ewfermion_test.go:219: the electron at 0.2958 c should lag the neutrino at -0.1129 c: that lag IS the mass
+  --- FAIL: TestEWLeptonPackets (77.41s)
+  FAIL
+  FAIL	github.com/WaveReality/waves/wavesim	77.428s
+  FAIL
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I notice the initial sums are zero since they're read before the kernel writes anything, which is a minor test artifact. But the real problem is the neutrino speed coming out negative and slow at -0.1129c instead of the expected +0.97c, and the electron at 0.2958c also looks off — something in the setup must be causing this discrepancy.
+
+Checking the WeylPacket helicity and direction settings, they look consistent with left-handed motion in +X. I'm also verifying whether EM coupling is disabled and whether HiggsBroken and the electroweak kernel evolution could be interfering with the packet's eigenstate purity, since the backward-moving neutrino suggests it isn't a clean eigenstate. I'm now comparing the shared C parameter across the Weyl and EW cases and checking whether the EW kernel is stepping the fermion fields with the correct current/previous buffers.
+
+I'm also examining the group-velocity statistic's cutoff logic and cross-checking the measured neutrino velocity against expected initial amplitude-squared values in the lattice volume, trying to see if the numbers are consistent with a properly normalized wave packet.
+
+The packet norm checks out, so it's really there but drifting backwards, which suggests it's actually a standing wave made of both +k and −k components rather than a clean traveling packet. That points toward a sign issue in how the past-time slice is initialized in ChiralSlab versus how chirality is handled in the electroweak fermion kernel, so I'm comparing the phase/velocity formula against the kernel's chirality convention to find the mismatch.
+
+I check the electroweak kernel's chirality signs and they match the Weyl case exactly, so the free-streaming part isn't the culprit. That means the issue might come from something HiggsBroken triggers afterward — maybe a parameter update — so I plan to isolate the test by running just a neutrino in an electroweak simulation with no Higgs at all, stripping out any mass effects to see if the drift persists.
+
+Then I trace whether the ordering of `RunEWFermionKernel` relative to `ctx.StepInc()` in StepRun could differ from the Weyl step order, since a mismatch there could explain the discrepancy.
+
+I also consider whether `EWNuMag`'s staggered product combined with the negative-clamping in `StatGroupVelMag` could be masking the actual sign issue.
+
+My best next move is to strip the Higgs out entirely and just run the neutrino packet alone for a hundred steps to see if the behavior isolates cleanly.
+
+
+</thinking>
+
+Something's wrong — the neutrino should be at ~+0.97c. Let me isolate it:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchNu(t *testing.T) {
+	const sz = 64
+	for _, tc := range []struct {
+		name string
+		init func(*Sim)
+	}{
+		{"EW nu, no Higgs", func(s *Sim) {
+			om, vg := s.ChiralDispersion(s.Config.Wavelength, 0)
+			fmt.Printf("  (EW om %.5f vg %.5f)\n", om, vg)
+			s.ChiralSlab(EWNu1a, math32.X, -1, s.Config.Amplitude, om, vg, 0)
+		}},
+		{"EW nu, Higgs broken", func(s *Sim) {
+			HiggsBroken(s)
+			om, vg := s.ChiralDispersion(s.Config.Wavelength, 0)
+			s.ChiralSlab(EWNu1a, math32.X, -1, s.Config.Amplitude, om, vg, 0)
+		}},
+	} {
+		ss := ewfSim(sz, tc.init)
+		out := "  " + tc.name + " ctr:"
+		for i := 0; i < 60; i++ {
+			ss.StepRun()
+			if i%10 == 9 {
+				c := GetCtx(0)
+				var num, den float64
+				for z := int32(1); z <= sz; z++ {
+					for y := int32(1); y <= sz; y++ {
+						for x := int32(1); x <= sz; x++ {
+							v := float64(State.Value(int(z), int(y), int(x), int(EWNuMag), int(c.CurState)))
+							if v < 0 {
+								v = 0
+							}
+							num += v * float64(x)
+							den += v
+						}
+					}
+				}
+				out += fmt.Sprintf(" %.2f", num/den)
+			}
+		}
+		fmt.Println(out)
+	}
+}
+EOF
+go test -run TestScratchNu -v -timeout 900s ./ 2>&1 | grep -E "^  " | head -6``
+  ```
+    (EW om 0.09582 vg 0.23203)
+    EW nu, no Higgs ctr: 35.04 37.05 38.90 40.54 41.82 42.71
+    EW nu, Higgs broken ctr: 35.04 37.05 38.90 40.54 41.82 42.71
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The neutrino is indeed advancing in +X, going from 35.04 to 42.71 over 50 steps, giving about 0.153 cubes/step versus an expected 0.232 — slower than predicted. But the per-10-step rate is clearly decaying (2.0, 1.85, 1.64, 1.28, 0.89), suggesting the packet is spreading out or something is wrapping around rather than moving uniformly.
+
+With a 64-cell box starting at 32, the packet's leading edge (width ~12, σ~6) reaches the boundary around x=60. If it wraps and re-enters near x=1, a naive centroid calculation would get pulled backward — that could explain the apparent deceleration. But the actual stat should use a circular centroid, which should handle wrapping fine, so I'm confused why the test still measured a negative velocity (−0.1129c) over 150 steps.
+
+Maybe the packet spreads so much relative to the box (35 cells of drift in a 64-cell box, more than half its size) that the centroid becomes meaningless once it fills too much of the domain. But even before any wrapping issues, the early motion (first 30 steps) shows the measured 0.153 already diverging from the expected 0.232, so there's something else going on beyond just box-size effects.
+
+I'm comparing this to the Weyl equation at the same coupling constant — there, the same-magnitude neutrino DOES move at the correct group velocity (0.236 matching 0.232), so the electroweak fermion kernel must differ from the Weyl kernel somehow, even though on the surface their massless, field-free neutrino terms look identical (same coupling structure, same gradient function, same dimensionality settings). I'm now wondering if the difference lies in how the wave packet itself is constructed, checking the default wavelength parameter in the packet setup.
+
+Both cases use identical packet construction and identical mass-zero dispersion relations, so the kernels should behave the same way — yet the motion clearly differs. I'm now planning to run a direct side-by-side comparison to find the discrepancy.
+
+I'm also noticing that `ewfSim` never explicitly sets `ss.Params.ThreeD`, which raises the question of whether that flag matters for the EW case specifically.
+
+Actually, both the EW kernel and my fermion kernel always use Gradient10, so ThreeD shouldn't matter here — I can skip that comparison. What catches my attention instead is the centroid measurement itself: the packet jumps from 32 (box center) to 35.04 after just one step, which is way more than the expected ~32.5 shift. That's odd enough that I should double check whether the initial centroid is really starting where I think it is, possibly due to how `EWNuMag` gets populated only after the kernel runs.
+
+Working through the indexing, I realize the discrepancy might come from a coordinate offset: the interior cell index 32 actually corresponds to full index 33 once halo offsets are included, and my scratch measurement uses 1-based full indices spanning 1 to sz. So the centroid I'm computing is probably shifted by exactly that halo offset, which could explain the anomalous jump.
+
+Rather than keep chasing this offset, I should focus on what matters: the rate of change, roughly (42.71−35.04)/50 ≈ 0.153. The cleanest path forward is to directly compare the Weyl and EW measurements within the same box using identical measurement code, which would isolate the discrepancy without needing to fully resolve the indexing puzzle.
+
+
+</thinking>
+
+The neutrino moves but at 0.153 cubes/step, not the predicted 0.232. Let me compare the two kernels directly under identical conditions:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func ctrOf(sz int32, vr int) float64 {
+	c := GetCtx(0)
+	var num, den float64
+	for z := int32(1); z <= sz; z++ {
+		for y := int32(1); y <= sz; y++ {
+			for x := int32(1); x <= sz; x++ {
+				v := float64(State.Value(int(z), int(y), int(x), vr, int(c.CurState)))
+				if v < 0 {
+					v = 0
+				}
+				num += v * float64(x)
+				den += v
+			}
+		}
+	}
+	return num / den
+}
+
+func TestScratchCmp(t *testing.T) {
+	const sz = 64
+	const n = 40
+	// EW neutrino
+	ew := ewfSim(sz, func(s *Sim) {
+		om, vg := s.ChiralDispersion(s.Config.Wavelength, 0)
+		s.ChiralSlab(EWNu1a, math32.X, -1, s.Config.Amplitude, om, vg, 0)
+	})
+	ew.StepRun()
+	a0 := ctrOf(sz, int(EWNuMag))
+	for range n {
+		ew.StepRun()
+	}
+	a1 := ctrOf(sz, int(EWNuMag))
+	fmt.Printf("  EW   nu: %.3f -> %.3f = %.4f cubes/step  (C %.3f)\n", a0, a1, (a1-a0)/n, ew.Params.C)
+
+	// Weyl neutrino, same box
+	wy := wySim(sz, NeutrinoPacket)
+	wyStep(wy)
+	b0 := ctrOf(sz, int(WeylLMag))
+	for range n {
+		wyStep(wy)
+	}
+	b1 := ctrOf(sz, int(WeylLMag))
+	om, vg := wy.ChiralDispersion(wy.Config.Wavelength, 0)
+	fmt.Printf("  Weyl nu: %.3f -> %.3f = %.4f cubes/step  (C %.3f, om %.5f vg %.5f)\n",
+		b0, b1, (b1-b0)/n, wy.Params.C, om, vg)
+}
+EOF
+go test -run TestScratchCmp -v -timeout 900s ./ 2>&1 | grep -E "^  " | head -4``
+  ```
+    EW   nu: 33.076 -> 40.663 = 0.1897 cubes/step  (C 0.250)
+    Weyl nu: 33.089 -> 40.508 = 0.1855 cubes/step  (C 0.250, om 0.17771 vg 0.17961)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The EW neutrino (0.1897) and Weyl neutrino (0.1855) agree within 2%, so the kernel checks out. I notice the chiral dispersion values differ oddly from an earlier EW scratch calculation though — I'm trying to figure out if that's due to a config mismatch between the two simulations.
+
+Working through the math manually: with wavelength 8 and c=0.25, I can verify om=0.17771 and vg=0.17959 directly from the dispersion formula, confirming those numbers are correct. So now I'm puzzled why the earlier EW scratch run printed different values (om 0.09582, vg 0.23203) — checking whether Params.C had actually been set correctly before that init function ran, since it seems like it should have been 0.25 by that point.
+
+Working backward from om=0.09582, the implied c would be about 0.1353, which doesn't match 0.25 — but if wavelength were 16 instead of 8, c=0.25 gives exactly that value. So the real question becomes why wavelength would be 16 in that run instead of the expected 8, since Config.Defaults() should set it to 8 — unless something like an ElectroweakConfig function overrides Config.Wavelength to 16, which I should go check.
+
+As for why TestEWLeptonPackets gave −0.1129c for the neutrino: it's likely the same dispersion contamination issue as before — 150 steps at 0.19 velocity in a 64-cell box covers ~28 cells, plus spreading and wraparound corrupt the mean displacement measurement. I need to redo this test with a much longer thin box (like the 384×4×4 setup used in TestDispersion) rather than a small cubic one, since a thin geometry should work fine for electroweak fields too, including the Higgs sector.
+
+Let me try 192×8×8 with about 100 steps — at 0.19 cubes/step that's only 19 cells traveled, well within bounds and no wraparound. But I need to check the electron's expected group velocity too: computing om0 from the electron mass and running it through the chiral dispersion relation, I get vg ≈ 0.130, compared to the neutrino's ≈ 0.1796 — a clear separation between the two that the test should be able to resolve cleanly.
+
+Now I want to fix the test setup: use a longer box along the propagation axis, fewer steps, and read t0 right after the first step rather than at t=0. I should also parameterize the simulation function so the box dimensions aren't hardcoded as cubic, then rewrite the test to use these updated settings.
+
+
+</thinking>
+
+The kernels agree — EW 0.1897 vs Weyl 0.1855 cubes/step. My test box was just too small: 150 steps × 0.19 = 28 cells in a 64 box, so it wrapped and self-interfered, exactly the trap from your figures.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && python3 - <<'PY'
+p='ewfermion_test.go'
+s=open(p).read()
+old = """func ewfSim(sz int32, init func(*Sim)) *Sim {"""
+new = """func ewfSim(sz int32, init func(*Sim)) *Sim {
+	return ewfSimBox(math32.Vec3i(sz, sz, sz), init)
+}
+
+// ewfSimBox is ewfSim with an explicit box shape, for the packet runs that
+// need room to travel without wrapping into themselves.
+func ewfSimBox(sz math32.Vector3i, init func(*Sim)) *Sim {"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace("""	ss.Config.Size.Set(sz, sz, sz)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap""", """	ss.Config.Size = sz
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap""", 1)
+
+old2 = s[s.index("// TestEWLeptonPackets"):]
+new2 = '''// TestEWLeptonPackets is the demo, measured: the same wave in the two halves
+// of one doublet, and the Higgs can only slow one of them down.
+//
+// A long box, because both packets have to travel several times their own
+// width without wrapping into themselves -- a 64 cube is far too small for
+// this and reads the resulting self-interference as the packet going
+// backwards.
+func TestEWLeptonPackets(t *testing.T) {
+	const nst = 100
+	ss := ewfSimBox(math32.Vec3i(192, 8, 8), LeptonPackets)
+	p := ss.Params
+	me := float64(p.MassE)
+	c := float64(p.C)
+	// what the lattice dispersion says each of them should do
+	_, vgn := ss.ChiralDispersion(ss.Config.Wavelength, 0)
+	_, vge := ss.ChiralDispersion(ss.Config.Wavelength, float32(c*me))
+	ss.StepRun() // the Mag variables are written by the kernel, not the init
+	nu0, el0, er0 := ewfSums()
+	for range nst {
+		ss.StepRun()
+	}
+	nu1, el1, er1 := ewfSums()
+	vnu := dispMean(ss.StatVals(StatGroupVelName(EWNuMag, math32.X))) * c
+	ve := dispMean(ss.StatVals(StatGroupVelName(EWEMag, math32.X))) * c
+	t.Logf("y = %.1f gives m_e = %.4f (1/cube), so the halves trade at c m_e = %.4f per step",
+		p.YukawaE, me, c*me)
+	t.Logf("neutrino: |nu|^2 %.0f -> %.0f, speed %.4f (lattice says %.4f)", nu0, nu1, vnu, vgn)
+	t.Logf("electron: L %.0f -> %.0f, R %.0f -> %.0f, speed %.4f (lattice says %.4f)",
+		el0, el1, er0, er1, ve, vge)
+	t.Logf("the electron is %.1f%% slower than the neutrino, and nothing but the Higgs did that",
+		100*(1-ve/vnu))
+	if er0 <= 0 {
+		t.Errorf("the electron has no right-handed half: the Yukawa term is not doing anything")
+	}
+	if math.Abs(vnu/float64(vgn)-1) > 0.1 {
+		t.Errorf("the neutrino went at %.4f, want the massless lattice speed %.4f", vnu, vgn)
+	}
+	if math.Abs(ve/float64(vge)-1) > 0.1 {
+		t.Errorf("the electron went at %.4f, want the massive lattice speed %.4f", ve, vge)
+	}
+	if ve >= 0.9*vnu {
+		t.Errorf("the electron at %.4f should visibly lag the neutrino at %.4f: that lag IS the mass",
+			ve, vnu)
+	}
+}
+'''
+open(p,'w').write(s.replace(old2, new2, 1))
+PY
+go test -run TestEWLeptonPackets -v -timeout 900s ./ 2>&1 | grep -E "^---|_test.go:|FAIL" | head -10``
+  ```
+      ewfermion_test.go:223: y = 8.0 gives m_e = 0.6958 (1/cube), so the halves trade at c m_e = 0.1739 per step
+      ewfermion_test.go:225: neutrino: |nu|^2 1916 -> 1916, speed 0.2362 (lattice says 0.2320)
+      ewfermion_test.go:226: electron: L 1887 -> 1916, R 677 -> 648, speed 0.1222 (lattice says 0.1136)
+      ewfermion_test.go:228: the electron is 48.3% slower than the neutrino, and nothing but the Higgs did that
+  --- PASS: TestEWLeptonPackets (2.54s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The demo confirms the predictions reasonably well: neutrino speed is 1.8% off the lattice prediction while electron speed is 7.6% off, with the electron running 48.3% slower than the neutrino. The |ν|² norm stays exactly conserved at 1916, though the electron's L and R components trade between 1887/677 and 1916/648, and I note the wavelength here is 16 since the vg values match up.
+
+Now I should confirm ElectroweakConfig sets Wavelength=16, then wrap up two remaining items: whether to add lepton magnitudes as a selectable panel in the GUI (they're already automatically selectable as state vars, so I'll leave it), and whether the halo damping for the first-order lepton fields needs EdgesOpenKernel in addition to the existing ElectroweakDampKernel — I need to check if running both together would cause the edge-writing kernels to conflict for the second-order gauge fields.
+
+Since ElectroweakDampKernel and EdgesOpenKernel both write edge cells, running both risks conflict. The cleaner fix is extending ElectroweakDampKernel itself to handle the 12 contiguous lepton variables the same way it already handles the Higgs block, copying values from the nearest interior cell into the halo for both time levels. Writing the lepton halo copy loop...
+
+I realize I should also cover the 4 derived Mag vars for display consistency—they're contiguous right after the lepton vars, so extending the loop to 16 entries (EWNu1a through EWEMag) covers everything cleanly. Now I need to find where to insert this in the damp kernel.
+
+
+</thinking>
+
+The demo works. Now the damping — the leptons are first-order and need an open halo:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "EdgeInward" -A 10 electroweak.goal | head -16``
+  ```
+  1187:	ctx.EdgeInward(x, y, z, &ix, &iy, &iz)
+  1188-	for k := range 9 { // the four components, their four velocities, and Hmag
+  1189-		vr := int32(EWHsCa) + int32(k)
+  1190-		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
+  1191-		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
+  1192-	}
+  1193-}
+  1194-
+  1195-//gosl:end
+  1196-
+  1197-func (ss *Sim) ElectroweakConfig() {
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('electroweak.goal').read()
+old = """	for k := range 9 { // the four components, their four velocities, and Hmag
+		vr := int32(EWHsCa) + int32(k)
+		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
+		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
+	}
+}"""
+new = """	for k := range 9 { // the four components, their four velocities, and Hmag
+		vr := int32(EWHsCa) + int32(k)
+		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
+		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
+	}
+	// The leptons are FIRST order, so Sommerfeld damping has nothing to leave
+	// out: they get the open halo of EdgesOpenKernel instead, which is the
+	// same copy-from-inward, plus the absorbing layer EWFermionKernel applies
+	// in the interior. Done here rather than by running that kernel as well,
+	// because it would fight this one over the gauge edge cells.
+	for k := range 16 { // three spinors, then the four magnitudes
+		vr := int32(EWNu1a) + int32(k)
+		State[z, y, x, vr, cur] = State[iz, iy, ix, vr, cur]
+		State[z, y, x, vr, prv] = State[iz, iy, ix, vr, prv]
+	}
+}"""
+assert old in s
+open('electroweak.goal','w').write(s.replace(old, new, 1))
+PY
+cat >> ewfermion_test.go <<'EOF'
+
+// TestEWLeptonDamp: the leptons must leave through a damped boundary rather
+// than bounce off it, like every other first-order field here.
+func TestEWLeptonDamp(t *testing.T) {
+	const nst = 900
+	ss := ewfSimBox(math32.Vec3i(32, 32, 32), LeptonPackets)
+	ss.Params.Edges = EdgesDamp
+	ss.Params.Update()
+	ss.Init()
+	ss.StepRun()
+	nu0, el0, er0 := ewfSums()
+	t0 := nu0 + el0 + er0
+	if t0 <= 0 {
+		t.Fatalf("nothing in the box to damp")
+	}
+	for range nst {
+		ss.StepRun()
+	}
+	nu1, el1, er1 := ewfSums()
+	left := (nu1 + el1 + er1) / t0
+	t.Logf("leptons: %.3f%% left after %d steps (nu %.4f, e_L %.4f, e_R %.4f)",
+		100*left, nst, nu1/t0, el1/t0, er1/t0)
+	if math.Abs(left) > 0.01 {
+		t.Errorf("%.3f%% of the leptons are still in the box: they are reflecting", 100*left)
+	}
+}
+EOF
+goal build 2>&1|tail -1 && go test -run 'TestEWLeptonDamp' -v -timeout 900s ./ 2>&1 | grep -E "^---|_test.go:|FAIL" | head -6``
+  ```
+  goal build succeeded
+      ewfermion_test.go:264: leptons: 0.002% left after 900 steps (nu 0.0000, e_L 0.0000, e_R 0.0000)
+  --- PASS: TestEWLeptonDamp (57.68s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now the full verification — generate, yaegi, and the whole suite:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go *_test.go; go generate ./... 2>&1 | grep -iE "^error|failed" | head; echo "gen ok"; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd ../wavesim && go test ./ 2>&1 | grep -E "^---|_test\.go:|^ok|^FAIL" | head -40``
+  ```
+  Command running in background with ID: ba03f24yb. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/ba03f24yb.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task b1ljsw23p, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+The leptons are in the electroweak kernel and working. Full suite running; here's the state.
+
+## `EWFermionKernel`
+
+One generation as Weyl 2-spinors: the doublet (ν_L, e_L) at Y = −1/2, and the singlet e_R at Y = −1. No ν_R. Sixteen new state variables, `EWStatesN` 73 → 89, translated and validated by both naga and tint.
+
+It's your Weyl kernel with two things taken out of the parameter list and put into the fields:
+
+```
+d_t nu_L = +c sigma.D nu_L - i y phi^+  e_R
+d_t e_L  = +c sigma.D e_L  - i y phi^0  e_R
+d_t e_R  = -c sigma.D e_R  - i y (phi^+* nu_L + phi^0* e_L)
+```
+
+It runs after `ElectroweakKernel` and reads only `prv`, which that kernel never writes, so the order between them is a convenience rather than a correctness question.
+
+## Four things measured
+
+**It reduces to Weyl exactly.** In the broken vacuum φ⁺ = 0 and φ⁰ = v, so the only surviving term is −i·c·m_e between e_L and e_R — which *is* `Omega0`. Same spinor under both kernels:
+
+```
+after 200 steps: e_L 911.67181 (Weyl 911.67181), e_R 112.32796 (Weyl 112.32777)
+electron tracks Weyl to 3.58e-07; neutrino moved by 0.00e+00
+```
+
+**Charge is a result now.** Uniform photon field, Yukawa off:
+
+```
+phase rate per step: nu +0.000000, e_L -0.005009, e_R -0.005009   (e A0 = 0.004998)
+as charges:          nu +0.0000,   e_L -1.0022,   e_R -1.0022
+```
+
+The neutrino is exactly zero because `g·sinθ_W − g'·cosθ_W` cancels identically, for any couplings — not because anything was set to zero. And both chiralities land on the same charge despite getting there differently (T³ = −1/2 with Y = −1/2 versus hypercharge alone at Y = −1), which is *why* a mass term joining them is allowed at all. The 0.2% is the leapfrog's own rate error and shrinks with the rate.
+
+**The demo.**
+
+```
+neutrino: speed 0.2362 (lattice says 0.2320)
+electron: speed 0.1222 (lattice says 0.1136)
+the electron is 48.3% slower than the neutrino, and nothing but the Higgs did that
+```
+
+**Damping**: 0.002% left after 900 steps.
+
+## Two dimensional bugs I introduced and caught
+
+Both the gauge and Yukawa terms were missing a factor of **c**. `G` and `y·φ` are 1/cube quantities in the Higgs sector's convention — inverse lengths, like `HiggsV` and `MW` — while `d_t` is per step, so they need the same `c` that `c σ·∇` carries. The charge test read −1.0165 instead of −1 until I fixed it; the numbers being 4× off from the dimensionally-correct value is what flagged it.
+
+`Params.MassE` is documented as the inverse Compton length, with the L↔R flip *rate* being `C·MassE` — the same relation as `Omega0 = Mass·C²`.
+
+## Notes
+
+`WeylPacket` now delegates to a shared `ChiralSlab` in `init.goal`, and `WeylDispersion` to `ChiralDispersion`, so the electroweak leptons and the standalone equation build packets from one implementation. All eight Weyl tests still pass.
+
+`EWDemoYukawa = 8` — absurd as a Yukawa, larger than the top quark's, and I wrote that into the doc because it's the physical content: the electron is light because that one number is tiny, not because anything else about it is small.
+
+Still to do, per your staging: the leptons currently feel the fields but don't source them. `EM` gates the gauge coupling; `SelfField` is the natural switch for adding their current to the W/B equations of motion when you want it.
+
+## 🧑 User - 2026-09-25 21:12:59
+
+<task-notification>
+<task-id>ba03f24yb</task-id>
+<tool-use-id>toolu_01VRyKtQmfZMaxJoe418YRGU</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/ba03f24yb.output</output-file>
+<status>completed</status>
+<summary>Background command "Generate and full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-25 21:13:03
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/ba03f24yb.output``
+  ```
+  gosl.go
+  gen ok
+  goal run succeeded
+  --- FAIL: TestPacketEnvelope (23.53s)
+      dispersion_test.go:154: Weyl neutrino  slab: X  5.99 ->  6.02 ( +0.5%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Weyl neutrino  blob: X  5.99 ->  6.02 ( +0.5%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:164: Weyl neutrino: a blob of finite transverse extent must diffract, but its Z width grew only +0.0%
+      dispersion_test.go:186: Weyl neutrino: the blob should spread along X far more than the slab (+0.5% vs +0.5%), from transverse k alone
+      dispersion_test.go:154: Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+  FAIL
+  FAIL	github.com/WaveReality/waves/wavesim	466.323s
+  FAIL
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+<thinking>
+TestPacketEnvelope is failing for Weyl because my ChiralSlab refactor accidentally hardcoded the slab envelope behavior, making the blob act identically to the slab instead of respecting Config.PacketSlab as intended. I need to trace back through my earlier WeylPacket change to figure out where that distinction got lost.
+
+Turns out I copied the pre-PacketDist body into ChiralSlab, so it always computes a hardcoded slab distance instead of calling ss.PacketDist like the edited WeylPacket does — that's the regression. I'll restore the PacketDist-based version in ChiralSlab and update the doc comment to mention Config.PacketSlab instead of unconditionally saying "the envelope is a slab." Good catch by the test suite, exactly the kind of bug it's meant to expose.
+
+
+</thinking>
+
+Regression from my refactor — I rebuilt `ChiralSlab` from the version of `WeylPacket` I'd read *before* this session's `PacketDist` change, so it hardcodes a slab and ignores `Config.PacketSlab`. Restoring it:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+old = """				f := c.AddScalar(1)
+				d := CoordToFloat(c).Dim(dim) - ctr.Dim(dim)
+				g := d / wd
+				e := (d + vg) / wd // where the envelope was one step ago
+				en := amp * math32.FastExp(-g*g)"""
+new = """				f := c.AddScalar(1)
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.SetDim(dim, off.Dim(dim)+vg) // where it was one step ago
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / wd
+				e := ss.PacketDist(pst, dim) / wd
+				en := amp * math32.FastExp(-g*g)"""
+assert old in s
+s = s.replace(old, new, 1)
+old2 = """// The envelope is a slab: gaussian along dim, flat across the other two. A
+// round blob carries transverse momentum, so it is not a helicity eigenstate,
+// it spreads sideways and its centroid crawls instead of tracking the group
+// velocity. See TestPacketEnvelope for that contrast measured."""
+new2 = """// The envelope defaults to a slab -- gaussian along dim, flat across the other
+// two -- and should stay one. A round blob carries transverse momentum, so it
+// is not a helicity eigenstate, it spreads sideways and its centroid crawls
+// instead of tracking the group velocity. Clear [Config.PacketSlab] to watch
+// it fail at exactly that; TestPacketEnvelope measures the difference."""
+assert old2 in s
+open('init.goal','w').write(s.replace(old2, new2, 1))
+PY
+goal build 2>&1|tail -1 && go test -run 'TestPacketEnvelope|TestWeyl|TestEW' -v -timeout 900s ./ 2>&1 | grep -E "^---|dispersion_test|FAIL" | head -12``
+  ```
+  Command did not complete within its 120s timeout and was moved to the background (ID: b3xugriph). Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b3xugriph.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task by75mldf1, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+One regression, caught by the suite and now fixed.
+
+When I factored `WeylPacket` into the shared `ChiralSlab`, I rebuilt its body from the copy I'd read **earlier in this session** — before the `PacketDist` work. So the refactored version hardcoded the slab envelope and silently ignored `Config.PacketSlab`. `TestPacketEnvelope` caught it immediately: the Weyl blob came out byte-identical to the slab, transverse width flat at +0.0%.
+
+That's exactly the failure mode the test was written for — an equation that stops responding to the envelope switch. Good argument for having measured the diffraction rather than just eyeballing it.
+
+`ChiralSlab` now goes through `PacketDist` for both the present envelope and the shifted past, and its doc says the slab is a default rather than a fact. Verification running on the affected tests.
+
+Worth noting what this says about the refactor generally: extracting shared code from a function is only safe against the *current* version of it, and I had a stale one in context. The Weyl tests all passed because none of them exercise the blob path — only the cross-equation envelope test does.
+
+## 🧑 User - 2026-09-25 21:15:52
+
+<task-notification>
+<task-id>b3xugriph</task-id>
+<tool-use-id>toolu_01DHHU6T469rwszJzQatHk7P</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b3xugriph.output</output-file>
+<status>completed</status>
+<summary>Background command "Restore PacketDist in ChiralSlab" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-25 21:15:56
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b3xugriph.output``
+  ```
+  goal build succeeded
+      dispersion_test.go:154: Weyl neutrino  slab: X  5.99 ->  6.02 ( +0.5%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Weyl neutrino  blob: X  5.99 ->  7.10 (+18.5%)   Z  6.00 ->  7.33 (+22.2%)
+      dispersion_test.go:154: Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+  --- PASS: TestPacketEnvelope (23.57s)
+  --- PASS: TestEWFermionVsWeyl (2.14s)
+  --- PASS: TestEWFermionCharge (0.09s)
+  --- PASS: TestEWLeptonPackets (2.45s)
+  --- PASS: TestEWLeptonDamp (57.11s)
+  --- PASS: TestWeylNeutrino (9.95s)
+  --- PASS: TestWeylChiralFlip (0.25s)
+  --- PASS: TestWeylElectronAtRest (0.82s)
+  
+  [exited with code 0]
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go *_test.go; go test ./ 2>&1 | grep -E "^---|_test\.go:|^ok|^FAIL" | head -30``
+  ```
+  Command running in background with ID: bgx3iqel6. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bgx3iqel6.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+
+</details>
+
+Fix confirmed — the Weyl blob diffracts again (X +18.5%, Z +22.2% against the slab's flat +0.5% / +0.0%), and all four electroweak lepton tests pass alongside it.
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bizkdiz6k, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Full suite running to confirm nothing else moved. While it goes, the shape of what landed:
+
+**`EWFermionKernel`** — one lepton generation in the electroweak background. The doublet (ν_L, e_L) at Y = −1/2 coupling to W^a and B, the singlet e_R at Y = −1 coupling to B alone, no ν_R. Sixteen state variables, `EWStatesN` 73 → 89, validated by naga and tint.
+
+**Four measurements that make the case:**
+
+| | result |
+|---|---|
+| reduces to Weyl in the broken vacuum | tracks to 3.58e-07; neutrino moves by **0.00e+00** |
+| charge from Q = T³ + Y | ν **+0.0000**, e_L −1.0022, e_R −1.0022 |
+| electron vs neutrino | 0.1222 vs 0.2362 — **48.3% slower** |
+| damped boundary | 0.002% left after 900 steps |
+
+**Two dimensional bugs I introduced and caught** — the gauge and Yukawa terms both needed the factor of **c** that `c σ·∇` carries, since `G` and `y·φ` are 1/cube quantities in the Higgs sector's units. The charge test read −1.0165 until fixed.
+
+**One regression I introduced and the suite caught** — the `ChiralSlab` extraction was built from a stale copy of `WeylPacket` and dropped `PacketDist`. Now fixed.
+
+The thing I'd actually flag for your attention: `EWDemoYukawa = 8`, larger than the top quark's coupling. That number is doing all the work in the demo, and it's the honest statement of why you can't otherwise see this — the electron is light purely because y_e is 3e-6, and nothing else about the mechanism changes when you wind it up. The default stays realistic; only the config raises it.
+
+Next, when you want it: the leptons feel the fields but don't source them. `EM` already gates the gauge coupling, and `SelfField` is the natural switch for adding their current to the W and B equations of motion.
+
+## 🧑 User - 2026-09-25 21:24:00
+
+<task-notification>
+<task-id>bgx3iqel6</task-id>
+<tool-use-id>toolu_017vs1BjCiNr59bPBXVV2A2S</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bgx3iqel6.output</output-file>
+<status>completed</status>
+<summary>Background command "Final full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-25 21:24:05
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bgx3iqel6.output``
+  ```
+  gosl.go
+  ok  	github.com/WaveReality/waves/wavesim	476.934s
+  
+  [exited with code 0]
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -c "^func Test" *_test.go | awk -F: '{s+=$2} END {print s" test funcs"}'; echo "--- changed (non-shader) ---"; cd /Users/oreilly/wavereality/waves && git status --short | grep -v "^??" | grep -v shaders/; echo "--- new files ---"; git status --short | grep "^??" | grep -E "wavesim|yaegi"``
+  ```
+  76 test funcs
+  --- changed (non-shader) ---
+   M "electroweak_py/contrails/1789818779 - system-reminder.md"
+   M wavesim/electroweak.go
+   M wavesim/electroweak.goal
+   M wavesim/enumgen.go
+   M wavesim/gosl.go
+   M wavesim/init.go
+   M wavesim/init.goal
+   M wavesim/params.go
+   M wavesim/sim.go
+   M wavesim/typegen.go
+   M wavesim/weyl.go
+   M wavesim/weyl.goal
+   M yaegiwaves/github_com-WaveReality-waves-wavesim.go
+  --- new files ---
+  ?? wavesim/.DS_Store
+  ?? wavesim/ewfermion_test.go
+  ?? wavesim/shaders/EWFermionKernel.wgsl
+  ?? wavesim/shaders/imports/
+  ...
+  ```
+
+</details>
+
 Green.
 
 ```
-ok  github.com/WaveReality/waves/wavesim  396.320s
+ok  github.com/WaveReality/waves/wavesim  476.934s
 ```
 
-All 72 tests pass. `goal build`, `go generate` in both packages, gofmt clean apart from the pre-existing generated `gosl.go`.
+76 tests pass — the 72 that existed plus the four new electroweak lepton tests. `goal build`, `go generate` in both packages, and gofmt all clean apart from the pre-existing generated `gosl.go`.
 
-## The shared defaults
+The changeset:
 
-```go
-pr.C = 0.25       // set by WaveC's Visscher bound, the tightest here
-pr.Hbar = 1.0
-pr.Mass = 2       // m c / hbar = 0.5 against khat = 0.77
-pr.Edges = EdgesWrap
-```
-
-No equation overrides any of them. `WeylC`, `SchrodingerMass` and `WaveCC` are all deleted — each had existed only to say something the shared default now says. The per-*demo* settings stayed, because those are physics: `NeutrinoPacket` must have Mass=0, the bound Schrödinger demos must have walls, `BoundStateMass` is 4 so the Compton wavelength lands on one cube.
-
-## Six tests moved, and none of them by loosening a number
-
-| test | what was actually wrong |
+| file | change |
 |---|---|
-| `TestDiracHydrogenBound` | `BoundStateMass` was tied to C=0.5 → now 4 |
-| `TestSchrodinger*` (3) | bound states need walls; wrap drove |E| past the stability bound |
-| `TestWaveDispersion` | 100 steps was under one carrier period — now four whole periods from `PacketFreq` |
-| `TestDiffusion` | its premise C²=C held only by coincidence — now arranged explicitly |
-| `TestEdgesDamp`, `TestElectroweakDamp` | measuring "has it arrived", not "did it reflect" — now ~3 traversals |
-| `TestKGGaugeUniform` | magic 2e-3 replaced with the documented `0.5 × A0` scaling |
+| [electroweak.goal](wavesim/electroweak.goal) | 16 lepton state vars, `EWFermionKernel`, `EWGaugeActY`/`EWGaugeMul`, `YLep`/`YER`, `LeptonPackets`, stats, lepton halo in the damp kernel |
+| [init.goal](wavesim/init.goal) | `ChiralDispersion`, `ChiralSlab` — shared with Weyl |
+| [weyl.goal](wavesim/weyl.goal) | `WeylPacket` and `WeylDispersion` now delegate to those |
+| [params.go](wavesim/params.go) | `YukawaE` (realistic default), derived `MassE` |
+| [sim.go](wavesim/sim.go) | `RunEWFermionKernel` in the Electroweak step |
+| [ewfermion_test.go](wavesim/ewfermion_test.go) | the four tests |
 
-Each of those is now expressed in terms of the thing it depends on, so the next parameter change won't silently invalidate them.
+Plus `shaders/EWFermionKernel.wgsl`, new and untracked.
 
-## Two things to carry forward
+The neutrality result is the one I'd keep. Back when you added EM to Weyl you asked whether neutrality could come out automatically, and the answer then was no — `WeylQ` was a number someone typed. Now:
 
-**Your original conclusion mostly survives, with one correction.** KG ≡ KGC ≡ Dirac is solid and now holds at matched mass. Schrödinger dispersing more than Dirac is true in theory but by ~1.5×, not 10× — and I was wrong to attribute your figures' gap to mismatched masses, since you'd matched them in the GUI. The real distortion there was the 64³ box, where mean Vg sat at 0.02–0.05 c instead of ~0.68 c. I'd drop "Weyl least of all": Weyl and Dirac are the same equation, so any gap is discretization.
+```
+phase rate per step: nu +0.000000, e_L -0.005009, e_R -0.005009
+```
 
-**`WaveCDir`'s packet speed is unexplained.** 0.996 c at C=0.5 falling to 0.765 c at C=0.25, not matching `dω/dk` for the relation the scheme should obey, not k-spread, not the initialization. It's written up in the test doc with everything I ruled out. Worth a look if you ever lean on that equation quantitatively.
+Exactly zero, because `g·sinθ_W − g'·cosθ_W` cancels identically for any couplings. And the two chiralities landing on the same charge by different routes is precisely the condition that permits a mass term to join them at all — which is the same term the Higgs is supplying.
+
+Green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  476.934s
+```
+
+76 tests pass — the 72 that existed plus the four new electroweak lepton tests. `goal build`, `go generate` in both packages, and gofmt all clean apart from the pre-existing generated `gosl.go`.
+
+The changeset:
+
+| file | change |
+|---|---|
+| [electroweak.goal](wavesim/electroweak.goal) | 16 lepton state vars, `EWFermionKernel`, `EWGaugeActY`/`EWGaugeMul`, `YLep`/`YER`, `LeptonPackets`, stats, lepton halo in the damp kernel |
+| [init.goal](wavesim/init.goal) | `ChiralDispersion`, `ChiralSlab` — shared with Weyl |
+| [weyl.goal](wavesim/weyl.goal) | `WeylPacket` and `WeylDispersion` now delegate to those |
+| [params.go](wavesim/params.go) | `YukawaE` (realistic default), derived `MassE` |
+| [sim.go](wavesim/sim.go) | `RunEWFermionKernel` in the Electroweak step |
+| [ewfermion_test.go](wavesim/ewfermion_test.go) | the four tests |
+
+Plus `shaders/EWFermionKernel.wgsl`, new and untracked.
+
+The neutrality result is the one I'd keep. Back when you added EM to Weyl you asked whether neutrality could come out automatically, and the answer then was no — `WeylQ` was a number someone typed. Now:
+
+```
+phase rate per step: nu +0.000000, e_L -0.005009, e_R -0.005009
+```
+
+Exactly zero, because `g·sinθ_W − g'·cosθ_W` cancels identically for any couplings. And the two chiralities landing on the same charge by different routes is precisely the condition that permits a mass term to join them at all — which is the same term the Higgs is supplying.
 

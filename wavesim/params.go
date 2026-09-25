@@ -344,8 +344,27 @@ type Parameters struct {
 	// must stay under 3/8. The default 0.5 gives 0.25 and is fine.
 	Diffusion slbool.Bool
 
+	// YukawaE is y_e, the coupling between the Higgs doublet and the electron
+	// in the term -y_e (Lbar Phi e_R + h.c.). It is the ONLY place an electron
+	// mass can come from here: there is no mass parameter in the lepton
+	// kernel, and m_e = y_e v / sqrt(2) appears because Phi is not zero.
+	//
+	// The default is the real one, which is tiny: the electron is 0.511 MeV
+	// against v = 246 GeV, so y_e is about 3e-6 and the mass it makes is far
+	// below anything visible on a lattice whose Higgs Compton length is 16
+	// cubes. The lepton configs raise it to something watchable and say so.
+	// Nothing else in the model changes when you do -- which is the point.
+	YukawaE float32
+
+	// MassE = YukawaE * HiggsV / sqrt(2) is the electron mass it produces, in
+	// 1/cube: an inverse Compton length, the same units HiggsV, MW and MZ are
+	// in. The L-R flip RATE is C times this, as Omega0 = Mass * C^2 is for the
+	// standalone Weyl equation. It goes to zero with HiggsV above the
+	// transition, which is the whole point of it being derived.
+	MassE float32 `edit:"-"`
+
 	// gosl requires the total struct size to be a multiple of 16 bytes.
-	pad, pad1, pad2 float32
+	pad float32
 }
 
 func (pr *Parameters) Update() {
@@ -381,6 +400,7 @@ func (pr *Parameters) Update() {
 	if pr.HiggsLambda > 0 && pr.HiggsMuSq > 0 {
 		pr.HiggsV = math32.Sqrt(pr.HiggsMuSq / pr.HiggsLambda)
 	}
+	pr.MassE = pr.YukawaE * pr.HiggsV * InvSqrt2
 	pr.MW = pr.GW * pr.HiggsV / 2.0
 	pr.MZ = pr.HiggsV * math32.Sqrt(pr.GW*pr.GW+pr.GpW*pr.GpW) / 2.0
 	nw := math32.Sqrt(pr.GW*pr.GW + pr.GpW*pr.GpW)
@@ -431,6 +451,10 @@ func (pr *Parameters) Defaults() {
 	pr.ThermalC = 0.3973 // (3g^2 + g'^2 + 4y_t^2 + 8lambda)/16, SM values
 	pr.GW = 0.6533
 	pr.GpW = 0.3500
+	// the real one: sqrt(2) * 0.511 MeV / 246.22 GeV. It makes an electron
+	// mass six orders below the W, which on this lattice is nothing at all --
+	// see the YukawaE doc, and the lepton configs, which raise it.
+	pr.YukawaE = 2.935e-6
 	pr.YangMills.SetBool(true)
 	pr.Boris.SetBool(true)
 	pr.Diff = 0.5

@@ -484,6 +484,94 @@ func (ss *Sim) CarrierPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, am
 	ss.CarrierPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
 }
 
+// ChiralDispersion returns the lattice angular frequency and group velocity of
+// a first-order chiral packet at the given carrier wavelength, whose two
+// chiralities trade at rate om0:
+//
+//	sin(omega) = sqrt(c^2 sin^2(k) + om0^2)
+//
+// om0 = 0 is the massless case, where the packet travels at essentially c.
+// [Sim.WeylDispersion] is this with om0 = Params.Omega0, and the electroweak
+// leptons use it with c times Params.MassE, since there the rate comes from
+// the Higgs rather than from a parameter.
+func (ss *Sim) ChiralDispersion(wavelength, om0 float32) (float32, float32) {
+	k := TwoPi / wavelength
+	c := ss.Params.C
+	sk := math32.Sin(k)
+	ss2 := c*c*sk*sk + om0*om0
+	rs := math32.Sqrt(ss2)
+	if rs <= 0 {
+		return 0, 0
+	}
+	return math32.Asin(rs), c * c * sk * math32.Cos(k) / (rs * math32.Sqrt(1-ss2))
+}
+
+// ChiralSlab writes a travelling slab packet of ONE chirality into the four
+// state variables starting at base, which must be the (1a, 1b, 2a, 2b)
+// components of a Weyl 2-spinor.
+//
+// The envelope defaults to a slab -- gaussian along dim, flat across the other
+// two -- and should stay one. A round blob carries transverse momentum, so it
+// is not a helicity eigenstate, it spreads sideways and its centroid crawls
+// instead of tracking the group velocity. Clear [Config.PacketSlab] to watch
+// it fail at exactly that; TestPacketEnvelope measures the difference.
+//
+// Both time levels are written. A three-level leapfrog reads its own past, and
+// a wave given no past goes both ways at once: the earlier one has its
+// envelope pulled back by one step of GROUP velocity and its phase advanced by
+// one step of om, which are the same thing only when the wave is massless.
+//
+// eoh scales a LOCAL contribution to that phase advance from A0s, for the case
+// where the packet sits in a potential: a wave at rest in one turns at a rate
+// shifted by q A0 / hbar, and a past written without it is the past of a
+// different wave. Pass 0 where there is no such field.
+func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, vg, eoh float32) {
+	c1 := int(base.Int64())
+	// the spinor with sigma.khat = helicity, for khat along +dim
+	s1, s2 := float32(1)/math32.Sqrt2, helicity/math32.Sqrt2 // +X: sigma_x
+	if dim == math32.Z {                                     // +Z: sigma_z is already diagonal
+		s1, s2 = 0, 1
+		if helicity > 0 {
+			s1, s2 = 1, 0
+		}
+	}
+	k := TwoPi / ss.Config.Wavelength
+	wd := ss.Config.PacketWidth
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	sz := ss.Config.Size
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				off := CoordToFloat(c).Sub(ctr)
+				pst := off
+				pst.SetDim(dim, off.Dim(dim)+vg) // where it was one step ago
+				d := off.Dim(dim)
+				g := ss.PacketDist(off, dim) / wd
+				e := ss.PacketDist(pst, dim) / wd
+				en := amp * math32.FastExp(-g*g)
+				eo := amp * math32.FastExp(-e*e)
+				ph := k * d
+				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
+				po := om + eoh*State[f.Z, f.Y, f.X, A0s, prv]
+				oa, ob := eo*math32.Cos(ph+po), eo*math32.Sin(ph+po)
+				State[f.Z, f.Y, f.X, c1, prv] += s1 * na
+				State[f.Z, f.Y, f.X, c1+1, prv] += s1 * nb
+				State[f.Z, f.Y, f.X, c1+2, prv] += s2 * na
+				State[f.Z, f.Y, f.X, c1+3, prv] += s2 * nb
+				State[f.Z, f.Y, f.X, c1, cur] += s1 * oa
+				State[f.Z, f.Y, f.X, c1+1, cur] += s1 * ob
+				State[f.Z, f.Y, f.X, c1+2, cur] += s2 * oa
+				State[f.Z, f.Y, f.X, c1+3, cur] += s2 * ob
+			}
+		}
+	}
+}
+
 // BoundStateMass is the mass the relativistic bound-state configs set, both
 // the atoms and the oscillators. It has to be this heavy: a = Compton / Z
 // alpha, so a light particle makes an atom far too big for the lattice. It
