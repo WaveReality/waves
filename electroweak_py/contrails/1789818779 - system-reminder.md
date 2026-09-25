@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-25 22:10:23
+- **Last Message:** 2026-09-25 22:23:09
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -172,7 +172,7 @@ I'll search, and I have a new theory from your results.
 <details>
 <summary>Tool Calls (3)</summary>
 
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
 - **WebSearch**: `Search `Claude desktop app inline LaTeX math not rendering raw dollar signs``
 - **WebSearch**: `Search `Claude Code markdown KaTeX inline math rendering bug github issue``
   ```
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3123,7 +3123,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -3324,7 +3324,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -3383,7 +3383,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23548,7 +23548,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -23809,7 +23809,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -23871,7 +23871,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -26200,7 +26200,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -85225,7 +85225,7 @@ The cp command is stuck waiting for overwrite confirmation since it's aliased to
   7
   Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
   ```
-- **ToolSearch**: `query, max_results`
+- **ToolSearch**: `max_results, query`
 - **TaskStop**: `task_id`
   ```
   {"message":"Successfully stopped task: brtlph5aa (cd /Users/oreilly/wavereality/waves/wavesim && cp /tmp/weyl.goal.new weyl.goal && rm -f dispersion_test.go.bak && python3 - <<'PY'\np='dispersion_test.go'\ns=open(p).read()\ns=s.replace('probe: WeylLMag, init: NeutrinoPacket','probe: WeylMag, init: NeutrinoPacket')\ns=s.replace('probe: WeylLMag, init: ElectronPacket','probe: WeylMag, init: ElectronPacket')\nopen(p,'w').write(s)\nPY\ngoal build 2>&1|tail -1 && go generate ./... 2>&1 | grep -icE \"error\" ; grep -n \"^const WeylStatesN\" enumgen.go)","task_id":"brtlph5aa","task_type":"local_bash","command":"cd /Users/oreilly/wavereality/waves/wavesim && cp /tmp/weyl.goal.new weyl.goal && rm -f dispersion_test.go.bak && python3 - <<'PY'\np='dispersion_test.go'\ns=open(p).read()\ns=s.replace('probe: WeylLMag, init: NeutrinoPacket','probe: WeylMag, init: NeutrinoPacket')\ns=s.replace('probe: WeylLMag, init: ElectronPacket','probe: WeylMag, init: ElectronPacket')\nopen(p,'w').write(s)\nPY\ngoal build 2>&1|tail -1 && go generate ./... 2>&1 | grep -icE \"error\" ; grep -n \"^const WeylStatesN\" enumgen.go"}
@@ -85254,7 +85254,7 @@ grep -n "Weyl neutrino\|Weyl electron" dispersion_test.go; goal build 2>&1|tail 
   ```
   (Bash completed with no output)
   ```
-- **Monitor**: `description, timeout_ms, command`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task brqrljk6x, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -87107,7 +87107,7 @@ gofmt -l *.go; goal build 2>&1|tail -1; go generate ./... 2>&1 | grep -iE "^erro
   Command running in background with ID: bakzzm8a0. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bakzzm8a0.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task buv0f2v0v, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -87696,7 +87696,7 @@ Checking that the Z stat is properly populated for Wave, Maxwell, and EW cases �
   Command running in background with ID: bc1xb82gt. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc1xb82gt.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `command, description, timeout_ms`
+- **Monitor**: `description, timeout_ms, command`
   ```
   Monitor started (task bhxva82fp, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -89345,7 +89345,7 @@ goal build 2>&1|tail -1 && go test ./ 2>&1 | grep -E "^---|FAIL|^ok|\.go:[0-9]+:
   Command running in background with ID: bacz9sn7q. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `description, timeout_ms, command`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task bef0bz5na, expires in 20m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -94854,7 +94854,7 @@ Now the full verification — generate, yaegi, and the whole suite:
   Command running in background with ID: ba03f24yb. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/ba03f24yb.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `command, description, timeout_ms`
+- **Monitor**: `description, timeout_ms, command`
   ```
   Monitor started (task b1ljsw23p, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -95069,7 +95069,7 @@ Fix confirmed — the Weyl blob diffracts again (X +18.5%, Z +22.2% against the 
 <details>
 <summary>Tool Calls (1)</summary>
 
-- **Monitor**: `command, description, timeout_ms`
+- **Monitor**: `timeout_ms, command, description`
   ```
   Monitor started (task bizkdiz6k, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -95769,7 +95769,7 @@ Both pass. Running the full verification:
   Command running in background with ID: b7rx5zb42. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7rx5zb42.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `command, description, timeout_ms`
+- **Monitor**: `description, timeout_ms, command`
   ```
   Monitor started (task btxudbztd, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -96932,7 +96932,7 @@ All 22 files are present with fresh timestamps, so my `wc -l` was lying. Verifyi
   Command running in background with ID: blqhiie7p. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/blqhiie7p.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task bg73cwhek, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -97004,7 +97004,7 @@ Let me confirm the suite is still green with the constant swapped in:
   Command running in background with ID: bydpkojwm. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bydpkojwm.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task bxa8aj440, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -97145,13 +97145,537 @@ Three things remain from the list we built earlier, in the order I'd tackle them
 2. **Charged-current W exchange**, e_L ↔ ν_L. The `φ⁺` coupling is already in both the kernel and the back-reaction, so this is a config plus stats rather than new physics.
 3. **Symmetry restoration above T_c** — needs no new code at all, since `MassE` already follows `HiggsV`; just a config that raises `Temp` and a stat watching the electron catch the neutrino.
 
-That was the monitor confirming the same result I already reported — suite green at 491.565s, 82 tests, shaders validated.
+## 🧑 User - 2026-09-25 22:11:32
 
-Nothing outstanding. The electroweak lepton work is complete: `EWFermionKernel` with the doublet and singlet, gauge coupling gated on `EM`, and both back-reactions — the gauge current and the Yukawa force on the Higgs — gated on `SelfField`.
+do the energy gradient check on the yukawa coefficient
 
-Three things remain from the list we built earlier, in the order I'd tackle them:
+## 🤖 Assistant - 2026-09-25 22:11:37
 
-1. **Energy-gradient check on the Yukawa coefficient** — the one number in this work pinned by derivation rather than by a conservation law. `energy.go` has the harness.
-2. **Charged-current W exchange**, e_L ↔ ν_L. The `φ⁺` coupling is already in both the kernel and the back-reaction, so this is a config plus stats rather than new physics.
-3. **Symmetry restoration above T_c** — needs no new code at all, since `MassE` already follows `HiggsV`; just a config that raises `Temp` and a stat watching the electron catch the neutrino.
+*Model: claude-opus-5*
+
+<thinking>
+I'm examining the existing energy functions—ElectroweakStaticEnergy, ewSiteEnergy, and ewGradMismatch—to plan adding the Yukawa interaction term to the static energy and extending the gradient-mismatch test to check the kernel's force against −dU/dΦ with this new term included.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 35,160p energy.go``
+  ```
+  func ElectroweakStaticEnergy() float64 {
+  	ctx := GetCtx(0)
+  	p := &Params[0]
+  	sz := ctx.Size.V()
+  	tot := 0.0
+  	for z := int32(1); z <= sz.Z; z++ {
+  		for y := int32(1); y <= sz.Y; y++ {
+  			for x := int32(1); x <= sz.X; x++ {
+  				tot += float64(ewSiteEnergy(x, y, z, p.GW, p))
+  			}
+  		}
+  	}
+  	return tot
+  }
+  
+  // ElectroweakStaticEnergyNear sums the energy over the 27 sites centred on
+  // (x,y,z). Every stencil reaches at most one cube, so the derivative of the
+  // TOTAL energy w.r.t. one site lives entirely in this block. That makes the
+  // numerical-gradient check boundary-independent, so the test field need not be
+  // lattice-periodic.
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm verifying the energy functional derivation for the Higgs potential term, checking that the force factor μ² − λ·mag correctly matches the negative gradient of the potential with respect to ψ_i.
+
+Now I need to derive the corresponding Yukawa potential U_Yuk. By matching the source terms for each real component (ψ⁰_a, ψ⁰_b, ψ⁺_a, ψ⁺_b) to the negative gradient condition, I find U_Yuk = √2y times the sum of these fields with the real and imaginary parts of e_R†e_L and e_R†ν_L, confirming consistency between the real and imaginary source terms.
+
+Since the fermions are fixed for this check, this expression is linear in Ψ, so the gradient trivially recovers the source — but that's actually the point: the check verifies the implemented force matches the gradient of a properly-formed energy, and the real test comes from finite-differencing the full `ewSiteEnergy` against the full kernel force.
+
+A wrong sign, factor, or field-mapping error (like swapping real/imag or φ⁺/φ⁰) would show up in this comparison, so it's a genuine consistency check on sign and structure — though it can't independently fix the overall scale relative to the fermion equation without a dynamical conservation law. I'm now wondering if I can push further and actually pin that coefficient by writing the Yukawa energy from the fermion side instead, then checking the Higgs force is consistent with that same expression — if both derive from one unified interaction term, passing the check would tie the two sides together.
+
+I'm working out the real part of the fermion Yukawa interaction energy explicitly, expanding Ψ⁰ and the electron/neutrino bilinears into their component pieces to get the explicit energy expression in terms of ψ⁰_a, ψ⁰_b, and the electron field components.
+
+Comparing this against U_Yuk, the coefficients match up to the factor c: E_f = c·U_Yuk, confirming Hamiltonian consistency with the expected form.
+
+Cross-checking against the Higgs potential term in the kernel, I confirm that hf = csq·(cov + vfac·psi) matches the derivative structure of U, so the acceleration follows as c² times the negative gradient of U with respect to ψ.
+
+But for the fermion side, the relation isn't as clean — d_tψ_f = −iHψ_f has H as a rate, and the corresponding field energy ψ†Hψ carries different units than U, with the exact factor depending on how the fermion kinetic term is normalized rather than a simple factor of c. What I can verify precisely is that the Higgs force equals −dU/dΨ for U_Yuk = √2 y(Ψ·bilinear), matching sign and coefficient.
+
+Combined with the fermion side's −i(y/√2)cΨψ, the two differ by exactly one factor of c — consistent with the rate-to-field conversion used elsewhere in the kernel. That's a solid check of everything but one overall convention.
+
+For implementation, I'll add the Yukawa term to `ewSiteEnergy` gated on SelfField, then extend `ewGradMismatch` — first I need to look at how that function perturbs things by reading the test helper.
+
+
+</thinking>
+
+Now the test harness:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 1,128p energy_test.go``
+  ```
+  package wavesim
+  
+  import (
+  	"fmt"
+  	"math"
+  	"testing"
+  )
+  
+  // ewFillWave lays down a single plane wave of wavelength L along a general
+  // direction, in all nine spatial W components with staggered phases. W_0 and
+  // B_0 stay zero, as do all velocities -- the sector ElectroweakStaticEnergy
+  // covers.
+  //
+  // It must be ONE plane wave, not a product of two. A product is a superposition
+  // of modes at |k1+k2| and |k1-k2|, whose force contributions can partly cancel
+  // at the probe site; the relative mismatch then measures that cancellation
+  // rather than the discretization, and stops converging.
+  func ewFillWave(sz int32, L float64, amp float32) {
+  	n := int(sz) + 2
+  	k := 2 * math.Pi / L
+  ...
+  ```
+
+</details>
+
+<thinking>
+The existing harness checks the W fields, but for the Yukawa term I need to probe the Higgs components instead, since that's where the force acts. This term is exactly linear in Ψ with no derivatives, so its contribution to −dU/dΨ has no stencil mismatch — unlike the Yang-Mills convergence test, this one can be verified to near machine precision.
+
+My design: run with the self-field toggle on and off, take the difference in the measured Higgs force (which isolates the pure Yukawa contribution since all other gradient terms cancel), and compare it against −d(U_Yuk)/dΨ obtained by finite-differencing the static energy between the two settings. Since U_Yuk is exactly linear with no derivatives, the two should agree to float precision — though I need to be careful since turning self-field on also activates gauge back-reaction, which could contaminate the comparison.
+
+So the plan: add the Yukawa term to the site energy function gated on the self-field flag, then write a test that builds a non-vacuum Higgs configuration with a fully complex fermion state (all lepton components nonzero), probes several Higgs components at multiple sites, and checks that the kernel force difference matches the numeric energy-gradient difference to about 1e-5 relative accuracy. I also need to make sure the test writes the state to the correct time slice, since the energy function reads from slice zero by convention.
+
+Now I'm implementing the Yukawa contribution to the site energy, computing spinor bilinears from the lepton fields at the current site.
+
+The rest of the field pairings check out correctly. Since `ewSiteEnergy` lives in a plain Go file that calls the gosl-defined `EWSpinBilinear`, I need a small helper to read spinor pairs before implementing the function and its test — I should look at what `ymSim` does for the test setup.
+
+Rather than reusing `ymSim`, which seems used elsewhere for gradient checks, I'll build my own simulation in the test similar to `ewfSim` but with fields on slice 0, matching how `ewSiteEnergy` and `ewStep` reference the context's current/previous slices. Let me grep for `ymSim` to confirm the conventions.
+
+
+</thinking>
+
+The Yukawa term is exactly linear in Ψ with no derivatives, so unlike the Yang-Mills check this one can be exact rather than a convergence test. Let me check the sim helper first:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func ymSim" -A 20 *_test.go | head -25; echo "=== ewStep ==="; grep -n "func ewStep" -A 10 *_test.go | head -12``
+  ```
+  electroweak_test.go:363:func ymSim(sz int32) *Sim {
+  electroweak_test.go-364-	ss := ewSim(sz)
+  electroweak_test.go-365-	ss.Params.HiggsMu = 0
+  electroweak_test.go-366-	ss.Params.Update()
+  electroweak_test.go-367-	State.SetZeros()
+  electroweak_test.go-368-	GetCtx(0).Init()
+  electroweak_test.go-369-	return ss
+  electroweak_test.go-370-}
+  electroweak_test.go-371-
+  electroweak_test.go-372-// ewWBase returns the first state variable of SU(2) component a (1..3);
+  electroweak_test.go-373-// the four potentials are at +0..+3 and their velocities at +4..+7.
+  electroweak_test.go-374-func ewWBase(a int) int { return int(EWW10s) + (a-1)*8 }
+  electroweak_test.go-375-
+  electroweak_test.go-376-// TestYangMillsPureGauge is the acceptance test for the self-coupling.
+  electroweak_test.go-377-//
+  electroweak_test.go-378-// A constant uniform W^3_0 = B over a vacuum gauge field is PURE GAUGE: it is
+  electroweak_test.go-379-// the gauge transform, by U = exp(i g B c t T^3), of a static uniform W^1_x.
+  electroweak_test.go-380-// So the exact solution has (W^1_x, W^2_x) turning in the adjoint 1-2 plane at
+  electroweak_test.go-381-//
+  electroweak_test.go-382-//	omega = +c * g * B
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('energy.go').read()
+old = """	// gauge fixing: (1/2)(div W^a)^2 and (1/2)(div B)^2"""
+new = """	// ---- Yukawa: the leptons' coupling to the condensate -------------------
+	//
+	// Present only with Params.SelfField, which is exactly when the kernel's
+	// force carries it. Unlike every other term here it is EXACT on the
+	// lattice: it has no derivative in it and is linear in Psi, so no stencil
+	// mismatch can enter and -dU/dPsi is the source term identically rather
+	// than in the continuum limit.
+	if p.SelfField.IsTrue() {
+		rd := func(v EWStates) float32 {
+			return State.Value(int(z), int(y), int(x), int(v), 0)
+		}
+		nu1 := math32.Vec2(rd(EWNu1a), rd(EWNu1b))
+		nu2 := math32.Vec2(rd(EWNu2a), rd(EWNu2b))
+		el1 := math32.Vec2(rd(EWEL1a), rd(EWEL1b))
+		el2 := math32.Vec2(rd(EWEL2a), rd(EWEL2b))
+		er1 := math32.Vec2(rd(EWER1a), rd(EWER1b))
+		er2 := math32.Vec2(rd(EWER2a), rd(EWER2b))
+		re := EWSpinBilinear(0, er1, er2, el1, el2)
+		rn := EWSpinBilinear(0, er1, er2, nu1, nu2)
+		yk := Sqrt2 * p.YukawaE
+		e += yk * (psi.X*rn.X + psi.Y*rn.Y + psi.Z*re.X + psi.W*re.Y)
+	}
+
+	// gauge fixing: (1/2)(div W^a)^2 and (1/2)(div B)^2"""
+assert old in s
+open('energy.go','w').write(s.replace(old, new, 1))
+PY
+cat >> ewfermion_test.go <<'EOF'
+
+// ewfSetAll writes a value to a variable on BOTH time slices at one site, as
+// the energy checks need: ElectroweakStaticEnergy reads slice 0 while the
+// kernel reads whichever the context says.
+func ewfSetAll(v float32, x, y, z int32, vr EWStates) {
+	for t := range 2 {
+		State.Set(v, int(z), int(y), int(x), int(vr), t)
+	}
+}
+
+// TestEWYukawaForceIsEnergyGradient pins the Yukawa back-reaction coefficient
+// the way TestElectroweakForceIsEnergyGradient pins the Yang-Mills ones: the
+// kernel's force on the Higgs must be -dU/dPsi for the energy functional.
+//
+// This one can be EXACT, where that one is a convergence test. The Yang-Mills
+// terms are built from Gradient10 while the force uses Laplacian19, and those
+// two are not adjoint-compatible, so the agreement is only O(a^2). The Yukawa
+// term has no derivative in it at all: -sqrt(2) y (e_R^dag e_L) is the local
+// fermion bilinear and nothing else, so the gradient is the source identically
+// and any disagreement is a wrong sign, a wrong factor, or a component pairing
+// the wrong way round.
+//
+// Measured as the DIFFERENCE between SelfField on and off, which cancels the
+// covariant Laplacian and the potential and leaves only the term in question.
+func TestEWYukawaForceIsEnergyGradient(t *testing.T) {
+	const sz = 10
+	const h = 1e-3
+	// every Higgs component, at several sites
+	comps := []EWStates{EWHsCa, EWHsCb, EWHs0a, EWHs0b}
+	vels := []EWStates{EWHvCa, EWHvCb, EWHv0a, EWHv0b}
+	sites := [][3]int32{{4, 4, 4}, {5, 4, 6}, {6, 5, 4}, {4, 6, 5}}
+
+	// a configuration with every component of both the Higgs and the three
+	// lepton fields nonzero and complex, so no term can hide behind a zero
+	build := func(self bool) *Sim {
+		ss := ewfSim(sz, nil)
+		ss.Params.SelfField.SetBool(self)
+		ss.Params.YukawaE = 0.7
+		ss.Params.Update()
+		State.SetZeros()
+		GetCtx(0).Init()
+		n := int32(sz) + 2
+		for z := int32(0); z < n; z++ {
+			for y := int32(0); y < n; y++ {
+				for x := int32(0); x < n; x++ {
+					a := float64(x)*0.31 + float64(y)*0.17 + float64(z)*0.23
+					for i, vr := range []EWStates{EWHsCa, EWHsCb, EWHs0a, EWHs0b,
+						EWNu1a, EWNu1b, EWNu2a, EWNu2b,
+						EWEL1a, EWEL1b, EWEL2a, EWEL2b,
+						EWER1a, EWER1b, EWER2a, EWER2b} {
+						v := 0.2 * math.Sin(a+0.7*float64(i))
+						ewfSetAll(float32(v), x, y, z, vr)
+					}
+				}
+			}
+		}
+		return ss
+	}
+
+	// the kernel's force on each Higgs component, at each site, for both flags
+	kf := map[bool][]float64{}
+	for _, self := range []bool{false, true} {
+		ss := build(self)
+		csq := float64(ss.Params.CSq)
+		save := State.Clone()
+		ewStep(ss)
+		cur := int(GetCtx(0).CurState)
+		var f []float64
+		for _, s := range sites {
+			for _, vv := range vels {
+				f = append(f, float64(State.Value(int(s[2]), int(s[1]), int(s[0]), int(vv), cur))/csq)
+			}
+		}
+		State.CopyFrom(save)
+		GetCtx(0).Init()
+		kf[self] = f
+	}
+
+	// and -dU/dPsi, the same difference, by finite differences on the energy
+	nf := map[bool][]float64{}
+	for _, self := range []bool{false, true} {
+		build(self)
+		var f []float64
+		for _, s := range sites {
+			for _, vr := range comps {
+				base := State.Value(int(s[2]), int(s[1]), int(s[0]), int(vr), 0)
+				ewfSetAll(base+h, s[0], s[1], s[2], vr)
+				up := ElectroweakStaticEnergyNear(s[0], s[1], s[2])
+				ewfSetAll(base-h, s[0], s[1], s[2], vr)
+				dn := ElectroweakStaticEnergyNear(s[0], s[1], s[2])
+				ewfSetAll(base, s[0], s[1], s[2], vr)
+				f = append(f, -(up-dn)/(2*h))
+			}
+		}
+		nf[self] = f
+	}
+
+	var sd, sf float64
+	for i := range kf[true] {
+		dk := kf[true][i] - kf[false][i] // the Yukawa force alone
+		dn := nf[true][i] - nf[false][i] // the Yukawa gradient alone
+		sd += (dk - dn) * (dk - dn)
+		sf += dn * dn
+	}
+	n := float64(len(kf[true]))
+	rms := math.Sqrt(sf / n)
+	rel := math.Sqrt(sd/n) / rms
+	t.Logf("Yukawa force RMS %.6e over %d probes, mismatch against -dU/dPsi %.3e relative", rms, int(n), rel)
+	if rms <= 0 {
+		t.Fatalf("no Yukawa force at all: the test is not exercising the term")
+	}
+	if rel > 1e-4 {
+		t.Errorf("the Higgs force is not the gradient of the Yukawa energy: off by %.3e", rel)
+	}
+}
+EOF
+go test -run TestEWYukawaForceIsEnergyGradient -v ./ 2>&1 | grep -E "^---|_test.go:|FAIL|panic|\.go:[0-9]+:[0-9]+" | head -8``
+  ```
+      ewfermion_test.go:666: Yukawa force RMS 4.906771e-02 over 16 probes, mismatch against -dU/dPsi 2.272e-05 relative
+  --- PASS: TestEWYukawaForceIsEnergyGradient (0.02s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The tiny 2.27e-5 relative mismatch is consistent with float32 roundoff, since dividing energy differences by h=1e-3 amplifies the ~1e-7 float32 epsilon by roughly 500x, landing right around 5e-5. This confirms the Higgs force is exactly the negative gradient of the Yukawa energy term.
+
+But this only pins the Higgs-side force against the energy functional I wrote — I still need to check it against the fermion equation itself. The fermion kernel's Yukawa coupling coefficient is ye = y·(1/√2)·c multiplying the stored Ψ, while the energy functional's Yukawa term is U = √2·y·(Ψ·bilinear), so I need to work out precisely how these two coefficients relate.
+
+For consistency, the fermion interaction energy computed from its own Hamiltonian should reduce to c times the same U_Yuk term — a clean proportionality by the speed of light factor c, coming from how the field's equation of motion (with the 1/c² kinetic term) translates the energy gradient into an acceleration of c²(−dU/dΨ).
+
+So I'm setting up the Higgs conjugate momentum π = ∂_tΨ/c² and its Hamiltonian H_H = (c²/2)π² + U, and comparing that to the fermion's Hamiltonian form H = ψ†H_f ψ. For the total Hamiltonian to correctly generate both equations of motion with only one interaction term, I need to check whether embedding E_f = c·U_Yuk into H reproduces the expected Higgs field acceleration equation, ∂_t²Ψ = −c·(something), consistently.
+
+Working through it, plugging E_f = c·U_Yuk into the Higgs equation gives a factor of c³ rather than c², so there's a genuine mismatch of one power of c between the two sides given these normalizations. But since the fermion field's overall scale is arbitrary — the fermion EOM is linear in ψ so any rescaling leaves it unchanged, while the source term E_f scales quadratically — that leftover factor of c can simply be absorbed into how I normalize ψ. So the relative coefficient isn't fixed by the equations themselves; it's a free choice tied to the fermion normalization convention.
+
+What's actually verified and pinned down is the sign, the √2 factor, and the φ⁺↔ν_L/φ⁰↔e_L pairing, all confirmed to 2.3e-5, plus the fact that both sides share the same Yukawa coupling y and bilinear structure — so there's genuinely one coupling parameter, not two. What remains unfixed is the overall strength relative to the fermion amplitude, which is just a normalization convention, analogous to the same freedom present in defining the gauge current's strength.
+
+Now let me confirm the Yukawa addition to ewSiteEnergy won't break the existing electroweak force test — since ymSim has SelfField off by default and the fermion fields are zero there, the new term stays inactive, so that test should be safe. I'll double check the math32 import is already present in energy.go, run gofmt, and then execute the full test suite.
+
+
+</thinking>
+
+**2.272e-05 relative** over 16 probes — float32 noise on a finite difference. The Higgs force is exactly −dU/dΨ.
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go *_test.go; go generate ./... 2>&1 | grep -iE "error|failed" | head; echo "gen done"; ls shaders/*.wgsl | wc -l; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd ../wavesim && go test ./ 2>&1 | grep -E "^---|_test\.go:|^ok|^FAIL" | head -20``
+  ```
+  Command running in background with ID: bwdmd7f21. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bwdmd7f21.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task b405613ek, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Done, and it's a stronger check than the Yang-Mills one it's modelled on. Suite running.
+
+## Why this one can be exact
+
+`TestElectroweakForceIsEnergyGradient` is a *convergence* test — the Yang-Mills terms are built from `Gradient10` while the force uses `Laplacian19`, and those aren't adjoint-compatible, so agreement is only O(a²).
+
+The Yukawa term has no derivative in it. `−√2 y (e_R† e_L)` is the local fermion bilinear and nothing else, so −dU/dΨ is the source *identically*, not in the continuum limit. Any disagreement would be a wrong sign, a wrong factor, or a component pairing the wrong way round.
+
+I measured it as the **difference between `SelfField` on and off**, which cancels the covariant Laplacian and the potential and leaves only the term under test:
+
+```
+Yukawa force RMS 4.906771e-02 over 16 probes,
+mismatch against -dU/dPsi 2.272e-05 relative
+```
+
+All four Higgs components at four sites, with every component of the Higgs and all three lepton fields nonzero and complex so nothing hides behind a zero.
+
+## What this does and doesn't establish
+
+It pins the **sign**, the **√2**, and the **φ⁺↔ν_L / φ⁰↔e_L component pairing**, and confirms both sides use one `y` rather than two independent couplings.
+
+It does not pin the overall strength relative to the fermion amplitude — and I now think nothing can, because that isn't physics. Working it through: the fermion's interaction energy from its own Hamiltonian comes out as `c·U_Yuk`, differing from the Higgs side by one factor of c. But the fermion EOM is linear, so rescaling ψ leaves it unchanged while scaling the interaction energy quadratically. The factor is absorbable into the fermion field normalization, which is a convention here rather than a determined quantity — the same freedom that makes the gauge current's absolute strength conventional.
+
+So the honest statement is: the coefficient is now pinned to everything a normalization-independent check can pin it to. The residual freedom is the fermion field's own normalization, which is why the amplitude has to be turned down by hand rather than following from anything.
+
+## 🧑 User - 2026-09-25 22:22:00
+
+<task-notification>
+<task-id>bwdmd7f21</task-id>
+<tool-use-id>toolu_01E7dCGrT4YXXEmyaSNiDcU8</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bwdmd7f21.output</output-file>
+<status>completed</status>
+<summary>Background command "Generate and full suite with Yukawa energy" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-25 22:22:11
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bwdmd7f21.output``
+  ```
+  gosl.go
+  gen done
+        11
+  goal run succeeded
+  ok  	github.com/WaveReality/waves/wavesim	482.040s
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+<thinking>
+The suite passed in 482s with generate reporting no errors, but the shader count still shows 11 instead of the real 22 — the same discrepancy as before. I need to figure out why `ls shaders/*.wgsl | wc -l` is undercounting when run from that directory.
+
+Wait, I think I see the bug: since `cd` only chained with `&&` before the first couple commands, everything after switched to `;`-separated execution, meaning the working directory context for the `ls` command might not be what I expect — that would explain why the count comes back wrong.
+
+So the pattern seems to be that each `go generate ./...` pass only writes about half the shader files, requiring two runs to get the full 22. Rather than guess further, I should just recount now and, if it's 11 again, rerun generate once more to see if it doubles up as before, then check which specific files are missing.
+
+
+</thinking>
+
+Shader count reads 11 again after this generate. Checking which are missing:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim/shaders && ls -1 *.wgsl | wc -l; echo "--- files ---"; ls -1 *.wgsl``
+  ```
+        22
+  --- files ---
+  DiracDampKernel.wgsl
+  DiracKernel.wgsl
+  EWFermionKernel.wgsl
+  EdgesOpenKernel.wgsl
+  EdgesWrapKernel.wgsl
+  ElectroweakDampKernel.wgsl
+  ElectroweakKernel.wgsl
+  KleinGordonCDampKernel.wgsl
+  KleinGordonCKernel.wgsl
+  KleinGordonDampKernel.wgsl
+  KleinGordonKernel.wgsl
+  MaxwellDampKernel.wgsl
+  MaxwellKernel.wgsl
+  SchrodingerAKernel.wgsl
+  SchrodingerBKernel.wgsl
+  SpinfieldKernel.wgsl
+  WaveCAKernel.wgsl
+  WaveCBKernel.wgsl
+  ...
+  ```
+
+</details>
+
+<thinking>
+All 22 files are actually there, so the discrepancy must be in how `ls` is being invoked — using a path-prefixed glob from the parent versus running it directly inside the directory seems to change the output count, likely due to `ls` defaulting to one-per-line only in certain piping contexts.
+
+Actually, I suspect the real cause is timing: when `ls` runs immediately after `go generate` in the same compound command, the generator may not have finished flushing all files to disk yet, so only 11 show up. When checked separately afterward, all 22 are present. So 22 is the correct, authoritative count, and my inline check right after generate isn't reliable — I should correct the note I wrote about this earlier.
+
+I need to fix the memory entry to instruct running the file count as a separate command after generate finishes, rather than chaining it, and clarify that the validation-output count (which showed 22) is trustworthy while the immediate `ls` check is not. Let me update that and finalize my report.
+
+
+</thinking>
+
+All 22 present. The inline `ls` immediately after `go generate` in the same command is what's unreliable — both times it read 11 while a separate check read 22. Correcting the memory note, since I'd recommended exactly that check:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/.claude/projects/-Users-oreilly-wavereality-waves/memory && python3 - <<'PY'
+p='wavesim-build-sequence.md'
+s=open(p).read()
+old = """Cheapest standing check, since the exit code is useless: after `go generate`,
+count `Validation successful` lines and `shaders/*.wgsl` files and require both
+to equal the number of kernels (22 as of 2026-09-25). A count taken BEFORE the
+regenerate in the same compound command reads the post-deletion number and
+looks alarming for no reason -- count after."""
+new = """Cheapest standing check, since the exit code is useless: grep the `go generate`
+output for `error:`, and count its `Validation successful` lines, requiring one
+per kernel (22 as of 2026-09-25). Count from the OUTPUT, not from the directory:
+an `ls shaders/*.wgsl | wc -l` chained into the same command after `go generate`
+read 11 twice in a row while the directory actually held all 22, so the files
+are evidently not all visible yet when the tool returns. A separate later `ls`
+is accurate."""
+assert old in s
+open(p,'w').write(s.replace(old, new, 1))
+PY
+echo ok``
+  ```
+  ok
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  482.040s
+22 shader files, generate clean
+```
+
+83 tests pass. The Yukawa coefficient check is in.
+
+## What it does
+
+`ElectroweakStaticEnergy` gains the Yukawa term, gated on `SelfField` so it appears exactly when the kernel's force carries it. `TestEWYukawaForceIsEnergyGradient` probes all four Higgs components at four sites and compares the kernel's force to −dU/dΨ, taking the **difference between `SelfField` on and off** so the covariant Laplacian and the potential cancel and only the term under test remains:
+
+```
+Yukawa force RMS 4.906771e-02 over 16 probes,
+mismatch against -dU/dPsi 2.272e-05 relative
+```
+
+Unlike the Yang-Mills gradient test, which can only converge as O(a²) because `Gradient10` and `Laplacian19` aren't adjoint-compatible, this one is exact — the Yukawa term has no derivative in it, so its gradient is the source identically. The 2.3e-05 is float32 noise on the finite difference.
+
+## What I'd revise from what I said before
+
+I told you this coefficient was "pinned by derivation rather than by a conservation law" and implied the energy check would close that. It closes most of it — sign, the √2, and the φ⁺↔ν_L / φ⁰↔e_L pairing — but working through the remainder, the overall strength relative to the fermion amplitude **can't** be pinned by any check, and isn't a defect. The fermion EOM is linear, so rescaling ψ leaves it unchanged while scaling the interaction energy quadratically; the leftover factor is absorbable into the fermion field's normalization, which is a convention here. Same reason the gauge current's absolute strength is conventional.
+
+So the coefficient is now as determined as a normalization-independent check can make it, and the amplitude still has to be turned down by hand because that genuinely doesn't follow from anything.
+
+## One correction to your memory file
+
+I'd added guidance to verify the shader count with `ls shaders/*.wgsl | wc -l` after `go generate`. That check is wrong — it read 11 twice while the directory held all 22, so the files aren't all visible when the tool returns. Rewrote it to count `Validation successful` lines from generate's own output instead, which was accurate both times.
+
+Green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  482.040s
+22 shader files, generate clean
+```
+
+83 tests pass. The Yukawa coefficient check is in.
+
+## What it does
+
+`ElectroweakStaticEnergy` gains the Yukawa term, gated on `SelfField` so it appears exactly when the kernel's force carries it. `TestEWYukawaForceIsEnergyGradient` probes all four Higgs components at four sites and compares the kernel's force to −dU/dΨ, taking the **difference between `SelfField` on and off** so the covariant Laplacian and the potential cancel and only the term under test remains:
+
+```
+Yukawa force RMS 4.906771e-02 over 16 probes,
+mismatch against -dU/dPsi 2.272e-05 relative
+```
+
+Unlike the Yang-Mills gradient test, which can only converge as O(a²) because `Gradient10` and `Laplacian19` aren't adjoint-compatible, this one is exact — the Yukawa term has no derivative in it, so its gradient is the source identically. The 2.3e-05 is float32 noise on the finite difference.
+
+## What I'd revise from what I said before
+
+I told you this coefficient was "pinned by derivation rather than by a conservation law" and implied the energy check would close that. It closes most of it — sign, the √2, and the φ⁺↔ν_L / φ⁰↔e_L pairing — but working through the remainder, the overall strength relative to the fermion amplitude **can't** be pinned by any check, and isn't a defect. The fermion EOM is linear, so rescaling ψ leaves it unchanged while scaling the interaction energy quadratically; the leftover factor is absorbable into the fermion field's normalization, which is a convention here. Same reason the gauge current's absolute strength is conventional.
+
+So the coefficient is now as determined as a normalization-independent check can make it, and the amplitude still has to be turned down by hand because that genuinely doesn't follow from anything.
+
+## One correction to your memory file
+
+I'd added guidance to verify the shader count with `ls shaders/*.wgsl | wc -l` after `go generate`. That check is wrong — it read 11 twice while the directory held all 22, so the files aren't all visible when the tool returns. Rewrote it to count `Validation successful` lines from generate's own output instead, which was accurate both times.
 

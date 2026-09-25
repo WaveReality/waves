@@ -556,3 +556,118 @@ func TestEWHiggsBackReaction(t *testing.T) {
 		t.Errorf("a neutrino moved the condensate by %.2e: it has no Yukawa partner", mn-v)
 	}
 }
+
+// ewfSetAll writes a value to a variable on BOTH time slices at one site, as
+// the energy checks need: ElectroweakStaticEnergy reads slice 0 while the
+// kernel reads whichever the context says.
+func ewfSetAll(v float32, x, y, z int32, vr EWStates) {
+	for t := range 2 {
+		State.Set(v, int(z), int(y), int(x), int(vr), t)
+	}
+}
+
+// TestEWYukawaForceIsEnergyGradient pins the Yukawa back-reaction coefficient
+// the way TestElectroweakForceIsEnergyGradient pins the Yang-Mills ones: the
+// kernel's force on the Higgs must be -dU/dPsi for the energy functional.
+//
+// This one can be EXACT, where that one is a convergence test. The Yang-Mills
+// terms are built from Gradient10 while the force uses Laplacian19, and those
+// two are not adjoint-compatible, so the agreement is only O(a^2). The Yukawa
+// term has no derivative in it at all: -sqrt(2) y (e_R^dag e_L) is the local
+// fermion bilinear and nothing else, so the gradient is the source identically
+// and any disagreement is a wrong sign, a wrong factor, or a component pairing
+// the wrong way round.
+//
+// Measured as the DIFFERENCE between SelfField on and off, which cancels the
+// covariant Laplacian and the potential and leaves only the term in question.
+func TestEWYukawaForceIsEnergyGradient(t *testing.T) {
+	const sz = 10
+	const h = 1e-3
+	// every Higgs component, at several sites
+	comps := []EWStates{EWHsCa, EWHsCb, EWHs0a, EWHs0b}
+	vels := []EWStates{EWHvCa, EWHvCb, EWHv0a, EWHv0b}
+	sites := [][3]int32{{4, 4, 4}, {5, 4, 6}, {6, 5, 4}, {4, 6, 5}}
+
+	// a configuration with every component of both the Higgs and the three
+	// lepton fields nonzero and complex, so no term can hide behind a zero
+	build := func(self bool) *Sim {
+		ss := ewfSim(sz, nil)
+		ss.Params.SelfField.SetBool(self)
+		ss.Params.YukawaE = 0.7
+		ss.Params.Update()
+		State.SetZeros()
+		GetCtx(0).Init()
+		n := int32(sz) + 2
+		for z := int32(0); z < n; z++ {
+			for y := int32(0); y < n; y++ {
+				for x := int32(0); x < n; x++ {
+					a := float64(x)*0.31 + float64(y)*0.17 + float64(z)*0.23
+					for i, vr := range []EWStates{EWHsCa, EWHsCb, EWHs0a, EWHs0b,
+						EWNu1a, EWNu1b, EWNu2a, EWNu2b,
+						EWEL1a, EWEL1b, EWEL2a, EWEL2b,
+						EWER1a, EWER1b, EWER2a, EWER2b} {
+						v := 0.2 * math.Sin(a+0.7*float64(i))
+						ewfSetAll(float32(v), x, y, z, vr)
+					}
+				}
+			}
+		}
+		return ss
+	}
+
+	// the kernel's force on each Higgs component, at each site, for both flags
+	kf := map[bool][]float64{}
+	for _, self := range []bool{false, true} {
+		ss := build(self)
+		csq := float64(ss.Params.CSq)
+		save := State.Clone()
+		ewStep(ss)
+		cur := int(GetCtx(0).CurState)
+		var f []float64
+		for _, s := range sites {
+			for _, vv := range vels {
+				f = append(f, float64(State.Value(int(s[2]), int(s[1]), int(s[0]), int(vv), cur))/csq)
+			}
+		}
+		State.CopyFrom(save)
+		GetCtx(0).Init()
+		kf[self] = f
+	}
+
+	// and -dU/dPsi, the same difference, by finite differences on the energy
+	nf := map[bool][]float64{}
+	for _, self := range []bool{false, true} {
+		build(self)
+		var f []float64
+		for _, s := range sites {
+			for _, vr := range comps {
+				base := State.Value(int(s[2]), int(s[1]), int(s[0]), int(vr), 0)
+				ewfSetAll(base+h, s[0], s[1], s[2], vr)
+				up := ElectroweakStaticEnergyNear(s[0], s[1], s[2])
+				ewfSetAll(base-h, s[0], s[1], s[2], vr)
+				dn := ElectroweakStaticEnergyNear(s[0], s[1], s[2])
+				ewfSetAll(base, s[0], s[1], s[2], vr)
+				f = append(f, -(up-dn)/(2*h))
+			}
+		}
+		nf[self] = f
+	}
+
+	var sd, sf float64
+	for i := range kf[true] {
+		dk := kf[true][i] - kf[false][i] // the Yukawa force alone
+		dn := nf[true][i] - nf[false][i] // the Yukawa gradient alone
+		sd += (dk - dn) * (dk - dn)
+		sf += dn * dn
+	}
+	n := float64(len(kf[true]))
+	rms := math.Sqrt(sf / n)
+	rel := math.Sqrt(sd/n) / rms
+	t.Logf("Yukawa force RMS %.6e over %d probes, mismatch against -dU/dPsi %.3e relative", rms, int(n), rel)
+	if rms <= 0 {
+		t.Fatalf("no Yukawa force at all: the test is not exercising the term")
+	}
+	if rel > 1e-4 {
+		t.Errorf("the Higgs force is not the gradient of the Yukawa energy: off by %.3e", rel)
+	}
+}

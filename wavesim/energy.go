@@ -143,6 +143,29 @@ func ewSiteEnergy(x, y, z int32, g float32, p *Parameters) float32 {
 			e += 0.25 * fb * fb
 		}
 	}
+	// ---- Yukawa: the leptons' coupling to the condensate -------------------
+	//
+	// Present only with Params.SelfField, which is exactly when the kernel's
+	// force carries it. Unlike every other term here it is EXACT on the
+	// lattice: it has no derivative in it and is linear in Psi, so no stencil
+	// mismatch can enter and -dU/dPsi is the source term identically rather
+	// than in the continuum limit.
+	if p.SelfField.IsTrue() {
+		rd := func(v EWStates) float32 {
+			return State.Value(int(z), int(y), int(x), int(v), 0)
+		}
+		nu1 := math32.Vec2(rd(EWNu1a), rd(EWNu1b))
+		nu2 := math32.Vec2(rd(EWNu2a), rd(EWNu2b))
+		el1 := math32.Vec2(rd(EWEL1a), rd(EWEL1b))
+		el2 := math32.Vec2(rd(EWEL2a), rd(EWEL2b))
+		er1 := math32.Vec2(rd(EWER1a), rd(EWER1b))
+		er2 := math32.Vec2(rd(EWER2a), rd(EWER2b))
+		re := EWSpinBilinear(0, er1, er2, el1, el2)
+		rn := EWSpinBilinear(0, er1, er2, nu1, nu2)
+		yk := Sqrt2 * p.YukawaE
+		e += yk * (psi.X*rn.X + psi.Y*rn.Y + psi.Z*re.X + psi.W*re.Y)
+	}
+
 	// gauge fixing: (1/2)(div W^a)^2 and (1/2)(div B)^2
 	for a := 0; a < 3; a++ {
 		dv := gW[a][0].X + gW[a][1].Y + gW[a][2].Z
