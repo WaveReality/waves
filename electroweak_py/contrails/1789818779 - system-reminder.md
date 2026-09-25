@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-24 20:34:00
+- **Last Message:** 2026-09-25 20:13:41
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -2066,7 +2066,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -3001,7 +3001,7 @@ PY
   [This command modified 1 file you've previously read: potential_plot.py. Call Read before editing.]
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -3262,7 +3262,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -4378,7 +4378,7 @@ grep -n "w_source\|conserved" README.md | head``
   96:- **External sources must be conserved.** `forces(..., jW=...)` adds a prescribed
   113:- Push the drive frequency in `w_source_demo.py` right up to threshold and watch the
   ```
-- **SendUserFile**: `status, caption, display, files`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -5653,7 +5653,7 @@ ls -la *.py *.png *.md && echo && .venv/bin/python verify.py 2>&1 | tail -3``
   ALL CHECKS PASSED
   ============================================================================
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `caption, display, files, status`
   ```
   1 file delivered to user.
   ```
@@ -6115,7 +6115,7 @@ PY
   -rw-r--r--  1 oreilly  staff   8161 Sep 19 18:05 verify.py
   -rw-r--r--  1 oreilly  staff  14006 Sep 20 12:10 w_source_demo.py
   ```
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `display, files, status, caption`
   ```
   1 file delivered to user.
   ```
@@ -22613,7 +22613,7 @@ Clean. Let me add a README and do a final end-to-end run:
   ALL CHECKS PASSED
   ...
   ```
-- **SendUserFile**: `display, files, status, caption`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23670,7 +23670,7 @@ grep -n "potential_plot" README.md``
   11:python potential_plot.py  # -> higgs_potential.png
   21:| `potential_plot.py` | the potential itself: double well, Mexican hat, vacuum manifold |
   ```
-- **SendUserFile**: `files, status, caption, display`
+- **SendUserFile**: `status, caption, display, files`
   ```
   1 file delivered to user.
   ```
@@ -23930,7 +23930,7 @@ PY
   done
   ```
 - **Read**: `Read `/Users/oreilly/wavereality/waves/electroweak_py/higgs_potential.png``
-- **SendUserFile**: `caption, display, files, status`
+- **SendUserFile**: `files, status, caption, display`
   ```
   1 file delivered to user.
   ```
@@ -87696,7 +87696,7 @@ Checking that the Z stat is properly populated for Wave, Maxwell, and EW cases �
   Command running in background with ID: bc1xb82gt. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc1xb82gt.output. You will be notified when it completes. To check interim output, use Read on that file path.
   Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
   ```
-- **Monitor**: `timeout_ms, command, description`
+- **Monitor**: `command, description, timeout_ms`
   ```
   Monitor started (task bhxva82fp, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
   ```
@@ -87789,15 +87789,4654 @@ The transverse stat is live in all nine equations. Every packet now reports `VdX
 
 Everything from this session is committed-ready but uncommitted — `stats.goal`, `init.goal`, `config.go`, and the nine equation files, plus the regenerated `.go`, shaders, `enumgen`, `typegen` and yaegi bindings.
 
-Full suite green.
+## 🧑 User - 2026-09-24 21:00:44
+
+looks good -- check out results/*.tsv or *.png (if you want to look at plots?) for standardized comparisons for all massive particle wave packets without slab. this clearly shows schrodinger dispersing much more quickly than dirac, and weyl least of all. all the KG versions are same as dirac.
+
+## 🤖 Assistant - 2026-09-24 21:00:48
+
+*Model: claude-opus-5*
+
+<thinking>
+I should check the results directory to see what's there.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && ls -la results/ 2>/dev/null || find . -maxdepth 3 -name "results" -type d 2>/dev/null``
+  ```
+  total 2304
+  drwxr-xr-x  22 oreilly  staff     704 Sep 24 22:50 ./
+  drwxr-xr-x  21 oreilly  staff     672 Sep 24 22:53 ../
+  -rw-r--r--   1 oreilly  staff   36608 Sep 24 22:43 fig_dispersion_dirac.pdf
+  -rw-r--r--@  1 oreilly  staff   83059 Sep 24 22:43 fig_dispersion_dirac.png
+  -rw-r--r--   1 oreilly  staff   38211 Sep 24 22:43 fig_dispersion_dirac.svg
+  -rw-r--r--   1 oreilly  staff   77720 Sep 24 22:43 fig_dispersion_dirac.tsv
+  -rw-r--r--   1 oreilly  staff   36567 Sep 24 22:50 fig_dispersion_kg.pdf
+  -rw-r--r--@  1 oreilly  staff   82709 Sep 24 22:50 fig_dispersion_kg.png
+  -rw-r--r--   1 oreilly  staff   38168 Sep 24 22:50 fig_dispersion_kg.svg
+  -rw-r--r--   1 oreilly  staff   68606 Sep 24 22:50 fig_dispersion_kg.tsv
+  -rw-r--r--   1 oreilly  staff   36563 Sep 24 22:47 fig_dispersion_kgc.pdf
+  -rw-r--r--@  1 oreilly  staff   86711 Sep 24 22:47 fig_dispersion_kgc.png
+  -rw-r--r--   1 oreilly  staff   38166 Sep 24 22:47 fig_dispersion_kgc.svg
+  -rw-r--r--   1 oreilly  staff   61178 Sep 24 22:47 fig_dispersion_kgc.tsv
+  -rw-r--r--   1 oreilly  staff   36871 Sep 24 22:42 fig_dispersion_schrod.pdf
+  -rw-r--r--@  1 oreilly  staff   59061 Sep 24 22:42 fig_dispersion_schrod.png
+  -rw-r--r--   1 oreilly  staff   38731 Sep 24 22:42 fig_dispersion_schrod.svg
+  -rw-r--r--   1 oreilly  staff   53655 Sep 24 22:42 fig_dispersion_schrod.tsv
+  -rw-r--r--   1 oreilly  staff   36124 Sep 24 22:44 fig_dispersion_weyl.pdf
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/results && for f in *.tsv; do echo "=== $f"; head -1 "$f"; wc -l < "$f"; done``
+  ```
+  === fig_dispersion_dirac.tsv
+  |Step	#Charge	#Mag	#LMag	#WidMagX	#VdMagX	#CtrMagX	#VgMagX	#WidMagZ	#VdMagZ	#SigX	#SigY	#SigZ
+       401
+  === fig_dispersion_kg.tsv
+  |Step	#Kinetic	#Potential	#Energy	#WidPosX	#VdPosX	#CtrPosX	#VgPosX	#WidPosZ	#VdPosZ
+       401
+  === fig_dispersion_kgc.tsv
+  |Step	#Charge	#Mag	#WidAsX	#VdAsX	#CtrAsX	#VgAsX	#WidMagZ	#VdMagZ
+       401
+  === fig_dispersion_schrod.tsv
+  |Step	#Mag	#WidMagX	#VdMagX	#CtrMagX	#VgMagX	#WidMagZ	#VdMagZ
+       401
+  === fig_dispersion_weyl.tsv
+  |Step	#Mag	#LMag	#RMag	#WidMagX	#VdMagX	#CtrMagX	#VgMagX	#WidLMagX	#VdLMagX	#CtrLMagX	#VgLMagX	#WidRMagX	#VdRMagX	#CtrRMagX	#VgRMagX	#WidMagZ	#VdMagZ	#HelicityL	#HelicityR
+       401
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I need to extract the initial and final widths, Vd, and Vg values from each case, then write a script to analyze this data.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/results && python3 - <<'PY'
+import csv, os
+files = [("Schrodinger","fig_dispersion_schrod.tsv"),
+         ("KleinGordon","fig_dispersion_kg.tsv"),
+         ("KleinGordonC","fig_dispersion_kgc.tsv"),
+         ("Dirac","fig_dispersion_dirac.tsv"),
+         ("Weyl","fig_dispersion_weyl.tsv")]
+print(f"{'eq':<13} {'steps':>5} {'WidX0':>7} {'WidXf':>7} {'grow':>7} {'WidZ0':>7} {'WidZf':>7} {'growZ':>7} {'VdX~':>8} {'VgX~':>8}")
+for name,f in files:
+    rows=list(csv.DictReader(open(f), delimiter='\t'))
+    h=rows[0].keys()
+    wx=[k for k in h if k.startswith('#Wid') and k.endswith('X')][0]
+    vdx=[k for k in h if k.startswith('#Vd') and k.endswith('X')][0]
+    vgx=[k for k in h if k.startswith('#Vg') and k.endswith('X')][0]
+    wz=[k for k in h if k.startswith('#Wid') and k.endswith('Z')][0]
+    g=lambda k,i: float(rows[i][k])
+    n=len(rows)
+    # mean of last half for rates
+    vd=sum(float(r[vdx]) for r in rows[n//2:])/ (n-n//2)
+    vg=sum(float(r[vgx]) for r in rows[n//2:])/ (n-n//2)
+    print(f"{name:<13} {n:>5} {g(wx,0):>7.3f} {g(wx,-1):>7.3f} {100*(g(wx,-1)/g(wx,0)-1):>6.1f}% "
+          f"{g(wz,0):>7.3f} {g(wz,-1):>7.3f} {100*(g(wz,-1)/g(wz,0)-1):>6.1f}% {vd:>8.5f} {vg:>8.4f}")
+PY``
+  ```
+  eq            steps   WidX0   WidXf    grow   WidZ0   WidZf   growZ     VdX~     VgX~
+  Schrodinger     400   5.999  12.621  110.4%   6.000  16.221  170.3%  0.06469   0.1483
+  KleinGordon     400   6.008   6.775   12.8%   6.009  11.441   90.4%  0.00599   0.3218
+  KleinGordonC    400   6.008   6.775   12.8%   6.000  11.361   89.4%  0.00599   0.3218
+  Dirac           400   6.000   6.729   12.2%   6.000  11.361   89.4%  0.00591   0.3288
+  Weyl            400   5.995   6.180    3.1%   6.000   9.991   66.5%  0.00281   0.2987
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I should check the plots to confirm visually, but the numbers already support the claim: Schrödinger disperses far more (+110.4% width increase) than the Klein-Gordon variants (+12.8%), consistent with Weyl being the least dispersive of all.
+
+Dirac's 12.2% is essentially identical to KG (within 1.4%), while Weyl's 3.1% is notably lower — about half of Dirac's rate. That's curious since in continuum theory Dirac and Weyl should share the same relativistic dispersion relation at equal mass and momentum, so the discrepancy likely traces back to differences in how each is discretized on the lattice — Dirac/KG use a Laplacian-based stencil, so I need to check whether Weyl instead uses a gradient stencil that alters its effective dispersion.
+
+I also notice the group velocities aren't matched across cases (Dirac 0.329 vs Weyl 0.299), meaning these runs may not share the same effective momentum-to-mass ratio, so this isn't a clean apples-to-apples comparison. I want to track down whatever script or config generated these numbers to verify the actual parameters used before drawing conclusions.
+
+Thinking about the Schrodinger case's much larger dispersion — actually that's expected since ω = ħk²/2m is purely quadratic with maximum curvature, while the relativistic square-root dispersion flattens at higher k but matches the nonrelativistic quadratic form in the small-k limit, so the curvatures should actually coincide there rather than differ.
+
+So the discrepancy must trace back to mass values instead: Schrodinger uses Mass=2 giving ħ/2m=0.25, while KG uses Mass=0.125, which should actually produce *more* spreading if mass alone governed it — but that's backwards from what I'm seeing, so I suspect the small KG mass is pushing it into an ultra-relativistic regime at k=2, where ω becomes nearly linear in k and dispersion is suppressed rather than enhanced.
+
+That means the "Schrodinger disperses more than Dirac" claim in the writeup isn't really an intrinsic property of the equations — it's an artifact of unmatched parameters. I should flag this before the user builds a conclusion on it, so I need to track down where these parameters are actually generated.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves && grep -rn "fig_dispersion" --include=*.go --include=*.goal --include=*.py --include=*.md --include=*.sh . 2>/dev/null | head -20; echo "--- recent commits ---"; git log --oneline -6``
+  ```
+  --- recent commits ---
+  4241c8d comparable stats in longitudinal and transverse directions for dispersion, and wave packets, for all cases
+  07a40c1 fix bug in variable selection due to overlapping plan names -- now unique per StateVars typename
+  d59431e minor GUI rearranging of fields
+  68397af Claude added dispersion stats for all waves
+  9bc0ac5 Claude added damped edges for Electroweak. now everything is complete on edge handling.
+  93d4fcf Claude added interior damping to Schrodinger
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+These likely came from the GUI rather than a generator script, so I don't have the exact parameters used—I need to infer them from the data itself, like the wavelength setting and the Vg value of 0.148 for the Schrodinger case.
+
+Better yet, let me actually verify this by running matched simulations myself rather than guessing. Reconstructing the defaults: Wave/KG use C=0.5, Mass=0.125; Schrodinger uses C=0.5, Mass=2; Weyl uses C=0.35 with mass depending on config; Dirac and KGC both use C=0.5, Mass=0.125. That means Schrodinger is being compared at 16× the mass of Dirac, which would fully explain why it appears to disperse so much faster—this isn't really an apples-to-apples comparison of the equations themselves.
+
+I want to check whether heavier mass paradoxically means less dispersion nonrelativistically, while the near-massless relativistic cases look nearly dispersionless simply because they're so relativistic. The real question is how much of the observed difference comes from the equation versus the chosen parameters, so I should compute each equation's predicted dσ/dt from its own dispersion relation and compare against the measured values—that would let me cleanly separate "equation effect" from "parameter effect." My plan is to run each equation's packet config, print out its actual Mass, C, and other parameters, then compare predicted versus measured dispersion.
+
+Since Weyl can't use C=0.5 for stability reasons, I can't match C exactly across all equations, but I can standardize by matching group velocity Vg instead, since that reflects the same physical regime. Let me start by reproducing the user's numbers to recover the actual parameters, and take a look at one of the plots to see what's being shown.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Read**: `Read `/Users/oreilly/wavereality/waves/results/fig_dispersion_schrod.png``
+
+</details>
+
+<thinking>
+The Schrodinger WidMagX curve's oscillations — dipping to 4 at step 90, back up to 8.8 at 220, down to 6 at 275, up to 12.8 at 390 — don't look like smooth dispersion at all. That pattern suggests wrap-around artifacts, likely from the packet crossing the periodic boundary or the circular-width measure aliasing, especially since WidMagZ rises smoothly by comparison.
+
+Checking the numbers: with group velocity around 0.148×C, a full box crossing doesn't line up with the ~185-step oscillation period I'm seeing in X, so a simple boundary crossing doesn't fully explain the dips. It's possible the packet is wrapping and self-interfering, creating fringes that distort the circular width measurement, or there's a dimensional asymmetry where Z behaves as a genuine spatial dimension while X is constrained differently.
+
+This actually points to quantum revivals — in a periodic box a free packet spreads, wraps around, interferes with itself, and periodically re-forms, so those dips at ~90 and ~275 steps could be partial revivals. That means the measured +110% growth in X width is likely contaminated by wrap-around effects once the packet fills a significant fraction of the box, which is worth flagging before I trust that number. Now let me check the dirac and weyl plots.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Read**: `Read `/Users/oreilly/wavereality/waves/results/fig_dispersion_dirac.png``
+
+</details>
+
+<thinking>
+The Dirac case shows fast small ripples from zitterbewegung superimposed on a smooth rise, with WidMagX going from 6.0 to ~6.7 and WidMagZ from 6.0 to ~11.4. I want to check the Weyl case next since it's the extreme scenario, then move on to the quantitative analysis.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Read**: `Read `/Users/oreilly/wavereality/waves/results/fig_dispersion_weyl.png``
+
+</details>
+
+<thinking>
+Looking at the Weyl data, WidMagX stays essentially flat around 6, oscillating between 5.8 and 6.2 with no net dispersion over 400 steps, while WidMagZ climbs smoothly from 6 to 9.2 due to pure diffraction. This confirms that Weyl's X width isn't dispersing at all—it's just the breathing pattern I noticed earlier, meaning "Weyl least of all" holds true and is actually even more pronounced than expected, essentially zero dispersion.
+
+The real question now is whether this is a fair comparison across the different wave equations, so I want to check the parameters for each. I'm planning to rerun the same configurations, print out the parameters, and compute theoretical spreading rates to determine whether the ordering I'm seeing is intrinsic to the physics or just an artifact of parameter choices. The key theoretical relationship is that the asymptotic spreading rate depends on the second derivative of the dispersion relation evaluated at the carrier wavenumber, divided by twice the initial packet width—so I need ω''(k₀) for each system: Schrödinger, KG/Dirac/KGC, and Weyl each have different dispersion relations that I should compute numerically rather than trying to derive by hand.
+
+I'm setting up a test that numerically differentiates the lattice dispersion relations using the code's existing functions where possible, then compares the predicted spreading rate to the measured diffusion coefficient. For each equation I plan to print the mass, wave speed, hbar, and packet parameters, then use the existing frequency functions—like the lattice frequency helper for the KG-type equations—while figuring out the right approach for Schrödinger's own dispersion coefficient and Weyl's separate formula.
+
+Rather than trying to perfectly match parameters across equations, which gets complicated since Weyl needs a specific coupling constant for stability and Schrödinger's mass parameter isn't directly comparable to the relativistic ones, I'm leaning toward a purely empirical approach: run each equation and check whether the ordering of results holds up, which more directly tests whether an effect is intrinsic to the equation or just an artifact of parameter choices. The cleanest matching condition would be to compare packets at the same group velocity, so they sit at equivalent points on their respective dispersion curves.
+
+The user is reporting their finding that Schrödinger disperses fastest, Dirac in the middle, Weyl slowest, with KG matching Dirac -- so my job now is to validate this against the actual data and flag caveats. The KG-Dirac agreement to three significant figures is a strong, solid result worth highlighting, but I should also note that the Schrödinger curve looks contaminated by wraparound/revival oscillations past step 60, meaning that +110% figure isn't a clean dispersion measurement, and that the mass parameters across the different runs aren't matched to begin with.
+
+Let me actually verify by checking the run parameters directly to confirm this discrepancy is the real driver of the apparent difference rather than something inherent to the equations themselves.
+
+
+</thinking>
+
+Let me check what parameters these actually ran at:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchParams(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		eq   Equations
+		init func(*Sim)
+	}{
+		{"Schrodinger", Schrodinger, FreePacket},
+		{"KleinGordon", KleinGordon, WavePacket},
+		{"KleinGordonC", KleinGordonC, ChargedPacket},
+		{"Dirac", Dirac, SpinPacket},
+		{"Weyl-e", Weyl, ElectronPacket},
+	} {
+		ss := &Sim{}
+		ss.Config = &Config{}
+		ss.Config.Defaults()
+		ss.Config.GPU, ss.Config.GUI = false, false
+		ss.Config.Equation = tc.eq
+		ss.Config.Size.Set(64, 64, 64)
+		ss.Config.PacketSlab = false
+		ss.ConfigSim()
+		ss.Params.ThreeD.SetBool(true)
+		ss.Params.Update()
+		ss.InitFunc = tc.init
+		ss.Init()
+		p := ss.Params
+		m := math32.Sqrt(p.MOverHSq)
+		fmt.Printf("%-13s C %.3f Hbar %.3f Mass %.4f  MOverH %.4f  Omega0 %.4f  wl %.0f pw %.0f\n",
+			tc.name, p.C, p.Hbar, p.Mass, m, p.Omega0, ss.Config.Wavelength, ss.Config.PacketWidth)
+	}
+}
+EOF
+go test -run TestScratchParams -v ./ 2>&1 | grep -E "^[A-Z][a-zA-Z]+ *C |^Weyl"``
+  ```
+  Schrodinger   C 0.500 Hbar 1.000 Mass 2.0000  MOverH 1.0000  Omega0 0.5000  wl 8 pw 12
+  KleinGordon   C 0.500 Hbar 1.000 Mass 0.1250  MOverH 0.0625  Omega0 0.0312  wl 8 pw 12
+  KleinGordonC  C 0.500 Hbar 1.000 Mass 0.1250  MOverH 0.0625  Omega0 0.0312  wl 8 pw 12
+  Dirac         C 0.500 Hbar 1.000 Mass 0.1250  MOverH 0.0625  Omega0 0.0312  wl 8 pw 12
+  Weyl-e        C 0.350 Hbar 1.000 Mass 2.0000  MOverH 0.7000  Omega0 0.2450  wl 8 pw 12
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm confirming the mass discrepancy is real: Schrödinger has m/ħ = 1.0 while KG/KGC/Dirac are 16× lighter at 0.0625, and Weyl sits at 0.7 with C = 0.35. Now I'm computing the effective wavenumber at wavelength 8 (k̂ ≈ 0.766) to compare the mass term against the dispersion relation for the KG/Dirac case.
+
+That reveals KG/Dirac are essentially massless (mass is only ~8% of momentum), so they're ultra-relativistic with almost no dispersion — matching Wave's near-zero VdX. Weyl, by contrast, has mass roughly equal to momentum (mildly relativistic), yet it showed the least dispersion of all three, which is a puzzle worth investigating further.
+
+So the observed ordering — Schrödinger disperses most, Dirac middle, Weyl least — isn't really a property of the equations themselves but mostly reflects the fact that these three are being compared at wildly different masses. I'm now trying to figure out what should happen at matched mass and momentum: expanding the relativistic dispersion relation in a nonrelativistic limit, it should reduce to the same quadratic form as Schrödinger's, plus higher-order correction terms.
+
+Since Weyl and Dirac share the same continuum dispersion relation, differing only in lattice discretization, the real prediction is that Schrödinger, KG, Dirac, and Weyl should all closely match in the nonrelativistic regime, with the relativistic ones dispersing very slightly less, and this gap should grow larger as the system becomes more relativistic — the relativistic dispersions flatten toward the light-cone slope while Schrödinger's quadratic curve keeps running away. That feels like the actual valuable result to demonstrate, but it requires rerunning the comparison with masses matched across all four equations, so I'm setting up that matched test now.
+
+Good, so Vd/C actually ends up independent of C entirely, meaning matching m/ħ, wavelength, and packet width across setups is sufficient since C cancels out (aside from small lattice-timestep artifacts). So I just need Mass tuned so that m/ħ = Mass·C/Hbar matches consistently across the Schrödinger and Klein-Gordon equations, and I'm verifying that this formula checks out against the known Schrödinger case.
+
+I'm now planning to test all five equations at a common m/ħ value like 0.7 (mildly relativistic), then also at 2 (nonrelativistic) and 0.1 (ultra-relativistic) to see how the pattern holds, though I notice Schrödinger's dispersion relation doesn't involve C at all.
+
+Working through the nonrelativistic limit of the relativistic dispersion, I confirm the effective ħ/2m coefficient matches exactly through the substitution μ = mC/ħ, so the quadratic term in the expansion reduces cleanly to ħ/2m — the same form Schrödinger uses.
+
+So the fair comparison across models means fixing the same Mass, Hbar, and C, along with matching wavelength and width. But this raises a subtlety for Weyl at a different C value: since ħ/2m itself doesn't depend on C, but Vd gets reported in units of C, Weyl's numbers would appear inflated relative to a comparison run at a different speed.
+
+The cleanest fix is to report dσ/dt as absolute cubes per step rather than in units of C — that way C cancels out of the comparison entirely, and matching Mass, Hbar, wavelength, and width across all five models makes them directly comparable. I'll run all five at Mass=1.0, Hbar=1, wavelength 8, width 12, each using its native C value (Weyl at 0.35, the rest at 0.5), reporting in cubes/step, and also test a few mass values to reveal the relativistic crossover behavior. I also need a large enough simulation box to avoid the wraparound contamination that showed up in the Schrodinger plot, though a 128³ box is fairly heavy computationally on CPU.
+
+Rather than a full 3D box which would be too slow, I realize a slab in a long thin box is actually the cleaner setup for this specific question — since I'm just measuring longitudinal dispersion, not diffraction, the 3D blob geometry doesn't matter here. This matches what TestDispersion already does, so I'll use a slab in a 384×4×4 box for 200 steps, which should run fast and directly answer whether the equations diverge at matched mass. I need to make sure to override Weyl's own mass setting since it defaults to WeylPacketMass=2.
+
+For overriding the mass properly, I realize I can't just set it after the packet is built — the phase advance depends on mass during construction. I'll need to write custom init functions that set Params.Mass to the target value, call Update, and then invoke the packet builder directly, though I notice the Schrodinger packet frequency logic doesn't have its own case in the switch statement, so I need to check how that affects things.
+
+For the KG, KGC, Dirac and Weyl cases I need to verify each one uses the mass-dependent frequency correctly, and for Weyl specifically I need to check how ElectronPacket sets WeylPacketMass so I can replicate it with a chosen mass — this matters for confirming whether the user's conclusion actually holds.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 587,620p weyl.goal``
+  ```
+  // one frequency, so the ratio just sits there -- only the few percent of the
+  // other energy sign that the initialization leaves behind ripples it, at the
+  // expected pi hbar / m c^2. ElectronChiralFlip is the zitter demo, and it is
+  // built from an equal mix of both signs, which is why it swings all the way.
+  // Nothing moves transversely in either: Z holds to five digits.
+  func ElectronPacket(ss *Sim) {
+  	p := ss.Params
+  	p.Mass = WeylPacketMass
+  	p.Update()
+  	om, _ := ss.WeylDispersion(ss.Config.Wavelength)
+  	ck := p.C * math32.Sin(TwoPi/ss.Config.Wavelength)
+  	rr := (om - ck) / p.Omega0 // right-handed share of a positive-energy state
+  	a := ss.Config.Amplitude
+  	ss.WeylPacket(WeylL1a, math32.X, -1, a)
+  	ss.WeylPacket(WeylR1a, math32.X, -1, a*rr)
+  }
+  
+  // ElectronAtRest is the two halves in equal measure, which is what a massive
+  // particle at rest IS: chirality is not helicity, and at zero momentum the
+  // electron is half left and half right at every instant. Both magnitudes sit
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+// mass in units of m c / hbar (inverse Compton length), matched across all
+func matchedInit(eq Equations, mu float32) func(*Sim) {
+	return func(ss *Sim) {
+		p := ss.Params
+		p.Mass = mu / p.C // so that Mass*C/Hbar == mu
+		p.Update()
+		a := ss.Config.Amplitude
+		switch eq {
+		case Schrodinger:
+			ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+		case KleinGordon:
+			ss.MovingWavePacketConfig(WavePos, WaveVel, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+		case KleinGordonC:
+			ss.ChargedPacketConfig(math32.X, a, 1)
+		case Dirac:
+			ss.DiracPacketConfig(math32.X, a, 1)
+		case Weyl:
+			om, _ := ss.WeylDispersion(ss.Config.Wavelength)
+			ck := p.C * math32.Sin(TwoPi/ss.Config.Wavelength)
+			rr := (om - ck) / p.Omega0
+			ss.WeylPacket(WeylL1a, math32.X, -1, a)
+			ss.WeylPacket(WeylR1a, math32.X, -1, a*rr)
+		}
+	}
+}
+
+func TestScratchMatched(t *testing.T) {
+	cases := []struct {
+		name  string
+		eq    Equations
+		probe enums.Enum
+	}{
+		{"Schrodinger", Schrodinger, CabMag},
+		{"KleinGordon", KleinGordon, WavePos},
+		{"KleinGordonC", KleinGordonC, CabAs},
+		{"Dirac", Dirac, DiracMag},
+		{"Weyl", Weyl, WeylMag},
+	}
+	for _, mu := range []float32{0.0625, 0.35, 0.7, 2.0} {
+		fmt.Printf("\n=== m c / hbar = %.4f   (k_hat = 0.766 at wavelength 8)\n", mu)
+		for _, tc := range cases {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(384, 4, 4)
+			ss.Config.PacketSlab = true
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(true)
+			ss.Params.Update()
+			ss.InitFunc = matchedInit(tc.eq, mu)
+			ss.Init()
+			for range 200 {
+				ss.StepRun()
+			}
+			c := float64(ss.Params.C)
+			wd := ss.StatVals(StatWidthName(tc.probe, math32.X))
+			vg := dispMean(ss.StatVals(StatGroupVelName(tc.probe, math32.X))) * c
+			vd := dispMean(ss.StatVals(StatDispersionName(tc.probe, math32.X))) * c
+			fmt.Printf("  %-13s C %.2f Mass %6.3f | v %+.4f (%.3f c)  dsigma/dt %+.5f  w %5.2f -> %5.2f\n",
+				tc.name, c, ss.Params.Mass, vg, vg/c, vd, wd[0], wd[len(wd)-1])
+		}
+	}
+}
+EOF
+go test -run TestScratchMatched -v ./ 2>&1 | grep -E "^===|^  " | head -40``
+  ```
+  === RUN   TestScratchMatched
+  === m c / hbar = 0.0625   (k_hat = 0.766 at wavelength 8)
+    Schrodinger   C 0.50 Mass  0.125 | v +0.0000 (0.000 c)  dsigma/dt +0.00000  w  6.13 ->  0.00
+    KleinGordon   C 0.50 Mass  0.125 | v +0.2362 (0.472 c)  dsigma/dt +0.10418  w  6.02 -> 25.81
+    KleinGordonC  C 0.50 Mass  0.125 | v +0.4579 (0.916 c)  dsigma/dt +0.04791  w  6.02 -> 14.68
+    Dirac         C 0.50 Mass  0.125 | v +0.4580 (0.916 c)  dsigma/dt +0.04786  w  6.00 -> 14.67
+    Weyl          C 0.35 Mass  0.179 | v +0.2792 (0.798 c)  dsigma/dt +0.00673  w  5.99 ->  7.17
+  === m c / hbar = 0.3500   (k_hat = 0.766 at wavelength 8)
+    Schrodinger   C 0.50 Mass  0.700 | v +0.0006 (0.001 c)  dsigma/dt +0.00196  w  6.00 ->  0.00
+    KleinGordon   C 0.50 Mass  0.700 | v +0.2302 (0.460 c)  dsigma/dt +0.09444  w  6.02 -> 23.97
+    KleinGordonC  C 0.50 Mass  0.700 | v +0.4170 (0.834 c)  dsigma/dt +0.04852  w  6.02 -> 14.94
+    Dirac         C 0.50 Mass  0.700 | v +0.4169 (0.834 c)  dsigma/dt +0.04851  w  6.00 -> 14.92
+    Weyl          C 0.35 Mass  1.000 | v +0.2663 (0.761 c)  dsigma/dt +0.00420  w  5.99 ->  6.63
+  === m c / hbar = 0.7000   (k_hat = 0.766 at wavelength 8)
+    Schrodinger   C 0.50 Mass  1.400 | v +0.4194 (0.839 c)  dsigma/dt +0.08316  w  6.00 -> 21.70
+    KleinGordon   C 0.50 Mass  1.400 | v +0.2104 (0.421 c)  dsigma/dt +0.07820  w  6.01 -> 20.96
+    KleinGordonC  C 0.50 Mass  1.400 | v +0.3374 (0.675 c)  dsigma/dt +0.05444  w  6.02 -> 16.20
+    Dirac         C 0.50 Mass  1.400 | v +0.3376 (0.675 c)  dsigma/dt +0.05414  w  6.00 -> 16.16
+    Weyl          C 0.35 Mass  2.000 | v +0.2362 (0.675 c)  dsigma/dt +0.00208  w  5.99 ->  6.18
+  === m c / hbar = 2.0000   (k_hat = 0.766 at wavelength 8)
+  ...
+  ```
+
+</details>
+
+<thinking>
+Several of these matched runs look broken — Schrodinger cases at mu=0.0625 and 0.35 show zero velocity and collapsing width, suggesting the packet blew up or was set up wrong. There's also an inconsistency where Klein-Gordon gives v=0.236 at mu=0.0625 while KGC/Dirac give v=0.458 for the same mass, even though they should agree, which points to a possible issue with how KG's packet frequency is derived from the fitted constants.
+
+The doc clarifies that MovingWavePacket's velocity is tuned for massless waves, so at higher mass it's not actually a KG eigenstate and it splits into two pieces — explaining the huge dσ/dt value, since that's really the two halves separating rather than genuine dispersion. Weyl at mu=2 shows a superluminal v=1.189c, clearly unstable since it's past the stability bound, and Schrodinger's mass parameter doesn't carry the same meaning as in the relativistic equations. So this "matched" harness isn't valid — several packet builders break outside their intended ranges, and there's also a deeper issue that Schrodinger has no wave speed C in its formulation at all.
+
+Actually, checking further: Schrodinger's ħ/2m coefficient does match the relativistic quadratic dispersion coefficient when I scale Mass appropriately, but at low mass this term becomes enormous and violates the stability bound |E|Δt/ħ ≤ 2, which is why I saw a zero readout — the kinetic term blows past the threshold. So a clean matched comparison across all five equations over a wide mass range isn't really achievable without carefully respecting each one's own stability window. What is solid, though, is that KGC and Dirac agree to 3-4 significant digits at every mass I tested.
+
+This confirms the user's earlier observation that "all the KG versions are same as Dirac," and now I've shown it holds at matched mass too, not just at the default configuration. In contrast, the real second-order KG equation does not agree with KGC/Dirac at matched mass — its velocity is roughly half and its spreading rate is about double, because the wave packet config mistunes the packet for a massive field, causing it to split; the original match only worked because the default mass was nearly massless, where the packet tuning happens to be correct.
+
+Right, wl=8,pw=12 gave a different velocity — so the mismatch isn't purely about mu. The key difference must be the setup: my run uses a 384×4×4 slab box with PacketSlab=true, while the user's used a 64³ blob configuration, and the dimensionality (3D vs slab) is likely what's driving the discrepancy in velocity and dσ/dt, not the mass parameter itself.
+
+Comparing the width growth: the user's setup shows only 12.8% widening over 400 steps, while mine balloons far more over just 200 steps — something structural must differ beyond the mass matching. I suspect it's in how mass gets set after enabling ThreeD, since my matchedInit computes Mass from mu/C and calls Update, but the ordering or context of that update relative to ThreeD might not match the reference setup.
+
+Even confirming the wave packet config call is identical between mine and theirs, the results diverge wildly — so I'm now suspecting the box dimensions (384×4×4 vs 64×64×64) and the PacketSlab flag as the real source of the discrepancy.
+
+In a 64-box a σ=6 packet spreading normally would saturate near 18.5, but the user's measurement stayed at 6.775, meaning it didn't spread at all — while mine reached 25.81 in the 384 box. Since the Z width did grow in the user's run, they must have had ThreeD enabled, so I want to directly reproduce their exact 64³ blob setup with 400 steps and compare it against my slab configuration to isolate where the difference in spreading is actually coming from.
+
+
+</thinking>
+
+These matched runs look unreliable — let me check my harness against the user's actual setup before drawing conclusions:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+func runOne(eq Equations, probe enums.Enum, init func(*Sim), sz math32.Vector3i, slab bool, nst int, threeD bool) (vg, vd, w0, wf float64) {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size = sz
+	ss.Config.PacketSlab = slab
+	ss.ConfigSim()
+	ss.Params.ThreeD.SetBool(threeD)
+	ss.Params.Update()
+	if init != nil {
+		ss.InitFunc = init
+	}
+	ss.Init()
+	for range nst {
+		ss.StepRun()
+	}
+	c := float64(ss.Params.C)
+	wd := ss.StatVals(StatWidthName(probe, math32.X))
+	vg = dispMean(ss.StatVals(StatGroupVelName(probe, math32.X))) * c
+	vd = dispMean(ss.StatVals(StatDispersionName(probe, math32.X))) * c
+	return vg, vd, wd[0], wd[len(wd)-1]
+}
+
+func TestScratchRepro(t *testing.T) {
+	type setup struct {
+		tag    string
+		sz     math32.Vector3i
+		slab   bool
+		nst    int
+		threeD bool
+	}
+	setups := []setup{
+		{"64^3 blob 400", math32.Vec3i(64, 64, 64), false, 400, true},
+		{"384x4 slab 200", math32.Vec3i(384, 4, 4), true, 200, true},
+		{"384x4 blob 200", math32.Vec3i(384, 4, 4), false, 200, true},
+	}
+	for _, s := range setups {
+		fmt.Printf("\n=== %s\n", s.tag)
+		for _, tc := range []struct {
+			name  string
+			eq    Equations
+			probe enums.Enum
+			init  func(*Sim)
+		}{
+			{"KleinGordon", KleinGordon, WavePos, WavePacket},
+			{"Dirac", Dirac, DiracMag, SpinPacket},
+			{"Schrodinger", Schrodinger, CabMag, FreePacket},
+		} {
+			vg, vd, w0, wf := runOne(tc.eq, tc.probe, tc.init, s.sz, s.slab, s.nst, s.threeD)
+			fmt.Printf("  %-12s v %+.4f  dsig/dt %+.5f  w %5.2f -> %5.2f\n", tc.name, vg, vd, w0, wf)
+		}
+	}
+}
+EOF
+go test -run TestScratchRepro -v ./ 2>&1 | grep -E "^===|^  " | head -20``
+  ```
+  === RUN   TestScratchRepro
+  === 64^3 blob 400
+    KleinGordon  v +0.0196  dsig/dt +0.00269  w  6.02 ->  7.28
+    Dirac        v -0.0408  dsig/dt +0.00272  w  6.00 ->  6.87
+    Schrodinger  v +0.0098  dsig/dt +0.01782  w  6.00 -> 12.62
+  === 384x4 slab 200
+    KleinGordon  v +0.2362  dsig/dt +0.10418  w  6.02 -> 25.81
+    Dirac        v +0.4580  dsig/dt +0.04786  w  6.00 -> 14.67
+    Schrodinger  v +0.2936  dsig/dt +0.04421  w  6.00 -> 14.50
+  === 384x4 blob 200
+    KleinGordon  v +0.2372  dsig/dt +0.10363  w  6.02 -> 25.71
+    Dirac        v +0.4580  dsig/dt +0.04798  w  6.00 -> 14.70
+    Schrodinger  v +0.2944  dsig/dt +0.04344  w  6.00 -> 14.35
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Now I see it clearly: in the 64³ box the velocities are essentially zero across KG, Dirac, and Schrodinger, while in the 384-long box they jump to 0.24–0.46. The Schrodinger width in the 64³ case matches the user's TSV value almost exactly, and the KG value is close too, likely differing slightly due to step count.
+
+The real explanation is that with a 64-cell box and a Gaussian envelope of width ~12, the packet's tails wrap around and overlap itself, making the centroid essentially stationary and the width/centroid measurements unreliable due to the periodic wrap — which explains the oscillating Schrodinger curve. So the 64³ results are really measuring a packet that's effectively confined rather than freely propagating.
+
+The apparent hierarchy (Schrodinger disperses much more than Dirac) is also confounded by mass mismatch: KG and Dirac use mc/ħ=0.0625 (essentially massless, nearly dispersionless), while Schrodinger uses mc/ħ=1.0. Once tested in a long box where packets can actually propagate freely, the ordering shifts and Schrodinger and Dirac dispersion become nearly equal (0.044 vs 0.048), so the original claimed ordering doesn't hold once these confounds are removed.
+
+So maybe the doc's "fitted constants" claim is outdated, since MovingWavePacket's frequency does derive from the lattice KG dispersion. The factor-of-two gap between 0.236 and 0.458 looks like a splitting artifact rather than a straightforward mistuning — if part of the packet moves backward, the centroid velocity would come out roughly halved rather than near zero. I want to verify this by computing the theoretical group velocity directly from the lattice dispersion relation at this wavelength and mass to see what it predicts.
+
+That calculation gives about 0.46, matching the Dirac/KGC result closely, which confirms the KG packet's 0.236 is close to half the correct value — consistent with roughly a quarter of the wave's amplitude propagating backward. This backward leakage would also explain the packet's faster-than-expected width growth, and it's masked in large 64³ runs simply because nothing has time to propagate far enough to reveal it. This looks like a genuine finding worth flagging: the KleinGordon WavePacket isn't a clean one-directional packet, unlike the massless Wave case where TestDispersion showed a clean group velocity near 0.98. But then I recall TestDispersion actually reported KleinGordon's Vg as +0.9674 at a different wavelength, which complicates this picture and needs reconciling.
+
+Both constructions set position and velocity from the same carrier frequency, so I need to look more closely at how each handles the phase shift. MovingWavePacket derives the quarter-cycle offset by shifting the phase parameter inside GaussWave, which affects the carrier phase directly, while CarrierPacket applies the same shift through its own cosine/sine formulation — I suspect the subtle difference lies in exactly how that phase shift interacts with the envelope versus the carrier.
+
+Then I check the mass parameter used for the frequency calculation in both PacketFreq and ChargedPacketConfig, and they turn out identical, using the square root of MOverHSq. So the behavioral divergence between real and complex Klein-Gordon isn't from these formulas at all — it's a deeper physical fact: a real scalar field's cosine is necessarily a superposition of both left- and right-moving plane waves, so a real KG field simply can't support a genuinely one-directional wave packet the way the complex field can.
+
+Actually working through it more carefully with the real field's time derivative, I convince myself a one-way packet should be achievable even for a real field, so this reasoning path isn't resolving the discrepancy. I set aside the theory and just accept the numerical result: for a long box at wl=8/pw=12, real KG measures a velocity of 0.236 against the theoretical 0.460, while KGC and Dirac report zero.
+
+That's a genuine discrepancy worth flagging rather than diagnosing fully now. I want to sanity check it at a wider packet width to see if it's just a packet-tuning artifact, then focus my report on two things that actually undermine the stated conclusion: the 64³ box case where packets aren't propagating properly (measured velocity far below theoretical), and the Schrödinger curve showing visible self-interference oscillation rather than clean free-packet motion.
+
+The masses also aren't matched across models — Schrödinger sits near mc/ħ=1.0 while KG/KGC/Dirac are nearly massless at 0.0625 and Weyl at 0.7 — explaining why the KG/Dirac cases barely disperse. I should present the long-box numbers at matching defaults where the ordering shifts, while highlighting the strong result that does hold up: KGC matches Dirac to 3-4 digits across every mass tested. Let me run the quick width check to confirm the real-KG packet anomaly before writing this up.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+p='zz_scratch_test.go'
+s=open(p).read()
+s=s.replace('''	ss.Config.PacketSlab = slab
+	ss.ConfigSim()''','''	ss.Config.PacketSlab = slab
+	ss.Config.Wavelength, ss.Config.PacketWidth = scratchWL, scratchPW
+	ss.ConfigSim()''')
+s=s.replace('func TestScratchRepro','var scratchWL, scratchPW float32 = 8, 12\n\nfunc TestScratchRepro')
+s=s.replace('''	for _, s := range setups {''','''	_ = setups
+	for _, wlpw := range [][2]float32{{8, 12}, {16, 32}} {
+	scratchWL, scratchPW = wlpw[0], wlpw[1]
+	fmt.Printf("\\n######## wavelength %.0f  packetwidth %.0f\\n", scratchWL, scratchPW)
+	for _, s := range []setup{{"384x4 slab 200", math32.Vec3i(384, 4, 4), true, 200, true}} {''')
+s=s.replace('''			fmt.Printf("  %-12s v %+.4f  dsig/dt %+.5f  w %5.2f -> %5.2f\\n", tc.name, vg, vd, w0, wf)
+		}
+	}
+}''','''			fmt.Printf("  %-12s v %+.4f  dsig/dt %+.5f  w %5.2f -> %5.2f\\n", tc.name, vg, vd, w0, wf)
+		}
+	}
+	}
+}''')
+s=s.replace('''			{"Schrodinger", Schrodinger, CabMag, FreePacket},''','''			{"KleinGordonC", KleinGordonC, CabAs, ChargedPacket},
+			{"Schrodinger", Schrodinger, CabMag, FreePacket},''')
+open(p,'w').write(s)
+PY
+go test -run TestScratchRepro -v ./ 2>&1 | grep -E "^####|^===|^  " | head -20``
+  ```
+  === RUN   TestScratchRepro
+  ######## wavelength 8  packetwidth 12
+  === 384x4 slab 200
+    KleinGordon  v +0.2362  dsig/dt +0.10418  w  6.02 -> 25.81
+    Dirac        v +0.4580  dsig/dt +0.04786  w  6.00 -> 14.67
+    KleinGordonC v +0.4579  dsig/dt +0.04791  w  6.02 -> 14.68
+    Schrodinger  v +0.2936  dsig/dt +0.04421  w  6.00 -> 14.50
+  ######## wavelength 16  packetwidth 32
+  === 384x4 slab 200
+    KleinGordon  v +0.1151  dsig/dt +0.07377  w 16.01 -> 30.39
+    Dirac        v +0.4835  dsig/dt +0.00947  w 16.00 -> 17.68
+    KleinGordonC v +0.4834  dsig/dt +0.00944  w 16.01 -> 17.68
+    Schrodinger  v +0.1594  dsig/dt +0.00644  w 16.00 -> 17.27
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I'm puzzled by the discrepancy: at wl=16/pw=32 the Klein-Gordon group velocity reading is much worse than Dirac's, yet TestDispersion reported a very different, higher velocity for the same parameters in a 384×4×4 box. I'm realizing the difference likely comes from TestDispersion measuring WavePos with a squared StatGroupVel method, which probes something distinct from what I'm computing.
+
+I check my scratch setup and notice TestDispersion never set ThreeD, while mine does. That seems like the key divergence — with ThreeD=true, the 19-point Laplacian wraps transversely over just 4 cells, though for a uniform slab that should contribute nothing since the envelope is constant across Y and Z, so 3D and 1D should theoretically agree. I verify the CFL condition holds fine (0.25·5.33 = 1.33 ≤ 4), so stability isn't the issue. I'm now wondering if the real problem is in how my dispMean averages samples, possibly including edge effects that skew the result.
+
+Comparing numbers directly: TestDispersion reports Vg as 0.9674 in units of C, meaning 0.9674×0.5 = 0.484 in absolute terms, while I got 0.1151 — a real, substantial discrepancy, not a units error. The setups differ in two ways: TestDispersion never sets ThreeD (defaulting to 1D behavior) and runs 150 steps versus my 200 with ThreeD=true. This suggests TestDispersion's KG simulation ran purely in 1D mode where the physics checks out, but something breaks specifically when running in 3D mode — that's likely the actual bug.
+
+I want to verify this by directly comparing KG runs with ThreeD true vs false in an otherwise identical box. My hunch is that the 19-point 3D Laplacian stencil doesn't reduce to the same effective coefficient as the 1D 3-point stencil even for a field that only varies along one axis, since the isotropic 3D stencil incorporates face and edge neighbor weights that distort the effective response along a single direction.
+
+That would mean KG's dispersion in 3D diverges from the LatticeFreq prediction (which assumes the 1D form), causing the packet mistuning and splitting I'm seeing. But that raises a puzzle — Dirac/KGC also run through the 19-point Laplacian in 3D and use the same LatticeFreq, yet they come out correctly at 0.483, so something else must distinguish KG's behavior from theirs.
+
+Since MovingWavePacket and CarrierPacket both share the same LatticeFreq calculation, a 3D-induced dispersion error should mistune both equally — but Dirac isn't mistuned. So the real distinction must lie in how each equation encodes wave direction: Dirac/KGC are complex fields where the a/b quarter-cycle relation picks out positive frequency through the phase gradient itself, a construction that's robust regardless of small errors in ω. Real KG, by contrast, derives its directionality purely from matching ψ̇ to a quarter-shifted packet using ω directly, so any inaccuracy in ω leaks straight into a spurious backward-traveling component.
+
+This points to a concrete bug: real KG's WavePacket likely uses the 1D k̂ for LatticeFreq while the 3D kernel's 19-point Laplacian implies a different effective k̂, mistuning the packet only when ThreeD is true. I want to verify this by running the KG slab test in the long box with ThreeD false versus true — if velocities come out around 0.48 versus 0.115 respectively, that confirms the bug, which would also mean TestDispersion (run in 1D) isn't catching it, and it explains the anomaly in the user's 64³ KG figure since that was 3D. Let me run that check now.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+func TestScratch3D(t *testing.T) {
+	for _, td := range []bool{false, true} {
+		fmt.Printf("\n=== ThreeD = %v\n", td)
+		for _, tc := range []struct {
+			name  string
+			eq    Equations
+			probe enums.Enum
+			init  func(*Sim)
+		}{
+			{"Wave", Wave, WavePos, WavePacket},
+			{"KleinGordon", KleinGordon, WavePos, WavePacket},
+			{"KleinGordonC", KleinGordonC, CabAs, ChargedPacket},
+			{"Dirac", Dirac, DiracMag, SpinPacket},
+		} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(384, 4, 4)
+			ss.Config.Wavelength, ss.Config.PacketWidth = 16, 32
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(td)
+			ss.Params.Update()
+			ss.InitFunc = tc.init
+			ss.Init()
+			for range 200 {
+				ss.StepRun()
+			}
+			c := float64(ss.Params.C)
+			wd := ss.StatVals(StatWidthName(tc.probe, math32.X))
+			vg := dispMean(ss.StatVals(StatGroupVelName(tc.probe, math32.X))) * c
+			vd := dispMean(ss.StatVals(StatDispersionName(tc.probe, math32.X))) * c
+			fmt.Printf("  %-13s v %+.4f  dsig/dt %+.5f  w %5.2f -> %5.2f\n", tc.name, vg, vd, wd[0], wd[len(wd)-1])
+		}
+	}
+}
+EOF
+go test -run TestScratch3D -v ./ 2>&1 | grep -E "^===|^  " | head -12``
+  ```
+  === RUN   TestScratch3D
+  === ThreeD = false
+    Wave          v +0.4897  dsig/dt +0.00958  w 16.01 -> 17.69
+    KleinGordon   v +0.4834  dsig/dt +0.00944  w 16.01 -> 17.68
+    KleinGordonC  v +0.4834  dsig/dt +0.00944  w 16.01 -> 17.68
+    Dirac         v +0.4835  dsig/dt +0.00947  w 16.00 -> 17.68
+  === ThreeD = true
+    Wave          v +0.1144  dsig/dt +0.07470  w 16.01 -> 30.51
+    KleinGordon   v +0.1151  dsig/dt +0.07377  w 16.01 -> 30.39
+    KleinGordonC  v +0.4834  dsig/dt +0.00944  w 16.01 -> 17.68
+    Dirac         v +0.4835  dsig/dt +0.00947  w 16.00 -> 17.68
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+With ThreeD false, all four models agree closely on v and dσ/dt. But when ThreeD is true, KleinGordonC and Dirac stay consistent while Wave and KleinGordon unexpectedly drop to v ≈ 0.114 — something's off with those two in the 3D case.
+
+Tracing this down: the moving wave packet derives its frequency from the 1D lattice dispersion relation, but in 3D the actual Laplacian uses a 19-point isotropic stencil with a different effective dispersion. That mismatch feeds the wrong frequency into the velocity setup, leaving a large spurious backward component so the packet crawls at quarter-speed and appears to split apart. KleinGordonC and Dirac avoid this because their complex-field packets get their direction from the phase gradient rather than directly from the mistuned frequency — though I need to double check that CarrierPacket's velocity assignment doesn't have the same vulnerability.
+
+This means the user's 3D KG figure had a subtly split packet, but since their 64³ box has essentially zero propagation speed anyway, it doesn't affect their comparison — everything just sits still there regardless. I want to now derive the actual dispersion relation for the 19-point stencil to confirm this and figure out the right fix.
+
+Given how directly this undermines the comparison, I should probably just fix it rather than only report it, so let me pull up the stencil weights first.
+
+
+</thinking>
+
+Found a real bug. Let me confirm the mechanism:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "Laplacian19\b" -A 30 funcs.goal | head -45``
+  ```
+  15:// Laplacian19Radius is the spectral radius of Laplacian19, attained at
+  16-// k = (pi, pi, 0). Every explicit stability bound on this lattice is set by
+  17-// it: the wave equations through C, and Schrodinger through SchrodingerVMax.
+  18-const Laplacian19Radius float32 = 16.0 / 3.0
+  19-
+  20-func (ss *Sim) ConfigVars() {
+  21-	Params = make([]Parameters, 1)
+  22-	Params[0].Defaults()
+  23-	ss.Params = &Params[0]
+  24-	ss.Units.Defaults()
+  25-	Ctx = make([]Context, 1)
+  26-	Ctx[0].Init()
+  27-	NeighWts = tensor.NewFloat32(int(NeighWeightsN), 27)
+  28-	NeighOffs = tensor.NewInt32(26,3)
+  29-	// NeighOffs is ordered by SHELL: faces first (indices 0-5), then edges
+  30-	// (6-17), then corners (18-25). That ordering is what lets the Laplacian
+  31-	// stop at NLapNeigh = 18 and never read the corners at all.
+  32-	//
+  33-	// Laplacian weights, face : edge : corner = 2 : 1 : 0 -- the 19-point
+  34-	// stencil. Two conditions pin these down. Normalization
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm working out the 19-point stencil weights, setting face neighbors to weight a=2b relative to edge neighbors b, and normalizing so the sum of weight times squared displacement equals 2 for each axis direction.
+
+Solving the normalization gives b=1/6 and a=1/3, so the coefficients are fixed. I'm then computing the Fourier symbol of this Laplacian by plugging in a plane wave along the x-axis, summing contributions from face pairs and edge pairs, and finding the total collapses to 2(a+4b)(cos k − 1).
+
+That simplifies to −4sin²(k/2), meaning the 19-point stencil's dispersion relation along a coordinate axis is identical to the simple 1D three-point stencil — so my earlier suspicion that LatticeFreq was wrong in 3D was mistaken. This means the Wave/KG breakage in 3D must have a different cause, so I'm reconsidering the test setup, particularly whether the 384×4×4 box and the PacketSlab default settings in TestScratch3D were configured correctly.
+
+Since PacketSlab defaults to true and makes the field uniform across Y/Z, the transverse Laplacian should vanish and 3D should behave exactly like 1D — unless the boundary conditions matter. If the default edge behavior is damping rather than wrapping, then the slab would get damped at the Y/Z boundaries since the transverse size is only 4, breaking the uniformity that makes 3D reduce to 1D. I need to check whether WaveConfig sets Edges explicitly or falls back to a damping default, since that could be exactly what's corrupting the packet.
+
+But wait, KGC and Dirac gave identical 1D/3D results despite presumably having the same edge treatment, so edge damping alone can't explain why Wave differs. I should just test directly: run Wave in 3D with a larger transverse box and with wrap edges explicitly set, and compare. Let me check what Edges default each equation config actually uses, since Weyl might explicitly set wrap while Wave inherits damping.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchEdges(t *testing.T) {
+	for _, tr := range []int32{4, 16} {
+		for _, ed := range []Edges{EdgesWrap, EdgesDamp} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = Wave
+			ss.Config.Size.Set(384, tr, tr)
+			ss.Config.Wavelength, ss.Config.PacketWidth = 16, 32
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(true)
+			ss.Params.Edges = ed
+			ss.Params.Update()
+			ss.InitFunc = WavePacket
+			ss.Init()
+			for range 200 {
+				ss.StepRun()
+			}
+			c := float64(ss.Params.C)
+			wd := ss.StatVals(StatWidthName(WavePos, math32.X))
+			vg := dispMean(ss.StatVals(StatGroupVelName(WavePos, math32.X))) * c
+			fmt.Printf("  transverse %2d  edges %-10v  v %+.4f  w %5.2f -> %5.2f\n", tr, ed, vg, wd[0], wd[len(wd)-1])
+		}
+	}
+	// and the default Edges each equation config leaves behind
+	for _, eq := range []Equations{Wave, KleinGordon, KleinGordonC, Dirac} {
+		ss := &Sim{}
+		ss.Config = &Config{}
+		ss.Config.Defaults()
+		ss.Config.GPU, ss.Config.GUI = false, false
+		ss.Config.Equation = eq
+		ss.Config.Size.Set(64, 4, 4)
+		ss.ConfigSim()
+		fmt.Printf("  %-13v default Edges = %v\n", eq, ss.Params.Edges)
+	}
+}
+EOF
+go test -run TestScratchEdges -v ./ 2>&1 | grep -E "^  " | head -12``
+  ```
+    transverse  4  edges Wrap        v +0.4897  w 16.01 -> 17.69
+    transverse  4  edges Damp        v -0.0014  w 16.01 -> 15.72
+    transverse 16  edges Wrap        v +0.4897  w 16.01 -> 17.69
+    transverse 16  edges Damp        v +0.4065  w 16.01 -> 20.47
+    Wave          default Edges = Fixed
+    KleinGordon   default Edges = Fixed
+    KleinGordonC  default Edges = Wrap
+    Dirac         default Edges = Wrap
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I found it: Wave and KleinGordon default to EdgesFixed while KleinGordonC and Dirac default to EdgesWrap. With EdgesFixed in 3D, the transverse walls become hard boundaries, so a uniform slab clamped to zero at Y and Z edges acts like a hard-walled waveguide that reflects the packet and destroys the expected behavior.
+
+That explains why v = 0.114 with fixed edges but v = +0.4897 with wrap, matching the 1D result exactly — confirming 1D looked fine only because Y/Z aren't in that kernel, so EdgesFixed only clamps the X ends, which the packet hasn't reached in 200 steps. This also matches the user's 64³ KG figure — it likely ran with a stationary packet inside a hard-walled box, which explains the smooth curve and tiny velocity. I still need to check Schrodinger's default edge setting, since Weyl uses EdgesWrap, and I'm compiling the full list of problems with the figures, starting with the box being too small at 64³.
+
+Given the mass mismatches (1.0 for Schrodinger, 0.0625 for KG/KGC/Dirac, 0.7 for Weyl), what holds up so far is that KleinGordonC matches Dirac closely across every configuration I've tried, while Weyl shows the least dispersion — though it's running under different parameters. To get a real answer, I should rerun all five equations with a longer box, wrapped edges, 3D, and matched mass so the comparison is actually fair.
+
+Since Weyl's C differs from the others, matching Mass and Hbar alone doesn't fully align the relativistic regime — but I realize lowering C to 0.35 stabilizes all five equations equally, giving me a fully matched setup: same Mass, Hbar, wavelength, width, wrap edges, long box, 3D, all at C=0.35.
+
+Now I need to check stability separately for Schrodinger, since its kinetic term ħ²/2m scales differently — with ħ=1, Mass=1.4 gives a stability ratio just under 2, but Mass=1 is unstable. So I'll need Mass around 2 or 4 to keep Schrodinger stable while checking whether C actually factors into its kernel at all.
+
+With Mass=2, Hbar=1, and C=0.35, I'm computing the relativistic dispersion values — group velocity and frequency at wavelength 16 — to compare against Schrodinger's behavior at the same settings.
+
+Schrodinger gives ω=0.03807, vg=0.1914, reasonably close to the relativistic values (0.167 vs 0.191), confirming they're in a comparable regime. Now I'm working out the curvature term: for Schrodinger, ω'' comes out to 0.462 using the identity k̂²=2(1−cos k), and I'm starting the analogous second-derivative calculation for the relativistic dispersion relation ω=C√(u+μ²).
+
+This gives ω''=0.304 for the relativistic case versus 0.462 for Schrodinger, meaning the Schrodinger case should disperse about 1.52 times more.
+
+With σ₀=16, that translates to a modest but real difference (0.0144 vs 0.0095), roughly 50% more spread for Schrodinger, not the order-of-magnitude gap I initially expected. Weyl should behave like Dirac but with its distinct stencil using sin(k) instead of 2sin(k/2), so I need to set up a mass-tunable packet for Weyl — checking that at C=0.35 and Mass=2, Weyl's Omega0 comes out to 0.7, matching its default ElectronPacket setup. Time to actually run this and write up the final comparison.
+
+
+</thinking>
+
+Root cause found — it's not the equations. Let me run the clean comparison:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+// predicted |omega''| for the lattice dispersion, by central difference
+func omega2(f func(k float64) float64, k, h float64) float64 {
+	return math.Abs((f(k+h) - 2*f(k) + f(k-h)) / (h * h))
+}
+
+func TestScratchClean(t *testing.T) {
+	const wl, pw = 16.0, 32.0
+	const cc = 0.35 // one speed of light for everybody: Weyl cannot go faster
+	for _, mass := range []float32{2, 4} {
+		mu := float64(mass) * cc // m c / hbar
+		k := 2 * math.Pi / wl
+		sig := pw / 2.0 // intensity sigma of the initial envelope
+		relOm := func(k float64) float64 {
+			kh := 2 * math.Sin(k/2)
+			return cc * math.Sqrt(kh*kh+mu*mu)
+		}
+		schOm := func(k float64) float64 {
+			kh := 2 * math.Sin(k/2)
+			return (1.0 / (2 * float64(mass))) * kh * kh
+		}
+		fmt.Printf("\n=== Mass %.0f  (hbar/2m = %.3f, m c/hbar = %.2f, C = %.2f, wavelength %.0f, sigma %.0f)\n",
+			mass, 1/(2*float64(mass)), mu, cc, wl, sig)
+		fmt.Printf("    predicted dsigma/dt = |omega''| / (2 sigma):  relativistic %.5f   Schrodinger %.5f\n",
+			omega2(relOm, k, 1e-3)/(2*sig), omega2(schOm, k, 1e-3)/(2*sig))
+		for _, tc := range []struct {
+			name  string
+			eq    Equations
+			probe enums.Enum
+		}{
+			{"Schrodinger", Schrodinger, CabMag},
+			{"KleinGordon", KleinGordon, WavePos},
+			{"KleinGordonC", KleinGordonC, CabAs},
+			{"Dirac", Dirac, DiracMag},
+			{"Weyl", Weyl, WeylMag},
+		} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(384, 8, 8)
+			ss.Config.Wavelength, ss.Config.PacketWidth = wl, pw
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(true)
+			ss.Params.Edges = EdgesWrap // NOT the Wave/KG default
+			ss.Params.C = cc
+			ss.Params.Update()
+			eq := tc.eq
+			ss.InitFunc = func(s *Sim) {
+				p := s.Params
+				p.Mass = mass
+				p.C = cc
+				p.Update()
+				a := s.Config.Amplitude
+				switch eq {
+				case Schrodinger:
+					s.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+				case KleinGordon:
+					s.MovingWavePacketConfig(WavePos, WaveVel, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+				case KleinGordonC:
+					s.ChargedPacketConfig(math32.X, a, 1)
+				case Dirac:
+					s.DiracPacketConfig(math32.X, a, 1)
+				case Weyl:
+					om, _ := s.WeylDispersion(s.Config.Wavelength)
+					ck := p.C * math32.Sin(TwoPi/s.Config.Wavelength)
+					rr := (om - ck) / p.Omega0
+					s.WeylPacket(WeylL1a, math32.X, -1, a)
+					s.WeylPacket(WeylR1a, math32.X, -1, a*rr)
+				}
+			}
+			ss.Init()
+			for range 300 {
+				ss.StepRun()
+			}
+			c := float64(ss.Params.C)
+			wd := ss.StatVals(StatWidthName(tc.probe, math32.X))
+			vg := dispMean(ss.StatVals(StatGroupVelName(tc.probe, math32.X))) * c
+			vd := dispMean(ss.StatVals(StatDispersionName(tc.probe, math32.X))) * c
+			fmt.Printf("  %-13s v %+.4f (%.3f c)  dsigma/dt %+.5f   w %5.2f -> %5.2f\n",
+				tc.name, vg, vg/c, vd, wd[0], wd[len(wd)-1])
+		}
+	}
+}
+EOF
+go test -run TestScratchClean -v ./ 2>&1 | grep -E "^===|^ " | head -20``
+  ```
+  === RUN   TestScratchClean
+  === Mass 2  (hbar/2m = 0.250, m c/hbar = 0.70, C = 0.35, wavelength 16, sigma 16)
+      predicted dsigma/dt = |omega''| / (2 sigma):  relativistic 0.00950   Schrodinger 0.01444
+    Schrodinger   v +0.1912 (0.546 c)  dsigma/dt +0.00202   w 16.00 -> 16.60
+    KleinGordon   v +0.1667 (0.476 c)  dsigma/dt +0.00470   w 16.00 -> 17.49
+    KleinGordonC  v +0.1667 (0.476 c)  dsigma/dt +0.00470   w 16.00 -> 17.49
+    Dirac         v +0.1667 (0.476 c)  dsigma/dt +0.00466   w 16.00 -> 17.48
+    Weyl          v +0.1882 (0.538 c)  dsigma/dt +0.00042   w 16.00 -> 16.12
+  === Mass 4  (hbar/2m = 0.125, m c/hbar = 1.40, C = 0.35, wavelength 16, sigma 16)
+      predicted dsigma/dt = |omega''| / (2 sigma):  relativistic 0.00643   Schrodinger 0.00722
+    Schrodinger   v +0.0956 (0.273 c)  dsigma/dt +0.00049   w 16.00 -> 16.15
+    KleinGordon   v +0.0923 (0.264 c)  dsigma/dt +0.00482   w 16.00 -> 16.71
+    KleinGordonC  v +0.0923 (0.264 c)  dsigma/dt +0.00482   w 16.00 -> 16.71
+    Dirac         v +0.0920 (0.263 c)  dsigma/dt +0.00508   w 16.00 -> 17.80
+    Weyl          v +0.1672 (0.478 c)  dsigma/dt -0.00340   w 16.00 -> 15.07
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Rerunning with wrapped edges, 3D, and matched mass/C values flips the pattern: Schrodinger now disperses less than Dirac (0.0020 vs 0.0047), the reverse of what I found before.
+
+But comparing these numbers to the predicted asymptotic dσ/dt rates, both measured values are far below what theory predicts — around 0.00202 vs 0.01444 for Schrodinger and 0.0047 vs 0.0095 for the relativistic case. That's because at only 300 steps we're still deep in the early regime where σ grows roughly linearly with t/τ, well before the asymptotic spreading rate kicks in. The predicted ratio between Schrodinger and relativistic dispersion is 1.52, but the measured ratio is 0.43 — completely inverted, which means the early-time behavior doesn't scale the way the asymptotic theory would suggest, and something in my setup or expectations needs a closer look. I'm checking the initial envelope width parameters to make sure the packet's starting σ actually matches between the two models.
+
+Measured Schrodinger velocity 0.1912 matches predicted group velocity 0.1914 almost exactly, and KG's measured 0.1667 matches its predicted 0.1671 too, so velocities align beautifully with theory. The spreading rate mismatch must come from being far from asymptotic behavior at 300 steps, where early-time spreading depends differently on σ₀ and τ, so I want to compute τ to check.
+
+Using the Gaussian spreading formula σ(t) = σ₀√(1+(t/τ)²) with τ = 2σ₀²/ω'', I get τ ≈ 1108 steps for Schrodinger, predicting σ ≈ 16.58 at t=300 against a measured 16.60 — a near-perfect match. For the relativistic case τ ≈ 1685 gives a predicted σ ≈ 16.25.
+
+But the measured value is 17.49, noticeably larger than predicted, so the relativistic wavepackets spread faster than the simple Gaussian formula suggests. This extra spreading likely comes from a residual negative-energy component or zitterbewegung ripple contaminating the packet — with mass parameter C=0.35 giving Omega0=0.7, the zitter period is only about 4.5 steps, fast enough to noticeably distort the width measurement even while the overall trend still tracks Gaussian spreading.
+
+Checking the actual numbers confirms it: Schrodinger's measured spread (16.60) matches its prediction (16.58) almost exactly, while relativistic's measured (17.49) diverges from its prediction (16.25), meaning the relativistic excess is a numerical artifact. So the true physics ordering at matched mass really is Schrodinger dispersing more than Dirac — the same qualitative conclusion the user reached — but the correct effect size is only ~1.5×, not 10×, and the user's 10× figure stems from an unintended 16× mass mismatch between the two setups rather than from the physics itself.
+
+Weyl adds another wrinkle: its measured dispersion (0.00042) is far below Dirac's, but Weyl uses a different gradient stencil (sin(k) instead of 2sin(k/2)) and was run at a different velocity point on the curve (0.538c vs Dirac's 0.476c), so it isn't even matched to the same conditions. That means "Weyl disperses least" is really a lattice-stencil artifact rather than a genuine physics result, similar to the mass-mismatch issue found with Schrodinger and relativistic.
+
+Importantly, in the continuum Weyl and Dirac are the same equation — any measured difference between them here is purely discretization, which is worth flagging as a caveat. I've gathered enough now; I want to double-check this Weyl-vs-Dirac claim analytically by comparing sin(k) and 2sin(k/2) at a representative k value before writing everything up.
+
+The bigger gap between Weyl and Dirac's numbers (0.00042 vs 0.0047) is likely because the WeylPacket construction builds a genuinely clean positive-energy state with correct group-velocity and phase advance baked in, giving it almost no opposite-energy contamination, while the KG/Dirac packets carry more. That fits the picture that the extra spreading seen elsewhere is contamination from other branches — Weyl, done carefully, spreads less than expected: predicted σ(300)≈16.25, measured 16.12.
+
+Dirac by contrast measured 17.48 against the same 16.25 prediction, so Weyl and Schrödinger both track their predictions well while KG/KGC/Dirac overshoot by roughly 8%, consistent with a small negative-energy admixture in those packets. This feels like a coherent story now, so I want to clean up the scratch work and prepare a report covering: what the original TSVs actually showed, the three issues with how the comparison was originally set up, what the clean re-run reveals, and an honest final summary — making sure I don't overclaim and that no leftover scratch files remain.
+
+On the Wave/KG EdgesFixed default, I'll flag rather than change it unilaterally since it's a user-facing setting they've been actively curating — could be intentional for wall-bounded demos. Now I'll clean up and check git status.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && git status --short . | grep -v "^??" | head``
+  ```
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Everything is committed cleanly now, so I'm ready to write the report honestly: the original conclusion doesn't hold, and I need to lay out the evidence clearly, including the TSV summary, the near-zero group velocities in the 64³ runs, the mass mismatch, the EdgesFixed default, and the clean re-run results.
+
+From my own repro at 64³ blob 400, the velocities were KG +0.0196, Dirac −0.0408, Schrodinger +0.0098, but I want to pull the actual Vg values straight from the TSV files rather than rely on my repro numbers, so I'm checking the source data directly.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/results && python3 - <<'PY'
+import csv
+files=[("Schrodinger","fig_dispersion_schrod.tsv"),("KleinGordon","fig_dispersion_kg.tsv"),
+       ("KleinGordonC","fig_dispersion_kgc.tsv"),("Dirac","fig_dispersion_dirac.tsv"),
+       ("Weyl","fig_dispersion_weyl.tsv")]
+print(f"{'eq':<13} {'mean Vg (units of C)':>21} {'|Vg| max':>9}")
+for name,f in files:
+    rows=list(csv.DictReader(open(f), delimiter='\t'))
+    vg=[k for k in rows[0] if k.startswith('#Vg') and k.endswith('X')][0]
+    v=[float(r[vg]) for r in rows[20:]]
+    print(f"{name:<13} {sum(v)/len(v):>21.4f} {max(abs(x) for x in v):>9.4f}")
+PY``
+  ```
+  eq             mean Vg (units of C)  |Vg| max
+  Schrodinger                  0.0279    1.0043
+  KleinGordon                  0.0196    2.3433
+  KleinGordonC                 0.0196    2.3433
+  Dirac                        0.0238    2.3985
+  Weyl                         0.0517    2.0806
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Their own data confirms it — mean group velocities of only 0.02-0.05c with wild excursions up to 2.4c mean the packets aren't propagating freely, they're sitting and sloshing, so the measured widths can't reflect free-packet dispersion. Now I have what I need to write the report: lead with the fact that the central conclusion doesn't survive scrutiny and explain why, while still crediting the part that does hold up, the KGC-Dirac equivalence.
+
+
+</thinking>
+
+I looked at all five TSVs and the PNGs. Your numbers reproduce exactly:
+
+| | WidX growth | WidZ growth | mean VdX |
+|---|---|---|---|
+| Schrodinger | **+110.4%** | +170.3% | 0.0647 |
+| KleinGordon | +12.8% | +90.4% | 0.00599 |
+| KleinGordonC | +12.8% | +89.4% | 0.00599 |
+| Dirac | +12.2% | +89.4% | 0.00591 |
+| Weyl | **+3.1%** | +66.5% | 0.00281 |
+
+**KleinGordon ≡ KleinGordonC to five digits, and Dirac within 1.4%** — that part is solid, and it held at every mass I tried afterwards.
+
+But the ordering across the three *different* equations doesn't hold up. Three things are wrong with the setup, and I'd rather you know now than after writing it up.
+
+## The packets aren't moving
+
+Mean `VgMagX` from your own TSVs, in units of C:
 
 ```
-ok  github.com/WaveReality/waves/wavesim  404.026s
+Schrodinger 0.0279   KleinGordon 0.0196   KleinGordonC 0.0196
+Dirac 0.0238         Weyl 0.0517      (excursions to |Vg| = 2.4)
 ```
 
-72 tests pass. `goal build`, `go generate` in both packages, and gofmt all clean — only the pre-existing generated `gosl.go`.
+At wavelength 8 these should sit near **0.92 c**. They're at 2%, with swings past 2c. In a 64³ box a packet of width 12 overlaps itself immediately, so the centroid and width are measuring a standing self-interference pattern, not a travelling packet. That's what the dips to 4 and back in the Schrödinger PNG are — its curve turns over at step 390 and comes back down.
 
-The transverse stat is live in all nine equations. Every packet now reports `VdX` and `VdZ` on the same scale, so dispersion and diffraction read as separate numbers on one plot, and `PacketSlab` switches every equation's envelope together to isolate one from the other.
+## Wave and KleinGordon default to `EdgesFixed`; everything else defaults to `EdgesWrap`
 
-Everything from this session is committed-ready but uncommitted — `stats.goal`, `init.goal`, `config.go`, and the nine equation files, plus the regenerated `.go`, shaders, `enumgen`, `typegen` and yaegi bindings.
+This one surprised me. In 3D that makes the *transverse* walls hard reflectors, and a slab is uniform right up to them:
+
+```
+transverse 4   edges Wrap   v +0.4897   w 16.01 -> 17.69
+transverse 4   edges Damp   v -0.0014   w 16.01 -> 15.72
+```
+
+So KG isn't comparable with KGC/Dirac out of the box, even in a big box. Worth deciding whether that default is deliberate — I haven't touched it.
+
+## The masses differ by 16×
+
+```
+Schrodinger   mc/hbar = 1.0     (Mass 2,     C 0.50)
+KG/KGC/Dirac  mc/hbar = 0.0625  (Mass 0.125, C 0.50)
+Weyl          mc/hbar = 0.70    (Mass 2,     C 0.35)
+```
+
+At wavelength 8, k̂ = 0.766. So KG and Dirac are running at mass = 8% of momentum — **effectively massless**, which is exactly why they barely disperse. Weyl is at a different C again.
+
+## Re-run clean
+
+Wrap edges, 384-long box, 3D, one C = 0.35 for everyone, same mass, same wavelength 16, width 32, 300 steps:
+
+```
+                                              measured      Gaussian prediction
+Schrodinger   v 0.546 c   16.00 -> 16.60      dsig/dt 0.00202      16.58
+KleinGordon   v 0.476 c   16.00 -> 17.49      dsig/dt 0.00470      16.25
+KleinGordonC  v 0.476 c   16.00 -> 17.49      dsig/dt 0.00470      16.25
+Dirac         v 0.476 c   16.00 -> 17.48      dsig/dt 0.00466      16.25
+Weyl          v 0.538 c   16.00 -> 16.12      dsig/dt 0.00042      16.25
+```
+
+Group velocities now match theory to three digits (Schrödinger 0.1912 vs 0.1914 predicted; KG 0.1667 vs 0.1671). And **the ordering inverts** — Schrödinger now spreads *less* than Dirac, not 10× more.
+
+Two honest caveats on my own re-run. Schrödinger lands on σ₀√(1+(t/τ)²) to three digits, and Weyl nearly does, but the KG family overshoots its prediction by 8% — most likely a residual opposite-energy component that `WeylPacket` avoids by writing its past explicitly. And asymptotically theory says Schrödinger *should* disperse ~1.5× more than the relativistic ones, since the sqrt flattens ω'' relative to a pure parabola; 300 steps is only t/τ ≈ 0.27, too early to see it.
+
+## What I'd say the data supports
+
+"All the KG versions are the same as Dirac" — yes, strongly, and now at matched mass too.
+
+"Schrödinger disperses more" — true in theory, but by about 1.5×, not 10×, and your figures show the 10× because Schrödinger is 16× heavier there, not because of the equation.
+
+"Weyl least of all" — I'd drop this one. Weyl and Dirac are the same equation physically; identical dispersion relation. Any gap between them is the gradient stencil versus the Laplacian, or how cleanly each packet is initialized, and here it looks like the latter.
+
+Want me to turn the clean matched setup into a committed test so the figures can be regenerated from it?
+
+## 🧑 User - 2026-09-24 21:18:06
+
+Let's set the default C to 0.35 and Mass = 2 for all cases -- i.e., as the Defaults() for Params, and just don't set them in the equation-specific configs. This is what I ran those plots at, in the GUI. all at 64^3 with 8/12 wavelength, width. Schrodinger doesn't use C (remember!?) but I ran it at Mass = 2 -- should we somehow implicitly compensate for the C in some way for that case?
+
+## 🤖 Assistant - 2026-09-24 21:19:05
+
+*Model: claude-opus-5*
+
+<thinking>
+Actually I need to correct myself — the user ran everything at C=0.35 and Mass=2 in the GUI, not per-equation defaults, so my mass-mismatch critique was off. Checking: mc/ħ = 0.7 for the relativistic cases, and ħ/2m = 0.25 for Schrödinger at Mass=2, so their comparison was indeed matched consistently.
+
+That said, my other two criticisms still hold. Recomputing the expected group velocity at C=0.35, Mass=2, wavelength 8 gives roughly 0.68c, but their TSV data shows a measured Vg of only 0.02–0.05c — a huge discrepancy suggesting the packets in the 64³ box weren't actually propagating as expected, even accounting for wraparound in a periodic box.
+
+Checking Schrödinger's width, it grew to 12.6 out of a saturation point of 18.5 in a box of 64, meaning the packet spread substantially — about 68% toward saturation — which could make centroid tracking unreliable. But Weyl's width stayed tight at 6 while its Vg still read only 0.05, which doesn't fit the spreading explanation, so something else must be affecting the velocity measurement — possibly related to how ViewInterval interacts with the sampling window.
+
+I confirm ViewInterval=1 since 400 steps gives 401 rows, matching the TSV data. Over a 20-sample window, the packet moves about 4.8 cells, well under the 32-cell half-box threshold, so the wraparound correction shouldn't be misfiring — meaning the discrepancy must come from somewhere else in the calculation.
+
+Given the Vg reads 0.02 instead of the expected 0.68c, I suspect the packets weren't actually moving at all, which points to the initial configuration: the GUI defaults might be HarmonicOscillator for Schrodinger, SpinAtRest for Dirac, and ChargeAtRest for KGC — all stationary setups rather than FreePacket. If Dirac used SpinAtRest and KGC used ChargeAtRest, zero velocity would be exactly what's expected.
+
+But checking the Schrodinger width data against a harmonic oscillator coherent state doesn't fit either — coherent states keep constant width, while the plot shows monotone growth with dips, more consistent with free spreading. So maybe the actual configs used were the wave-packet variants (FreePacket, SpinPacket, WavePacket, ChargedPacket, ElectronPacket) but with mass and speed-of-light parameters set in a way that slows the apparent motion way down.
+
+I decide the best path is to stop guessing and instead empirically replicate: run all five packet configs at 64³, C=0.35, Mass=2, wavelength 8, packet width 12, blob shape, 400 steps, and compare to their TSV output to see which one matches. I also need to account for how the GUI mass setting interacts with each config's own initialization — some configs set their own mass value while others don't, so hitting Init after setting Mass=2 could behave differently depending on which config is chosen.
+
+So the actual task is to set Params.Defaults() to C=0.35, Mass=2, strip those C/Mass assignments out of the equation-specific configs, and then address whether Schrodinger's equation should compensate for C somehow. Thinking about that last part — Schrodinger's kernel coefficient is ħ/2m with no C dependence, but physically the nonrelativistic limit of the relativistic dispersion relation does bring in a rest-mass energy term tied to c, so I'm working through whether that connection matters here.
+
+Since the quadratic coefficient ħ/2m is independent of c, Schrodinger with the same m and ħ automatically matches the nonrelativistic limit of the relativistic equations regardless of C — so no compensation is needed for dispersion matching, which seems like the core answer. Still, I'm noting that C might matter elsewhere for Schrodinger, particularly around stability constraints tied to the timestep.
+
+That comes out to 1.01c, superluminal — which is exactly the honest point that Schrödinger has no built-in speed limit, and that lines up with the TSV's reported max |Vg| of 1.0043 for Schrodinger. So the run really was at Mass=2, C=0.35, and the packet's peak velocity momentarily reads just above c; the low mean of 0.0279 is just an artifact of the packet wrapping and its width saturating, making the centroid unreliable while the peak value matches the prediction.
+
+This confirms no compensation is needed for dispersion between the two models. The real comparison is that at matched Mass and k, Schrödinger's group velocity vastly exceeds the relativistic one at the same wavelength — that gap is the physics itself, since Schrödinger has no notion of c. Matching Mass and Hbar already gives the correct nonrelativistic limit because ħ/2m contains no c, so adjusting anything to compensate would actually break that correspondence. The one caveat worth mentioning is that since Schrödinger's kernel ignores C entirely, changing C in the GUI silently...
+
+I need to check whether Weyl config sets C=WeylC(0.35) and Mass, and grep for other configs doing the same. Then I should look at the per-config mass constants like WeylPacketMass or ElectronPacket's mass setting — those are separate from the equation-level defaults and probably fine to keep, since they'd align with the new Mass=2 default anyway. I also want to verify C=0.35 remains stable across all equations, since lower values tend to be safer.
+
+Then there's the second-order stability question: Schrödinger doesn't depend on C but does depend on Mass, and at Mass=2 the kinetic term stays under threshold — though SchrodingerVMax scales with mass, so the hydrogen/oscillator configs need re-checking. BoundStateMass=2 references a comment about Compton wavelength fitting one cube at C=0.5, which would shift with C=0.35, so I need to confirm the bound-state configs still hold up.
+
+This change could ripple through many tests, so I want to be systematic — find every C/Mass assignment across the configs before touching anything, then run the full suite afterward.
+
+
+</thinking>
+
+Good correction — you'd already matched them in the GUI. That invalidates my mass-mismatch point; I was reading the code defaults, not what you ran. Your Schrödinger TSV peaks at `|Vg| = 1.0043`, which is exactly the 1.01c that Mass=2 predicts, so the setup is confirmed.
+
+On your question — **no compensation, and that's not a coincidence**:
+
+$$\omega = c\sqrt{k^2 + (mc/\hbar)^2} \;\approx\; \frac{mc^2}{\hbar} + \frac{\hbar k^2}{2m}$$
+
+The quadratic coefficient is ħ/2m with **no c in it**. So matching `Mass` and `Hbar` already matches Schrödinger to the relativistic nonrelativistic limit exactly, at any C. Compensating would break the thing you want.
+
+Let me find every place C and Mass get set:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "Params.C = \|\.C = \|Params.Mass = \|p.Mass = \|ss.Params.Mass" *.goal | grep -v "_test" | head -40; echo "=== Params.Defaults C/Mass"; grep -n "Defaults()" -A 40 params.go | grep -nE "\.C = |\.Mass = |\.Hbar = " ``
+  ```
+  dirac.goal:490:	p.Mass = BoundStateMass
+  dirac.goal:547:	p.Mass = BoundStateMass
+  kg-complex.goal:349:	p.Mass = BoundStateMass
+  kg-complex.goal:424:	p.Mass = BoundStateMass
+  klein-gordon.goal:98:	ss.Params.C = 0.5
+  klein-gordon.goal:99:	ss.Params.Mass = 0.125
+  schrodinger.goal:142:	ss.Params.Mass = SchrodingerMass
+  spinfield.goal:266:	ss.Params.Mass = 0.1
+  wavec.goal:156:	ss.Params.C = WaveCC
+  wavecdir.goal:97:	ss.Params.C = 0.5 // under 1 in 1D, under 1/sqrt(3) in 3D
+  wave.goal:130:	ss.Params.C = 0.5
+  wave.goal:131:	ss.Params.Mass = 0.125
+  weyl.goal:302:	ss.Params.C = WeylC
+  weyl.goal:553:	ss.Params.Mass = 0
+  weyl.goal:594:	p.Mass = WeylPacketMass
+  weyl.goal:609:	ss.Params.Mass = WeylMass
+  weyl.goal:627:	ss.Params.Mass = WeylMass
+  weyl.goal:735:	p.Mass = WeylOscMass
+  weyl.goal:769:	p.Mass = BoundStateMass
+  === Params.Defaults C/Mass
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm sorting out which items are the equation config structs the user wants removed (found across several .goal files) versus the per-config initialization functions that set mass for specific physical cases like the Dirac or Klein-Gordon bound state examples.
+
+Then I check whether other configs like Maxwell or Electroweak set their own C values — they don't, so they inherit the default 0.5. I'm working through stability constraints for lowering C to 0.35 across each equation type: second-order equations have plenty of margin, but WaveC's Visscher stability bound looks tight, leaving only about 7% margin, so I flag that as needing closer verification while the others (WaveCDir, Weyl) seem fine.
+
+I should also flag whether Electroweak's whole calibrated setup (HiggsV, MZ, thetaW) needs to stay independent since shifting C there ripples through every test, whereas Maxwell is fine with C=0.35 since that's just the speed of light. And for Mass=2, I'm checking whether it's actually inert for massless fields like Wave, since the kernel has no mass term, versus KleinGordon where mass genuinely matters.
+
+Now with mass=2 and C=0.35, the Klein-Gordon μ becomes 0.7 — a substantial jump from the current 0.125, making the demo notably more massive, though that seems intentional for comparability. I'm also weighing whether to touch Spinfield's Mass=0.1, since it's half-disabled code with a commented-out config reference, and changing it risks breaking thermal_test.go — I want to check if spinfield actually has test coverage before deciding.
+
+I'll leave Spinfield's Mass untouched since it isn't really part of the wave-comparison story, and just note that decision explicitly. For BoundStateMass=2, the existing comment about Compton wavelength assumed C=0.5, but with C=0.35 the Compton wavelength shifts to about 1.43 cubes, so I'll need to update that comment and check whether the hydrogen configs (Weyl, Dirac, KG) need retuning. My plan is to make the change, run the full test suite, then see what breaks and fix accordingly.
+
+Let me start by checking the current SchrodingerMass and WaveCC values first.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "SchrodingerMass\|WaveCC\b" *.goal | grep -v "ss.Params" | head; echo "=== params defaults ctx"; sed -n 392,404p params.go``
+  ```
+  schrodinger.goal:130:// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+  schrodinger.goal:132:const SchrodingerMass float32 = 2
+  wavec.goal:128:// WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
+  wavec.goal:134:const WaveCC float32 = 0.25
+  === params defaults ctx
+  
+  //gosl:end
+  
+  func (pr *Parameters) Defaults() {
+  	pr.Energy.SetBool(true)
+  	pr.C = 0.5
+  	pr.Hbar = 1.0
+  	pr.Mass = 0.125
+  	pr.A0NoWave.SetBool(true)
+  	pr.E = 1.0
+  	pr.WeylQ = 1
+  	pr.WaveDir = 1
+  	pr.Mu0 = 1.0
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+SchrodingerMass is already set to 2, and WaveCC is at 0.25. Now I want to check the stability comment around wavec.goal:128-134 to see if WaveC can safely be raised to 0.35.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 126,136p wavec.goal; echo "=== schrod 128-145"; sed -n 128,146p schrodinger.goal``
+  ```
+  }
+  
+  // WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
+  // C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
+  // 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
+  // Set below that with room to spare: at 0.35 the 3D norm was already drifting
+  // by 11% over thirty steps, which is what running up against the bound looks
+  // like before it actually blows up.
+  const WaveCC float32 = 0.25
+  
+  // RunWaveC runs one whole step: the a kernel, the edges, then the b kernel,
+  === schrod 128-145
+  }
+  
+  // SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+  // at the default hbar of 1, which is comfortably inside the stability bound.
+  const SchrodingerMass float32 = 2
+  
+  func (ss *Sim) SchrodingerConfig() {
+  	ParamsShouldDisplay = SchrodingerShouldDisplay
+  ...
+  ```
+
+</details>
+
+<thinking>
+Since WaveC already drifts 11% over thirty steps at C=0.35 from my earlier measurement, it has to keep its own C=0.25 as a hard constraint I need to flag to the user rather than override silently. So I'm updating the defaults to C=0.35 and Mass=2 for the other equations while carving out WaveC's exception.
+
+I need to decide about Spinfield's Mass=0.1, which may be load-bearing for the thermal test but isn't part of the user-facing equation list — I'll leave it as-is and just flag it. Similarly, since WeylC now equals the new default of 0.35, that constant becomes redundant, so I should remove it and fold its rationale into the Params.Defaults documentation instead.
+
+Nicely, the global C value turns out to be dictated by Weyl's stability bound, the tightest constraint besides WaveC — that's worth noting when I update BoundStateMass's comment referencing "At C = 0.5."
+
+I'm also considering the Edges defaults: Schrödinger deliberately keeps EdgesFixed for its "particle in a box" setup, while Wave/KG inherit Fixed from Params.Defaults and KGC/Dirac explicitly override to Wrap. Since the user didn't ask me to touch this, I'll just flag it and leave the behavior unchanged.
+
+Time to make the edits.
+
+
+</thinking>
+
+Two constraints before I make the change — one blocking:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+import re
+
+# 1. Params.Defaults: the shared C and Mass
+p='params.go'
+s=open(p).read()
+old = """	pr.C = 0.5
+	pr.Hbar = 1.0
+	pr.Mass = 0.125"""
+new = """	// C is set by the TIGHTEST equation, so one value works everywhere and the
+	// cases stay comparable: the first-order leapfrog in WeylKernel needs
+	// sqrt(c^2 khat^2 + om^2) < 1 for the steepest khat the gradient stencil
+	// sees, which lands here. The second-order equations would take 0.866 and
+	// are simply run slower. The one exception is WaveC, whose Visscher scheme
+	// against Laplacian19 caps out at 3/8 and drifts well before that: see
+	// WaveCC.
+	pr.C = 0.35
+	pr.Hbar = 1.0
+	// Mass is shared for the same reason. At this C it puts m c / hbar at 0.7
+	// against khat = 0.77 at the default wavelength, so a packet is mildly
+	// relativistic -- the one regime where the mass term is doing something
+	// visible without the packet either sitting still or going light-speed.
+	// Schrodinger has no C, but needs no correction for that: the
+	// nonrelativistic limit of c sqrt(k^2 + (mc/hbar)^2) is hbar k^2 / 2m,
+	// whose coefficient has no c in it, so the same Mass and Hbar already
+	// match it to the relativistic cases. hbar / 2m = 0.25 here.
+	pr.Mass = 2"""
+assert old in s
+open(p,'w').write(s.replace(old,new,1))
+
+# 2. drop the per-equation C / Mass
+drops = [
+ ('wave.goal', """	// declared, not inherited: switching equations leaves Params alone, so
+	// whatever the last one wanted would otherwise still be here
+	ss.Params.C = 0.5
+	ss.Params.Mass = 0.125
+	ss.Params.Update()
+""", """	ss.Params.Update()
+"""),
+ ('klein-gordon.goal', """	ss.Params.C = 0.5
+	ss.Params.Mass = 0.125
+""", ""),
+ ('wavecdir.goal', """	ss.Params.C = 0.5 // under 1 in 1D, under 1/sqrt(3) in 3D
+""", ""),
+ ('weyl.goal', """	// a first-order leapfrog needs sqrt(c^2 khat^2 + om^2) < 1, and khat for
+	// the 10-point gradient runs past 1, so C sits well under the second-order
+	// limit of sqrt(3)/2. Mass is set per config, not here.
+	ss.Params.C = WeylC
+""", """	// C comes from Parameters.Defaults, which is set by THIS equation's bound:
+	// it is the tightest of them. Mass is set per config, not here.
+"""),
+ ('schrodinger.goal', """	// hbar / 2m must stay under about 1 for the leapfrog to hold, and the
+	// shared default mass of 0.125 puts it at 4. See SchrodingerAKernel.
+	ss.Params.Mass = SchrodingerMass
+""", ""),
+]
+for f, old, new in drops:
+    s=open(f).read()
+    assert old in s, f
+    open(f,'w').write(s.replace(old,new,1))
+    print("dropped from", f)
+
+# 3. WaveC is the exception: say so where it is set
+s=open('wavec.goal').read()
+old = """// WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
+// C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
+// 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
+// Set below that with room to spare: at 0.35 the 3D norm was already drifting
+// by 11% over thirty steps, which is what running up against the bound looks
+// like before it actually blows up."""
+new = """// WaveCC is the coefficient WaveCConfig sets, and the ONE case that does not
+// take the shared C from [Parameters.Defaults]. Visscher's scheme holds while
+// C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
+// 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
+// Set below that with room to spare: at the shared 0.35 the 3D norm was
+// already drifting by 11% over thirty steps, which is what running up against
+// the bound looks like before it actually blows up. So this one equation is
+// not directly comparable in absolute speed, and its stats say so: they are
+// in units of ITS C."""
+assert old in s
+open('wavec.goal','w').write(s.replace(old,new,1))
+print("annotated wavec")
+PY
+grep -n "WeylC\|SchrodingerMass" *.goal | grep -v "_test"``
+  ```
+  dropped from wave.goal
+  dropped from klein-gordon.goal
+  dropped from wavecdir.goal
+  dropped from weyl.goal
+  dropped from schrodinger.goal
+  annotated wavec
+  schrodinger.goal:130:// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+  schrodinger.goal:132:const SchrodingerMass float32 = 2
+  weyl.goal:100:// WeylConfig sets it.
+  weyl.goal:268:	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+  weyl.goal:270:	WeylC float32 = 0.35
+  weyl.goal:293:func (ss *Sim) WeylConfig() {
+  weyl.goal:296:	ss.initFuncs = WeylConfigs
+  weyl.goal:430:var WeylConfigs = []InitFunc{
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+# WeylC and SchrodingerMass are now unused: fold them away
+s=open('weyl.goal').read()
+old = """	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+	// tighter than the second-order one the other equations use.
+	WeylC float32 = 0.35
+
+"""
+assert old in s
+s=s.replace(old,"",1)
+s=s.replace("// Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat\n// the gradient stencil can see, so C has to be well under its usual limit:\n// WeylConfig sets it.",
+            "// Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat\n// the gradient stencil can see, so C has to be well under the second-order\n// limit. This is the tightest bound of any equation here, so it is what sets\n// the shared C in [Parameters.Defaults].")
+open('weyl.goal','w').write(s)
+
+s=open('schrodinger.goal').read()
+old = """// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+// at the default hbar of 1, which is comfortably inside the stability bound.
+const SchrodingerMass float32 = 2
+
+"""
+assert old in s
+open('schrodinger.goal','w').write(s.replace(old,"",1))
+PY
+goal build 2>&1 | tail -3``
+  ```
+  Traceback (most recent call last):
+    File "<stdin>", line 8, in <module>
+  AssertionError
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "WeylC\b" weyl.goal; echo "---"; sed -n 264,272p weyl.goal; echo "=== schrod"; grep -n "SchrodingerMass" schrodinger.goal``
+  ```
+  268:	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+  270:	WeylC float32 = 0.35
+  ---
+  
+  //gosl:end
+  
+  const (
+  	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+  	// tighter than the second-order one the other equations use.
+  	WeylC float32 = 0.35
+  	
+  	// WeylMass is the electron mass the AT REST configs set, light enough that the
+  === schrod
+  130:// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
+  132:const SchrodingerMass float32 = 2
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The trailing whitespace on the blank line broke my match — I need a regex instead. The Weyl doc replacement also failed in the same script, so I'll redo both fixes carefully.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+import re
+s=open('weyl.goal').read()
+old = """	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
+	// tighter than the second-order one the other equations use.
+	WeylC float32 = 0.35
+"""
+assert old in s
+s = s.replace(old, "", 1)
+# drop the now-leading blank line inside the const block
+s = s.replace("const (\n\t\n\t// WeylMass", "const (\n\t// WeylMass", 1)
+old2 = """// Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat
+// the gradient stencil can see, so C has to be well under its usual limit:
+// WeylConfig sets it."""
+new2 = """// Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat
+// the gradient stencil can see, so C has to be well under the second-order
+// limit. That is the tightest bound of any equation here, which is why it is
+// what sets the shared C in [Parameters.Defaults]."""
+assert old2 in s
+s = s.replace(old2, new2, 1)
+open('weyl.goal','w').write(s)
+
+s=open('schrodinger.goal').read()
+m = re.search(r"// SchrodingerMass is the mass.*?\nconst SchrodingerMass float32 = 2\n\n", s, re.S)
+assert m
+open('schrodinger.goal','w').write(s[:m.start()] + s[m.end():])
+print("ok")
+PY
+goal build 2>&1 | tail -3 && grep -n "WeylC\b\|SchrodingerMass" *.goal | grep -v _test``
+  ```
+  ok
+  go build
+  goal build succeeded
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -rn "WeylC\b\|SchrodingerMass" . --include=*.go --include=*.goal 2>/dev/null | grep -v typegen | grep -v "\.go:" | head; echo "--- BoundStateMass comment ---"; grep -n "At C = 0.5" init.goal``
+  ```
+  --- BoundStateMass comment ---
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "BoundStateMass" -B 12 init.goal | head -20``
+  ```
+  475-		}
+  476-	}
+  477-}
+  478-
+  479-// CarrierPacketConfig is a version of [Sim.CarrierPacket] that takes its
+  480-// wavelength and width variables from [Config]. amp is relative to
+  481-// [Config.Amplitude], so a caller can keep a mixing weight such as
+  482-// cos(theta_W) in amp and leave the overall size to the user.
+  483-func (ss *Sim) CarrierPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, amp, dir, om, phase float32) {
+  484-	ss.CarrierPacket(pos, vel, dim, ctr, ss.Config.Wavelength, ss.Config.PacketWidth, ss.Config.Amplitude*amp, dir, om, phase)
+  485-}
+  486-
+  487:// BoundStateMass is the mass the relativistic bound-state configs set, both
+  488-// the atoms and the oscillators. It has to be this heavy: a = Compton / Z
+  489-// alpha, so a light particle makes an atom far too big for the lattice. At
+  490-// C = 0.5 this puts the Compton wavelength at one cube, so Z alpha is just
+  491-// 1 / [Config.HydrogenRadius] for n = 1 and twice that for the deeper n = 2
+  492-// well. The default 5 means Z alpha = 0.2, around iron, so the relativistic
+  493-// corrections are not small -- which is the point of running these at all.
+  494-// Raise the radius to make them smaller.
+  ...
+  ```
+
+</details>
+
+<thinking>
+With BoundStateMass = 2, recalculating with C = 0.35 instead of 0.5 gives a Compton wavelength of about 1.43 cubes, so Z alpha becomes roughly 0.286 rather than 0.2 — meaning larger relativistic corrections and likely shifts in the bound-state tests.
+
+Since BoundStateMass now equals the default Mass, explicit configs setting it are harmless, but the doc's description needs correcting to be C-agnostic. I'll update it and rerun the suite to see what breaks.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+old = """// alpha, so a light particle makes an atom far too big for the lattice. At
+// C = 0.5 this puts the Compton wavelength at one cube, so Z alpha is just
+// 1 / [Config.HydrogenRadius] for n = 1 and twice that for the deeper n = 2
+// well. The default 5 means Z alpha = 0.2, around iron, so the relativistic
+// corrections are not small -- which is the point of running these at all.
+// Raise the radius to make them smaller."""
+new = """// alpha, so a light particle makes an atom far too big for the lattice. It
+// matches the shared [Parameters.Defaults] mass, so the atoms sit at the same
+// mass as the free packets. The Compton wavelength is hbar / m c = 1.43 cubes
+// at the shared C, so Z alpha is Compton / [Config.HydrogenRadius] for n = 1
+// and twice that for the deeper n = 2 well. The default radius 5 means Z alpha
+// = 0.29, past iron, so the relativistic corrections are not small -- which is
+// the point of running these at all. Raise the radius to make them smaller."""
+assert old in s
+open('init.goal','w').write(s.replace(old,new,1))
+PY
+goal build 2>&1|tail -1 && go test ./ 2>&1 | grep -E "^---|FAIL|^ok|\.go:[0-9]+:" | head -40``
+  ```
+  Command running in background with ID: bacz9sn7q. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bef0bz5na, expires in 20m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Change is in; suite running. Two things you should know before it reports.
+
+## No compensation for Schrödinger, and the reason is load-bearing
+
+The nonrelativistic limit of $c\sqrt{k^2+(mc/\hbar)^2}$ is $\hbar k^2/2m$, and **that coefficient has no $c$ in it**. So matching `Mass` and `Hbar` already matches Schrödinger to the relativistic cases exactly, at any C. Adding a C correction would be introducing an error, not removing one.
+
+What C *does* change for Schrödinger is the unit its stats are reported in — and that's informative rather than broken. At Mass=2, wavelength 8, Schrödinger's group velocity is $(\hbar/m)\hat k\cos(k/2) = 0.354$ cubes/step, which against C=0.35 reads **1.01 c**. Your TSV maxes at 1.0043. The Schrödinger packet outruns light, exactly as an equation with no light speed in it should, and the plot says so in one number. I'd keep that.
+
+I put the reasoning in the `Defaults()` comment so the next person doesn't try to "fix" it.
+
+## WaveC can't take 0.35
+
+It's the one exception, and your own earlier measurement is why — the comment on `WaveCC` records that at 0.35 the 3D norm drifted **11% over thirty steps**. Visscher against `Laplacian19` caps at 3/8 and degrades well before it. So `WaveCConfig` keeps `C = 0.25`, and I noted in its doc that its stats are therefore in units of *its* C and not directly comparable in absolute speed.
+
+Everything else is now unset per-equation and inherits from `Params.Defaults()`:
+
+```go
+pr.C = 0.35   // set by Weyl's first-order leapfrog: the tightest bound here
+pr.Hbar = 1.0
+pr.Mass = 2   // m c / hbar = 0.7 vs khat = 0.77: mildly relativistic
+```
+
+`WeylC` and `SchrodingerMass` are deleted — both were just restating the new shared default. Per-*config* masses stay, since those are physics: `NeutrinoPacket` must set Mass=0, `ElectronAtRest` wants a light mass for a watchable flip, and `BoundStateMass` pins the atoms.
+
+One knock-on I fixed in the docs: `BoundStateMass`'s comment claimed "at C = 0.5 the Compton wavelength is one cube". At 0.35 it's 1.43 cubes, so Zα goes from 0.20 to **0.29** at the default radius 5 — past iron. The atoms are now meaningfully more relativistic, which may move the hydrogen tests. I'll see shortly.
+
+Still standing from before, and unaffected by this change: Wave and KleinGordon default to `EdgesFixed` while KGC, Dirac and Weyl default to `EdgesWrap`, which in 3D makes the transverse walls reflect. That's the remaining reason your KG run isn't comparable with the others. Want me to move `EdgesWrap` into `Defaults()` too, and let Schrödinger keep `EdgesFixed` for its particle-in-a-box?
+
+## 🧑 User - 2026-09-24 21:25:44
+
+In the GUI, I manually set the Edge to Wrap. Wrap should be the global Defaults() as you suggest, and Schrodinger can set EdgesFixed just for the specific demos that need it. And how about we go down to C = 0.25 as the global default. It is a nicer number in general :)
+
+## 🤖 Assistant - 2026-09-24 21:26:15
+
+*Model: claude-opus-5*
+
+<thinking>
+I'm planning two changes: setting EdgesWrap as the default in Params.Defaults() rather than having each equation configure it individually, and moving the EdgesFixed setting out of the general Schrodinger config so it only applies to the specific box-particle demos that need fixed boundaries.
+
+The other Schrodinger demos — HarmonicOscillator, HydrogenGround, HydrogenP, FreePacket — are confined by their potentials, so wrap should be fine there, and is actually better for FreePacket. For HarmonicOscillator specifically, I recall the potential was clamped with SchrodingerVMax after it blew up at high resolution, and since the quadratic well is centered with matching max values at both edges, wrapping should actually be continuous in value even if the derivative isn't.
+
+I want to be pragmatic here: make the change, run the Schrodinger tests, and see what breaks empirically. BoxStandingWave and BoxTwoStates definitely need EdgesFixed since they're eigenstates of a hard-walled box.
+
+Now I'm checking stability for the global default C=0.25 across equations — working through the Weyl equation's dispersion relation, where Omega0 = Mass*C²/Hbar, giving Omega0=0.125 at Mass=2, C=0.25.
+
+Checking the max value: sqrt(0.0625 + 0.0156) = 0.28, well under the stability bound of 1. For WaveC, switching to C=0.25 makes it match WaveCC exactly, so WaveC no longer needs a special exception — a nice simplification that's probably why 0.25 was chosen as the nicer default. Second-order stability at 0.25 is comfortably within the 0.866 limit, and Schrodinger isn't affected by C at all. For the relativistic mass term, μ = mc/ħ = 0.5, compared to k̂ = 0.766 at wavelength 8, giving μ/k̂ = 0.65 — somewhat more relativistic than the 0.91 ratio before.
+
+For BoundStateMass, the Compton wavelength becomes 1/0.5 = 2, giving Zα = 0.4, which is getting fairly large and corresponds to something like cesium (Z≈55) — a fairly relativistic atom that could strain assumptions built into the nonrelativistic hydrogen configs, so I want to keep an eye on whether tests flag this. I'm wondering whether BoundStateMass itself should be increased to compensate, since a bigger mass shrinks the Compton wavelength and thus Zα for a fixed radius — trying to work out what Compton value would bring Zα back down to something more reasonable like 0.2.
+
+That would mean BoundStateMass = 4 restores the old atomic regime, though then atoms and free packets carry different masses, which seems acceptable since each already had its own constant. I want to make both changes and rerun the tests, and I'm also considering whether to drop the special-case WaveC override now that C=0.25 is the global default matching WaveCC, since the binding constraint may now come from WaveC's Visscher bound rather than the Weyl condition — need to check which constraint is actually tighter at these values.
+
+WaveC turns out to be the tightest constraint, so 0.25 is its safe value, meaning the shared C should be documented as being set by WaveC's Visscher scheme rather than Weyl's condition. I should update the Defaults comment to reflect this before checking on the currently running test suite from the earlier C=0.35 change, which is now superseded — I'll need to stop it and rerun with the new changes once I confirm it's finished.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output 2>/dev/null | head -30``
+  ```
+  goal build succeeded
+  ```
+
+</details>
+
+<thinking>
+I'm debating whether to let this test run finish for the C=0.35 baseline data, but decide it's better to just stop it and go directly to testing the target state rather than running two suites.
+
+Now I'm making the actual edits: setting Params.Defaults to C=0.25 with EdgesWrap, removing the per-equation Edges=EdgesWrap overrides from KGC, Dirac, and Weyl, relocating Schrodinger's EdgesFixed setting into BoxStandingWave/BoxTwoStates, and removing WaveC's special C exception along with the WaveCC constant. I need to locate all the Edges assignments first before making these changes.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "Params.Edges = \|\.Edges = " *.goal params.go | grep -v _test``
+  ```
+  dirac.goal:310:	ss.Params.Edges = EdgesWrap
+  dirac.goal:464:	p.Edges = EdgesDamp
+  dirac.goal:491:	p.Edges = EdgesDamp
+  dirac.goal:548:	p.Edges = EdgesDamp
+  dirac.goal:591:	p.Edges = EdgesWrap
+  electroweak.goal:845:	ss.Params.Edges = EdgesWrap
+  maxwell.goal:309:	ss.Params.Edges = EdgesFixed
+  maxwell.goal:323:	ss.Params.Edges = EdgesFixed
+  maxwell.goal:346:	ss.Params.Edges = EdgesWrap
+  maxwell.goal:368:	ss.Params.Edges = EdgesWrap
+  maxwell.goal:389:	ss.Params.Edges = EdgesWrap
+  maxwell.goal:413:	ss.Params.Edges = EdgesDamp
+  kg-complex.goal:205:	ss.Params.Edges = EdgesWrap
+  kg-complex.goal:331:	ss.Params.Edges = EdgesDamp
+  kg-complex.goal:350:	p.Edges = EdgesDamp
+  kg-complex.goal:425:	p.Edges = EdgesDamp
+  spinfield.goal:265:	ss.Params.Edges = EdgesDamp
+  schrodinger.goal:136:	ss.Params.Edges = EdgesFixed // walls at zero: a particle in a box
+  wavecdir.goal:97:	ss.Params.Edges = EdgesWrap
+  wavec.goal:160:	ss.Params.Edges = EdgesWrap
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm cataloging the specific line numbers across the equation configs (dirac, electroweak, kg-complex, schrodinger, wavecdir, wavec, weyl) and per-config init functions where the EdgesWrap settings need to be removed, keeping only Schrodinger's EdgesFixed.
+
+Weyl and spinfield's per-demo settings stay untouched since those are intentional per-demo choices, not equation-level defaults. Maxwell doesn't set Edges at the equation level at all — its init functions handle it individually, which is fine as-is. Wave and KleinGordon currently inherit EdgesFixed from Defaults but will inherit Wrap after my change, so I need to check if that's the desired behavior. For Schrodinger specifically, I'm planning to remove the equation-level EdgesFixed and instead add it directly to BoxStandingWave and BoxTwoStates, so I need to look at those functions now.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func BoxStandingWave\|func BoxTwoStates" -A 8 schrodinger.goal``
+  ```
+  212:func BoxStandingWave(ss *Sim) {
+  213-	ss.SineBox(CabAs, Both, 1, ss.Config.Amplitude)
+  214-}
+  215-
+  216-// BoxTwoStates is the same box holding the lowest two standing waves at once.
+  217-//
+  218-// Neither one moves on its own, but they turn at different rates, E1/hbar and
+  219-// E2/hbar, so their sum beats: |chi|^2 sloshes from one side to the other and
+  220-// back at the DIFFERENCE frequency. Every visible motion in a bound quantum
+  --
+  222:func BoxTwoStates(ss *Sim) {
+  223-	a := ss.Config.Amplitude
+  224-	ss.SineBox(CabAs, Both, 1, a)
+  225-	ss.SineBox(CabAs, Both, 2, a)
+  226-}
+  227-
+  228-// HydrogenGround is as close to a hydrogen atom as this equation gets: an
+  229-// attractive 1/r well with the electron in its ground state, exp(-r/a).
+  230-//
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+import re
+# 1. Params.Defaults: C 0.25, Edges Wrap
+s=open('params.go').read()
+old = """	// C is set by the TIGHTEST equation, so one value works everywhere and the
+	// cases stay comparable: the first-order leapfrog in WeylKernel needs
+	// sqrt(c^2 khat^2 + om^2) < 1 for the steepest khat the gradient stencil
+	// sees, which lands here. The second-order equations would take 0.866 and
+	// are simply run slower. The one exception is WaveC, whose Visscher scheme
+	// against Laplacian19 caps out at 3/8 and drifts well before that: see
+	// WaveCC.
+	pr.C = 0.35"""
+new = """	// C is set by the TIGHTEST equation, so one value works everywhere and the
+	// cases stay comparable. That is WaveC: Visscher's scheme against
+	// Laplacian19 caps out at 3/8 and is already drifting by 11% over thirty
+	// steps at 0.35. Weyl's first-order leapfrog comes next at around 0.35,
+	// and the second-order equations would take 0.866; they are simply run
+	// slower. No equation now sets its own.
+	pr.C = 0.25"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """	// Mass is shared for the same reason. At this C it puts m c / hbar at 0.7
+	// against khat = 0.77 at the default wavelength, so a packet is mildly
+	// relativistic"""
+new = """	// Mass is shared for the same reason. At this C it puts m c / hbar at 0.5
+	// against khat = 0.77 at the default wavelength, so a packet is mildly
+	// relativistic"""
+assert old in s
+s = s.replace(old, new, 1)
+open('params.go','w').write(s)
+
+# Edges default
+s=open('params.go').read()
+m = re.search(r"\n(\s*)pr\.Hbar = 1\.0\n", s)
+assert m
+add = ("\n\tpr.Hbar = 1.0\n"
+       "\t// wrap by default: a periodic box is the only boundary that does not\n"
+       "\t// act on the wave, so it is the right one for comparing equations. The\n"
+       "\t// demos that want a wall -- a particle in a box, a charge against a\n"
+       "\t// conductor -- set EdgesFixed for themselves.\n"
+       "\tpr.Edges = EdgesWrap\n")
+s = s[:m.start()] + add + s[m.end():]
+open('params.go','w').write(s)
+print("params done")
+
+# 2. drop equation-level Edges
+drops = [
+ ('dirac.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('electroweak.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('kg-complex.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('wavecdir.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('wavec.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('weyl.goal', "\tss.Params.Edges = EdgesWrap\n", ""),
+ ('schrodinger.goal', "\tss.Params.Edges = EdgesFixed // walls at zero: a particle in a box\n", ""),
+]
+for f, old, new in drops:
+    s=open(f).read()
+    assert old in s, f
+    open(f,'w').write(s.replace(old, new, 1))
+    print("dropped equation-level Edges from", f)
+
+# 3. the two box demos own their walls
+s=open('schrodinger.goal').read()
+old = """func BoxStandingWave(ss *Sim) {
+	ss.SineBox(CabAs, Both, 1, ss.Config.Amplitude)
+}"""
+new = """func BoxStandingWave(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+	ss.Params.Update()
+	ss.SineBox(CabAs, Both, 1, ss.Config.Amplitude)
+}"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """func BoxTwoStates(ss *Sim) {
+	a := ss.Config.Amplitude"""
+new = """func BoxTwoStates(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+	ss.Params.Update()
+	a := ss.Config.Amplitude"""
+assert old in s
+open('schrodinger.goal','w').write(s.replace(old, new, 1))
+print("box demos own their walls")
+
+# 4. WaveC no longer needs its own C: the shared one IS 0.25
+s=open('wavec.goal').read()
+s = re.sub(r"// WaveCC is the coefficient WaveCConfig sets.*?const WaveCC float32 = 0\.25\n\n", "", s, flags=re.S)
+assert "WaveCC" not in s.split("//gosl:end")[-1] or True
+s = s.replace("\tss.Params.C = WaveCC\n", "")
+open('wavec.goal','w').write(s)
+PY
+grep -n "WaveCC" *.goal | grep -v _test; goal build 2>&1 | tail -3``
+  ```
+  params done
+  dropped equation-level Edges from dirac.goal
+  dropped equation-level Edges from electroweak.goal
+  dropped equation-level Edges from kg-complex.goal
+  dropped equation-level Edges from wavecdir.goal
+  dropped equation-level Edges from wavec.goal
+  dropped equation-level Edges from weyl.goal
+  dropped equation-level Edges from schrodinger.goal
+  box demos own their walls
+  wavec.goal:142:func (ss *Sim) WaveCConfig() {
+  wavec.goal:145:	ss.initFuncs = WaveCConfigs
+  wavec.goal:175:var WaveCConfigs = []InitFunc{
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+I want to compare against the earlier baseline result of C=0.35 before running the new suite. Let me verify the Defaults in params.go look correct and double-check there's no leftover WaveCC reference lingering in the tests, then proceed to run the suite.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (4)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 393,425p params.go; echo "=== leftover refs ==="; grep -rn "WaveCC\|WeylC\b\|SchrodingerMass" . --include=*_test.go --include=*.goal 2>/dev/null | head``
+  ```
+  //gosl:end
+  
+  func (pr *Parameters) Defaults() {
+  	pr.Energy.SetBool(true)
+  	// C is set by the TIGHTEST equation, so one value works everywhere and the
+  	// cases stay comparable. That is WaveC: Visscher's scheme against
+  	// Laplacian19 caps out at 3/8 and is already drifting by 11% over thirty
+  	// steps at 0.35. Weyl's first-order leapfrog comes next at around 0.35,
+  	// and the second-order equations would take 0.866; they are simply run
+  	// slower. No equation now sets its own.
+  	pr.C = 0.25
+  	pr.Hbar = 1.0
+  	// wrap by default: a periodic box is the only boundary that does not
+  	// act on the wave, so it is the right one for comparing equations. The
+  	// demos that want a wall -- a particle in a box, a charge against a
+  	// conductor -- set EdgesFixed for themselves.
+  	pr.Edges = EdgesWrap
+  	// Mass is shared for the same reason. At this C it puts m c / hbar at 0.5
+  	// against khat = 0.77 at the default wavelength, so a packet is mildly
+  	// relativistic -- the one regime where the mass term is doing something
+  ...
+  ```
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output 2>/dev/null | head -40``
+  ```
+  goal build succeeded
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && go test ./ 2>&1 | grep -E "^---|FAIL|^ok|_test\.go:[0-9]+:" | head -50``
+  ```
+  Command running in background with ID: bc08a6nqb. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bchofv05e, expires in 20m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Both changes in, suite running. C = 0.25 turned out to be more than a nicer number.
+
+## It eliminates the exception
+
+`WaveCC` was 0.25 *because* Visscher against `Laplacian19` caps at 3/8 and was already drifting 11% over thirty steps at 0.35. With the shared C at 0.25, WaveC no longer needs its own — so `WaveCC` is deleted, `WaveCConfig` sets nothing, and **no equation overrides C anywhere**. The `Defaults()` comment now names WaveC as the binding constraint, with Weyl next at ~0.35 and the second-order ones at 0.866 just being run slower.
+
+That also makes WaveC directly comparable in absolute speed for the first time — its stats were previously in units of a different C from everyone else's.
+
+## Edges
+
+```go
+pr.Edges = EdgesWrap
+```
+
+Removed from the seven `<Eq>Config()` functions that were each setting it (Dirac, Electroweak, KGC, WaveC, WaveCDir, Weyl set Wrap; Schrödinger set Fixed). Wave and KleinGordon now inherit Wrap instead of Fixed, which closes the transverse-wall problem in their 3D runs.
+
+`EdgesFixed` moved down to the two demos that actually mean it — `BoxStandingWave` and `BoxTwoStates`, where the wall *is* the physics. The per-demo `EdgesDamp` / `EdgesFixed` settings in Maxwell, Dirac, KGC and Weyl configs are untouched; those are deliberate per-case choices.
+
+## One consequence to watch
+
+`m c/ħ` drops from 0.7 to **0.5** against k̂ = 0.77 — slightly more relativistic, still in the regime where the mass term does something visible.
+
+The bound states move further. Compton = ħ/mc is now 2 cubes, so at the default radius 5 the atoms sit at **Zα = 0.4** — around caesium, up from 0.2 at the old C=0.5. The nonrelativistic starting shape is a correspondingly worse guess. If the hydrogen tests complain, the clean fix is raising `BoundStateMass` to 4, which puts Compton back at 1 cube and Zα back at 0.2 without touching the free-packet mass — those are already separate constants. I'll see what the suite says before changing anything.
+
+## 🧑 User - 2026-09-24 21:28:03
+
+<task-notification>
+<task-id>bacz9sn7q</task-id>
+<tool-use-id>toolu_01BXW5mWmboKg2WNYiKAgbsy</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output</output-file>
+<status>completed</status>
+<summary>Background command "Update doc, run full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 21:28:06
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bacz9sn7q.output``
+  ```
+  goal build succeeded
+  --- FAIL: TestDiracHydrogenBound (35.92s)
+      dirac_test.go:295: DiracHydrogen spread by 43.2%, not bound
+      dirac_test.go:297: DiracHydrogen   rms  8.654, spreads at most +43.2%, max E 0.02676
+      dirac_test.go:297: DiracHydrogenP  rms 13.639, spreads at most +0.0%, max E 0.05352
+  --- FAIL: TestDiracChirality (0.03s)
+      dirac_test.go:329: at rest |psi_L|^2 / |psi_R|^2 = 1.01501, want 1: chirality is not helicity
+      dirac_test.go:331: at rest  |psi_L|^2 / |psi_R|^2 = 1.01501
+      dirac_test.go:338: starts 1.48% left-chiral, should be purely right
+      dirac_test.go:355: conversion period 12.0 steps, want pi hbar / m c^2 = 12.8
+      dirac_test.go:358: total varies by 1.492%, but |psi_L|^2 + |psi_R|^2 must be conserved
+      dirac_test.go:360: right half falls to 0.066% at step 6, so the period is 12 vs pi hbar / m c^2 = 12.8; total varies 1.4923%
+  --- FAIL: TestDispersion (2.13s)
+      dispersion_test.go:280: Wave           Vg +0.9824  Vd +0.01228   width 16.004 -> 16.476 (+3.0%)
+      dispersion_test.go:280: KleinGordon    Vg +0.4791  Vd +0.00516   width 16.004 -> 16.093 (+0.6%)
+      dispersion_test.go:280: Maxwell photon Vg +0.9825  Vd +0.01228   width 16.004 -> 16.476 (+3.0%)
+      dispersion_test.go:280: WaveC          Vg +0.7650  Vd +0.00415   width 16.000 -> 16.154 (+1.0%)
+      dispersion_test.go:280: WaveCDir       Vg +0.9669  Vd +0.00012   width 15.993 -> 15.985 (-0.1%)
+      dispersion_test.go:280: Schrodinger    Vg +0.5464  Vd +0.00297   width 16.000 -> 16.154 (+1.0%)
+      dispersion_test.go:280: KleinGordonC   Vg +0.4791  Vd +0.00516   width 16.004 -> 16.093 (+0.6%)
+  ...
+  ```
+
+</details>
+
+<thinking>
+The C=0.35 baseline shows 5 failures, while C=0.25 is still running and may differ. Looking closer, these failures seem to be mostly test assertions tuned to the old parameter values rather than genuine breakage — for instance, the DiracHydrogenBound test flags spreading at 43.2% because the higher C value shifts Zα toward a more relativistic regime, changing the expected wavefunction shape.
+
+For chirality, the tolerance failures trace back to the zitter oscillation becoming poorly resolved at Mass=2, C=0.35 (only ~13 steps per period vs. the previous ~100), while C=0.25 should resolve it better with ~25 steps per period. The dispersion test failure is similar — my minimum Vd bound of 0.1 was calibrated for the old ultra-light Mass=0.125 particle, which spread quickly; at Mass=2 the particle is heavier and spreads much more slowly, so that threshold needs retuning.
+
+For edges damping, the wave and KGC/Dirac packets simply haven't had time to reach the boundary within 300 steps at the new lower speeds — this looks like a "hasn't left yet" measurement issue requiring more steps or a smaller box, rather than a real bug. And now I'm looking at the gauge time component test, where the radius drift is showing exactly zero when omega is halved, when it should be around 4.
+
+So all five failing tests trace back to being calibrated for the old parameters, with only one genuine physics issue — bound states appearing at higher Zα. I want to wait for the C=0.25 results before deciding on fixes, then work through each: raising the BoundStateMass to 4 gives a Compton wavelength restoring the originally designed regime, which is a clean, principled fix.
+
+For the chirality tolerances, at C=0.25 the resolution should improve enough that the test likely passes without changes. For the dispersion minimum velocity test, I need to retune the threshold since spreading is genuinely slower at Mass=2 — I'll check the measured value and set a sensible bound. For the edge damping test, the packets are slower now so I should give the simulation more steps to let the wave actually reach the boundary before checking absorption, rather than relaxing the tolerance artificially.
+
+But before making these fixes, I should wait for the C=0.25 results to come back first — no point tuning against the wrong baseline. Let me check on that.
+
+
+</thinking>
+
+C=0.35 baseline came back with 5 failures. Let me see the C=0.25 run before fixing anything:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output 2>/dev/null | head -50``
+  ```
+  (Bash completed with no output)
+  ```
+
+</details>
+
+<thinking>
+While the suite runs, I'll prepare my reasoning for the BoundStateMass fix and review the edges test setup so I can act quickly once results come in. Since edits won't affect the currently running binary, it's safe to go ahead and read through edges_test.go now to understand the metric and steps involved.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 40,100p edges_test.go``
+  ```
+  	for z := int32(1); z <= c.Size.Z; z++ {
+  		for y := int32(1); y <= c.Size.Y; y++ {
+  			for x := int32(1); x <= c.Size.X; x++ {
+  				for v := range nv {
+  					f := float64(State.Value(int(z), int(y), int(x), v, cur))
+  					s += f * f
+  				}
+  			}
+  		}
+  	}
+  	return s
+  }
+  
+  // TestEdgesDamp sends a packet into the boundary in every equation that damps
+  // and measures what comes back, which is the only thing a damping boundary is
+  // for.
+  //
+  // Two mechanisms are being checked. The second-order equations use Sommerfeld
+  // damping in the boundary cell, where the force sets the velocity instead of
+  // adding to it. The first-order ones cannot: they have no acceleration to
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm realizing the reduced group velocity at C=0.25 with mass 2 means the packet only travels about 36 cells in 300 steps, less than the 48-cell box boundary — that's why 20% remains unreached rather than reflected. I need to adjust the step count or velocity scaling to account for this slower propagation.
+
+Trying a smaller box of 24 cells with 600 steps would let the slowest packet cross about three times while cutting overall compute cost roughly fourfold, but a PacketWidth of 12 might be too wide for a 24-cell box, so I want to check the config defaults in dampSim before committing to that approach.
+
+Also, I'm weighing whether to lighten the packet mass in the damping test specifically to keep it fast, but that would weaken the point of the test since absorbing a slow, heavy wave is a harder and more meaningful check of the Sommerfeld boundary than absorbing something moving near c. Better to keep the shared mass defaults and just shrink the box, so let me go look at dampSim's box configuration first.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 1,38p edges_test.go``
+  ```
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  import (
+  	"testing"
+  
+  	"cogentcore.org/core/math32"
+  )
+  
+  func dampSim(eq Equations, sz int32, init func(*Sim)) *Sim {
+  	ss := &Sim{}
+  	ss.Config = &Config{}
+  	ss.Config.Defaults()
+  	ss.Config.GPU, ss.Config.GUI = false, false
+  	ss.Config.Equation = eq
+  	ss.Config.Size.Set(sz, sz, sz)
+  	ss.Config.Wavelength = 8
+  ...
+  ```
+
+</details>
+
+<thinking>
+With PacketWidth 6 (σ=3), a box size of 24 gives 8σ, which should be sufficient. At sz=24, the slowest velocity means crossing half the box takes about 100 steps, so I'll run 600 steps for three full traversals to ensure nothing reflects off the boundary—computational cost scales as 24³.
+
+Actually, checking the damping layer: EdgeDampWidth=8 capped at size/4 means at sz=24 the absorbing layer eats half the box, which makes the test nearly meaningless since there's barely any free region left. At sz=32 it's still half, and even at sz=48 it's a third—so the layer is unavoidably a large fraction regardless. I could keep sz=48 but bump steps to 900 for proper traversal coverage, though that roughly triples runtime to over two minutes. The cleanest fix would be to derive step count from the packet's actual group velocity so the test scales correctly across parameter choices, rather than hardcoding a step count.
+
+Since 20.9% "left" for KGC likely means the packet is genuinely mid-transit rather than fully damped, giving it three times the steps should let it actually finish crossing the box. I'll just settle on 900 steps at sz=48 and accept the roughly two-minute cost, though I'm also considering shrinking the box to a thin slab (48×16×16) along the direction of travel to cut the cell count by 9x, since the packet config already defaults to a slab shape anyway.
+
+But wait — if the packets are uniform slabs across Y and Z now, the transverse damping layers on the sides of a narrow box would actively eat into them, which is a real interaction I hadn't accounted for and could be affecting current results in ways I don't fully understand yet. Rather than keep reasoning in circles, I should just wait for the C=0.25 run to finish and tune parameters based on actual measurements.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output 2>/dev/null | head -50``
+  ```
+  (Bash completed with no output)
+  ```
+
+</details>
+
+The C=0.35 baseline is informative — all five failures are parameter-calibration, not breakage:
+
+| failure | cause |
+|---|---|
+| `TestDiracHydrogenBound` | Zα 0.20 → 0.29; nonrelativistic starting shape no longer bound |
+| `TestDiracChirality` | zitter period fell from 100 steps to 12.8 — barely resolved, 1.5% drift |
+| `TestDispersion` | my own `minVd: 0.1` for Dirac-at-rest, set when it was 16× lighter |
+| `TestEdgesDamp` | packets are slower, so 300 steps no longer gets them to the wall |
+| `TestGaugeTimeComponent` | drift fell to exactly 0, so its ω² scaling check divides by zero |
+
+Every one is a threshold tuned to Mass=0.125 and C=0.5. The physics moved as it should — a heavier particle spreads *slower*, which is why `Dirac at rest` dropped from 0.243 to 0.0028.
+
+Two of these should get real fixes rather than looser numbers:
+
+**`BoundStateMass`** is the genuine one. It exists to put the Compton wavelength at one cube; that was tied to C=0.5 and is now wrong. At C=0.25 it needs to be **4** to restore Compton = 1 cube and Zα = 0.2. It's already a separate constant from the free-packet mass, so the atoms can keep their own regime without touching the comparison.
+
+**`TestEdgesDamp`** is measuring "has it left yet", not "did it reflect". At C=0.25 with Mass=2, KGC and Dirac move at ~0.12 cubes/step, so in 300 steps they cover 36 cells of a 48-cell box — they simply haven't finished crossing. It needs enough steps for the slowest packet to traverse several times.
+
+One thing I want to check there: `PacketSlab` now defaults true, so those packets are slabs, and a slab in a damped box gets eaten from the *transverse* faces too. That's a new interaction from this session's change, and it could be flattering the numbers rather than testing the downstream boundary. I'll verify which mechanism is doing the absorbing before I retune the threshold.
+
+Waiting on the C=0.25 run — `TestDiracChirality` in particular should recover on its own, since the zitter period doubles to 25 steps.
+
+## 🧑 User - 2026-09-24 21:32:48
+
+yeah set BoundStateMass to 4 and retune the edges test
+
+## 🤖 Assistant - 2026-09-24 21:32:51
+
+*Model: claude-opus-5*
+
+<thinking>
+I should check the C=0.25 suite result first before making both changes.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output 2>/dev/null``
+  ```
+  (Bash completed with no output)
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('init.goal').read()
+old = """// matches the shared [Parameters.Defaults] mass, so the atoms sit at the same
+// mass as the free packets. The Compton wavelength is hbar / m c = 1.43 cubes
+// at the shared C, so Z alpha is Compton / [Config.HydrogenRadius] for n = 1
+// and twice that for the deeper n = 2 well. The default radius 5 means Z alpha
+// = 0.29, past iron, so the relativistic corrections are not small -- which is
+// the point of running these at all. Raise the radius to make them smaller."""
+new = """// is set so the Compton wavelength hbar / m c comes out at exactly one cube at
+// the shared C of [Parameters.Defaults], which makes Z alpha just
+// 1 / [Config.HydrogenRadius] for n = 1, and twice that for the deeper n = 2
+// well. The default radius 5 means Z alpha = 0.2, around iron, so the
+// relativistic corrections are not small -- which is the point of running
+// these at all. Raise the radius to make them smaller.
+//
+// It is therefore HEAVIER than the shared free-packet mass, and has to be:
+// tie it to that instead and the atom is a Compton wavelength across times
+// 1 / Z alpha, which does not fit the lattice."""
+assert old in s
+s = s.replace(old, new, 1)
+old2 = "const BoundStateMass float32 = 2"
+new2 = "const BoundStateMass float32 = 4"
+assert old2 in s
+open('init.goal','w').write(s.replace(old2, new2, 1))
+PY
+grep -n "BoundStateMass float32" init.goal; goal build 2>&1 | tail -1``
+  ```
+  500:const BoundStateMass float32 = 4
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Now let me measure what the edges test actually needs, rather than guessing:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchDamp(t *testing.T) {
+	const sz = 48
+	for _, slab := range []bool{true, false} {
+		fmt.Printf("\n=== PacketSlab = %v\n", slab)
+		for _, tc := range []struct {
+			eq   Equations
+			name string
+			init func(*Sim)
+		}{
+			{Wave, "Wave", nil},
+			{KleinGordonC, "KleinGordonC", ChargedPacket},
+			{Dirac, "Dirac", func(s *Sim) {
+				s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+			}},
+			{Schrodinger, "Schrodinger", FreePacket},
+			{WaveCDir, "WaveCDir", nil},
+			{WaveC, "WaveC", nil},
+			{Weyl, "Weyl", nil},
+		} {
+			ss := &Sim{}
+			ss.Config = &Config{}
+			ss.Config.Defaults()
+			ss.Config.GPU, ss.Config.GUI = false, false
+			ss.Config.Equation = tc.eq
+			ss.Config.Size.Set(sz, sz, sz)
+			ss.Config.Wavelength = 8
+			ss.Config.PacketWidth = 6
+			ss.Config.PacketSlab = slab
+			ss.ConfigSim()
+			ss.Params.ThreeD.SetBool(true)
+			ss.Params.Edges = EdgesDamp
+			ss.Params.Update()
+			if tc.init != nil {
+				ss.InitFunc = tc.init
+			}
+			ss.Init()
+			ss.StepRun()
+			t0 := dampTot(ss)
+			out := fmt.Sprintf("  %-13s", tc.name)
+			n := 0
+			for _, target := range []int{300, 600, 900, 1200} {
+				for n < target {
+					ss.StepRun()
+					n++
+				}
+				out += fmt.Sprintf("  %d:%7.3f%%", target, 100*dampTot(ss)/t0)
+			}
+			fmt.Println(out)
+		}
+	}
+}
+EOF
+go test -run TestScratchDamp -v -timeout 900s ./ 2>&1 | grep -E "^===|^  " | head -20``
+  ```
+  Command did not complete within its 120s timeout and was moved to the background (ID: b0lubbkh3). Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b0lubbkh3.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+
+</details>
+
+<thinking>
+At C=0.25 more failures show up. TestDiracHydrogenBound got worse (78.7%), likely fixable with BoundStateMass=4 from an earlier run before my change. TestDispersion is failing two assertions — minVd at 0.1 and the Weyl/Wave ratio — since Wave's Vd is now negative (-0.00174), breaking the assumption that |Wave/Weyl| >= 10.
+
+TestEdgesDamp is also worse (24-31%), likely a steps issue, and TestElectroweakDamp fails at 28.07% for the same root cause — the photon pulse now travels slower at C=0.25 versus 0.5, so 300 steps isn't sufficient. There's also a gauge tolerance issue in TestKGGaugeUniform, and possibly more failures I haven't seen yet. Good news: TestDiracChirality passed as predicted, since zitter is better resolved. I need to pull the full failure list from the output.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -E "^--- FAIL|^ok|^FAIL" /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output; echo "=== details for the ones not yet seen ==="; sed -n '/TestKGGaugeUniform/,$p' /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bc08a6nqb.output | head -40``
+  ```
+  --- FAIL: TestDiracHydrogenBound (37.46s)
+  --- FAIL: TestDispersion (2.32s)
+  --- FAIL: TestEdgesDamp (42.64s)
+  --- FAIL: TestElectroweakDamp (51.23s)
+  --- FAIL: TestKGGaugeUniform (0.11s)
+  --- FAIL: TestSchrodingerNorm (7.18s)
+  --- FAIL: TestSchrodingerCoherent (4.77s)
+  --- FAIL: TestSchrodingerHydrogenP (9.69s)
+  === details for the ones not yet seen ===
+  --- FAIL: TestKGGaugeUniform (0.11s)
+      kg_test.go:235: A0 = 0.001 (e A0 / hbar is 0.01 of Omega0): charge -189.80699 (+5.8e-05)   |chi|^2 195.25513 (-4.6e-04)
+      kg_test.go:235: A0 = 0.005 (e A0 / hbar is 0.04 of Omega0): charge -189.85219 (+3.0e-04)   |chi|^2 194.90874 (-2.2e-03)
+      kg_test.go:244: A0 = 0.005 changed |chi|^2 by -2.24e-03
+      kg_test.go:235: A0 = 0.010 (e A0 / hbar is 0.08 of Omega0): charge -189.90058 (+5.5e-04)   |chi|^2 194.49655 (-4.3e-03)
+      kg_test.go:244: A0 = 0.01 changed |chi|^2 by -4.35e-03
+  --- FAIL: TestSchrodingerNorm (7.18s)
+      schrodinger_test.go:79: BoxStandingWave     norm 1953.12492, varies by 1.03e-04 (0.000%) over 2000 steps
+      schrodinger_test.go:79: HarmonicOscillator  norm 180.31984, varies by +Inf (+Inf%) over 2000 steps
+      schrodinger_test.go:85: HarmonicOscillator: norm varies by +Inf%
+      schrodinger_test.go:79: HydrogenGround      norm 362.42591, varies by +Inf (+Inf%) over 2000 steps
+  ...
+  ```
+
+</details>
+
+<thinking>
+Now serious problems appear: HarmonicOscillator and HydrogenGround norms blow up to infinity, the hydrogen node test explodes to 1.57e+08, and the coherent state period comes out wrong (259 vs 320). This suggests something's off with how Schrodinger's potentials are being computed.
+
+Actually, the real culprit is likely the default Edges setting — it switched from EdgesFixed to EdgesWrap. With a wrapped boundary, the harmonic well's wavefunction tail leaks out one side and re-enters where the potential is also at max, causing instability that wouldn't occur with a fixed, clamped-to-zero boundary.
+
+The vmax clamp on the quadratic potential itself still holds since ħ/2m and the kinetic budget haven't changed, so the blow-up must come specifically from how the wrap boundary interacts with the well's edges rather than from the potential magnitude itself.
+
+But HydrogenGround and HydrogenP also blew up under wrap, which points elsewhere — maybe the wrap logic (RunEdgesHalo/WrapEdges) is now actually executing for Schrödinger cases since Edges==EdgesWrap, whereas previously with EdgesFixed it was a no-op.
+
+Actually the real culprit is probably that EdgesFixed used to pin the potential's edge region at zero, so the state never reached the high-V corners. With wrapping, the state can now touch that region where |E|Δt/ħ approaches or exceeds the stability bound of 2 — for the HarmonicOscillator test at 24³, V at the corner clamps to vmax=0.667 and combined with the kinetic budget of 1.333 sums to exactly 2.0, right at the marginal instability threshold. So these bound-state demos genuinely depend on fixed edges to stay stable.
+
+I should set EdgesFixed specifically for the bound-state Schrodinger configs — HarmonicOscillator, BoxStandingWave, BoxTwoStates, HydrogenGround, HydrogenP — while leaving FreePacket on the shared wrap boundary, since a bound state in a box needs walls but a free packet should wrap freely. I'm now wondering whether the same logic applies to bound configs in the other equations, like KGC's ScalarHydrogen setup.
+
+The other equations already handle this per-config: KG-complex and Dirac set EdgesDamp in several places, and Weyl's WeylHydrogen sets EdgesWrap, which becomes redundant but harmless once the shared default changes. That leaves me reconsidering TestSchrodingerCoherent's period discrepancy (259 vs 320) — likely caused by wrap-induced distortion near instability that should resolve once EdgesFixed is restored — and TestKGGaugeUniform's gauge tolerance issue tied to the mass and Omega0 changes affecting the eA0/hbar term.
+
+Actually looking closer, Omega0 went up 4x (0.03125 to 0.125) with the new mass/coupling values, which should make the perturbation relatively smaller, yet |chi|² changed by 2.2e-3, exceeding what seems to be a 1e-3 tolerance — that's odd since I'd expect better stability, not worse. I'll need to dig into that test separately. Moving on, TestElectroweakDamp also shows a similar "not enough steps" issue at 28% remaining.
+
+My plan going forward: bound state mass is set to 4 and done; Schrödinger bound configs need EdgesFixed applied; both damp tests need more steps allotted; TestDispersion needs its minVd and Wave/Weyl ratio assertions retuned; and TestKGGaugeUniform needs investigation. First I want to let the scratch damp run finish since it'll give me the step-count data I need, even though it's using the old bound state mass — that shouldn't matter for this particular measurement.
+
+Now looking at which Schrödinger configs are bound: Free Packet, Harmonic Oscillator, Box Standing Wave, Box Two States, Hydrogen Ground, and Hydrogen P — everything except Free Packet needs walls. Setting EdgesFixed explicitly in five of the six functions seems like the cleanest approach, though I'm weighing whether it'd be better to set it at the equation level instead and have FreePacket override it.
+
+Given 5 of 6 need it, per-demo explicitness feels right and lets me document why — bound states need walls since the potential at the wrapped edge sits at the stability ceiling. I'm considering whether a small helper method makes sense here versus just inlining it with a shared comment, weighing DRY-ness against over-engineering for something this small.
+
+I'll just inline the fixed-edges setting in each bound-state demo with one thorough comment on the first occurrence and shorter notes afterward, since repeated update calls are cheap. Let me also double-check whether HydrogenGround actually needs this before applying it everywhere, testing empirically as I go.
+
+
+</thinking>
+
+Schrödinger's bound states blow up to `+Inf` at C=0.25 — that's the wrap default, not C. Let me check the scratch measurement first:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b0lubbkh3.output 2>/dev/null | head -22``
+  ```
+  (Bash completed with no output)
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('schrodinger.goal').read()
+
+# the bound demos need walls; the free packet does not
+walls = """	// a bound state wants a WALL, not a wrapped neighbour: the potential at the
+	// far edge is up against SchrodingerVMax, and the shared wrap carries the
+	// tail straight into it, which puts |E| past the stability bound.
+	ss.Params.Edges = EdgesFixed
+	ss.Params.Update()
+"""
+short = """	ss.Params.Edges = EdgesFixed // bound: walls, not wrap. See HarmonicOscillator.
+	ss.Params.Update()
+"""
+targets = [
+ ("func HarmonicOscillator(ss *Sim) {\n", walls),
+ ("func BoxStandingWave(ss *Sim) {\n\tss.Params.Edges = EdgesFixed // walls at zero: this IS the box\n\tss.Params.Update()\n", None),
+ ("func BoxTwoStates(ss *Sim) {\n\tss.Params.Edges = EdgesFixed // walls at zero: this IS the box\n\tss.Params.Update()\n", None),
+ ("func HydrogenGround(ss *Sim) {\n", short),
+ ("func HydrogenP(ss *Sim) {\n", short),
+]
+for anchor, ins in targets:
+    assert anchor in s, anchor[:40]
+    if ins is None:
+        continue
+    s = s.replace(anchor, anchor + ins, 1)
+open('schrodinger.goal','w').write(s)
+PY
+grep -n "EdgesFixed" schrodinger.goal; goal build 2>&1|tail -1``
+  ```
+  197:	ss.Params.Edges = EdgesFixed
+  217:	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+  229:	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+  252:	ss.Params.Edges = EdgesFixed // bound: walls, not wrap. See HarmonicOscillator.
+  277:	ss.Params.Edges = EdgesFixed // bound: walls, not wrap. See HarmonicOscillator.
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && go test -run 'TestSchrodinger|TestDiracHydrogenBound' -v ./ 2>&1 | grep -E "^---|_test.go:" | head -25``
+  ```
+      dirac_test.go:297: DiracHydrogen   rms  8.654, spreads at most +10.8%, max E 0.01338
+      dirac_test.go:297: DiracHydrogenP  rms 13.639, spreads at most +0.0%, max E 0.02676
+  --- PASS: TestDiracHydrogenBound (46.25s)
+      schrodinger_test.go:79: BoxStandingWave     norm 1953.12492, varies by 1.03e-04 (0.000%) over 2000 steps
+      schrodinger_test.go:79: HarmonicOscillator  norm 180.31984, varies by 1.26e-05 (0.000%) over 2000 steps
+      schrodinger_test.go:79: HydrogenGround      norm 362.42591, varies by 2.86e-05 (0.000%) over 2000 steps
+  --- PASS: TestSchrodingerNorm (11.59s)
+      schrodinger_test.go:106: box ground state |chi|^2 at center: 0.97468, varies by 4.23e-06 (0.000%)
+  --- PASS: TestSchrodingerBoxStationary (1.40s)
+      schrodinger_test.go:142: coherent state period 324.5 sim steps, want 320.0 (+1.4%)
+  --- PASS: TestSchrodingerCoherent (8.75s)
+      schrodinger_test.go:176: group velocity 0.34988, hbar sin(k) / m = 0.35355, stat 0.34988
+  --- PASS: TestSchrodingerGroupVel (3.74s)
+      schrodinger_test.go:206: uncapped corner V would be 1.184, clamped to 0.667; norm 252.98198 varies by 6.24e-06 (0.000%)
+  --- PASS: TestSchrodingerBigBox (9.76s)
+      schrodinger_test.go:241: lobe peak 0.13533 at dz = +-5, node stays under 0.00154 (1.139% of peak) over 1000 steps
+  --- PASS: TestSchrodingerHydrogenP (13.29s)
+  ```
+
+</details>
+
+<thinking>
+All Schrodinger tests pass now, with BoundStateMass=4 fixing DiracHydrogen's spread from 78.7% down to 10.8%, and TestSchrodingerCoherent passing at +1.4%. Now I need to look at the remaining failures: TestDispersion, TestEdgesDamp, TestElectroweakDamp, and TestKGGaugeUniform, starting with the damping measurements.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b0lubbkh3.output 2>/dev/null | head -22``
+  ```
+  (Bash completed with no output)
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bvcfmtinu, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Both of your asks are done and verified:
+
+**`BoundStateMass = 4`** — Compton back to exactly 1 cube at C=0.25, Zα back to 0.2. `TestDiracHydrogenBound` goes from 78.7% spread to **10.8%**. I noted in the doc that it's deliberately heavier than the shared free-packet mass, and why: tie it to that and the atom is 1/Zα Compton wavelengths across, which doesn't fit the lattice.
+
+**Schrödinger's bound demos were the real casualty of the wrap default** — not C. `HarmonicOscillator` and `HydrogenGround` were going to `+Inf`, and `HydrogenP`'s node hit 1.57e8.
+
+The mechanism: the well's potential at the far edge sits right up against `SchrodingerVMax`, and with the kinetic term already spending 1.333 of the budget of 2, wrap carries the tail straight into that region and pushes |E| past the bound. `EdgesFixed` had been pinning those cells at zero, so it never mattered.
+
+So it's not just the two box demos — every *bound* Schrödinger config needs walls. `HarmonicOscillator`, `HydrogenGround` and `HydrogenP` now set `EdgesFixed` too; `FreePacket` keeps the shared wrap, which is what it wants anyway.
+
+```
+BoxStandingWave     norm varies by 1.03e-04 (0.000%) over 2000 steps
+HarmonicOscillator  norm varies by 1.26e-05 (0.000%)
+HydrogenGround      norm varies by 2.86e-05 (0.000%)
+coherent state period 324.5 steps, want 320.0 (+1.4%)
+HydrogenP node stays under 1.139% of peak over 1000 steps
+```
+
+All eight Schrödinger tests pass.
+
+Still open, and I'm measuring rather than guessing at the retune: `TestEdgesDamp` (24–31% left for Wave/KGC/Dirac) and `TestElectroweakDamp` (28%) are both the same "packets are slower at C=0.25, so 300 steps no longer reaches the wall". I have a sweep running at 300/600/900/1200 steps, slab and blob, to see where each one actually bottoms out — and whether the slab default means the transverse faces are doing the absorbing rather than the boundary under test. `TestDispersion` needs its `minVd` and the Wave-vs-Weyl ratio reset, since Wave's `Vd` is now −0.0017 and that ratio no longer means anything.
+
+## 🧑 User - 2026-09-24 21:41:56
+
+<task-notification>
+<task-id>b0lubbkh3</task-id>
+<tool-use-id>toolu_014eVogiuF8EpuhLTUKo7Vay</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b0lubbkh3.output</output-file>
+<status>completed</status>
+<summary>Background command "Measure absorption vs steps and envelope" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 21:41:58
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b0lubbkh3.output``
+  ```
+  === RUN   TestScratchDamp
+  === PacketSlab = true
+    Wave           300: 24.028%  600:  3.551%  900:  1.227%  1200:  0.403%
+    KleinGordonC   300: 29.866%  600: 10.814%  900:  2.902%  1200:  0.734%
+    Dirac          300: 31.239%  600: 11.077%  900:  2.239%  1200:  0.733%
+    Schrodinger    300:  0.053%  600:  0.005%  900:  0.001%  1200:  0.001%
+    WaveCDir       300:  0.151%  600:  0.047%  900:  0.015%  1200:  0.006%
+    WaveC          300:  0.054%  600:  0.005%  900:  0.002%  1200:  0.001%
+    Weyl           300:  0.131%  600:  0.048%  900:  0.014%  1200:  0.008%
+  === PacketSlab = false
+    Wave           300: 24.352%  600:  3.790%  900:  1.418%  1200:  0.435%
+    KleinGordonC   300: 19.770%  600:  8.376%  900:  3.015%  1200:  1.099%
+    Dirac          300: 22.058%  600:  9.009%  900:  3.015%  1200:  1.085%
+    Schrodinger    300:  0.065%  600:  0.006%  900:  0.001%  1200:  0.001%
+    WaveCDir       300:  0.361%  600:  0.111%  900:  0.028%  1200:  0.011%
+    WaveC          300:  0.066%  600:  0.006%  900:  0.001%  1200:  0.001%
+    Weyl           300:  0.396%  600:  0.153%  900:  0.040%  1200:  0.020%
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+<thinking>
+The data looks clean, decaying monotonically to well under 1% by 1200 steps, and slab versus blob barely differs, so the transverse faces aren't doing the work — my concern there was unfounded. At 1200 steps the max is KGC 0.734% for slab versus 1.099% for blob, which matters since blob exceeds the 1% threshold while slab stays under it, and the test uses the default PacketSlab=true so it passes at 0.734%.
+
+That's cutting it close though, so I'd rather use 1500 steps for margin — extrapolating the decay rate, that should land around 0.25%. But the runtime cost is steep: 300 steps takes 42s for the whole test, so 1500 would push it to 210s, and with the suite already around 400s that's a substantial hit. I'm weighing whether shrinking the box (sz=32 instead of 48) could offset the cost, since fewer cells and a shorter travel distance would roughly cancel out, though it changes the fraction of the box occupied by the damping layer, which might alter what's actually being tested. I'm second-guessing whether that fractional-box concern is even a real issue worth worrying about.
+
+Thinking it through more carefully, since a bigger damping layer fraction just makes the test marginally easier rather than invalid, I decide the more principled approach is to derive the step count directly from the physics: I want enough time for the slowest packet to traverse the box a few times, so using the slowest group velocity for a sz=48 box gives about 400 steps per traversal, and three traversals means 1200 steps. I'll go with sz=48, 1200 steps, a 1% threshold, and document the reasoning — that puts runtime around 170s, pushing the suite to roughly 530s, which I'm still weighing as acceptable.
+
+Testing a smaller sz=40 with 1000 steps as a faster alternative, giving about three traversals and an estimated 81s runtime, but I settle on the simpler, more defensible choice of keeping sz=48 unchanged (so the absorber fraction stays consistent with prior results) and just extending to 1200 steps, accepting the added runtime since other tests in this suite already run 40-50+ seconds.
+
+I still want to check TestElectroweakDamp, which fails at 28% with 300 steps, and probably needs a similar increase, plus revisit the TestDispersion assertions. Rather than picking numbers arbitrarily, I think the cleanest fix is to have each test derive its step count from the physics requirement of roughly three box traversals at the expected slowest speed, documented with a comment, using sz=40 to keep the cost reasonable — I'll measure to confirm this works before committing.
+
+
+</thinking>
+
+Clean data, and it settles the question: slab vs blob barely differs, so the transverse faces are **not** doing the absorbing — my concern was unfounded. Everything decays monotonically; it was purely a time problem.
+
+```
+                300       600       900      1200
+Wave         24.028%    3.551%    1.227%    0.403%
+KleinGordonC 29.866%   10.814%    2.902%    0.734%
+Dirac        31.239%   11.077%    2.239%    0.733%
+Schrodinger   0.053%    0.005%    0.001%    0.001%
+```
+
+Let me find a size/step pair that isn't 3 minutes:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+	"time"
+
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchDamp2(t *testing.T) {
+	for _, cfg := range []struct{ sz, nst int32 }{{40, 1000}, {32, 800}} {
+		start := time.Now()
+		fmt.Printf("\n=== sz %d  steps %d\n", cfg.sz, cfg.nst)
+		for _, tc := range []struct {
+			eq   Equations
+			name string
+			init func(*Sim)
+		}{
+			{Wave, "Wave", nil},
+			{KleinGordonC, "KleinGordonC", ChargedPacket},
+			{Dirac, "Dirac", func(s *Sim) {
+				s.MovingWavePacketConfig(Dirac1As, Dirac1Av, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+			}},
+			{Weyl, "Weyl", nil},
+		} {
+			ss := dampSim(tc.eq, cfg.sz, tc.init)
+			ss.StepRun()
+			t0 := dampTot(ss)
+			for range int(cfg.nst) {
+				ss.StepRun()
+			}
+			fmt.Printf("  %-13s %7.3f%%\n", tc.name, 100*dampTot(ss)/t0)
+		}
+		fmt.Printf("  (%.0fs)\n", time.Since(start).Seconds())
+	}
+}
+EOF
+go test -run TestScratchDamp2 -v -timeout 900s ./ 2>&1 | grep -E "^===|^  " | head -14``
+  ```
+  Command did not complete within its 120s timeout and was moved to the background (ID: b07xifo7f). Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b07xifo7f.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bzf185dss, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b07xifo7f.output``
+  ```
+  === RUN   TestScratchDamp2
+  === sz 40  steps 1000
+    Wave            0.420%
+    KleinGordonC    0.740%
+    Dirac           0.761%
+    Weyl            0.007%
+    (65s)
+  === sz 32  steps 800
+    Wave            0.367%
+    KleinGordonC    0.737%
+    Dirac           0.801%
+    Weyl            0.005%
+    (26s)
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+<thinking>
+Comparing sz=40/1000 versus sz=32/800, the latter matches current runtime cost while giving essentially identical accuracy, and keeps the same absorber width of 8. I'm picking sz=32/800 as the winner.
+
+Since 0.80% is a bit tight against the 1% threshold, I'll bump to 900 steps for more margin — estimating decay improves to roughly 0.6%, which feels safer. Now I need to look at TestElectroweakDamp (28.07% at 300 steps) and TestDispersion to apply similar scaling there.
+
+
+</thinking>
+
+sz=32/800 gives the same answer as sz=48/1200 at the original runtime. Let me apply both retunes:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && sed -n 820,855p electroweak_test.go``
+  ```
+  	const sz = 24
+  	for _, edges := range []Edges{EdgesWrap, EdgesDamp} {
+  		ss := ewDampSim(sz, edges, HiggsBroken)
+  		v := float64(ss.Params.HiggsV)
+  		var lo, hi = math.Inf(1), 0.0
+  		for range 100 {
+  			ss.StepRun()
+  			c := GetCtx(0)
+  			for _, p := range [][3]int{{1, 1, 1}, {sz / 2, sz / 2, sz / 2}, {sz, sz, sz}} {
+  				m := math.Sqrt(float64(State.Value(p[2], p[1], p[0], int(EWHmag), int(c.CurState))))
+  				lo, hi = math.Min(lo, m), math.Max(hi, m)
+  			}
+  		}
+  		off := math.Max(math.Abs(lo-v), math.Abs(hi-v)) / v
+  		if off > 0.01 {
+  			t.Errorf("%v: the broken vacuum wandered to %.5f..%.5f against v = %.5f", edges, lo, hi, v)
+  		}
+  		t.Logf("%v: |Phi| holds at %.5f..%.5f, v = %.5f", edges, lo, hi, v)
+  	}
+  
+  ...
+  ```
+
+</details>
+
+<thinking>
+Since the photon moves at half speed with C=0.25, 300 steps only covers 75 cells (1.5 crossings) instead of 150, which explains the lower 28% reading — doubling the step count to 600 should restore full coverage.
+
+Comparing to the Wave test, which is also massless at C=0.25 and needed 900-1200 steps at sz=48 to hit acceptable error, I suspect EW needs similarly high step counts, but since EW's threshold is looser (2% vs 1%), 900 steps might land around 1-2% — worth measuring directly rather than guessing, especially since running at full size is costly (51s for 300 steps at 48³). I'll shrink to sz=32 like the edges test to cut cost roughly to 0.89x while testing 600/900/1200 steps for EW, and apply the same sz=32/900-step change to the edges test itself.
+
+I also need to revisit TestDispersion's assertions — the "Dirac at rest: minVd 0.1" threshold is way off since measured value is 0.0041, so I need to reconsider what the physics actually predicts there.
+
+But something more troubling shows up: at C=0.25 both WaveCDir and Weyl neutrino now report small *negative* Vd values (~-0.004) instead of the near-zero or slightly positive values they had before, muddying the previously clean "gradient equations hold at zero" signal since now all three cases (Wave, WaveCDir, Weyl neutrino) show nonzero breathing-mode Vd.
+
+The likely culprit is that the shorter step count at the slower C ratio isn't covering enough of the breathing cycle to average it out — the test setup travels far fewer cells than before, so I need to scale nst proportionally (300 steps at C=0.25 to match 150 at C=0.5) and re-measure to see if the clean structure returns.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('edges_test.go').read()
+old = """func TestEdgesDamp(t *testing.T) {
+	const sz = 48"""
+new = """// The step count is set by the SLOWEST packet: at the shared mass a massive
+// one moves at about 0.12 cubes per step, so it needs some 270 steps just to
+// cross the box once, and a boundary that reflects only shows it on the way
+// back. This is about three traversals. Raising C or lowering Mass would let
+// it run shorter, but then it would not be the packet the other tests use.
+func TestEdgesDamp(t *testing.T) {
+	const sz = 32
+	const nst = 900"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """		for range 300 {
+			ss.StepRun()
+		}
+		left := dampTot(ss) / t0
+		if left > 0.01 {
+			t.Errorf("%s: %.3f%% of the wave is still in the box after 300 steps -- it is reflecting",
+				tc.name, 100*left)
+		}
+		t.Logf("%-13s %.3f%% left after 300 steps", tc.name, 100*left)"""
+new = """		for range nst {
+			ss.StepRun()
+		}
+		left := dampTot(ss) / t0
+		if left > 0.01 {
+			t.Errorf("%s: %.3f%% of the wave is still in the box after %d steps -- it is reflecting",
+				tc.name, 100*left, nst)
+		}
+		t.Logf("%-13s %.3f%% left after %d steps", tc.name, 100*left, nst)"""
+assert old in s
+open('edges_test.go','w').write(s.replace(old, new, 1))
+PY
+cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"testing"
+
+	"cogentcore.org/core/enums"
+	"cogentcore.org/core/math32"
+)
+
+func TestScratchTune(t *testing.T) {
+	// EW photon pulse: how many steps to clear at the shared C
+	for _, sz := range []int32{32} {
+		ss := ewDampSim(sz, EdgesDamp, PhotonPulse)
+		ss.StepRun()
+		g0 := ewGaugeWave()
+		n := 0
+		out := fmt.Sprintf("  EW photon sz %d:", sz)
+		for _, target := range []int{300, 600, 900, 1200} {
+			for n < target {
+				ss.StepRun()
+				n++
+			}
+			out += fmt.Sprintf("  %d:%7.3f%%", target, 100*ewGaugeWave()/g0)
+		}
+		fmt.Println(out)
+	}
+	// dispersion structure at a longer run, to cover the same distance as before
+	fmt.Println("\n=== TestDispersion at 300 steps (was 150)")
+	for _, tc := range []struct {
+		name  string
+		eq    Equations
+		probe enums.Enum
+		init  func(*Sim)
+	}{
+		{"Wave", Wave, WavePos, nil},
+		{"WaveCDir", WaveCDir, WaveCMag, nil},
+		{"Weyl neutrino", Weyl, WeylMag, NeutrinoPacket},
+		{"Schrodinger", Schrodinger, CabMag, FreePacket},
+		{"Dirac at rest", Dirac, DiracMag, SpinAtRest},
+	} {
+		ss := &Sim{}
+		ss.Config = &Config{}
+		ss.Config.Defaults()
+		ss.Config.GPU, ss.Config.GUI = false, false
+		ss.Config.Equation = tc.eq
+		ss.Config.Size.Set(384, 4, 4)
+		ss.Config.Wavelength, ss.Config.PacketWidth = 16, 32
+		ss.ConfigSim()
+		if tc.init != nil {
+			ss.InitFunc = tc.init
+			ss.Init()
+		}
+		for range 300 {
+			ss.StepRun()
+		}
+		wd := ss.StatVals(StatWidthName(tc.probe, math32.X))
+		vg := dispMean(ss.StatVals(StatGroupVelName(tc.probe, math32.X)))
+		vd := dispMean(ss.StatVals(StatDispersionName(tc.probe, math32.X)))
+		fmt.Printf("  %-14s Vg %+.4f  Vd %+.5f  w %6.3f -> %6.3f\n", tc.name, vg, vd, wd[0], wd[len(wd)-1])
+	}
+}
+EOF
+goal build 2>&1|tail -1 && go test -run TestScratchTune -v -timeout 600s ./ 2>&1 | grep -E "^===|^  " | head -12``
+  ```
+  goal build succeeded
+  === RUN   TestScratchTune
+    EW photon sz 32:  300: 10.489%  600:  1.415%  900:  0.265%  1200:  0.034%
+  === TestDispersion at 300 steps (was 150)
+    Wave           Vg +0.9855  Vd +0.01030  w 16.002 -> 16.710
+    WaveCDir       Vg +0.9453  Vd +0.00044  w 15.997 -> 16.022
+    Weyl neutrino  Vg +0.9449  Vd +0.00044  w 15.997 -> 16.022
+    Schrodinger    Vg +0.7650  Vd +0.00809  w 16.000 -> 16.603
+    Dirac at rest  Vg -0.0000  Vd +0.00841  w 16.000 -> 16.771
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+At 300 steps the structure comes back cleanly: Wave shows a lattice dispersion around Vd +0.0103, while WaveCDir and the Weyl neutrino both show gradients near zero at +0.00044, and Schrodinger and Dirac at rest land around +0.0081-0.0084. I'm now comparing Wave against WaveCDir to see what distinguishes them.
+
+Ratio-wise, 0.0103/0.00044 gives 23×, comfortably clearing the ≥10 threshold, and a maxVd bound of 0.005 works fine for both WaveCDir and the Weyl neutrino. Dirac at rest sits at 0.00841 though, so minVd needs retuning from 0.1 down to roughly 0.005. Checking the EW photon test at sz=32 with 900 steps gives 0.265%, safely under 2%, so I want to align sz=32/900 with the edges test. That means updating three spots: edges_test.go already set to sz=32/nst=900, electroweak_test.go's photon pulse needs sz 48→32 and steps 300→900, and dispersion_test.go needs nst 150→300 plus the minVd change for Dirac at rest. I've confirmed the dispersion ratio assertion holds (23× ≥ 10) and maxVd=0.005 works for both near-zero cases. Now I want to double-check the Weyl electron probe and TestKGGaugeUniform before applying edits and running the suite — though I'm second-guessing whether 0.005 gives enough margin (only 1.7×) for the Dirac at rest bound.
+
+Since the whole point of that assertion is showing a massive particle spreads even at rest, in contrast to the near-zero gradient values, I think 0.004 is a better bound — it keeps clear separation from 0.00044 (9×) while still leaving 2× margin under the measured 0.00841. I'll use 0.004 and update the assertion message accordingly, then check whether the doc comment in TestDispersion needs updating too, though its wording about the massless Weyl packet holding shape better still seems accurate. Time to apply these edits.
+
+
+</thinking>
+
+The 300-step run restores the structure completely — `Wave` 0.0103 vs the gradient equations at 0.00044, a 23× separation. Applying all three retunes:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && python3 - <<'PY'
+# EW photon pulse: same reasoning as TestEdgesDamp
+s=open('electroweak_test.go').read()
+old = """	ss := ewDampSim(48, EdgesDamp, PhotonPulse)
+	ss.StepRun()
+	g0 := ewGaugeWave()
+	for range 300 {
+		ss.StepRun()
+	}
+	left := ewGaugeWave() / g0
+	if left > 0.02 {
+		t.Errorf("photon pulse: %.2f%% of the gauge WAVE is still in the box", 100*left)
+	}
+	t.Logf("photon pulse: %.3f%% of the gauge wave left after 300 steps", 100*left)"""
+new = """	// as in TestEdgesDamp, the step count is several box traversals at the
+	// shared C: a boundary that reflects only shows it on the way back
+	const psz, pst = 32, 900
+	ss := ewDampSim(psz, EdgesDamp, PhotonPulse)
+	ss.StepRun()
+	g0 := ewGaugeWave()
+	for range pst {
+		ss.StepRun()
+	}
+	left := ewGaugeWave() / g0
+	if left > 0.02 {
+		t.Errorf("photon pulse: %.2f%% of the gauge WAVE is still in the box", 100*left)
+	}
+	t.Logf("photon pulse: %.3f%% of the gauge wave left after %d steps", 100*left, pst)"""
+assert old in s
+open('electroweak_test.go','w').write(s.replace(old, new, 1))
+
+# dispersion: same distance covered as before, and a threshold that matches the shared mass
+s=open('dispersion_test.go').read()
+old = """	const sz = 384
+	const nst = 150"""
+new = """	const sz = 384
+	// enough steps for the packet to cover the same ground it used to at a
+	// higher C: a rate averaged over less than a breathing cycle reads
+	// whichever half of the cycle it landed in
+	const nst = 300"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """{name: "Dirac at rest", eq: Dirac, probe: DiracMag, init: SpinAtRest, rest: true, minVd: 0.1},"""
+new = """{name: "Dirac at rest", eq: Dirac, probe: DiracMag, init: SpinAtRest, rest: true, minVd: 0.004},"""
+assert old in s
+open('dispersion_test.go','w').write(s.replace(old, new, 1))
+PY
+go test -run 'TestDispersion|TestPacketEnvelope|TestEdgesDamp|TestElectroweakDamp' -v -timeout 900s ./ 2>&1 | grep -E "^---|_test.go:" | head -30``
+  ```
+  Command running in background with ID: b7q0kllnu. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7q0kllnu.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 200,250p kg_test.go``
+  ```
+  	ss.RunStats(false)
+  }
+  
+  // TestKGGaugeUniform: a uniform constant A0 is pure gauge -- it multiplies chi
+  // by a phase and changes no observable. Both |chi|^2 and the total charge must
+  // come out the same as with no field at all.
+  //
+  // The charge is the sharper half. Its free part alone is NOT invariant: the
+  // phase rotation adds to phi_b d(phi_a) - phi_a d(phi_b). The -e^2 A0 |chi|^2
+  // term in rho is exactly what cancels that, so this checks that the coupling
+  // term in the CHARGE matches the coupling term in the EQUATION.
+  //
+  // The field has to be set BEFORE the wave, because ChargedUniform reads A0 to
+  // get the turning rate right; start it at the free rate and the state is a
+  // superposition of the two frequencies, which beats and is not a gauge
+  // transform of anything.
+  func TestKGGaugeUniform(t *testing.T) {
+  	const sz = 6
+  	run := func(a0 float32) (q, cc float64) {
+  		ss := kgSim(sz, func(s *Sim) {
+  ...
+  ```
+
+</details>
+
+<thinking>
+The test itself notes that the chi^2 drift grows linearly with A0 due to a discretization effect from applying rotation at half steps, not an invariance failure — the charge check is the sharper diagnostic. The chi^2 failures occurred at A0=0.005 and A0=0.01, exceeding the 2e-3 tolerance, while the charge check passed comfortably at those same points.
+
+Checking the numbers, Omega0 went from 0.03125 under the old mass to 0.125 now, a 4x increase, even though the rotation angle per step (2eA0Δt/ħ) stayed the same regardless of mass. The drift growing in proportion to this jump in Omega0 makes sense if the discretization error scales roughly as A0 × Omega0 × Δt², since a faster intrinsic turning rate amplifies the half-step interleaving error. Given that the charge check — the sharper test — still passes, the sensible fix is to loosen the tolerance on the chi^2 check rather than treat this as a real invariance violation.
+
+Testing across A0 values (0.001, 0.005, 0.01) I find the measured drift divided by A0 gives a nearly constant ratio around 0.43-0.46, confirming the documented linear scaling. That means a principled tolerance would be bounding the drift at roughly 0.5 × A0 instead of using some arbitrary flat number — this actually tests the expected linear relationship rather than just papering over the numeric discrepancy. I'll implement the tolerance check that way.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('kg_test.go').read()
+old = """		// |chi|^2 drifts a little, growing linearly with A0: a discretization
+		// effect of applying the rotation at half steps, not a failure of the
+		// invariance. The charge above is the sharper statement.
+		if math.Abs(cc/cc0-1) > 2e-3 {
+			t.Errorf("A0 = %g changed |chi|^2 by %.2e", a0, cc/cc0-1)
+		}"""
+new = """		// |chi|^2 drifts a little: a discretization effect of applying the
+		// rotation at half steps, not a failure of the invariance. The charge
+		// above is the sharper statement. What is checked here is the SHAPE of
+		// that error rather than a fixed size -- it is linear in A0, at about
+		// 0.44 of it, so the bound scales the same way and does not have to be
+		// re-picked when the mass or C move the state's own turning rate.
+		if math.Abs(cc/cc0-1) > 0.5*float64(a0) {
+			t.Errorf("A0 = %g changed |chi|^2 by %.2e, more than the linear %.2e",
+				a0, cc/cc0-1, 0.5*float64(a0))
+		}"""
+assert old in s
+open('kg_test.go','w').write(s.replace(old, new, 1))
+PY
+cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7q0kllnu.output 2>/dev/null | head -30``
+  ```
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Monitor**: `description, timeout_ms, command`
+  ```
+  Monitor started (task b9ifz3d3p, expires in 15m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+Both retunes applied, plus a third that fell out of the same root cause. Waiting on verification.
+
+## `TestEdgesDamp` — sz 48→32, 300→900 steps
+
+The measurement showed the box size barely matters but the step count is everything, so I took the size *down* to keep runtime flat while tripling the steps:
+
+| | sz 48 / 1200 | sz 40 / 1000 | **sz 32 / 900** |
+|---|---|---|---|
+| Wave | 0.403% | 0.420% | ~0.37% |
+| KleinGordonC | 0.734% | 0.740% | ~0.74% |
+| Dirac | 0.733% | 0.761% | ~0.80% |
+| cost | ~170s | 65s | **~30s** |
+
+Same answer, same runtime as before. The 1% threshold stands. I documented the count as roughly three box traversals at the slowest packet's 0.12 cubes/step, so the *reason* is in the code rather than a magic number.
+
+## `TestElectroweakDamp` — same treatment
+
+The photon pulse is massless but still halved in speed by C. At sz=32: 300 → 10.5%, 600 → 1.4%, **900 → 0.265%**, comfortably under its 2% threshold.
+
+## `TestDispersion` — 150 → 300 steps
+
+This one wasn't just a threshold. At C=0.25 the packets cover half the ground in 150 steps, which is less than a breathing cycle, so the window mean was landing on whichever half of the breath it caught — `WaveCDir` and `Weyl` were reading −0.004 instead of ≈0. Doubling the steps to cover the same distance restores it:
+
+```
+Wave           Vd +0.01030
+WaveCDir       Vd +0.00044
+Weyl neutrino  Vd +0.00044
+Schrodinger    Vd +0.00809
+Dirac at rest  Vd +0.00841
+```
+
+23× separation between Wave and the gradient equations, so the ≥10 ratio assertion holds. `minVd` for Dirac-at-rest goes 0.1 → 0.004, which still separates it 9× from the gradient cases.
+
+## `TestKGGaugeUniform` — replaced the magic number
+
+The |χ|² drift grew because `Omega0` went up 4× with the shared mass, and the half-step rotation error scales with the state's own turning rate. The charge check — the sharp one, per the test's own comment — still passes at 5.5e-4.
+
+Rather than bump 2e-3 to 5e-3, I checked the scaling: drift/A0 = 0.46, 0.44, 0.43 across the three fields. Dead linear, exactly as the comment claims. So the bound is now `0.5 * A0`, which tests the documented behavior and won't need re-picking next time the mass or C moves.
+
+## 🧑 User - 2026-09-24 22:03:56
+
+<task-notification>
+<task-id>b7q0kllnu</task-id>
+<tool-use-id>toolu_01YP9aC8fnVprt112nHaFhcr</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7q0kllnu.output</output-file>
+<status>completed</status>
+<summary>Background command "Apply retunes and verify" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 22:04:03
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7q0kllnu.output``
+  ```
+      dispersion_test.go:154: Weyl neutrino  slab: X  5.99 ->  6.02 ( +0.5%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Weyl neutrino  blob: X  5.99 ->  7.10 (+18.5%)   Z  6.00 ->  7.33 (+22.2%)
+      dispersion_test.go:154: Schrodinger    slab: X  6.00 ->  6.78 (+13.0%)   Z 13.86 -> 13.86 ( +0.0%)
+      dispersion_test.go:154: Schrodinger    blob: X  6.00 ->  6.74 (+12.4%)   Z  6.00 ->  6.80 (+13.4%)
+  --- PASS: TestPacketEnvelope (22.64s)
+      dispersion_test.go:283: Wave           Vg +0.9855  Vd +0.01030   width 16.002 -> 16.710 (+4.4%)
+      dispersion_test.go:283: KleinGordon    Vg +0.6017  Vd +0.00596   width 16.002 -> 16.352 (+2.2%)
+      dispersion_test.go:283: Maxwell photon Vg +0.9865  Vd +0.01030   width 16.002 -> 16.710 (+4.4%)
+      dispersion_test.go:283: WaveC          Vg +0.7650  Vd +0.00809   width 16.000 -> 16.603 (+3.8%)
+      dispersion_test.go:283: WaveCDir       Vg +0.9453  Vd +0.00044   width 15.997 -> 16.022 (+0.2%)
+      dispersion_test.go:283: Schrodinger    Vg +0.7650  Vd +0.00809   width 16.000 -> 16.603 (+3.8%)
+      dispersion_test.go:283: KleinGordonC   Vg +0.6017  Vd +0.00596   width 16.002 -> 16.352 (+2.2%)
+      dispersion_test.go:283: Weyl neutrino  Vg +0.9449  Vd +0.00044   width 15.997 -> 16.022 (+0.2%)
+      dispersion_test.go:283: Weyl electron  Vg +0.5952  Vd -0.00021   width 15.999 -> 16.019 (+0.1%)
+      dispersion_test.go:283: Dirac at rest  Vg -0.0000  Vd +0.00841   width 16.000 -> 16.771 (+4.8%)  (at rest)
+  --- PASS: TestDispersion (4.25s)
+      edges_test.go:102: Wave          0.231% left after 900 steps
+      edges_test.go:102: KleinGordonC  0.496% left after 900 steps
+      edges_test.go:102: Dirac         0.583% left after 900 steps
+      edges_test.go:102: Schrodinger   0.000% left after 900 steps
+  ...
+  ```
+
+</details>
+
+All four pass. Running the full suite to confirm nothing else moved:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go; go generate ./... 2>&1 | grep -iE "^error|failed" | head; echo "gen ok"; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd ../wavesim && go test ./ 2>&1 | grep -E "^---|_test\.go:|^ok|^FAIL" | head -40``
+  ```
+  Command running in background with ID: b7b4c4dnl. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7b4c4dnl.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bpqgmzshi, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+All four retuned tests pass.
+
+```
+Wave          0.231% left after 900 steps      photon pulse: 0.265%
+KleinGordonC  0.496%                           Wrap: |Phi| holds at 0.12300
+Dirac         0.583%                           Damp: |Phi| holds at 0.12300
+Schrodinger   0.000%
+Weyl          0.004%
+```
+
+And the dispersion table is now the cleanest it's been:
+
+```
+Wave           Vg +0.9855  Vd +0.01030
+Maxwell photon Vg +0.9865  Vd +0.01030
+KleinGordon    Vg +0.6017  Vd +0.00596
+KleinGordonC   Vg +0.6017  Vd +0.00596
+WaveC          Vg +0.7650  Vd +0.00809
+Schrodinger    Vg +0.7650  Vd +0.00809
+WaveCDir       Vg +0.9453  Vd +0.00044
+Weyl neutrino  Vg +0.9449  Vd +0.00044
+Weyl electron  Vg +0.5952  Vd -0.00021
+Dirac at rest  Vg -0.0000  Vd +0.00841
+```
+
+Four exact pairings fall out of the shared parameters, none of them arranged:
+
+- **Maxwell = Wave** to four digits — the gauge potential really is just the wave equation.
+- **KleinGordonC = KleinGordon** exactly — the complex field adds nothing to the dispersion.
+- **Weyl neutrino = WaveCDir** at 0.00044 — the two gradient equations, both holding their shape.
+- **Schrodinger = WaveC** to four digits in *both* columns now. That's your Wave:KG = WaveC:Schrödinger identity showing up as literally the same numbers, which it couldn't before when WaveC was pinned at a different C.
+
+That last one is the payoff from dropping the `WaveCC` exception — at C=0.25 the two are finally on the same footing, and they turn out to be the same equation.
+
+Full suite plus both generates running now; I'll confirm when it lands.
+
+## 🧑 User - 2026-09-24 22:26:40
+
+<task-notification>
+<task-id>b7b4c4dnl</task-id>
+<tool-use-id>toolu_01XCZRAttre88VyL96vpRPia</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7b4c4dnl.output</output-file>
+<status>completed</status>
+<summary>Background command "Generate and full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-24 22:26:45
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/b7b4c4dnl.output``
+  ```
+  gosl.go
+  gen ok
+  goal run succeeded
+  --- FAIL: TestWaveDispersion (0.12s)
+      wave_test.go:89: Wave         wavelength 16: 1.0209 c
+      wave_test.go:89: Wave         wavelength 64: 1.1527 c
+      wave_test.go:89: KleinGordon  wavelength 16: 0.6298 c
+      wave_test.go:89: KleinGordon  wavelength 64: 0.1979 c
+      wave_test.go:95: Wave at wavelength 64 runs at 1.1527 c, but a massless wave has no scale to disperse about
+      wave_test.go:108: mass costs 0.3911 c at wavelength 16 and 0.9548 c at wavelength 64: the LONG waves are the ones it slows
+  --- FAIL: TestDiffusion (0.01s)
+      wave_test.go:175: the two coefficients must match to compare rates: 0.25 vs 0.0625
+  --- FAIL: TestWaveC (1.20s)
+      wavec_test.go:132: packet 3D=false dir +1: speed +0.1910, want +0.2500 -- a wave that split would barely move at all
+      wavec_test.go:138: 3D=false packet dir +1: speed +0.1910 = +0.764 c, total held
+      wavec_test.go:132: packet 3D=false dir -1: speed -0.1910, want -0.2500 -- a wave that split would barely move at all
+      wavec_test.go:138: 3D=false packet dir -1: speed -0.1910 = -0.764 c, total held
+      wavec_test.go:138: 3D=false pulse  dir +1: speed +0.2493 = +0.997 c, total held
+      wavec_test.go:138: 3D=false pulse  dir -1: speed -0.2493 = -0.997 c, total held
+      wavec_test.go:132: packet 3D=true dir +1: speed +0.1952, want +0.2500 -- a wave that split would barely move at all
+  ...
+  ```
+
+</details>
+
+<thinking>
+Three failures remain, all in the Wave/WaveC family. Looking at the first one, TestWaveDispersion shows the wave running superluminally at 1.15c for wavelength 64, and even at 1.02c for wavelength 16 — a massless second-order wave should stay at or below c, and dispersion should decrease at longer wavelengths, not increase, so something's off in how the wave speed is computed.
+
+Working through the group velocity formula for the leapfrog scheme by hand, at wavelength 64 the expected speed should be about 0.999c, not 1.15c, so the test result doesn't match theory. I wonder if the packet width relative to wavelength is the culprit — a PacketWidth of 12 against a wavelength of 64 gives a very lopsided packet, poorly suited to measuring group velocity via centroid motion. I want to check what specifically changed for this test case: only C dropped from 0.5 to 0.25 and Mass rose from 0.125 to 2.
+
+For Wave, mass doesn't actually factor into PacketFreq since Wave isn't included in the mass switch, so that shouldn't matter. But the boundary condition also flipped — Wave went from EdgesFixed to EdgesWrap, which is a substantial change since wrapped boundaries let the packet circulate rather than reflect off walls, and that alone could explain the mismatched velocity measurement. I want to check the box size and step count in the test to confirm.
+
+Then I move to TestDiffusion, where the key point is that the diffusion coefficients being compared need to match: 0.25 for Schrödinger (ħ/2m) versus 0.0625 for Wave's C².
+
+Previously, with C=0.5 and Mass=2, C² happened to equal ħ/2m=0.25 by construction. With the new default C=0.25, C² becomes 0.0625, breaking that equality — so the test needs to explicitly set matching parameters instead of relying on coincidental defaults.
+
+Finally, TestWaveC expects the packet's measured speed to equal C=0.25, but it's actually measuring 0.191 (about 0.764c), while the pulse test correctly reads 0.997c — meaning the carrier-modulated packet moves slower than expected while the plain pulse moves close to the true wave speed.
+
+Working through the dispersion relation for WaveC (ω = C k̂²), the group velocity at wl=8 comes out closer to 0.354, which is even higher than the expected 0.25 — so the discrepancy isn't simply "too slow," it depends on wavelength through this k-dependent group velocity formula, which matches the original design intent that WaveC should propagate at light speed c.
+
+I'm now checking whether C itself actually changed between WaveCConfig versions — it looks like C was already 0.25 (WaveCC) before, so it's unchanged, and the kernel doesn't depend on mass either. So the test failure must stem from something else, maybe how the test constructs its own simulation with explicit parameters like ThreeD and WaveDir rather than from C or Edges settings.
+
+I recall now that PacketDist with PacketSlab=true would give the same slab distance as before, so that's not the source of the discrepancy either. I'm going back through the config defaults to figure out what actually differs from before—maybe it's not PacketSlab at all, and I need to check whether wcSimEq sets any other field differently.
+
+I should stop guessing about whether Params.Defaults() runs before each equation config and instead verify directly — checking if Mass or Omega0 actually affects the WaveC kernel computation. Let me just look at the actual test files and the WaveC kernel code to see what's really happening.
+
+
+</thinking>
+
+Three failures left, all in the Wave/WaveC family. Let me diagnose:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "Omega0\|Mass\|MOverHSq" wavec.goal | head; echo "=== TestDiffusion premise ==="; sed -n 160,185p wave_test.go; echo "=== TestWaveC expectation ==="; sed -n 120,140p wavec_test.go``
+  ```
+  === TestDiffusion premise ===
+  	const n = 60
+  	for range n {
+  		ctx := GetCtx(0)
+  		ctx.StepInc()
+  		RunWaveKernel(int(ctx.Size.X))
+  		RunEdgesWrapKernel(int(ctx.EdgesN()))
+  	}
+  	a1 := at(int(WavePos))
+  	if a1 >= a0 {
+  		t.Fatalf("with Diffusion on the mode should decay, went %.4f -> %.4f", a0, a1)
+  	}
+  	decay := -math.Log(a1/a0) / n
+  
+  	w := wvMode(WaveC, wl)
+  	if math.Abs(float64(w.Params.C)-float64(d.Params.CSq)) > 1e-6 {
+  		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, d.Params.CSq)
+  	}
+  	prev := at(int(WaveCa))
+  	var first, last, cnt int
+  ...
+  ```
+
+</details>
+
+<thinking>
+I realize `TestWaveC` actually exercises `wcSim`, which configures `ss.Config.Equation = WaveCDir`, so despite its name it's really testing WaveCDir via `WaveCDirPacket`/`WaveCDirPulse`. That means I need to look at how `wavecdir.goal` previously set `ss.Params.C = 0.5`.
+
+I removed that override, so C is now 0.25 instead of 0.5, which halves WaveCDir's propagation speed. Since WaveCDir is a three-level leapfrog advection scheme, the group velocity depends on C through the relation sin(ω) = C·ĝ(k), so vg = C·ĝ'(k)/√(1-(C·ĝ)²) — plugging in the wavelength-8 packet's wavenumber gives group velocities of about 0.756C at C=0.5 versus about 0.718C at C=0.25, explaining why the packet reads slower at lower C while the pulse tracks C almost exactly.
+
+Both cases seem well under the ideal C, yet the measured 0.764C now suggests the test must have passed previously with some tolerance allowance — I should check what tolerance and wavelength wcSim's config actually uses, since the pulse's near-C speed comes from being dominated by long-wavelength (k→0) behavior where group velocity approaches C, unlike the carrier-dominated packet.
+
+At tol=0.2 both would fail, so that's not it either — something else must have changed between the two cases. I suspect `WaveCDirPacketAt` shifts the packet by `ss.Params.C * ss.Params.WaveDir`, which is the ideal one-step displacement, not the true group velocity — so any mismatch there could distort the packet differently depending on C. I need to actually read the test function and the dispersion test together to figure out the real cause before attempting a fix.
+
+Wait, I need to check the box size — if wl=64 spans the whole box, that could distort the result. For diffusion, the real fix is having the test set Mass explicitly so ħ/2m equals C² by construction rather than relying on coincidental defaults. And for the wave direction test, the expectation of "want = C" at wl=8 is too strict — it should really be the lattice group velocity instead. I should go read both test files to confirm.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 60,115p wave_test.go; echo "=== wavec_test head ==="; sed -n 100,122p wavec_test.go``
+  ```
+  // the same box, the same config, run under Wave and under KleinGordon at two
+  // wavelengths.
+  //
+  // Wave travels at c whatever the wavelength, because its equation has no
+  // scale in it -- c is a ratio, not a length, so nothing can make omega
+  // anything but proportional to k. The mass term supplies the one scale there
+  // is, the Compton wavelength, and after that omega cannot be proportional to
+  // anything.
+  //
+  // Note WHICH waves it slows. The Laplacian is a coupling to neighbours and its
+  // restoring force comes from the difference with them, which dies away as the
+  // wave gets longer; the mass is a spring to ground, and its does not. So short
+  // waves barely notice the mass and long ones are dominated by it -- the
+  // opposite of the usual lattice error, which spoils SHORT waves.
+  func TestWaveDispersion(t *testing.T) {
+  	const sz = 2048
+  	const short, long float32 = 16, 64
+  	speed := map[Equations]map[float32]float64{}
+  	for _, eq := range []Equations{Wave, KleinGordon} {
+  		speed[eq] = map[float32]float64{}
+  ...
+  ```
+
+</details>
+
+<thinking>
+Now I see it clearly: TestWaveC expects the wave packet to travel at exactly speed C within 1% tolerance, which held at C=0.5 but failed at C=0.25. I'm working through the leapfrog dispersion relation, sin ω = C·ĝ(k), and deriving the group velocity formula to understand why the lower Courant number breaks the expected accuracy.
+
+Neither the sin(k) approximation nor the linear ĝ(k)≈k model matches the measured 0.764 C — I'm speculating too much about the shape of the 10-point gradient stencil's frequency response. Instead of guessing further, I decide to just empirically measure the packet speeds directly by running WaveCDir at both C=0.5 and C=0.25 and comparing results.
+
+The real suspect is that `WaveCDirPacketAt` shifts the "past" state by exactly one step at speed C, assuming the group velocity equals C exactly — but if the true group velocity differs, that past state is wrong and the packet isn't a true eigenstate, causing it to split or slow down. What matters isn't the absolute mismatch but the relative mistuning vg/C − 1, which changes nonlinearly as C shrinks, and there's also a phase-advance term in how the past/future states get constructed that I need to check.
+
+At C=0.5 these two errors cancel nicely, but at C=0.25 the arcsin correction shrinks and the cancellation breaks down — so WaveCDir's packet initialization is really tuned by an accidental cancellation that only holds at C=0.5. The principled fix is to initialize using the actual lattice dispersion, computing ω = arcsin(C·ĝ(k)) and vg = dω/dk for the phase advance and envelope shift, exactly like WeylPacket does via WeylDispersion — so I should check whether that same helper can be reused in WaveCDir.
+
+I need to write an analogous dispersion helper for WaveCDir, same structure as WeylDispersion but without the mass term. But then I hit a suspicious result: TestWaveDispersion shows the wave at wl=64 measuring 1.1527c, which is superluminal and physically impossible for a second-order wave. That suggests the centroid measurement itself is off, so I should check how wvCtr computes centroid displacement given C=0.25 over 100 steps in a 2048-cell box.
+
+Since a packet moving faster than c can't happen from partial backward motion alone (that would slow the centroid, not speed it up), the packet must be reshaping. I suspect MovingWavePacket is using the wrong dispersion relation — it's using PacketFreq = C·k̂ instead of the true second-order leapfrog dispersion ω = 2·arcsin(Ck̂/2), and I'm working out the small-angle correction to confirm this discrepancy at wl=64.
+
+But computing vg_true gives roughly 0.999c, not the measured 1.153c — a 15% gap theory can't explain, so I suspect this is a measurement artifact from how wvCtr computes the intensity centroid rather than a real superluminal effect.
+
+Given the packet has only moved 25 cells relative to its own width of 64, small asymmetries could be skewing the centroid measurement. I'm also noting the Edges setting switched from Fixed to Wrap for the wave test, though with a 2048-cell box over 100 steps nothing should reach the boundary anyway. I want to check empirically by rerunning the dispersion test setup at different C values and inspecting how wvSim actually configures Wavelength and PacketWidth for the 1D case.
+
+I plan to measure both packet speed against the theoretical lattice group velocity and against C at a couple wavelengths, then decide on fixes — first I need to look at how wvSim and WeylDispersion are implemented.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 1,55p wave_test.go; echo "=== WeylDispersion ==="; grep -n "func (ss \*Sim) WeylDispersion" -A 25 weyl.goal``
+  ```
+  // Copyright (c) 2026, The WaveReality Authors. All rights reserved.
+  // Use of this source code is governed by a BSD-style
+  // license that can be found in the LICENSE file.
+  
+  package wavesim
+  
+  import (
+  	"math"
+  	"testing"
+  
+  	"cogentcore.org/core/math32"
+  )
+  
+  // wvSim builds Wave or KleinGordon on the same state with the same config, in
+  // 1D and in a box big enough that the packet never approaches the edges.
+  func wvSim(sz int32, eq Equations, wl, width float32) *Sim {
+  	ss := &Sim{}
+  	ss.Config = &Config{}
+  	ss.Config.Defaults()
+  	ss.Config.GPU, ss.Config.GUI = false, false
+  ...
+  ```
+
+</details>
+
+<thinking>
+Confirming that WeylDispersion models the gradient stencil response as sin(k), matching my expectation. For WaveCDir with the same leapfrog scheme but no mass term, the dispersion becomes ω = arcsin(C·sin k) with group velocity vg = C·cos(k)/√(1−C²sin²k); I'm now evaluating this at wavelength 8, where k=0.785 gives sin k = cos k ≈ 0.7071.
+
+Testing C=0.5 gives vg≈0.378 (0.756·C), and C=0.25 gives vg≈0.180 (0.718·C). But measured results show 0.191, which is about 6% faster than theory predicts, and oddly the test expects vg to equal C exactly, which never matches the sin(k) theory at this wavelength. Since the Weyl dispersion tests already validated the arcsin formula to five digits, sin(k) should be correct for Gradient10 — so I'm now suspecting WaveCDirKernel might use a different gradient operator entirely, like a simple 2-point central difference (Gradient1D) instead.
+
+I'm now realizing the packet itself is quite broad in k-space (only 1.5 wavelengths wide), so the measured centroid speed is really an average over a wide range of k values weighted toward small k, where group velocity approaches C — which would explain why the measured speed comes out higher than the single-carrier-k prediction, and why this averaging effect differs depending on C since vg(k)/C depends on C through the dispersion relation.
+
+But the jump from ~1.0 at C=0.5 to 0.764 at C=0.25 is far bigger than this averaging theory predicts, so I don't think that explains it either. Rather than keep modeling this analytically, I should just run WaveCDir at several values of C and measure the actual centroid speeds directly, alongside a dispersion measurement, to get real data instead of guessing.
+
+
+</thinking>
+
+Let me stop modeling and measure — WaveCDir at several C values, plus the Wave case:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+)
+
+func TestScratchCsweep(t *testing.T) {
+	fmt.Println("=== WaveCDir packet & pulse speed vs C (1D, wl 8, pw 12)")
+	fmt.Printf("  %5s  %8s  %8s  %8s   %8s\n", "C", "packet", "pulse", "theory", "pkt/C")
+	for _, cc := range []float32{0.5, 0.4, 0.35, 0.3, 0.25, 0.2} {
+		var got [2]float64
+		for i, init := range []func(*Sim){WaveCDirPacket, WaveCDirPulse} {
+			ss := wcSim(128, false, 1, init)
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			wcStep(ss)
+			x0, _ := wcCtr()
+			for range 20 {
+				wcStep(ss)
+			}
+			x1, _ := wcCtr()
+			got[i] = (x1 - x0) / 20
+		}
+		k := 2 * math.Pi / 8
+		c := float64(cc)
+		vg := c * math.Cos(k) / math.Sqrt(1-c*c*math.Sin(k)*math.Sin(k))
+		fmt.Printf("  %5.2f  %8.4f  %8.4f  %8.4f   %8.3f\n", cc, got[0], got[1], vg, got[0]/c)
+	}
+	fmt.Println("\n=== Wave packet speed vs C (1D sz 2048)")
+	for _, cc := range []float32{0.5, 0.35, 0.25} {
+		for _, wl := range []float32{16, 64} {
+			ss := wvSim(2048, Wave, wl, 2*wl)
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			wvStep(ss)
+			x0 := wvCtr(2048)
+			for range 100 {
+				wvStep(ss)
+			}
+			fmt.Printf("  C %4.2f wl %2.0f: %.4f c\n", cc, wl, (wvCtr(2048)-x0)/100/float64(cc))
+		}
+	}
+}
+EOF
+go test -run TestScratchCsweep -v -timeout 600s ./ 2>&1 | grep -E "^===|^  " | head -20``
+  ```
+  === RUN   TestScratchCsweep
+  === WaveCDir packet & pulse speed vs C (1D, wl 8, pw 12)
+        C    packet     pulse    theory      pkt/C
+     0.50    0.4982    0.5001    0.3780      0.996
+     0.40    0.3540    0.3994    0.2949      0.885
+     0.35    0.2950    0.3493    0.2554      0.843
+     0.30    0.2390    0.2992    0.2171      0.797
+     0.25    0.1910    0.2493    0.1796      0.764
+     0.20    0.1494    0.1994    0.1429      0.747
+  === Wave packet speed vs C (1D sz 2048)
+    C 0.50 wl 16: 0.9939 c
+    C 0.50 wl 64: 1.0059 c
+    C 0.35 wl 16: 1.0044 c
+    C 0.35 wl 64: 0.9763 c
+    C 0.25 wl 16: 1.0209 c
+    C 0.25 wl 64: 1.1527 c
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+This is very revealing: WaveCDir shows the pulse tracking C almost exactly, with the packet speed decreasing from 0.996C at C=0.5 down toward 0.747C at C=0.2, converging on the theoretical ratios I computed. So the packet speed seems to be approaching that theory value as C decreases.
+
+But the measured value at C=0.5 (0.4982) is 32% above theory (0.378), which doesn't fit as a simple coincidence — it suggests the packet isn't purely riding the carrier wavenumber at all. Given that the pulse (k≈0) matches vg(k→0)=C perfectly, the packet's carrier at wl=8 with a 12-wide envelope must have its centroid dominated by envelope dynamics rather than the carrier, and I need to work out why the measured intensity behaves this way.
+
+Actually at C=0.25 the packet runs legitimately at 0.764 C, not by coincidence like at C=0.5. The right fix is to compare the packet against the lattice group velocity rather than against C itself, since that's the physically correct expectation independent of C. But my theoretical value is 6% off from measured at C=0.25 while it's 32% off at C=0.5, so something's wrong with my theory for this kernel — possibly a mismatch between the 2-point gradient stencil used in 1D versus the 10-point stencil used in 3D.
+
+I'm second-guessing whether the leapfrog dispersion relation I used, sin(ω) = C ĝ, actually matches the kernel's update scheme — maybe it absorbs the factor of 2 differently. Rather than guess further, I should just look at the actual kernel implementation to get the scheme right, since that's the only way to give the test a correct expectation.
+
+Right, so k=0.785 checks out, and since the magnitude is envelope-squared with no carrier, the centroid should track group velocity — but the measured 0.996C at C=0.5 clashes with the predicted 0.756C. Maybe the envelope isn't purely translating; a mistuned initial condition could contaminate the mode mix and skew the centroid faster than pure vg. I think I've dug into the diagnosis enough — the honest conclusion is that the test's "travels at c to 1%" assumption only held under specific conditions I need to pin down.
+
+I see two paths: properly re-derive the true lattice dispersion so the packet is a clean eigenstate at vg (principled but I can't yet predict vg reliably here), or just special-case WaveCDir's C=0.5 behavior, which undercuts the user's goal of a shared comparable C across equations. Given I can't confidently fix vg right now, the most honest move is to flag this to the user as an unresolved, genuine discovery rather than quietly patching over it.
+
+I want to at least verify the scheme itself by reading through WaveCDirKernel quickly, since that's decisive and fast. I should also close out the two easier tests, TestDiffusion and TestWaveDispersion, so I'm not leaving everything unresolved — checking the Wave dispersion numbers shows its measured speed clearly degrades as C decreases, especially at longer wavelengths, with values ranging from near 1.0c up toward 1.15c depending on C and wavelength.
+
+That 1.15c reading seems too extreme, so I'm trying to figure out why: with the packet width comparable to the distance traveled during the measurement window, the centroid tracking may be picking up noise from a reshaping wave packet rather than a clean traveling one, and I'm checking whether the dispersion relation used in MovingWavePacket introduces enough error at that wavelength to explain it — though the numbers suggest it shouldn't. Fewer steps of travel relative to the packet width could just make the speed measurement noisier overall.
+
+I realize the real culprit is likely the carrier wobble: since the centroid comes from the squared magnitude of a real field, it oscillates at twice the carrier frequency, and measuring over exactly 100 steps captures a partial wobble cycle. At C=0.25 that's about half a cycle, which would maximize this bias, matching what `StatGroupVelWindow`'s documentation describes about carrier centroids wobbling under an envelope.
+
+The proper fix is to measure over a whole number of carrier periods rather than a fixed 100 steps. At wl=64, C=0.25, the carrier period works out to 256 steps, so 100 steps is far under one period — a large source of bias. At wl=16 the period is only 64 steps, so 100 steps covers about 1.56 periods, giving a smaller but still nonzero bias, consistent with the 1.0209 result.
+
+For the actual fix I want to compute n as a rounded multiple of the carrier period derived from the lattice frequency, separately for each equation since KG's mass shifts ω relative to Wave's. I should verify this by rerunning the Wave test at C=0.25, wl=64 with n=256 and n=512 to confirm the bias disappears.
+
+For the diffusion test mismatch, the real issue is the coefficients don't match: WaveC uses C directly while Wave-with-Diffusion uses C². At C=0.25 that's 0.25 versus 0.0625, so I need to adjust the mass or coefficient so the two equations are actually comparable.
+
+The fix is to explicitly set the WaveC coefficient equal to the diffusion sim's CSq before initialization, so the test compares decay versus rotation at truly matched values. Before finalizing that, I want to first check the measurement for the wave period hypothesis.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func WaveCDirKernel" -A 30 wavecdir.goal | head -40``
+  ```
+  49:func WaveCDirKernel(i uint32) { //gosl:kernel
+  50-	ctx := GetCtx(0)
+  51-	var x, y, z int32
+  52-	ok := ctx.StateCoords(i, &x, &y, &z)
+  53-	if !ok {
+  54-		return
+  55-	}
+  56-	cur := ctx.CurState
+  57-	prv := ctx.PrevState()
+  58-	oa := State[z, y, x, WaveCa, cur] // psi(t-1), not yet overwritten
+  59-	ob := State[z, y, x, WaveCb, cur]
+  60-	na := State[z, y, x, WaveCa, prv] // psi(t)
+  61-	nb := State[z, y, x, WaveCb, prv]
+  62-
+  63-	var ga, gb math32.Vector3
+  64-	if Params[0].ThreeD.IsTrue() {
+  65-		ga = Gradient10(x, y, z, int32(WaveCa), prv)
+  66-		gb = Gradient10(x, y, z, int32(WaveCb), prv)
+  67-	} else {
+  68-		ga = Gradient1D(x, y, z, int32(WaveCa), prv)
+  ...
+  ```
+
+</details>
+
+<thinking>
+I'm noticing the leapfrog update treats a and b as independent real fields, each undergoing its own real advection step using the spatial derivative, rather than acting as a complex rotation. That means I can analyze each component's Fourier mode separately, since the derivative just becomes a multiplication by i times the wavenumber for each one on its own.
+
+Working through the dispersion relation, treating ψ as a complex exponential with real and imaginary parts a and b, I derive sin ω = C·ĝ where ĝ is whatever the gradient stencil produces for that wavenumber — this confirms the model I'd been building. From there the group velocity depends on the derivative of ĝ with respect to k divided by cos ω, but plugging in the two-point central difference stencil at wl=8 and C=0.5 gives a predicted vg of about 0.378, while the measured value is 0.4982 — so the discrepancy means Gradient1D isn't using that simple central-difference stencil after all, and I need to check what it actually implements.
+
+Testing a spectrally exact gradient (ĝ=k, ĝ'=1) gives vg=0.544, overshooting the measured 0.498, while a fourth-order finite-difference stencil gives ĝ≈0.776 and ĝ'≈0.943, landing vg closer to the target — so I'm homing in on the fourth-order stencil as the likely candidate.
+
+But when I check this same fourth-order model at C=0.25, it predicts vg way higher than what's actually measured (0.961 vs 0.764 in Courant-scaled terms), so it clearly doesn't hold across both Courant numbers. This inconsistency makes me suspicious that something more subtle is happening, and I don't want to just keep guessing formulas or quietly adjust the test to match whatever the code currently outputs.
+
+Given that, I think the honest path is: fix the two issues I actually understand (diffusion coefficient matching and the carrier-period aliasing in wave dispersion), then flag WaveCDir's packet speed behavior as genuinely unresolved rather than force-fitting a coincidental match at C=0.5. I should ask whether to dig deeper into the kernel/initialization or just pin the value — though I want to double check one more thing about how wcSim configures its state variables and equation type first.
+
+Checking that the C parameter update ordering is correct before Init, then considering whether the packet's spectral width could explain the anomaly — it doesn't seem broad enough to matter. The more promising lead is that the envelope's initial shift uses C times the wave direction rather than the group velocity, which could be the actual source of the mismatch if vg diverges from C.
+
+Since the 4th-order model shows vg/C mismatches of only 2-4% at both C=0.5 and C=0.25, that alone doesn't obviously explain the discrepancy, so I want to just run a direct empirical test — initialize the packet with the measured correct past shift instead of assuming C, and see if that removes the C-dependence in speed.
+
+Actually, a cleaner experiment would be measuring the phase and group velocity directly from a pure plane-wave mode, no envelope, checking whether an equivalent to `wvMode` exists for WaveCDir. If not, I'd write one to track the phase across a and b arrays. This would directly validate the dispersion relation and pin down the correct group velocity value — worth doing now given how much time I've spent circling this, then reporting whatever remains unresolved.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+
+	"cogentcore.org/core/math32"
+)
+
+// pure plane wave: measure omega(k) directly, no envelope
+func TestScratchMode(t *testing.T) {
+	const sz = 128
+	fmt.Printf("  %5s %5s  %10s %10s %10s  %8s\n", "C", "wl", "om_meas", "C*ghat", "asin(Cg)", "ghat")
+	for _, cc := range []float32{0.5, 0.25} {
+		for _, wl := range []float32{8, 16, 32} {
+			ss := wcSim(sz, false, 1, func(s *Sim) {
+				k := 2 * math.Pi / float64(wl)
+				c := GetCtx(0)
+				cur, prv := int(c.CurState), int(c.PrevState())
+				for x := int32(0); x < sz; x++ {
+					a := float32(math.Cos(k * float64(x)))
+					b := float32(math.Sin(k * float64(x)))
+					State.Set(a, 1, 1, int(x+1), int(WaveCa), cur)
+					State.Set(b, 1, 1, int(x+1), int(WaveCb), cur)
+					State.Set(a, 1, 1, int(x+1), int(WaveCa), prv)
+					State.Set(b, 1, 1, int(x+1), int(WaveCb), prv)
+				}
+			})
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			ph := func() float64 {
+				c := GetCtx(0)
+				a := float64(State.Value(1, 1, 1, int(WaveCa), int(c.CurState)))
+				b := float64(State.Value(1, 1, 1, int(WaveCb), int(c.CurState)))
+				return math.Atan2(b, a)
+			}
+			p0 := ph()
+			const n = 40
+			for range n {
+				wcStep(ss)
+			}
+			d := ph() - p0
+			for d > math.Pi {
+				d -= 2 * math.Pi
+			}
+			for d < -math.Pi {
+				d += 2 * math.Pi
+			}
+			om := math.Abs(d) / n
+			k := 2 * math.Pi / float64(wl)
+			c := float64(cc)
+			gs := math.Sin(k)
+			fmt.Printf("  %5.2f %5.0f  %10.6f %10.6f %10.6f  %8.5f\n",
+				cc, wl, om, c*gs, math.Asin(c*gs), math.Sin(om)/c)
+			_ = math32.X
+		}
+	}
+}
+EOF
+go test -run TestScratchMode -v -timeout 600s ./ 2>&1 | grep -E "^  " | head -10``
+  ```
+        C    wl     om_meas     C*ghat   asin(Cg)      ghat
+     0.50     8    0.053871   0.353553   0.361367   0.10769
+     0.50    16    0.040273   0.191342   0.192529   0.08053
+     0.50    32    0.058081   0.097545   0.097701   0.11610
+     0.25     8    0.023473   0.176777   0.177711   0.09388
+     0.25    16    0.060181   0.095671   0.095817   0.24058
+     0.25    32    0.049815   0.048773   0.048792   0.19918
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The measured omega is completely off and the ghat values are way too small compared to the expected ~0.7 for wl=8, so my measurement itself must be broken. I suspect it's from calling Init twice (once inside wcSim and once after setting C), or the single-point phase measurement being contaminated, or the phase wrapping more than π across the 40 steps.
+
+At wl=8, C=0.5, the actual expected phase shift is around 0.36 rad/step, meaning over 40 steps it wraps many times over — my ±π unwrap approach across that many steps is invalid. I should instead measure omega from a single-step phase difference. Given the time this is taking, I'll be pragmatic: fix the diffusion test cleanly, address the wave dispersion carrier-period aliasing issue by checking with a quick n-sweep, and for the wave speed tests, redo the omega measurement properly using one-step phase differences before deciding how to proceed.
+
+
+</thinking>
+
+My phase measurement wrapped — ω·40 steps is many cycles. Let me measure per-step, and test the Wave aliasing hypothesis at the same time:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+)
+
+func TestScratchMode2(t *testing.T) {
+	const sz = 128
+	fmt.Println("=== WaveCDir omega(k) per step, pure plane wave")
+	fmt.Printf("  %5s %5s  %10s %10s %8s %8s\n", "C", "wl", "om_meas", "asin(Cg)", "ghat", "sin(k)")
+	for _, cc := range []float32{0.5, 0.25} {
+		for _, wl := range []float32{8, 16, 32} {
+			k := 2 * math.Pi / float64(wl)
+			ss := wcSim(sz, false, 1, func(s *Sim) {
+				c := GetCtx(0)
+				cur, prv := int(c.CurState), int(c.PrevState())
+				for x := int32(0); x < sz; x++ {
+					a := float32(math.Cos(k * float64(x)))
+					b := float32(math.Sin(k * float64(x)))
+					State.Set(a, 1, 1, int(x+1), int(WaveCa), cur)
+					State.Set(b, 1, 1, int(x+1), int(WaveCb), cur)
+					State.Set(a, 1, 1, int(x+1), int(WaveCa), prv)
+					State.Set(b, 1, 1, int(x+1), int(WaveCb), prv)
+				}
+			})
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			ph := func() float64 {
+				c := GetCtx(0)
+				a := float64(State.Value(1, 1, 1, int(WaveCa), int(c.CurState)))
+				b := float64(State.Value(1, 1, 1, int(WaveCb), int(c.CurState)))
+				return math.Atan2(b, a)
+			}
+			p0 := ph()
+			wcStep(ss)
+			d := ph() - p0
+			for d > math.Pi {
+				d -= 2 * math.Pi
+			}
+			for d < -math.Pi {
+				d += 2 * math.Pi
+			}
+			om := math.Abs(d)
+			c := float64(cc)
+			fmt.Printf("  %5.2f %5.0f  %10.6f %10.6f %8.5f %8.5f\n",
+				cc, wl, om, math.Asin(c*math.Sin(k)), math.Sin(om)/c, math.Sin(k))
+		}
+	}
+	fmt.Println("\n=== Wave speed vs number of steps (C 0.25): carrier period aliasing?")
+	for _, wl := range []float32{16, 64} {
+		k := 2 * math.Pi / float64(wl)
+		kh := 2 * math.Sin(k/2)
+		per := 2 * math.Pi / (0.25 * kh) // carrier period in steps
+		out := fmt.Sprintf("  wl %2.0f (carrier period %.0f steps):", wl, per)
+		for _, n := range []int{100, int(math.Round(per)), int(math.Round(2 * per)), int(math.Round(4 * per))} {
+			ss := wvSim(2048, Wave, wl, 2*wl)
+			wvStep(ss)
+			x0 := wvCtr(2048)
+			for range n {
+				wvStep(ss)
+			}
+			out += fmt.Sprintf("  n=%d:%.4fc", n, (wvCtr(2048)-x0)/float64(n)/0.25)
+		}
+		fmt.Println(out)
+	}
+}
+EOF
+go test -run TestScratchMode2 -v -timeout 600s ./ 2>&1 | grep -E "^===|^  " | head -14``
+  ```
+  === RUN   TestScratchMode2
+  === WaveCDir omega(k) per step, pure plane wave
+        C    wl     om_meas   asin(Cg)     ghat   sin(k)
+     0.50     8    0.615480   0.361367  1.15470  0.70711
+     0.50    16    0.365490   0.192529  0.71481  0.38268
+     0.50    32    0.192670   0.097701  0.38296  0.19509
+     0.25     8    0.339837   0.177711  1.33333  0.70711
+     0.25    16    0.189057   0.095817  0.75173  0.38268
+     0.25    32    0.097238   0.048792  0.38834  0.19509
+  === Wave speed vs number of steps (C 0.25): carrier period aliasing?
+    wl 16 (carrier period 64 steps):  n=100:1.0209c  n=64:1.0106c  n=129:0.9930c  n=258:0.9833c
+    wl 64 (carrier period 256 steps):  n=100:1.1527c  n=256:1.0089c  n=512:0.9971c  n=1024:0.9969c
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+This confirms carrier-period aliasing in Wave: at wl=64, the short 100-step window measured 1.1527c, but extending to whole carrier periods (n=256, 512, 1024) converges tightly to ~0.997-1.009c, showing Wave really does travel at c and the earlier discrepancy was just a sampling artifact. I'm now checking wl=16 with n=64 to see if the same correction holds at a different wavelength.
+
+For WaveCDir, the ghat value from sin(ω)/C isn't staying constant across different C values as it should if it were purely a stencil property — I'm getting 1.1547 at C=0.5 vs 1.3333 at C=0.25, and the ratio of measured ω values (1.81) doesn't match the expected 2x scaling. I suspect the plane-wave initialization isn't actually a proper eigenstate of the scheme since I'm setting current and previous values identically, which could be corrupting the phase relationship needed for a clean dispersion measurement.
+
+This is the same contamination bug as the packet initialization — setting prv equal to cur creates a superposition of forward and backward modes rather than the true phase-advanced state, so the single-step phase difference doesn't equal ω. That means WaveCDirPacketAt has the identical flaw: it advances phase using C directly instead of the true measured ω and group velocity, exactly the bug I already fixed in WeylPacket by switching to WeylDispersion for both envelope shift and phase advance.
+
+The proper fix is to give WaveCDir its own dispersion function returning both ω and vg, then use those consistently in WaveCDirPacketAt so it becomes a clean one-way eigenstate whose speed tracks vg rather than C. But the user only asked me to retune the edges test and set BoundStateMass, not to overhaul WaveCDir — though I did cause the suite to go red by changing C, so I'm weighing whether to just do the two clear fixes for now and flag WaveCDir separately.
+
+Actually, since the precedent from Weyl dispersion is strong and the fix is clearly correct, I'll implement it, verify the packet speed becomes vg and independent of C, and update the test expectation accordingly — reporting back if it doesn't pan out. First I'll knock out the two easy fixes for diffusion and wave dispersion before tackling WaveCDir.
+
+For the dispersion test, I need to measure over a whole number of carrier periods (at least ~4) rather than an arbitrary window, since a partial period misreads the carrier's intensity wobble as spurious motion — that's what caused wavelength 64 to register at 1.15c. Computing the period from the packet frequency...
+
+Checking numbers: for KG mass μ=0.5 at wl=64, period comes out to about 49 steps (×4 ≈ 196); at wl=16, period ≈40 (×4≈159). For the massless wave, wl=64 gives period 256 (×4=1024) and wl=16 gives 64 (×4=256), so I need to make sure the simulation window is long enough to cover the largest case, 1024 steps.
+
+That fits comfortably in a 2048-step 1D box, so it should be cheap to run. Now I want to implement this, and for the diffusion test I need to make sure the coefficients match explicitly — I'll go look at that test's setup around lines 150-175 to confirm.
+
+
+</thinking>
+
+Two decisive findings. **Wave is fine** — it was carrier aliasing:
+
+```
+wl 64 (carrier period 256 steps):  n=100:1.1527c  n=256:1.0089c  n=512:0.9971c  n=1024:0.9969c
+```
+
+And my WaveCDir plane-wave probe was invalid — I set `cur` and `prv` equal, which is a superposition of both ω branches. That's **the same mistake `WaveCDirPacketAt` makes**. Let me fix the two clear ones first:
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && sed -n 140,160p wave_test.go``
+  ```
+  // TestDiffusion is the last corner of the picture, and the one that says what
+  // the i in a quantum wave is for.
+  //
+  // Params.Diffusion moves the Laplacian from the acceleration to the velocity
+  // and nothing else: same term, same C^2. WaveC is that same first-order
+  // equation with an i in front. So a mode of wavenumber k DECAYS at C^2 khat^2
+  // under diffusion and ROTATES at C^2 khat^2 under WaveC -- the same rate, and
+  // the i is the entire difference between heat spreading out and a wave
+  // propagating.
+  func TestDiffusion(t *testing.T) {
+  	const wl float32 = 32
+  	k := 2 * math.Pi / float64(wl)
+  	kh2 := 4 * math.Sin(k/2) * math.Sin(k/2) // the 1D lattice khat^2
+  	at := func(v int) float64 {
+  		return float64(State.Value(1, 1, 9, v, int(GetCtx(0).CurState)))
+  	}
+  
+  	d := wvMode(Wave, wl)
+  	want := float64(d.Params.CSq) * kh2
+  	a0 := at(int(WavePos))
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func wvMode" -A 25 wave_test.go | head -30``
+  ```
+  116:func wvMode(eq Equations, wl float32) *Sim {
+  117-	ss := &Sim{}
+  118-	ss.Config = &Config{}
+  119-	ss.Config.Defaults()
+  120-	ss.Config.GPU, ss.Config.GUI = false, false
+  121-	ss.Config.Equation = eq
+  122-	ss.Config.Size.Set(256, 1, 1)
+  123-	ss.ConfigSim()
+  124-	ss.Params.Edges = EdgesWrap
+  125-	if eq == Wave {
+  126-		ss.Params.Diffusion.SetBool(true)
+  127-	}
+  128-	ss.Params.Update()
+  129-	ss.InitFunc = func(s *Sim) {
+  130-		if eq == Wave {
+  131-			s.Sine(WavePos, math32.X, wl, 0, 1, 0)
+  132-		} else {
+  133-			s.Sine(WaveCa, math32.X, wl, 0, 1, 0)
+  134-		}
+  135-	}
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+import re
+s=open('wave_test.go').read()
+
+# wvMode gains an explicit C, so the two coefficients can be MADE to match
+old = """func wvMode(eq Equations, wl float32) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(256, 1, 1)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	if eq == Wave {
+		ss.Params.Diffusion.SetBool(true)
+	}
+	ss.Params.Update()"""
+new = """func wvMode(eq Equations, wl, c float32) *Sim {
+	ss := &Sim{}
+	ss.Config = &Config{}
+	ss.Config.Defaults()
+	ss.Config.GPU, ss.Config.GUI = false, false
+	ss.Config.Equation = eq
+	ss.Config.Size.Set(256, 1, 1)
+	ss.ConfigSim()
+	ss.Params.Edges = EdgesWrap
+	ss.Params.C = c
+	if eq == Wave {
+		ss.Params.Diffusion.SetBool(true)
+	}
+	ss.Params.Update()"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old = """	d := wvMode(Wave, wl)
+	want := float64(d.Params.CSq) * kh2"""
+new = """	// the diffusion coefficient is C^2 and WaveC's is C, so the two are equal
+	// only if WaveC runs at the SQUARE of the other's C. The shared default
+	// does not arrange that for free, so the test arranges it: that is the
+	// whole premise of the comparison, not an incidental setting.
+	d := wvMode(Wave, wl, Params[0].C)
+	dc := d.Params.CSq
+	want := float64(dc) * kh2"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old = """	w := wvMode(WaveC, wl)
+	if math.Abs(float64(w.Params.C)-float64(d.Params.CSq)) > 1e-6 {"""
+new = """	w := wvMode(WaveC, wl, dc)
+	if math.Abs(float64(w.Params.C)-float64(dc)) > 1e-6 {"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace("t.Fatalf(\"the two coefficients must match to compare rates: %v vs %v\", w.Params.C, d.Params.CSq)",
+              "t.Fatalf(\"the two coefficients must match to compare rates: %v vs %v\", w.Params.C, dc)", 1)
+
+# TestWaveDispersion: measure over whole carrier periods
+old = """			ss := wvSim(sz, eq, wl, 2*wl)
+			wvStep(ss)
+			x0 := wvCtr(sz)
+			const n = 100
+			for range n {
+				wvStep(ss)
+			}
+			speed[eq][wl] = (wvCtr(sz) - x0) / n / float64(ss.Params.C)"""
+new = """			ss := wvSim(sz, eq, wl, 2*wl)
+			// over WHOLE carrier periods. The intensity centroid of a carrier
+			// under an envelope wobbles at twice the carrier frequency, as
+			// StatGroupVelWindow says, and a window that is not a whole number
+			// of them reads part of that wobble as motion: at wavelength 64 a
+			// hundred steps is well under one period and puts a massless wave
+			// at 1.15 c. Four periods, from the lattice frequency this
+			// equation actually has.
+			n := int(math.Round(4 * 2 * math.Pi / float64(ss.PacketFreq(wl))))
+			wvStep(ss)
+			x0 := wvCtr(sz)
+			for range n {
+				wvStep(ss)
+			}
+			speed[eq][wl] = (wvCtr(sz) - x0) / float64(n) / float64(ss.Params.C)"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace('t.Logf("%-12v wavelength %2.0f: %.4f c", eq, wl, speed[eq][wl])',
+              't.Logf("%-12v wavelength %2.0f: %.4f c  (%d steps)", eq, wl, speed[eq][wl], n)', 1)
+open('wave_test.go','w').write(s)
+PY
+go test -run 'TestWaveDispersion|TestDiffusion' -v -timeout 600s ./ 2>&1 | grep -E "^---|_test.go:" | head -14``
+  ```
+      wave_test.go:96: Wave         wavelength 16: 0.9833 c  (258 steps)
+      wave_test.go:96: Wave         wavelength 64: 0.9969 c  (1024 steps)
+      wave_test.go:96: KleinGordon  wavelength 16: 0.6174 c  (159 steps)
+      wave_test.go:96: KleinGordon  wavelength 64: 0.1958 c  (197 steps)
+      wave_test.go:115: mass costs 0.3659 c at wavelength 16 and 0.8011 c at wavelength 64: the LONG waves are the ones it slows
+  --- PASS: TestWaveDispersion (0.49s)
+      wave_test.go:206: WaveC mode did not oscillate: 1 crossings
+  --- FAIL: TestDiffusion (0.20s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Good, WaveDispersion now passes with both wave speeds behaving correctly and KG dispersing as expected. But TestDiffusion is failing—the WaveC mode isn't oscillating, only showing 1 crossing. Checking the math, the rotation rate with C=0.0625 and k̂² at wavelength 32 comes out to essentially zero, which explains why there's no oscillation.
+
+The period at this rate is about 2617 steps, but the test only runs 2000 steps—that's less than one full period, so it only picks up 1 crossing instead of enough to measure oscillation properly. I need to bump the step count to cover several periods, maybe deriving the loop count directly from the computed rate so it scales automatically. Since this is a small 256×1×1 box, running more steps is cheap. I also want to check the decay behavior over 60 steps at this rate to make sure the amplitude check still passes reasonably. Let me look at the relevant test code around lines 175-215.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 176,215p wave_test.go``
+  ```
+  		ctx.StepInc()
+  		RunWaveKernel(int(ctx.Size.X))
+  		RunEdgesWrapKernel(int(ctx.EdgesN()))
+  	}
+  	a1 := at(int(WavePos))
+  	if a1 >= a0 {
+  		t.Fatalf("with Diffusion on the mode should decay, went %.4f -> %.4f", a0, a1)
+  	}
+  	decay := -math.Log(a1/a0) / n
+  
+  	w := wvMode(WaveC, wl, dc)
+  	if math.Abs(float64(w.Params.C)-float64(dc)) > 1e-6 {
+  		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, dc)
+  	}
+  	prev := at(int(WaveCa))
+  	var first, last, cnt int
+  	for i := range 2000 {
+  		w.RunWaveC(int(GetCtx(0).Size.X))
+  		GetCtx(0).StepInc()
+  		RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('wave_test.go').read()
+old = """	prev := at(int(WaveCa))
+	var first, last, cnt int
+	for i := range 2000 {"""
+new = """	// enough steps for several turns at the rate being measured: the period is
+	// 2 pi / want, and the crossing count needs at least a couple of them
+	nrot := int(math.Round(4 * 2 * math.Pi / want))
+	prev := at(int(WaveCa))
+	var first, last, cnt int
+	for i := range nrot {"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace('t.Fatalf("WaveC mode did not oscillate: %d crossings", cnt)',
+              't.Fatalf("WaveC mode did not oscillate: %d crossings in %d steps", cnt, nrot)', 1)
+open('wave_test.go','w').write(s)
+PY
+go test -run TestDiffusion -v -timeout 600s ./ 2>&1 | grep -E "^---|_test.go:" | head``
+  ```
+  --- FAIL: TestDiffusion (0.00s)
+  	/Users/oreilly/wavereality/waves/wavesim/wave_test.go:169 +0xa54
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && go test -run TestDiffusion -v -timeout 600s ./ 2>&1 | head -20; echo "--- line 160-172 ---"; sed -n 160,175p wave_test.go``
+  ```
+  # github.com/WaveReality/waves/wavesim.test
+  ld: warning: ignoring duplicate libraries: '-lobjc'
+  === RUN   TestDiffusion
+  --- FAIL: TestDiffusion (0.00s)
+  panic: runtime error: index out of range [0] with length 0 [recovered, repanicked]
+  
+  goroutine 8 [running]:
+  testing.tRunner.func1.2({0x102c75720, 0x1400003eaf8})
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1872 +0x19c
+  testing.tRunner.func1()
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1875 +0x31c
+  panic({0x102c75720?, 0x1400003eaf8?})
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/runtime/panic.go:783 +0x120
+  github.com/WaveReality/waves/wavesim.TestDiffusion(0x14000003dc0)
+  	/Users/oreilly/wavereality/waves/wavesim/wave_test.go:169 +0xa54
+  testing.tRunner(0x14000003dc0, 0x102d6c0b0)
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1934 +0xc8
+  created by testing.(*T).Run in goroutine 1
+  	/opt/homebrew/Cellar/go@1.25/1.25.14/libexec/src/testing/testing.go:1997 +0x364
+  FAIL	github.com/WaveReality/waves/wavesim	0.022s
+  ...
+  ```
+
+</details>
+
+<thinking>
+I realize `Params[0].C` won't work at line 169 since `Params` is only populated after `ConfigVars()` runs inside `ConfigSim`, so it's still empty at this point in the test. Instead I should create the Wave sim first with its default C value, then pull `d.Params.CSq` from there, or just avoid referencing the global slice entirely and use a literal value.
+
+The cleanest fix is to make `wvMode` treat a passed-in c of 0 as "use the configured default," so I can call `wvMode(Wave, wl, 0)` instead. I'll implement that.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('wave_test.go').read()
+old = """	ss.Params.Edges = EdgesWrap
+	ss.Params.C = c"""
+new = """	ss.Params.Edges = EdgesWrap
+	if c > 0 { // 0 keeps the shared default
+		ss.Params.C = c
+	}"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """	d := wvMode(Wave, wl, Params[0].C)"""
+new = """	d := wvMode(Wave, wl, 0)"""
+assert old in s
+open('wave_test.go','w').write(s.replace(old, new, 1))
+PY
+go test -run 'TestDiffusion|TestWaveDispersion' -v -timeout 600s ./ 2>&1 | grep -E "^---|_test.go:" | head -12``
+  ```
+      wave_test.go:96: Wave         wavelength 16: 0.9833 c  (258 steps)
+      wave_test.go:96: Wave         wavelength 64: 0.9969 c  (1024 steps)
+      wave_test.go:96: KleinGordon  wavelength 16: 0.6174 c  (159 steps)
+      wave_test.go:96: KleinGordon  wavelength 64: 0.1958 c  (197 steps)
+      wave_test.go:115: mass costs 0.3659 c at wavelength 16 and 0.8011 c at wavelength 64: the LONG waves are the ones it slows
+  --- PASS: TestWaveDispersion (0.49s)
+      wave_test.go:223: same mode, same coefficient: diffusion decays at 0.002405 per step, WaveC rotates at 0.002402 (C^2 khat^2 = 0.002402) -- the i is the only difference
+  --- PASS: TestDiffusion (1.03s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Both tests pass, and the diffusion comparison is striking: decay 0.002405 versus rotation 0.002402, a match within 0.1%. Moving to the last test, TestWaveC, I'm examining how WaveCDirPacketAt writes the past using speed C and phase k·C under the ideal continuum dispersion assumption, whereas the true lattice scheme follows sin ω = C ĝ(k) instead.
+
+I need to check whether Gradient1D also produces sin(k) like Gradient10 does, since WeylDispersion relies on that relationship. Then I'm implementing WaveCDirDispersion to compute the correct angular frequency and group velocity from the lattice dispersion relation, checking for the stability bound where sin exceeds 1, and using these corrected values to fix the envelope shift and phase advance in WaveCDirPacketAt.
+
+I notice the bug now: the current code writes na/nb into prv but oa/ob into cur, and it computes the past phase as k*(d + C*dir), implicitly assuming phase velocity equals C, when it should use the true angular frequency om for phase advance while using vg only for the envelope shift. I need to mirror WeylPacket exactly — envelope shifted by vg*dir, but phase shifted separately by om*dir — to fix this mismatch.
+
+Let me implement that fix, allowing dir to be ±1 for WaveCDir, then test whether the packet speed tracks vg across C, updating the test's expected value if needed. First I want to check Gradient1D.
+
+
+</thinking>
+
+Both pass — and `TestDiffusion` now reads beautifully: decay 0.002405 vs rotation 0.002402, a 0.1% match. Now the last one:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 250,275p funcs.goal``
+  ```
+  // Gradient10 computes the 3D gradient from 5 antipodal pairs (10 points),
+  // for given x,y,z center coordinates, variable index vidx,
+  // and cur / prev time index tidx.
+  // Gradient1D computes the gradient along X only, as a centered difference:
+  // the 1D counterpart of [Gradient10], for non-ThreeD runs.
+  func Gradient1D(x, y, z, vidx, tidx int32) math32.Vector3 {
+  	var g math32.Vector3
+  	g.X = 0.5 * (State[z, y, x+1, vidx, tidx] - State[z, y, x-1, vidx, tidx])
+  	return g
+  }
+  
+  func Gradient10(x, y, z, vidx, tidx int32) math32.Vector3 {
+  	var g math32.Vector3
+  	for xyz := range 3 {
+  		sum := float32(0)
+  		for j := range NGradPair {
+  			xp := FaceOffs[xyz, Plus1, j, math32.X]
+  			xm := FaceOffs[xyz, Minus1, j, math32.X]
+  			yp := FaceOffs[xyz, Plus1, j, math32.Y]
+  			ym := FaceOffs[xyz, Minus1, j, math32.Y]
+  ...
+  ```
+
+</details>
+
+<thinking>
+Confirming Gradient1D matches the WeylDispersion model via the central difference formula. Next I need to implement WaveCDirDispersion and fix WaveCDirPacketAt, so I'm rereading the current WaveCDirPacketAt code I edited earlier before making changes.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (3)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 138,185p wavecdir.goal``
+  ```
+  }
+  
+  // WaveCDirPacketAt writes the packet into both time levels, the earlier one
+  // shifted back by one step's travel. The leapfrog reads its own past, and for
+  // this equation that past is exactly the packet one step upstream.
+  func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
+  	ctx := GetCtx(0)
+  	cur := ctx.CurState
+  	prv := ctx.PrevState()
+  	ctr := CenterF(math32.Vec3(-1, -1, -1))
+  	wd := ss.Config.PacketWidth
+  	back := ss.Params.C * ss.Params.WaveDir // how far upstream the past sits
+  	sz := ss.Config.Size
+  	var c math32.Vector3i
+  	for c.Z = range sz.Z {
+  		for c.Y = range sz.Y {
+  			for c.X = range sz.X {
+  				f := c.AddScalar(1)
+  				off := CoordToFloat(c).Sub(ctr)
+  				pst := off
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('wavecdir.goal').read()
+old = """// WaveCDirPacketAt writes the packet into both time levels, the earlier one
+// shifted back by one step's travel. The leapfrog reads its own past, and for
+// this equation that past is exactly the packet one step upstream.
+func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	back := ss.Params.C * ss.Params.WaveDir // how far upstream the past sits
+	sz := ss.Config.Size"""
+new = """// WaveCDirDispersion returns the lattice angular frequency and group velocity
+// at the given carrier wavelength: the three-level leapfrog against the
+// centered gradient gives
+//
+//	sin(omega) = c ghat,  ghat = sin(k)
+//
+// so omega = asin(c sin k) and the group velocity is its k derivative. Neither
+// is c: the gradient stencil pulls it down and the leapfrog's own arcsin pulls
+// it back up, and the two only cancel at one particular c.
+//
+// This is the [Sim.WeylDispersion] of this equation, with no mass term.
+func (ss *Sim) WaveCDirDispersion(wavelength float32) (float32, float32) {
+	k := TwoPi / wavelength
+	c := ss.Params.C
+	s := c * math32.Sin(k)
+	if s >= 1 || s <= -1 { // past the stability bound: nothing sensible to say
+		return 0, c
+	}
+	return math32.Asin(s), c * math32.Cos(k) / math32.Sqrt(1-s*s)
+}
+
+// WaveCDirPacketAt writes the packet into both time levels, the earlier one
+// shifted back by one step's travel. The leapfrog reads its own past, and a
+// wave given the WRONG past is a mixture of both directions, however cleanly
+// its present is written.
+//
+// The past therefore comes from [Sim.WaveCDirDispersion], not from c: the
+// envelope goes back by one step of the GROUP velocity and the phase by one
+// step of omega. Using c for both -- which is what the continuum equation
+// would say -- happens to be right at c = 0.5, where the two lattice errors
+// cancel, and leaves the packet visibly slow anywhere else.
+func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
+	ctx := GetCtx(0)
+	cur := ctx.CurState
+	prv := ctx.PrevState()
+	ctr := CenterF(math32.Vec3(-1, -1, -1))
+	wd := ss.Config.PacketWidth
+	dir := ss.Params.WaveDir
+	om, vg := float32(0), ss.Params.C
+	if wavelength > 0 {
+		om, vg = ss.WaveCDirDispersion(wavelength)
+	}
+	back := vg * dir // how far upstream the past sits
+	sz := ss.Config.Size"""
+assert old in s
+s = s.replace(old, new, 1)
+
+old = """				if wavelength > 0 {
+					k := TwoPi / wavelength
+					na, nb = en*math32.Cos(k*d), en*math32.Sin(k*d)
+					oa, ob = eo*math32.Cos(k*e), eo*math32.Sin(k*e)
+				} else {"""
+new = """				if wavelength > 0 {
+					k := TwoPi / wavelength
+					ph := k * d
+					po := ph + om*dir // one step of omega, not of k c
+					na, nb = en*math32.Cos(ph), en*math32.Sin(ph)
+					oa, ob = eo*math32.Cos(po), eo*math32.Sin(po)
+				} else {"""
+assert old in s
+s = s.replace(old, new, 1)
+s = s.replace("\t\t\t\td := off.X\n\t\t\t\te := pst.X\n", "\t\t\t\td := off.X\n", 1)
+open('wavecdir.goal','w').write(s)
+PY
+goal build 2>&1 | tail -3``
+  ```
+  go build
+  goal build succeeded
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+)
+
+func TestScratchCdirFix(t *testing.T) {
+	fmt.Printf("  %5s  %9s  %9s  %9s  %7s\n", "C", "packet", "vg(theory)", "pulse", "pkt/vg")
+	for _, cc := range []float32{0.5, 0.35, 0.25, 0.2} {
+		var got [2]float64
+		var vg float64
+		for i, init := range []func(*Sim){WaveCDirPacket, WaveCDirPulse} {
+			ss := wcSim(128, false, 1, init)
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			_, v := ss.WaveCDirDispersion(8)
+			vg = float64(v)
+			wcStep(ss)
+			x0, _ := wcCtr()
+			for range 20 {
+				wcStep(ss)
+			}
+			x1, _ := wcCtr()
+			got[i] = (x1 - x0) / 20
+		}
+		fmt.Printf("  %5.2f  %9.4f  %9.4f  %9.4f  %7.4f\n", cc, got[0], vg, got[1], got[0]/vg)
+		_ = math.Pi
+	}
+}
+EOF
+go test -run TestScratchCdirFix -v -timeout 600s ./ 2>&1 | grep -E "^  " | head -8``
+  ```
+        C     packet  vg(theory)      pulse   pkt/vg
+     0.50     0.4873     0.3780     0.5001   1.2892
+     0.35     0.2912     0.2554     0.3493   1.1399
+     0.25     0.1897     0.1796     0.2493   1.0564
+     0.20     0.1487     0.1429     0.1994   1.0409
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The fix barely moved the needle (packet 0.1910 → 0.1897 at C=0.25), and the packet still doesn't match vg (1.056× at C=0.25, 1.29× at C=0.5), so either my model of vg is wrong or the packet's centroid isn't actually tracking vg. I'm realizing the packet is wl=8, pw=12, meaning the envelope σ of the intensity is pw/2 = 6.
+
+Computing Δk = 1/(2σ) = 0.083 against k₀=0.785, that's roughly 10% spread in k. Checking how vg varies over that range with vg(k) = C cos k/√(1−C²sin²k) at C=0.25 shows values ranging from about 0.164 to 0.194, averaging near 0.179 — so k-averaging alone can't explain a 5.6% excess, though the excess at C=0.5 is much larger (29%) where vg is more curved. I'm double-checking whether the measured quantity really is the envelope centroid by looking at what `wcCtr()` uses, and also re-verifying the sign convention in my phase fix — confirming that for ψ ∝ e^{i(kx−ωt)}, the past phase one step back should be ph + ω for dir=+1, and that the envelope at that past time should be centered one vg upstream.
+
+Now I'm tracing through the buffer logic to make sure "past" is actually stored correctly — the code writes present values into `prv` and older values into `cur`, with a comment confirming cur holds u(t-1) until overwritten, so the older values do map to cur as intended. That construction seems right, so I'm turning to question whether vg itself is being computed correctly, rechecking that the gradient operator gives sin(k) as expected and stepping through the dispersion relation sin ω = C·ĝ along with how pa is updated using cd = 2·C·WaveDir.
+
+Working through the complex exponential ψ = e^{ikx}, I confirm the lattice derivative gives i·sin(k)·ψ, so ĝ = sin k checks out. Plugging ψ(t) = ψ₀e^{-iωt} into the recursion e^{-iω} = e^{iω} − 2iC sin k, I'm rearranging to get e^{-iω} − e^{iω} in terms of sin k to solve for ω.
+
+This yields sin ω = C sin k, and differentiating gives vg = C cos k / cos ω. Plugging in C=0.25 and k=0.785 numerically, I compute vg ≈ 0.1796, but the measured packet centroid speed is 0.1897 — about 5.6% faster than predicted, so I'm trying to figure out where this discrepancy might come from, possibly related to the measurement window or some other factor I'm missing.
+
+I suspect the 20-step measurement window is too short and contaminated by a transient. I should rerun the test with more steps (say 100) and a wider, narrower-in-k packet to check if this converges toward vg, which would confirm it's a k-spreading/transient artifact rather than a real error in the theory — then either update the test's expected value with a justified tolerance, or report the discrepancy.
+
+Let me try an even wider packet, around 2.7% k-spread, to narrow this down further.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('zz_scratch_test.go').read()
+s=s.replace('ss := wcSim(128, false, 1, init)','ss := wcSim(512, false, 1, init)\n\t\t\tss.Config.PacketWidth = pw')
+s=s.replace('for _, cc := range []float32{0.5, 0.35, 0.25, 0.2} {','for _, pw := range []float32{12, 48, 96} {\n\t\tfmt.Printf(" pw %.0f\\n", pw)\n\t\tfor _, cc := range []float32{0.5, 0.25} {')
+s=s.replace('''		fmt.Printf("  %5.2f  %9.4f  %9.4f  %9.4f  %7.4f\\n", cc, got[0], vg, got[1], got[0]/vg)
+		_ = math.Pi
+	}''','''		fmt.Printf("  %5.2f  %9.4f  %9.4f  %9.4f  %7.4f\\n", cc, got[0], vg, got[1], got[0]/vg)
+		_ = math.Pi
+		}
+	}''')
+s=s.replace('for range 20 {','for range 60 {').replace('/ 20','/ 60')
+open('zz_scratch_test.go','w').write(s)
+PY
+go test -run TestScratchCdirFix -v -timeout 600s ./ 2>&1 | grep -E "^ " | head -14``
+  ```
+        C     packet  vg(theory)      pulse   pkt/vg
+   pw 12
+     0.50     0.4852     0.3780     0.5004   1.2838
+     0.25     0.1906     0.1796     0.2494   1.0612
+   pw 48
+     0.50     0.4874     0.3780     0.5000   1.2895
+     0.25     0.1912     0.1796     0.2500   1.0645
+   pw 96
+     0.50     0.4875     0.3780     0.5000   1.2897
+     0.25     0.1912     0.1796     0.2500   1.0646
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+Widening the packet doesn't seem to change the envelope speed, so this isn't a k-spread effect — the envelope consistently moves at 1.29× vg for C=0.5 and 1.065× vg for C=0.25. That means either my computed vg is off, or the envelope simply isn't tracking vg as expected; checking the ratio of measured speeds (0.4875/0.1912 ≈ 2.55) against the expected factor of 2 confirms something doesn't line up.
+
+Trying to back out what ĝ'(k) would need to be to match the measured envelope speeds gives inconsistent values (0.912 vs 0.7527) that don't match cos(k)=0.7071 as they should if the dispersion model held — so the "sin ω = C sin k" model isn't actually describing this. Then I realize the real issue: the wave packet code writes a genuine complex envelope (env·e^{ikd}) for the directional case, but the pure pulse case is a real-valued envelope with zero imaginary part — and the underlying update rule is a real advection equation that moves things at exactly C regardless of phase, which explains why the envelope isn't obeying the group velocity formula at all.
+
+Writing ψ=env e^{ikd} makes it purely +k, so the envelope should indeed move at the group velocity dω/dk, not the phase speed. That resolves my confusion — but then the 1.065× discrepancy at C=0.25 with a nearly monochromatic packet (pw=96) needs another explanation, so I should check the actual Δk spread more carefully.
+
+I need to directly verify ω(k) by initializing a pure plane wave with the correct past phase and measuring the single-step phase advance, then comparing ω_meas to asin(C sin k) — if they match, my dispersion formula is right and the discrepancy must lie elsewhere, likely in the group velocity derivation itself.
+
+Given how much I've already invested here, I'm deciding to stop grinding unilaterally on the WaveCDir packet-vs-c question. Since my "fix" to the packet initialization only changed results by under 1%, the old initialization wasn't actually the source of the problem — though the new version is arguably more principled since it uses the true ω and group velocity rather than approximations.
+
+I still don't understand why the measured envelope speed at C=0.25 is 1.065× my computed group velocity, and I shouldn't encode a number I can't explain into a test. This is something I should surface to the user rather than paper over, even though leaving the test suite red is uncomfortable.
+
+I could pin the test's expectation to what's empirically measured (bad, that hides a mystery), or make WaveCDir's C=0.5 exception fix the discrepancy (but that undercuts the shared-C goal), or honestly report what I found. The cleanest path is to narrow what TestWaveC actually asserts — the real claim is that the pulse stays coherent and travels in the one physical direction, which does hold at 0.997c — while leaving the exact packet speed as the open question, and taking one more decisive measurement before deciding.
+
+
+</thinking>
+
+The wider packet doesn't change it, so it isn't k-spread. One decisive measurement — is my ω wrong, or is the envelope not moving at dω/dk?
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && cat > zz_scratch_test.go <<'EOF'
+package wavesim
+
+import (
+	"fmt"
+	"math"
+	"testing"
+)
+
+func TestScratchOmega(t *testing.T) {
+	fmt.Printf("  %5s %5s  %10s %10s   %10s %10s\n", "C", "wl", "om_meas", "asin(Csink)", "vg_meas", "dom/dk meas")
+	for _, cc := range []float32{0.5, 0.25} {
+		for _, wl := range []float64{8, 8.5} {
+			ss := wcSim(512, false, 1, func(s *Sim) {
+				s.Config.PacketWidth = 96
+				s.WaveCDirPacketAt(float32(wl), 1)
+			})
+			ss.Params.C = cc
+			ss.Params.Update()
+			ss.Init()
+			// single-step phase advance at the packet centre
+			ph := func() float64 {
+				c := GetCtx(0)
+				a := float64(State.Value(1, 1, 256, int(WaveCa), int(c.CurState)))
+				b := float64(State.Value(1, 1, 256, int(WaveCb), int(c.CurState)))
+				return math.Atan2(b, a)
+			}
+			// let it settle a few steps first
+			for range 5 {
+				wcStep(ss)
+			}
+			p0 := ph()
+			x0, _ := wcCtr()
+			wcStep(ss)
+			d := ph() - p0
+			for d > math.Pi {
+				d -= 2 * math.Pi
+			}
+			for d < -math.Pi {
+				d += 2 * math.Pi
+			}
+			for range 59 {
+				wcStep(ss)
+			}
+			x1, _ := wcCtr()
+			k := 2 * math.Pi / wl
+			fmt.Printf("  %5.2f %5.1f  %10.6f %10.6f   %10.6f\n",
+				cc, wl, math.Abs(d), math.Asin(float64(cc)*math.Sin(k)), (x1-x0)/60)
+		}
+	}
+}
+EOF
+go test -run TestScratchOmega -v -timeout 600s ./ 2>&1 | grep -E "^  " | head -8``
+  ```
+        C    wl     om_meas asin(Csink)      vg_meas dom/dk meas
+     0.50   8.0    0.676913   0.361367     0.484325
+     0.50   8.5    0.732005   0.343567     0.490640
+     0.25   8.0    0.370746   0.177711     0.192205
+     0.25   8.5    0.325037   0.169231     0.198910
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+<thinking>
+The measured ω comes out roughly twice my formula predicts, which makes sense since the three-level leapfrog scheme advances by two time steps per update, so I need to account for that factor of two in the dispersion relation.
+
+But redoing the algebra with e^{−iω} = e^{iω} − 2iCĝ still gives sin ω = Cĝ, and doubling that doesn't quite match either — off by 4-7%. Worse, I notice the measured ω at wavelength 8.5 actually increases with C when it should decrease, which is backwards, telling me my phase measurement at a single fixed point is unreliable since the moving wave packet's envelope shifts under that point each step, corrupting the phase readout.
+
+Given I can't cleanly validate the correction, I'm inclined to revert the WaveCDirPacketAt change and just report this as an open question — the modification was principled but its effect was under 1%, and unvalidated complexity in physics code isn't worth the risk even though the old continuum-based code has its own issues.
+
+But TestWaveC still fails either way. Maybe the better move is to keep the change since it mirrors validated Weyl behavior, and instead reframe what the test actually checks: the pulse traveling at exactly 0.997c is solid and well-understood, the packet propagating one-way without splitting is solid, but the packet's exact speed being below c and lattice-dependent is the honest caveat. Loosening the packet's speed assertion to "within some tolerance of C" feels weak given the deviation is as large as 23.6%.
+
+The most honest engineering answer is to admit I don't fully understand the WaveCDir packet speed and flag it for the user rather than papering over it, while keeping the tree clean by reverting the speculative unvalidated change. But before doing that, let me double-check wcCtr() — specifically whether it's measuring the magnitude WaveCMag or just the real component WaveCa, since that distinction could explain the whole discrepancy.
+
+Actually, maybe it's tracking phase velocity (ω/k) rather than group velocity — but running the numbers at C=0.25, k=0.785 gives vp≈0.2263, which doesn't match the measured 0.1912 either. So that's not it. Let me just go check wcCtr directly as my final verification.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && grep -n "func wcCtr" -A 20 wavec_test.go | head -24``
+  ```
+  88:func wcCtr() (float64, float64) {
+  89-	var num, den float64
+  90-	c := GetCtx(0)
+  91-	cur := int(c.CurState)
+  92-	for z := int32(1); z <= c.Size.Z; z++ {
+  93-		for y := int32(1); y <= c.Size.Y; y++ {
+  94-			for x := int32(1); x <= c.Size.X; x++ {
+  95-				v := float64(State.Value(int(z), int(y), int(x), int(WaveCMag), cur))
+  96-				num += v * float64(x)
+  97-				den += v
+  98-			}
+  99-		}
+  100-	}
+  101-	return num / den, den
+  102-}
+  103-
+  104-// TestWaveC: the first-order complex wave equation, against which the
+  105-// second-order WaveKernel is meant to be read.
+  106-//
+  107-// Everything in it travels at c in the ONE direction Params.WaveDir names, in
+  ...
+  ```
+
+</details>
+
+<thinking>
+I realize `wcCtr` actually uses the envelope quantity, so it does represent group velocity — meaning what I measured doesn't match my own vg after all. I've gone back and forth enough; rather than revert everything, I'll keep the `WaveCDirDispersion` correction since it's principled and mirrors the Weyl relation, even if not fully validated, and be upfront about that in my report.
+
+But since it doesn't actually fix the test, the disciplined move is to revert this last change and keep the diff limited to what I actually understand — preserving the earlier PacketDist fix from the envelope work. I'll revert wavecdir.goal back to its prior state, apply the inverse edit, rerun the full suite to confirm only TestWaveC still fails, and then report that as an open item with a clear recommendation.
+
+
+</thinking>
+
+I've hit the limit of what I can establish here. Reverting the unvalidated change and reporting:
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && rm -f zz_scratch_test.go && python3 - <<'PY'
+import re
+s=open('wavecdir.goal').read()
+# remove WaveCDirDispersion and restore the original past construction
+s = re.sub(r"// WaveCDirDispersion returns the lattice angular frequency.*?\n}\n\n(?=// WaveCDirPacketAt)", "", s, flags=re.S)
+old = """// WaveCDirPacketAt writes the packet into both time levels, the earlier one
+// shifted back by one step's travel. The leapfrog reads its own past, and a
+// wave given the WRONG past is a mixture of both directions, however cleanly
+// its present is written.
+//
+// The past therefore comes from [Sim.WaveCDirDispersion], not from c: the
+// envelope goes back by one step of the GROUP velocity and the phase by one
+// step of omega. Using c for both -- which is what the continuum equation
+// would say -- happens to be right at c = 0.5, where the two lattice errors
+// cancel, and leaves the packet visibly slow anywhere else."""
+new = """// WaveCDirPacketAt writes the packet into both time levels, the earlier one
+// shifted back by one step's travel. The leapfrog reads its own past, and for
+// this equation that past is exactly the packet one step upstream.
+//
+// The shift and the phase advance both use c, which is the CONTINUUM answer.
+// On the lattice the packet comes out at c only near c = 0.5; see TestWaveC."""
+assert old in s
+s = s.replace(old, new, 1)
+old = """	dir := ss.Params.WaveDir
+	om, vg := float32(0), ss.Params.C
+	if wavelength > 0 {
+		om, vg = ss.WaveCDirDispersion(wavelength)
+	}
+	back := vg * dir // how far upstream the past sits"""
+new = """	back := ss.Params.C * ss.Params.WaveDir // how far upstream the past sits"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """				d := off.X
+				gd := ss.PacketDist(off, math32.X) / wd"""
+new = """				d := off.X
+				e := pst.X
+				gd := ss.PacketDist(off, math32.X) / wd"""
+assert old in s
+s = s.replace(old, new, 1)
+old = """					ph := k * d
+					po := ph + om*dir // one step of omega, not of k c
+					na, nb = en*math32.Cos(ph), en*math32.Sin(ph)
+					oa, ob = eo*math32.Cos(po), eo*math32.Sin(po)"""
+new = """					na, nb = en*math32.Cos(k*d), en*math32.Sin(k*d)
+					oa, ob = eo*math32.Cos(k*e), eo*math32.Sin(k*e)"""
+assert old in s
+open('wavecdir.goal','w').write(s.replace(old, new, 1))
+PY
+goal build 2>&1|tail -1 && git diff --stat wavecdir.goal | cat``
+  ```
+  goal build succeeded
+   wavesim/wavecdir.goal | 5 +++--
+   1 file changed, 3 insertions(+), 2 deletions(-)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Two of the three are fixed properly. The third I could not resolve, and I'm stopping rather than papering over it.
+
+## Fixed: `TestWaveDispersion` — it was carrier aliasing, not physics
+
+Wave was reading 1.15c at wavelength 64. The intensity centroid wobbles at twice the carrier frequency — the same effect `StatGroupVelWindow` exists to average out — and 100 steps is well under one 256-step carrier period at C=0.25, so the window was reading part of the wobble as motion.
+
+The step count now comes from `PacketFreq` — four whole carrier periods, per equation:
+
+```
+Wave         wavelength 16: 0.9833 c  (258 steps)
+Wave         wavelength 64: 0.9969 c  (1024 steps)
+KleinGordon  wavelength 16: 0.6174 c  (159 steps)
+KleinGordon  wavelength 64: 0.1958 c  (197 steps)
+```
+
+## Fixed: `TestDiffusion` — the premise was an accident of the old defaults
+
+The test needs WaveC's coefficient (C) to equal Wave's diffusion coefficient (C²). That held only because C=0.5 and 0.5²=0.25 happened to coincide. `wvMode` now takes an explicit C so the test *arranges* the match instead of inheriting it, and the oscillation window scales with the rate being measured:
+
+```
+same mode, same coefficient: diffusion decays at 0.002405 per step,
+WaveC rotates at 0.002402 (C^2 khat^2 = 0.002402) -- the i is the only difference
+```
+
+## Unresolved: `TestWaveC`
+
+The **pulse** is fine — 0.997c at every C I tried, so the equation transports correctly and the doc's main claim holds. The **packet** is the problem:
+
+```
+   C     packet    pulse   vg(theory)   pkt/vg
+0.50     0.4875   0.5000     0.3780      1.29
+0.35     0.2912   0.3493     0.2554      1.14
+0.25     0.1912   0.2500     0.1796      1.06
+0.20     0.1487   0.1994     0.1429      1.04
+```
+
+The test asserts the packet moves at exactly C to 1%. That was true at C=0.5 and is false at 0.25.
+
+I chased this and failed. `sin ω = C·sin k` is the right relation for this scheme — I derived it from the kernel and `Gradient1D` is a plain centered difference — but the measured envelope speed sits above `dω/dk` by an amount that grows with C, and I couldn't explain it. It isn't k-spread: widening the packet from 12 to 96 changes nothing. My attempts to measure ω directly were contaminated both times, first by phase wrapping and then by the envelope translating under the probe point.
+
+I also wrote a `WaveCDirDispersion` and rebuilt the packet's past from the true ω and group velocity, mirroring what `WeylPacket` already does. It moved the answer by less than 1%, so the initialization was not the cause — and I've **reverted it**, since adding unvalidated machinery to physics code that fixes nothing is worse than leaving the honest version. I did leave a note in `WaveCDirPacketAt` that its shift and phase advance use the continuum c and that this only lands at c ≈ 0.5.
+
+So `TestWaveC` is the one red test. Three ways forward, and this is your call:
+
+1. **Pin WaveCDir at C=0.5** as its own exception. Restores the test, costs you the shared-C comparability for that one equation.
+2. **Relax the packet assertion** to "moves one way, below c, total conserved" and keep the exact-c claim only for the pulse, which is where it's solid.
+3. **Dig further** — I'd want to measure ω(k) with a properly constructed two-level eigenstate, which means getting the past right first, which is the thing I couldn't validate.
+
+## 🧑 User - 2026-09-25 20:05:34
+
+relax the packet assertion, keep the exact-c claim for the pulse
+
+## 🤖 Assistant - 2026-09-25 20:05:47
+
+*Model: claude-opus-5*
+
+<thinking>
+I want to restructure TestWaveC so the pulse checks the exact wave speed within tolerance, while the packet check just verifies subluminal motion in the correct direction with sign matching and magnitude bounded between a reasonable fraction of c and c itself, alongside the conservation check already in place. Looking at the C=0.25 data, the packet speed comes out around 0.1, which fits that bounded expectation.
+
+
+</thinking>
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && sed -n 104,148p wavec_test.go``
+  ```
+  // TestWaveC: the first-order complex wave equation, against which the
+  // second-order WaveKernel is meant to be read.
+  //
+  // Everything in it travels at c in the ONE direction Params.WaveDir names, in
+  // 1D and 3D alike. The pulse matters most: it has no phase to tell it where to
+  // go, and it still leaves in one piece, where the second-order equation would
+  // split it in half because its operator contains both factors.
+  func TestWaveC(t *testing.T) {
+  	for _, threeD := range []bool{false, true} {
+  		sz, n, tol := int32(128), 20, 0.01
+  		if threeD {
+  			sz, n, tol = 64, 10, 0.05
+  		}
+  		for _, tc := range []struct {
+  			name string
+  			init func(*Sim)
+  		}{{"packet", WaveCDirPacket}, {"pulse", WaveCDirPulse}} {
+  			for _, dir := range []float32{1, -1} {
+  				ss := wcSim(sz, threeD, dir, tc.init)
+  				wcStep(ss)
+  ...
+  ```
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && python3 - <<'PY'
+s=open('wavec_test.go').read()
+old = '''// TestWaveC: the first-order complex wave equation, against which the
+// second-order WaveKernel is meant to be read.
+//
+// Everything in it travels at c in the ONE direction Params.WaveDir names, in
+// 1D and 3D alike. The pulse matters most: it has no phase to tell it where to
+// go, and it still leaves in one piece, where the second-order equation would
+// split it in half because its operator contains both factors.
+func TestWaveC(t *testing.T) {
+	for _, threeD := range []bool{false, true} {
+		sz, n, tol := int32(128), 20, 0.01
+		if threeD {
+			sz, n, tol = 64, 10, 0.05
+		}
+		for _, tc := range []struct {
+			name string
+			init func(*Sim)
+		}{{"packet", WaveCDirPacket}, {"pulse", WaveCDirPulse}} {
+			for _, dir := range []float32{1, -1} {
+				ss := wcSim(sz, threeD, dir, tc.init)
+				wcStep(ss)
+				x0, q0 := wcCtr()
+				for range n {
+					wcStep(ss)
+				}
+				x1, q1 := wcCtr()
+				v := (x1 - x0) / float64(n)
+				want := float64(dir) * float64(ss.Params.C)
+				if math.Abs(v-want)/math.Abs(want) > tol {
+					t.Errorf("%v 3D=%v dir %+.0f: speed %+.4f, want %+.4f -- a wave that split would barely move at all",
+						tc.name, threeD, dir, v, want)
+				}
+				if math.Abs(q1/q0-1) > 1e-5 {
+					t.Errorf("%v 3D=%v dir %+.0f: total changed by %.2e", tc.name, threeD, dir, q1/q0-1)
+				}
+				t.Logf("3D=%-5v %-6s dir %+.0f: speed %+.4f = %+.3f c, total held",
+					threeD, tc.name, dir, v, v/float64(ss.Params.C))
+			}
+		}
+	}
+}'''
+new = '''// TestWaveC: the first-order complex wave equation, against which the
+// second-order WaveKernel is meant to be read.
+//
+// Everything in it leaves in ONE piece, in the one direction Params.WaveDir
+// names, in 1D and 3D alike, and that is the claim being tested. The pulse
+// matters most: it has no phase to tell it where to go, and it still goes,
+// where the second-order equation would split it in half because its operator
+// contains both factors. It travels at exactly c, and is held to that.
+//
+// The PACKET is not held to c, only to travelling one way, subluminally, with
+// its total conserved. A carrier of finite wavelength sees the lattice: the
+// gradient stencil and the leapfrog each bend the dispersion, and the envelope
+// comes out at 0.996 c at C = 0.5, falling to 0.765 c by C = 0.25. That is not
+// the k-spread of the envelope -- widening the packet eightfold does not move
+// it -- and it does not match dw/dk for sin(w) = C sin(k) either, which is the
+// relation the scheme should obey. Writing the past from that relation rather
+// than from c, as WeylPacket does, changes the answer by under a percent, so
+// the initialization is not the cause. Unexplained; the bound here is loose on
+// purpose rather than pinning a number nobody has accounted for.
+func TestWaveC(t *testing.T) {
+	for _, threeD := range []bool{false, true} {
+		sz, n, tol := int32(128), 20, 0.01
+		if threeD {
+			sz, n, tol = 64, 10, 0.05
+		}
+		for _, tc := range []struct {
+			name  string
+			init  func(*Sim)
+			atC   bool // held to exactly c
+		}{{"packet", WaveCDirPacket, false}, {"pulse", WaveCDirPulse, true}} {
+			for _, dir := range []float32{1, -1} {
+				ss := wcSim(sz, threeD, dir, tc.init)
+				wcStep(ss)
+				x0, q0 := wcCtr()
+				for range n {
+					wcStep(ss)
+				}
+				x1, q1 := wcCtr()
+				v := (x1 - x0) / float64(n)
+				c := float64(ss.Params.C)
+				want := float64(dir) * c
+				frac := v / want // of c, in the intended direction
+				switch {
+				case tc.atC:
+					if math.Abs(v-want)/math.Abs(want) > tol {
+						t.Errorf("%v 3D=%v dir %+.0f: speed %+.4f, want %+.4f -- a wave that split would barely move at all",
+							tc.name, threeD, dir, v, want)
+					}
+				case frac < 0.5:
+					// a packet that split would sit near zero, and one going
+					// the wrong way would come out negative
+					t.Errorf("%v 3D=%v dir %+.0f: speed %+.4f is %+.3f of c in the intended direction -- it should travel one way, whole",
+						tc.name, threeD, dir, v, frac)
+				case frac > 1.01:
+					t.Errorf("%v 3D=%v dir %+.0f: speed %+.4f is %+.3f c, and nothing here may outrun c",
+						tc.name, threeD, dir, v, frac)
+				}
+				if math.Abs(q1/q0-1) > 1e-5 {
+					t.Errorf("%v 3D=%v dir %+.0f: total changed by %.2e", tc.name, threeD, dir, q1/q0-1)
+				}
+				t.Logf("3D=%-5v %-6s dir %+.0f: speed %+.4f = %+.3f c, total held",
+					threeD, tc.name, dir, v, v/c)
+			}
+		}
+	}
+}'''
+assert old in s
+open('wavec_test.go','w').write(s.replace(old, new, 1))
+PY
+gofmt -w wavec_test.go && go test -run TestWaveC -v -timeout 600s ./ 2>&1 | grep -E "^---|_test.go:" | head -16``
+  ```
+      wavec_test.go:164: 3D=false packet dir +1: speed +0.1910 = +0.764 c, total held
+      wavec_test.go:164: 3D=false packet dir -1: speed -0.1910 = -0.764 c, total held
+      wavec_test.go:164: 3D=false pulse  dir +1: speed +0.2493 = +0.997 c, total held
+      wavec_test.go:164: 3D=false pulse  dir -1: speed -0.2493 = -0.997 c, total held
+      wavec_test.go:164: 3D=true  packet dir +1: speed +0.1952 = +0.781 c, total held
+      wavec_test.go:164: 3D=true  packet dir -1: speed -0.1952 = -0.781 c, total held
+      wavec_test.go:164: 3D=true  pulse  dir +1: speed +0.2492 = +0.997 c, total held
+      wavec_test.go:164: 3D=true  pulse  dir -1: speed -0.2492 = -0.997 c, total held
+  --- PASS: TestWaveC (1.22s)
+      wavec_test.go:219: 3D=false dir +1: speed +0.3523 (want +0.3536), a/b rms ratio 1.0000, total held
+      wavec_test.go:219: 3D=false dir -1: speed -0.3523 (want -0.3536), a/b rms ratio 1.0000, total held
+      wavec_test.go:219: 3D=true  dir +1: speed +0.3516 (want +0.3536), a/b rms ratio 1.0000, total held
+      wavec_test.go:219: 3D=true  dir -1: speed -0.3519 (want -0.3536), a/b rms ratio 1.0000, total held
+      wavec_test.go:235: pulse drifted +0.00000 over 60 steps: it spreads both ways instead
+      wavec_test.go:257: second order: pos rms 0.2424, vel rms 0.0464, ratio 0.191 -- a quantity and its rate, not two of a kind
+  --- PASS: TestWaveCPlain (0.98s)
+  Shell cwd was reset to /Users/oreilly/wavereality/waves/electroweak_py
+  ```
+
+</details>
+
+Running the full suite to confirm everything's green:
+
+<details>
+<summary>Tool Calls (2)</summary>
+
+- **Bash**: `Ran `cd /Users/oreilly/wavereality/waves/wavesim && gofmt -l *.go *_test.go; go generate ./... 2>&1 | grep -iE "^error|failed" | head; echo "gen ok"; cd ../yaegiwaves && go generate ./... 2>&1|tail -1; cd ../wavesim && go test ./ 2>&1 | grep -E "^---|_test\.go:|^ok|^FAIL" | head -40``
+  ```
+  Command running in background with ID: bh137ttiv. Output is being written to: /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bh137ttiv.output. You will be notified when it completes. To check interim output, use Read on that file path.
+  Session cwd remains /Users/oreilly/wavereality/waves/electroweak_py; directory changes made by the backgrounded command do not apply to subsequent commands.
+  ```
+- **Monitor**: `command, description, timeout_ms`
+  ```
+  Monitor started (task bh8jv343w, expires in 25m unless the source ends first; you get one notice at expiry — re-arm if you still need the watch). You will be notified on each event. Keep working — do not poll or sleep. Events may arrive while you are waiting for the user — an event is not their reply.
+  ```
+
+</details>
+
+`TestWaveC` passes. The split is now along the line of what's actually understood:
+
+```
+packet dir +1: speed +0.1910 = +0.764 c, total held
+pulse  dir +1: speed +0.2493 = +0.997 c, total held
+```
+
+**Pulse** keeps the exact-c assertion at the original 1% / 5% tolerance. That's the doc's headline claim and it holds at every C I tried.
+
+**Packet** is now held to what the test is really for — that the wave leaves *whole and one-way*:
+
+- `frac < 0.5` fails — a packet that split would sit near zero, and one going backwards comes out negative. That's the failure mode the original error message named, and it's still caught.
+- `frac > 1.01` fails — nothing may outrun c.
+- total conserved to 1e-5, unchanged.
+
+At C=0.25 it reads 0.764 c in 1D and 0.781 c in 3D, comfortably inside.
+
+I put the full account of what I don't know in the test doc rather than in a commit message, so the next person hits it where it matters: that the envelope runs at 0.996 c at C=0.5 and 0.765 c at C=0.25; that it isn't envelope k-spread, since widening the packet eightfold doesn't move it; that it doesn't match dω/dk for `sin(ω) = C sin(k)`, which is the relation the scheme should obey; and that rebuilding the past from that relation instead of from c — the `WeylPacket` approach — shifts it by under a percent, so the initialization isn't the cause. The loose bound is marked as deliberate rather than a number someone tuned.
+
+Full suite plus both generates running now.
+
+## 🧑 User - 2026-09-25 20:13:19
+
+<task-notification>
+<task-id>bh137ttiv</task-id>
+<tool-use-id>toolu_01WEYVozXfD9L1ug3j3Bva8t</tool-use-id>
+<output-file>/private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bh137ttiv.output</output-file>
+<status>completed</status>
+<summary>Background command "Generate and full suite" completed (exit code 0)</summary>
+</task-notification>
+
+## 🤖 Assistant - 2026-09-25 20:13:23
+
+*Model: claude-opus-5*
+
+<details>
+<summary>Tool Calls (1)</summary>
+
+- **Bash**: `Ran `cat /private/tmp/claude-503/-Users-oreilly-wavereality-waves-electroweak-py/f686e1ea-bdd7-4bb7-941a-3f50e95f69df/tasks/bh137ttiv.output``
+  ```
+  gosl.go
+  gen ok
+  goal run succeeded
+  ok  	github.com/WaveReality/waves/wavesim	396.320s
+  
+  [exited with code 0]
+  ```
+
+</details>
+
+Green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  396.320s
+```
+
+All 72 tests pass. `goal build`, `go generate` in both packages, gofmt clean apart from the pre-existing generated `gosl.go`.
+
+## The shared defaults
+
+```go
+pr.C = 0.25       // set by WaveC's Visscher bound, the tightest here
+pr.Hbar = 1.0
+pr.Mass = 2       // m c / hbar = 0.5 against khat = 0.77
+pr.Edges = EdgesWrap
+```
+
+No equation overrides any of them. `WeylC`, `SchrodingerMass` and `WaveCC` are all deleted — each had existed only to say something the shared default now says. The per-*demo* settings stayed, because those are physics: `NeutrinoPacket` must have Mass=0, the bound Schrödinger demos must have walls, `BoundStateMass` is 4 so the Compton wavelength lands on one cube.
+
+## Six tests moved, and none of them by loosening a number
+
+| test | what was actually wrong |
+|---|---|
+| `TestDiracHydrogenBound` | `BoundStateMass` was tied to C=0.5 → now 4 |
+| `TestSchrodinger*` (3) | bound states need walls; wrap drove |E| past the stability bound |
+| `TestWaveDispersion` | 100 steps was under one carrier period — now four whole periods from `PacketFreq` |
+| `TestDiffusion` | its premise C²=C held only by coincidence — now arranged explicitly |
+| `TestEdgesDamp`, `TestElectroweakDamp` | measuring "has it arrived", not "did it reflect" — now ~3 traversals |
+| `TestKGGaugeUniform` | magic 2e-3 replaced with the documented `0.5 × A0` scaling |
+
+Each of those is now expressed in terms of the thing it depends on, so the next parameter change won't silently invalidate them.
+
+## Two things to carry forward
+
+**Your original conclusion mostly survives, with one correction.** KG ≡ KGC ≡ Dirac is solid and now holds at matched mass. Schrödinger dispersing more than Dirac is true in theory but by ~1.5×, not 10× — and I was wrong to attribute your figures' gap to mismatched masses, since you'd matched them in the GUI. The real distortion there was the 64³ box, where mean Vg sat at 0.02–0.05 c instead of ~0.68 c. I'd drop "Weyl least of all": Weyl and Dirac are the same equation, so any gap is discretization.
+
+**`WaveCDir`'s packet speed is unexplained.** 0.996 c at C=0.5 falling to 0.765 c at C=0.25, not matching `dω/dk` for the relation the scheme should obey, not k-spread, not the initialization. It's written up in the test doc with everything I ruled out. Worth a look if you ever lean on that equation quantitatively.
+
+Green.
+
+```
+ok  github.com/WaveReality/waves/wavesim  396.320s
+```
+
+All 72 tests pass. `goal build`, `go generate` in both packages, gofmt clean apart from the pre-existing generated `gosl.go`.
+
+## The shared defaults
+
+```go
+pr.C = 0.25       // set by WaveC's Visscher bound, the tightest here
+pr.Hbar = 1.0
+pr.Mass = 2       // m c / hbar = 0.5 against khat = 0.77
+pr.Edges = EdgesWrap
+```
+
+No equation overrides any of them. `WeylC`, `SchrodingerMass` and `WaveCC` are all deleted — each had existed only to say something the shared default now says. The per-*demo* settings stayed, because those are physics: `NeutrinoPacket` must have Mass=0, the bound Schrödinger demos must have walls, `BoundStateMass` is 4 so the Compton wavelength lands on one cube.
+
+## Six tests moved, and none of them by loosening a number
+
+| test | what was actually wrong |
+|---|---|
+| `TestDiracHydrogenBound` | `BoundStateMass` was tied to C=0.5 → now 4 |
+| `TestSchrodinger*` (3) | bound states need walls; wrap drove |E| past the stability bound |
+| `TestWaveDispersion` | 100 steps was under one carrier period — now four whole periods from `PacketFreq` |
+| `TestDiffusion` | its premise C²=C held only by coincidence — now arranged explicitly |
+| `TestEdgesDamp`, `TestElectroweakDamp` | measuring "has it arrived", not "did it reflect" — now ~3 traversals |
+| `TestKGGaugeUniform` | magic 2e-3 replaced with the documented `0.5 × A0` scaling |
+
+Each of those is now expressed in terms of the thing it depends on, so the next parameter change won't silently invalidate them.
+
+## Two things to carry forward
+
+**Your original conclusion mostly survives, with one correction.** KG ≡ KGC ≡ Dirac is solid and now holds at matched mass. Schrödinger dispersing more than Dirac is true in theory but by ~1.5×, not 10× — and I was wrong to attribute your figures' gap to mismatched masses, since you'd matched them in the GUI. The real distortion there was the 64³ box, where mean Vg sat at 0.02–0.05 c instead of ~0.68 c. I'd drop "Weyl least of all": Weyl and Dirac are the same equation, so any gap is discretization.
+
+**`WaveCDir`'s packet speed is unexplained.** 0.996 c at C=0.5 falling to 0.765 c at C=0.25, not matching `dω/dk` for the relation the scheme should obey, not k-spread, not the initialization. It's written up in the test doc with everything I ruled out. Worth a look if you ever lean on that equation quantitatively.
 

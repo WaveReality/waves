@@ -95,8 +95,6 @@ func (ss *Sim) KleinGordonConfig() {
 	// only thing that changes is the mass term
 	ss.initFuncs = WaveConfigs
 	ss.InitFunc = WavePacket
-	ss.Params.C = 0.5
-	ss.Params.Mass = 0.125
 	ss.Params.Update()
 	ss.WaveStats()
 	ss.eqViewInitFunc = WaveViewAll

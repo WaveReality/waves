@@ -307,7 +307,6 @@ func (ss *Sim) DiracConfig() {
 	// the conservation the equation promises is the one you actually see. A
 	// config that couples to its own field wants damped edges instead, for the
 	// reason in ChargeSelfField, and should set that itself.
-	ss.Params.Edges = EdgesWrap
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.DiracStats()
 	ss.eqViewInitFunc = DiracViewAll
@@ -318,9 +317,9 @@ func (ss *Sim) DiracConfig() {
 // left-handed one it recovers, and the two components of the spinor.
 func DiracViewAll(view *View) {
 	view.Panels[0].Var = DiracMag
-	view.Panels[1].Var = DiracLMag
-	view.Panels[2].Var = Dirac1As
-	view.Panels[3].Var = DiracL1As
+	view.Panels[1].Var = Dirac1As
+	view.Panels[2].Var = Dirac1Bs
+	view.Panels[3].Var = Dirac2As
 }
 
 // DiracShouldDisplay determines which Parameters fields to display.

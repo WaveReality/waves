@@ -61,8 +61,14 @@ func dampTot(ss *Sim) float64 {
 // layer several cells deep. On its own the open halo leaves nearly half a
 // Weyl packet in the box, and 9% of a Schrodinger one, so the layer is doing
 // most of the work in both.
+// The step count is set by the SLOWEST packet: at the shared mass a massive
+// one moves at about 0.12 cubes per step, so it needs some 270 steps just to
+// cross the box once, and a boundary that reflects only shows it on the way
+// back. This is about three traversals. Raising C or lowering Mass would let
+// it run shorter, but then it would not be the packet the other tests use.
 func TestEdgesDamp(t *testing.T) {
-	const sz = 48
+	const sz = 32
+	const nst = 900
 	for _, tc := range []struct {
 		eq   Equations
 		name string
@@ -85,14 +91,14 @@ func TestEdgesDamp(t *testing.T) {
 			t.Errorf("%s: nothing in the box to damp", tc.name)
 			continue
 		}
-		for range 300 {
+		for range nst {
 			ss.StepRun()
 		}
 		left := dampTot(ss) / t0
 		if left > 0.01 {
-			t.Errorf("%s: %.3f%% of the wave is still in the box after 300 steps -- it is reflecting",
-				tc.name, 100*left)
+			t.Errorf("%s: %.3f%% of the wave is still in the box after %d steps -- it is reflecting",
+				tc.name, 100*left, nst)
 		}
-		t.Logf("%-13s %.3f%% left after 300 steps", tc.name, 100*left)
+		t.Logf("%-13s %.3f%% left after %d steps", tc.name, 100*left, nst)
 	}
 }

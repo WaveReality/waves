@@ -96,8 +96,6 @@ func (ss *Sim) WaveCDirConfig() {
 	ss.initFuncs = WaveCDirConfigs
 	ss.InitFunc = WaveCDirPacket
 	ss.WaveCDirStats()
-	ss.Params.C = 0.5 // under 1 in 1D, under 1/sqrt(3) in 3D
-	ss.Params.Edges = EdgesWrap
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveCViewAll
 }
@@ -144,6 +142,9 @@ func WaveCDirPulse(ss *Sim) {
 // WaveCDirPacketAt writes the packet into both time levels, the earlier one
 // shifted back by one step's travel. The leapfrog reads its own past, and for
 // this equation that past is exactly the packet one step upstream.
+//
+// The shift and the phase advance both use c, which is the CONTINUUM answer.
+// On the lattice the packet comes out at c only near c = 0.5; see TestWaveC.
 func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
 	ctx := GetCtx(0)
 	cur := ctx.CurState

@@ -237,11 +237,15 @@ func TestKGGaugeUniform(t *testing.T) {
 		if math.Abs(q/q0-1) > 1e-3 {
 			t.Errorf("A0 = %g changed the charge by %.2e: a uniform A0 is pure gauge", a0, q/q0-1)
 		}
-		// |chi|^2 drifts a little, growing linearly with A0: a discretization
-		// effect of applying the rotation at half steps, not a failure of the
-		// invariance. The charge above is the sharper statement.
-		if math.Abs(cc/cc0-1) > 2e-3 {
-			t.Errorf("A0 = %g changed |chi|^2 by %.2e", a0, cc/cc0-1)
+		// |chi|^2 drifts a little: a discretization effect of applying the
+		// rotation at half steps, not a failure of the invariance. The charge
+		// above is the sharper statement. What is checked here is the SHAPE of
+		// that error rather than a fixed size -- it is linear in A0, at about
+		// 0.44 of it, so the bound scales the same way and does not have to be
+		// re-picked when the mass or C move the state's own turning rate.
+		if math.Abs(cc/cc0-1) > 0.5*float64(a0) {
+			t.Errorf("A0 = %g changed |chi|^2 by %.2e, more than the linear %.2e",
+				a0, cc/cc0-1, 0.5*float64(a0))
 		}
 	}
 }

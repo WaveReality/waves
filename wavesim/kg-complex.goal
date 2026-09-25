@@ -202,7 +202,6 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 
 func (ss *Sim) KleinGordonCConfig() {
 	ParamsShouldDisplay = KGCShouldDisplay
-	ss.Params.Edges = EdgesWrap
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.StateVars = CabStatesN
 	ss.initFuncs = KGCConfigs

@@ -129,20 +129,12 @@ func (ss *Sim) RunSchrodinger(n int) {
 	RunSchrodingerBKernel(n)
 }
 
-// SchrodingerMass is the mass SchrodingerConfig sets, chosen so hbar / 2m = 0.25
-// at the default hbar of 1, which is comfortably inside the stability bound.
-const SchrodingerMass float32 = 2
-
 func (ss *Sim) SchrodingerConfig() {
 	ParamsShouldDisplay = SchrodingerShouldDisplay
 	ss.StateVars = CabStatesN
 	ss.initFuncs = SchrodingerConfigs
 	ss.InitFunc = HarmonicOscillator
 	ss.SchrodingerStats()
-	// hbar / 2m must stay under about 1 for the leapfrog to hold, and the
-	// shared default mass of 0.125 puts it at 4. See SchrodingerAKernel.
-	ss.Params.Mass = SchrodingerMass
-	ss.Params.Edges = EdgesFixed // walls at zero: a particle in a box
 	ss.Params.Update()
 	ss.eqViewInitFunc = CabViewAll
 }
@@ -201,6 +193,11 @@ func schrodOmega(ss *Sim) float32 {
 // The ground state width is sqrt(hbar / m omega), which is set from the period
 // rather than chosen, so the two are not free to disagree.
 func HarmonicOscillator(ss *Sim) {
+	// a bound state wants a WALL, not a wrapped neighbour: the potential at the
+	// far edge is up against SchrodingerVMax, and the shared wrap carries the
+	// tail straight into it, which puts |E| past the stability bound.
+	ss.Params.Edges = EdgesFixed
+	ss.Params.Update()
 	p := ss.Params
 	om := schrodOmega(ss)
 	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())
@@ -219,6 +216,8 @@ func HarmonicOscillator(ss *Sim) {
 // content of "energy level", and it is worth seeing that it is not an
 // approximation here.
 func BoxStandingWave(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+	ss.Params.Update()
 	ss.SineBox(CabAs, Both, 1, ss.Config.Amplitude)
 }
 
@@ -229,6 +228,8 @@ func BoxStandingWave(ss *Sim) {
 // back at the DIFFERENCE frequency. Every visible motion in a bound quantum
 // system is a beat between levels like this one.
 func BoxTwoStates(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // walls at zero: this IS the box
+	ss.Params.Update()
 	a := ss.Config.Amplitude
 	ss.SineBox(CabAs, Both, 1, a)
 	ss.SineBox(CabAs, Both, 2, a)
@@ -250,6 +251,8 @@ func BoxTwoStates(ss *Sim) {
 // nucleus and an electron finding each other -- there is no back-reaction, and
 // no second electron, so no chemistry.
 func HydrogenGround(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // bound: walls, not wrap. See HarmonicOscillator.
+	ss.Params.Update()
 	p := ss.Params
 	a := ss.Config.HydrogenRadius
 	k := p.Hbar * p.Hbar / (p.Mass * a)
@@ -273,6 +276,8 @@ func HydrogenGround(ss *Sim) {
 // The node is why a p electron feels the nucleus less than an s one, and the
 // lobes are why bonds built from them point in particular directions.
 func HydrogenP(ss *Sim) {
+	ss.Params.Edges = EdgesFixed // bound: walls, not wrap. See HarmonicOscillator.
+	ss.Params.Update()
 	p := ss.Params
 	a := ss.Config.HydrogenRadius / 2 // n = 2 decays over 2a, so halve a to keep the size
 	k := p.Hbar * p.Hbar / (p.Mass * a)

@@ -5,6 +5,7 @@
 package wavesim
 
 import (
+	"fmt"
 	"image"
 	"io/fs"
 	"sync"
@@ -254,40 +255,21 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 		})
 		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(gui.IsRunning()) })
 	})
-	tree.AddAt(p, "Step 1", func(w *core.Button) {
-		w.SetText("Step 1").SetIcon(icons.SkipNext).
-			SetTooltip("Step forward 1 time step").OnClick(func(e events.Event) {
-			tb := gui.Toolbar
-			if !gui.IsRunning() {
-				gui.StartRun()
-				tb.Restyle()
-				go gui.sim.StepN(1)
-			}
+
+	steps := []int{1, 10, 100, 500, 1000}
+	for _, st := range steps {
+		tx := fmt.Sprintf("Step %d", st)
+		tree.AddAt(p, tx, func(w *core.Button) {
+			w.SetText(tx).SetIcon(icons.SkipNext).
+				SetTooltip("Step forward given number of time steps").OnClick(func(e events.Event) {
+				tb := gui.Toolbar
+				if !gui.IsRunning() {
+					gui.StartRun()
+					tb.Restyle()
+					go gui.sim.StepN(st)
+				}
+			})
+			w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
 		})
-		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
-	})
-	tree.AddAt(p, "Step 10", func(w *core.Button) {
-		w.SetText("Step 10").SetIcon(icons.SkipNext).
-			SetTooltip("Step forward 10 time steps").OnClick(func(e events.Event) {
-			tb := gui.Toolbar
-			if !gui.IsRunning() {
-				gui.StartRun()
-				tb.Restyle()
-				go gui.sim.StepN(10)
-			}
-		})
-		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
-	})
-	tree.AddAt(p, "Step 100", func(w *core.Button) {
-		w.SetText("Step 100").SetIcon(icons.SkipNext).
-			SetTooltip("Step forward 10 time steps").OnClick(func(e events.Event) {
-			tb := gui.Toolbar
-			if !gui.IsRunning() {
-				gui.StartRun()
-				tb.Restyle()
-				go gui.sim.StepN(100)
-			}
-		})
-		w.FirstStyler(func(s *styles.Style) { s.SetEnabled(!gui.IsRunning()) })
-	})
+	}
 }

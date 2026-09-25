@@ -394,9 +394,28 @@ func (pr *Parameters) Update() {
 
 func (pr *Parameters) Defaults() {
 	pr.Energy.SetBool(true)
-	pr.C = 0.5
+	// C is set by the TIGHTEST equation, so one value works everywhere and the
+	// cases stay comparable. That is WaveC: Visscher's scheme against
+	// Laplacian19 caps out at 3/8 and is already drifting by 11% over thirty
+	// steps at 0.35. Weyl's first-order leapfrog comes next at around 0.35,
+	// and the second-order equations would take 0.866; they are simply run
+	// slower. No equation now sets its own.
+	pr.C = 0.25
 	pr.Hbar = 1.0
-	pr.Mass = 0.125
+	// wrap by default: a periodic box is the only boundary that does not
+	// act on the wave, so it is the right one for comparing equations. The
+	// demos that want a wall -- a particle in a box, a charge against a
+	// conductor -- set EdgesFixed for themselves.
+	pr.Edges = EdgesWrap
+	// Mass is shared for the same reason. At this C it puts m c / hbar at 0.5
+	// against khat = 0.77 at the default wavelength, so a packet is mildly
+	// relativistic -- the one regime where the mass term is doing something
+	// visible without the packet either sitting still or going light-speed.
+	// Schrodinger has no C, but needs no correction for that: the
+	// nonrelativistic limit of c sqrt(k^2 + (mc/hbar)^2) is hbar k^2 / 2m,
+	// whose coefficient has no c in it, so the same Mass and Hbar already
+	// match it to the relativistic cases. hbar / 2m = 0.25 here.
+	pr.Mass = 2
 	pr.A0NoWave.SetBool(true)
 	pr.E = 1.0
 	pr.WeylQ = 1

@@ -837,15 +837,18 @@ func TestElectroweakDamp(t *testing.T) {
 		t.Logf("%v: |Phi| holds at %.5f..%.5f, v = %.5f", edges, lo, hi, v)
 	}
 
-	ss := ewDampSim(48, EdgesDamp, PhotonPulse)
+	// as in TestEdgesDamp, the step count is several box traversals at the
+	// shared C: a boundary that reflects only shows it on the way back
+	const psz, pst = 32, 900
+	ss := ewDampSim(psz, EdgesDamp, PhotonPulse)
 	ss.StepRun()
 	g0 := ewGaugeWave()
-	for range 300 {
+	for range pst {
 		ss.StepRun()
 	}
 	left := ewGaugeWave() / g0
 	if left > 0.02 {
 		t.Errorf("photon pulse: %.2f%% of the gauge WAVE is still in the box", 100*left)
 	}
-	t.Logf("photon pulse: %.3f%% of the gauge wave left after 300 steps", 100*left)
+	t.Logf("photon pulse: %.3f%% of the gauge wave left after %d steps", 100*left, pst)
 }

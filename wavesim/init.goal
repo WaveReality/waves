@@ -486,13 +486,18 @@ func (ss *Sim) CarrierPacketConfig(pos, vel enums.Enum, dim math32.Dims, ctr, am
 
 // BoundStateMass is the mass the relativistic bound-state configs set, both
 // the atoms and the oscillators. It has to be this heavy: a = Compton / Z
-// alpha, so a light particle makes an atom far too big for the lattice. At
-// C = 0.5 this puts the Compton wavelength at one cube, so Z alpha is just
-// 1 / [Config.HydrogenRadius] for n = 1 and twice that for the deeper n = 2
-// well. The default 5 means Z alpha = 0.2, around iron, so the relativistic
-// corrections are not small -- which is the point of running these at all.
-// Raise the radius to make them smaller.
-const BoundStateMass float32 = 2
+// alpha, so a light particle makes an atom far too big for the lattice. It
+// is set so the Compton wavelength hbar / m c comes out at exactly one cube at
+// the shared C of [Parameters.Defaults], which makes Z alpha just
+// 1 / [Config.HydrogenRadius] for n = 1, and twice that for the deeper n = 2
+// well. The default radius 5 means Z alpha = 0.2, around iron, so the
+// relativistic corrections are not small -- which is the point of running
+// these at all. Raise the radius to make them smaller.
+//
+// It is therefore HEAVIER than the shared free-packet mass, and has to be:
+// tie it to that instead and the atom is a Compton wavelength across times
+// 1 / Z alpha, which does not fit the lattice.
+const BoundStateMass float32 = 4
 
 // HarmonicWell puts a harmonic well of angular frequency om into vr, the
 // SCALAR potential of a second-order equation, and returns the phase rate of a

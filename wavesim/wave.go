@@ -127,10 +127,6 @@ func (ss *Sim) WaveConfig() {
 	ss.initFuncs = WaveConfigs
 	ss.InitFunc = WavePacket
 	ss.WaveStats()
-	// declared, not inherited: switching equations leaves Params alone, so
-	// whatever the last one wanted would otherwise still be here
-	ss.Params.C = 0.5
-	ss.Params.Mass = 0.125
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveViewAll
 }

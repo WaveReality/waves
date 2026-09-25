@@ -98,8 +98,9 @@ const (
 // for an antisymmetric right-hand side, which this is.
 //
 // Stability wants sqrt(c^2 khat^2 + (m c^2 / hbar)^2) < 1 for the steepest khat
-// the gradient stencil can see, so C has to be well under its usual limit:
-// WeylConfig sets it.
+// the gradient stencil can see, so C has to be well under the second-order
+// limit. That is the tightest bound of any equation here, which is why it is
+// what sets the shared C in [Parameters.Defaults].
 //
 // 3D only. sigma.grad mixes the three axes into each other, so a 1D version
 // would not be this equation with a dimension removed -- it would be a
@@ -269,10 +270,6 @@ func WeylKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 const (
-	// WeylC is the speed of light WeylConfig sets: the first-order leapfrog is
-	// tighter than the second-order one the other equations use.
-	WeylC float32 = 0.35
-
 	// WeylMass is the electron mass the AT REST configs set, light enough that the
 	// L-R trade takes a watchable 50 steps: the period is pi hbar / m c^2.
 	WeylMass float32 = 0.5
@@ -300,11 +297,8 @@ func (ss *Sim) WeylConfig() {
 	ss.initFuncs = WeylConfigs
 	ss.InitFunc = NeutrinoPacket
 	ss.WeylStats()
-	// a first-order leapfrog needs sqrt(c^2 khat^2 + om^2) < 1, and khat for
-	// the 10-point gradient runs past 1, so C sits well under the second-order
-	// limit of sqrt(3)/2. Mass is set per config, not here.
-	ss.Params.C = WeylC
-	ss.Params.Edges = EdgesWrap
+	// C comes from Parameters.Defaults, which is set by THIS equation's bound:
+	// it is the tightest of them. Mass is set per config, not here.
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: see WeylKernel
 	ss.Params.Update()
 	ss.eqViewInitFunc = WeylViewAll

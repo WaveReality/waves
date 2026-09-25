@@ -79,14 +79,21 @@ func TestWaveDispersion(t *testing.T) {
 		speed[eq] = map[float32]float64{}
 		for _, wl := range []float32{short, long} {
 			ss := wvSim(sz, eq, wl, 2*wl)
+			// over WHOLE carrier periods. The intensity centroid of a carrier
+			// under an envelope wobbles at twice the carrier frequency, as
+			// StatGroupVelWindow says, and a window that is not a whole number
+			// of them reads part of that wobble as motion: at wavelength 64 a
+			// hundred steps is well under one period and puts a massless wave
+			// at 1.15 c. Four periods, from the lattice frequency this
+			// equation actually has.
+			n := int(math.Round(4 * 2 * math.Pi / float64(ss.PacketFreq(wl))))
 			wvStep(ss)
 			x0 := wvCtr(sz)
-			const n = 100
 			for range n {
 				wvStep(ss)
 			}
-			speed[eq][wl] = (wvCtr(sz) - x0) / n / float64(ss.Params.C)
-			t.Logf("%-12v wavelength %2.0f: %.4f c", eq, wl, speed[eq][wl])
+			speed[eq][wl] = (wvCtr(sz) - x0) / float64(n) / float64(ss.Params.C)
+			t.Logf("%-12v wavelength %2.0f: %.4f c  (%d steps)", eq, wl, speed[eq][wl], n)
 		}
 	}
 	// massless: the same speed at both, and that speed is c
@@ -113,7 +120,7 @@ func TestWaveDispersion(t *testing.T) {
 // wvMode puts a single pure sine mode of the given wavelength into an
 // equation, in 1D with wrapped edges, so its one lattice wavenumber can be
 // watched on its own.
-func wvMode(eq Equations, wl float32) *Sim {
+func wvMode(eq Equations, wl, c float32) *Sim {
 	ss := &Sim{}
 	ss.Config = &Config{}
 	ss.Config.Defaults()
@@ -122,6 +129,9 @@ func wvMode(eq Equations, wl float32) *Sim {
 	ss.Config.Size.Set(256, 1, 1)
 	ss.ConfigSim()
 	ss.Params.Edges = EdgesWrap
+	if c > 0 { // 0 keeps the shared default
+		ss.Params.C = c
+	}
 	if eq == Wave {
 		ss.Params.Diffusion.SetBool(true)
 	}
@@ -154,8 +164,13 @@ func TestDiffusion(t *testing.T) {
 		return float64(State.Value(1, 1, 9, v, int(GetCtx(0).CurState)))
 	}
 
-	d := wvMode(Wave, wl)
-	want := float64(d.Params.CSq) * kh2
+	// the diffusion coefficient is C^2 and WaveC's is C, so the two are equal
+	// only if WaveC runs at the SQUARE of the other's C. The shared default
+	// does not arrange that for free, so the test arranges it: that is the
+	// whole premise of the comparison, not an incidental setting.
+	d := wvMode(Wave, wl, 0)
+	dc := d.Params.CSq
+	want := float64(dc) * kh2
 	a0 := at(int(WavePos))
 	const n = 60
 	for range n {
@@ -170,13 +185,16 @@ func TestDiffusion(t *testing.T) {
 	}
 	decay := -math.Log(a1/a0) / n
 
-	w := wvMode(WaveC, wl)
-	if math.Abs(float64(w.Params.C)-float64(d.Params.CSq)) > 1e-6 {
-		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, d.Params.CSq)
+	w := wvMode(WaveC, wl, dc)
+	if math.Abs(float64(w.Params.C)-float64(dc)) > 1e-6 {
+		t.Fatalf("the two coefficients must match to compare rates: %v vs %v", w.Params.C, dc)
 	}
+	// enough steps for several turns at the rate being measured: the period is
+	// 2 pi / want, and the crossing count needs at least a couple of them
+	nrot := int(math.Round(4 * 2 * math.Pi / want))
 	prev := at(int(WaveCa))
 	var first, last, cnt int
-	for i := range 2000 {
+	for i := range nrot {
 		w.RunWaveC(int(GetCtx(0).Size.X))
 		GetCtx(0).StepInc()
 		RunEdgesWrapKernel(int(GetCtx(0).EdgesN()))
@@ -190,7 +208,7 @@ func TestDiffusion(t *testing.T) {
 		prev = v
 	}
 	if cnt < 2 {
-		t.Fatalf("WaveC mode did not oscillate: %d crossings", cnt)
+		t.Fatalf("WaveC mode did not oscillate: %d crossings in %d steps", cnt, nrot)
 	}
 	rot := 2 * math.Pi / (float64(last-first) / float64(cnt-1))
 

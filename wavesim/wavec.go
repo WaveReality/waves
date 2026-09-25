@@ -127,14 +127,6 @@ func (ws WaveCStates) SetVarSettings(vs *VarSettings) {
 	// todo: can set per variable here
 }
 
-// WaveCC is the coefficient WaveCConfig sets. Visscher's scheme holds while
-// C khat^2 stays under 2, and Laplacian19 reaches 16/3, so C must stay under
-// 3/8 -- twice what the three-level leapfrog in WaveCDirKernel would allow.
-// Set below that with room to spare: at 0.35 the 3D norm was already drifting
-// by 11% over thirty steps, which is what running up against the bound looks
-// like before it actually blows up.
-const WaveCC float32 = 0.25
-
 // RunWaveC runs one whole step: the a kernel, the edges, then the b kernel,
 // with CurState held fixed across all three.
 //
@@ -155,8 +147,6 @@ func (ss *Sim) WaveCConfig() {
 	ss.initFuncs = WaveCConfigs
 	ss.InitFunc = WaveCPacket
 	ss.WaveCStats()
-	ss.Params.C = WaveCC
-	ss.Params.Edges = EdgesWrap
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveCViewAll
 }

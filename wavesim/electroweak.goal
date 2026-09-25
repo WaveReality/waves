@@ -842,7 +842,6 @@ func (ss *Sim) ElectroweakConfig() {
 	ss.initFuncs = ElectroweakConfigs
 	ss.InitFunc = HiggsBroken
 	ss.ElectroweakStats()
-	ss.Params.Edges = EdgesWrap
 	ss.Config.Wavelength = 16
 	ss.Config.PacketWidth = 1.5 * ss.Config.Wavelength
 	ss.eqViewInitFunc = ElectroweakViewAll
