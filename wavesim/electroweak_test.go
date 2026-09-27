@@ -852,3 +852,109 @@ func TestElectroweakDamp(t *testing.T) {
 	}
 	t.Logf("photon pulse: %.3f%% of the gauge wave left after %d steps", 100*left, pst)
 }
+
+// ewMassColumn returns the (W^3, B) source the kernel produces for a uniform
+// perturbation of the two fields, divided by the perturbation: one column of
+// the mass matrix.
+//
+// Uniform, so Laplacian19 contributes nothing and the whole force is the
+// current. One step from rest, so the VELOCITY is csq times that current.
+func ewMassColumn(sz int32, w3, b, eps float32) (m3, mb float64) {
+	ss := ewSim(sz)
+	ss.Params.YangMills.SetBool(false) // W^3 alone has no commutator anyway
+	ss.Params.Update()
+	ss.Fill(EWW3Xs, Both, w3*eps)
+	ss.Fill(EWBXs, Both, b*eps)
+	WrapEdges()
+	csq := float64(ss.Params.CSq)
+	ewStep(ss)
+	c := GetCtx(0)
+	cur := int(c.CurState)
+	h := int(sz / 2)
+	// box W = j and the mass matrix is the NEGATIVE of the source
+	m3 = -float64(State.Value(h, h, h, int(EWW3Xv), cur)) / csq / float64(eps)
+	mb = -float64(State.Value(h, h, h, int(EWBXv), cur)) / csq / float64(eps)
+	return
+}
+
+// TestElectroweakMassMatrix is where the Higgs mechanism actually happens, and
+// the one place it can be read off as a matrix.
+//
+// Nothing in the kernel contains a gauge boson mass. What it has is a current,
+// and that current is built from the COVARIANT derivative -- so the gauge
+// potential appears twice in the same expression: once inside D_mu Psi through
+// EWGaugeActY's `du`/`dd`, and once as the prefactor `hg` or `gy` in
+// EWCurrent. At the vacuum the ordinary gradient vanishes and only the gauge
+// part is left, so the current collapses to something quadratic in the
+// couplings and proportional to |Psi|^2. That is the mass.
+//
+// Written out for Psi = (0, 0, v, 0):
+//
+//	j^3 = v^2 ( -hg^2 W^3 + hg gy B )
+//	j^Y = v^2 (  gy hg W^3 - gy^2 B )
+//
+// so M^2 = (v^2/4) [[g^2, -g g'], [-g g', g'^2]] with hg = g/2, gy = g'/2.
+//
+// B IS massive on its own: the g'^2 term is right there. The photon survives
+// because that matrix has determinant zero -- one unbroken generator,
+// Q = T^3 + Y, means exactly one zero eigenvalue -- and its null direction is
+// (g', g), which is (sinTheta_W, cosTheta_W), which is exactly the combination
+// the kernel writes into A0s. The orthogonal one is the Z and takes the whole
+// trace.
+//
+// This is the same cancellation TestEWFermionCharge sees from the fermion
+// side, where g sinTheta_W - g' cosTheta_W = 0 leaves the neutrino neutral.
+func TestElectroweakMassMatrix(t *testing.T) {
+	const sz = 8
+	const eps = 0.01
+	a11, a21 := ewMassColumn(sz, 1, 0, eps) // response to W^3
+	a12, a22 := ewMassColumn(sz, 0, 1, eps) // response to B
+
+	ss := ewSim(sz)
+	p := ss.Params
+	g, gp, v := float64(p.GW), float64(p.GpW), float64(p.HiggsV)
+	q := v * v / 4
+	want := [4]float64{q * g * g, -q * g * gp, -q * g * gp, q * gp * gp}
+	got := [4]float64{a11, a12, a21, a22}
+	names := [4]string{"W3W3", "W3B", "BW3", "BB"}
+	sc := q * (g*g + gp*gp) // the one nonzero eigenvalue, to measure against
+	for i := range got {
+		t.Logf("M^2[%-4s] = %+.6f, want %+.6f", names[i], got[i], want[i])
+		if math.Abs(got[i]-want[i]) > 1e-4*sc {
+			t.Errorf("M^2[%s] is %+.6f, want %+.6f", names[i], got[i], want[i])
+		}
+	}
+	if a22 <= 0 {
+		t.Errorf("B has no mass term of its own (%+.6f): the photon is massless by "+
+			"cancellation, not because B is uncoupled", a22)
+	}
+
+	// the photon direction must be annihilated
+	sw, cw := float64(p.SinThetaW), float64(p.CosThetaW)
+	p3 := a11*sw + a12*cw
+	pb := a21*sw + a22*cw
+	t.Logf("M^2 . photon(%.4f, %.4f) = (%+.3e, %+.3e), against MZ^2 = %.6f", sw, cw, p3, pb, sc)
+	if math.Abs(p3) > 1e-5*sc || math.Abs(pb) > 1e-5*sc {
+		t.Errorf("the photon direction is not a zero mode: (%.3e, %.3e)", p3, pb)
+	}
+
+	// and the Z direction must come out at exactly MZ^2
+	z3 := a11*cw - a12*sw
+	zb := a21*cw - a22*sw
+	ev := z3*cw - zb*sw
+	mz := float64(p.MZ)
+	t.Logf("Z eigenvalue %.6f, MZ^2 = %.6f (%+.3f%%)", ev, mz*mz, 100*(ev/(mz*mz)-1))
+	if math.Abs(ev/(mz*mz)-1) > 1e-4 {
+		t.Errorf("the Z eigenvalue is %g but Params.MZ says %g", ev, mz*mz)
+	}
+	// rank one: one unbroken generator, one massless boson. Measured as the
+	// CANCELLATION between the two products rather than against MZ^4, since
+	// that is what has to vanish and float32 floors it around its own epsilon.
+	det := a11*a22 - a12*a21
+	rel := math.Abs(det) / (math.Abs(a11*a22) + math.Abs(a12*a21))
+	t.Logf("determinant %.3e, a cancellation of %.3e to %.1e relative: rank one",
+		det, math.Abs(a11*a22), rel)
+	if rel > 1e-6 {
+		t.Errorf("the two products cancel only to %.2e: the matrix should be rank one", rel)
+	}
+}

@@ -33,13 +33,14 @@ func main() {
 	// 3D only:
 	// eqs := wavesim.Maxwell
 	// eqs := wavesim.KleinGordonC
-	eqs := wavesim.Dirac
+	// eqs := wavesim.Dirac
 	// eqs := wavesim.Weyl
-	// eqs := wavesim.Electroweak
+	eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	t1sz := 512
-	t3sz := 128
+	// t3sz := 128
+	t3sz := 64
 	// note: max 3d size is slightly above 400^3 for KGParticles
 	// Total memory size in floats: 4,157,747,712 GB: 16,630,990,848 num vars: 32 buf cap: 21,474,836,480
 	// nbufs = 10, total vars = 16 -- could squeeze neigh vars to get 12
