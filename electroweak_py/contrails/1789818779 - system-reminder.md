@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-27 00:29:50
+- **Last Message:** 2026-09-27 01:21:09
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -15324,4 +15324,369 @@ Sources:
 - [Mass generation and the problem of seagull divergences](https://inspirehep.net/files/2d01720e830649b97913e89c92f26b82)
 - [Scalar electrodynamics — Wikipedia](https://en.wikipedia.org/wiki/Scalar_electrodynamics)
 - [Electromagnetic Couplings of Nucleon Resonances (Kroll–Ruderman seagull)](https://arxiv.org/pdf/nucl-th/9604026)
+
+## 🧑 User - 2026-09-27 00:46:47
+
+so is there a "lattice QED" that anyone has developed, as an alternative to the standard perturbative approach, in the same vein as lattice QCD, but just for the simpler QED dirac + EM system. I've read in various places that the whole virtual particle framework is kind of an "artifact" of the standard approach, and that lattice-based methods do not require such constructs. It would be interesting to see how that plays out in the simple case -- don't want to have to take on all of QCD at this point! In particular, it would be informative to see what a lattice QED model would look like in comparison to the basic classical field model that we've implemented.
+
+## 🤖 Assistant - 2026-09-27 00:47:45
+
+*Model: claude-opus-5*
+
+Good question, and the answer has a nice payoff — one of the sources you already have in your bib turns out to be the exactly-solvable version of the argument you just wrote up. Let me verify several things before I commit to claims.
+
+One last check on a bibliographic claim I want to hand you:
+
+Yes — lattice QED exists, it predates lattice QCD's maturity, and it's interesting precisely because it's *harder* than you'd expect. And your instinct about virtual particles is substantially right. But the most useful finding is that there's an established method that is nearly exactly what you've already built, with a published statement of when it's valid.
+
+## Does lattice QED exist?
+
+Yes, since Wilson (1974). Compact U(1) was the first test case for lattice gauge theory. Two things make it a strange child, though:
+
+**It has a phase it shouldn't.** Compact lattice U(1) in 4D has a confining strong-coupling phase separated from the Coulomb phase by a transition. The confinement is driven by lattice monopoles and is a **pure lattice artifact** with no continuum counterpart — real QED doesn't confine. So the lattice adds physics that isn't there.
+
+**The continuum limit may not exist.** QED is believed to be trivial (Landau pole), and the lattice work bears this out: "the lack of a continuum limit for compact lattice QED in the weak coupling region," with Gaussian exponents suggesting the continuum theory is trivial. Lattice QED is an effective theory with a cutoff, not a fundamental one.
+
+Add that α = 1/137 makes perturbation theory work to 12 digits, and there's no confinement to explain — so nobody *needs* lattice QED the way they need lattice QCD. Where it's actually used today: QED corrections inside lattice QCD (isospin breaking, the proton–neutron splitting, muon g−2), QED₃ for condensed matter, strong-field/Schwinger pair production, and the Schwinger model.
+
+## "Virtual particles are an artifact"
+
+Substantially correct, and worth stating precisely.
+
+Virtual particles are internal lines in Feynman diagrams. Feynman diagrams are terms in a perturbative expansion of the path integral. Lattice computes the path integral directly by sampling field configurations — no expansion, so no diagrams, so no virtual particles anywhere in the calculation. The concept "largely only makes sense when describing particular Feynman diagrams."
+
+The caveat that matters: **the physics doesn't go away, only the particle interpretation of it.** Vacuum polarization, self-energy, the running coupling — all still present in the lattice correlation functions, just not decomposed into quanta. So "virtual particles aren't real" is right; "the effects attributed to them aren't real" would be wrong.
+
+## What lattice QED looks like next to your CA
+
+Four structural differences, in rough order of how much they'd change your code:
+
+**1. The gauge field lives on links, not sites.** This is the big one. Instead of `A_μ` at a site, you carry `U_μ(x) = exp(i g a A_μ(x))` — a group element on the *link* from `x` to `x+μ̂`. The field strength becomes the **plaquette**: the product of four link variables around an elementary square.
+
+The payoff is that gauge invariance becomes **exact at finite lattice spacing**, not approximate. Your site-based `A_μ` has gauge invariance only up to discretization error. Given that your whole gauge-theory writeup turns on invariance being exact, that's a notable gap between the prose and the code.
+
+**2. Euclidean time and Monte Carlo.** Standard lattice QED rotates to imaginary time so `e^{iS}` becomes a Boltzmann weight you can importance-sample. Consequence: **you cannot watch anything propagate.** You get masses from correlator decay, not trajectories. Real-time Monte Carlo is blocked by the sign problem — which is exactly why tensor networks and quantum computers are the current frontier for real-time gauge dynamics.
+
+Your simulation is real-time. That's not a deficiency; it's the thing standard lattice methods can't do.
+
+**3. Fermion doubling — and I think this one already affects your code.** Naive central differences give the lattice Dirac operator extra zeros in the Brillouin zone: `sin(k)` vanishes at `k=0` *and* at `k=π`. Each zero is an independent low-energy fermion. In 4D a single intended fermion becomes **sixteen species**.
+
+You've already measured your gradient kernel as `ĝ = sin(k)`. That's the naive discretization, so the `k=π` zero is there, and with three discretized spatial dimensions you'd have 2³ = 8 species rather than one.
+
+The fixes: **Wilson fermions** add a `(1-cos k)` term that vanishes at `k=0` but gives the doublers mass ~1/a — at the cost of breaking chiral symmetry. **Staggered (Kogut–Susskind) fermions** spread spinor components over sites, reducing 16→4. And the **Nielsen–Ninomiya theorem** says you can't escape: no local, hermitian, chirally-symmetric lattice fermion is doubler-free.
+
+Note where that bites hardest: **a Weyl fermion is intrinsically chiral**, so it's the case the no-go theorem targets most directly. Your `WeylKernel` is sitting exactly on that obstruction.
+
+**4. Quantum vs classical.** Yours is a single classical field trajectory. Lattice QED sums over all configurations. Your solution is the saddle point.
+
+## The method that's closest to yours
+
+This is the find. **Classical-statistical real-time lattice gauge theory** — Kasper, Hebenstreit & Berges, [arXiv:1403.4849](https://arxiv.org/html/1403.4849) — is your approach, formalized: solve the classical field equations on a Minkowskian lattice with link variables, sample over initial conditions, recover quantum dynamics.
+
+I verified their validity conditions: small coupling `g ≪ 1`, plus either large coherent fields `A ~ O(1/g)` or high occupation `1 ≪ n ≪ O(1/g²)`. And the honest limit: "the classical-statistical approximation is exact to order g² in the coupling whereas higher contributions O(g⁴) are neglected."
+
+So there's a published, citable statement of exactly when a classical field simulation *is* quantum QED — which is a much stronger position for your project than "this is a classical toy model." They also use Wilson fermions specifically to suppress doublers, confirming you'd hit that.
+
+The one thing they add that you don't have is the ensemble: sampling initial conditions from the appropriate quantum distribution rather than evolving one configuration. That's a relatively cheap addition to something like your setup.
+
+## Where I'd start
+
+**The Schwinger model** — QED in 1+1D. Exactly solvable, the standard benchmark, and it shares mass gap generation, confinement and chiral symmetry breaking with QCD while being about as simple as Dirac + EM gets. Massive recent literature on real-time simulation via DMRG/tensor networks and quantum computers, all of it non-perturbative and virtual-particle-free.
+
+Here's the payoff for your docs. The Schwinger model was "originally introduced to show that a gauge field, for which an explicit mass term is forbidden by gauge invariance, can acquire a mass dynamically" — it is the exactly-solvable demonstration of the argument you just wrote up, with the photon mass coming out as exactly `e/√π`. And the paper is **Schwinger, "Gauge Invariance and Mass. II," Phys. Rev. 128, 2425 (1962)** — the direct sequel to the `Schwinger62` already in your bib. The historical chain is confirmed too: Anderson explicitly took off from Schwinger's remarks.
+
+One honest contrast with your last question, though: the Schwinger model's photon mass comes from the **anomaly / vacuum polarization**, which is exact at one loop in 1+1D. So that one genuinely *is* a loop effect — unlike the Higgs mechanism, which is tree-level. Same statement ("gauge invariance forbids a mass term, the field gets a mass anyway"), two different mechanisms delivering it.
+
+---
+
+Two things I could do next, if useful: check whether your Dirac and Weyl kernels actually carry doublers (I'm inferring from `ĝ = sin(k)`, not from having read them), or sketch what link variables would look like in your kernel structure. The doubler check is the one I'd do first — if there are 8 species where you intend 1, that would quietly affect the dispersion statistics you've been collecting.
+
+Sources:
+- [Fermion production from real-time lattice gauge theory in the classical-statistical regime — Kasper, Hebenstreit, Berges](https://arxiv.org/html/1403.4849)
+- [Schwinger model — Wikipedia](https://en.wikipedia.org/wiki/Schwinger_model)
+- [Mathematical Problems of Gauge Quantum Field Theory: A Survey on the Schwinger Model](https://arxiv.org/pdf/hep-th/9707166)
+- [Compact U(1) Gauge Theory on Lattices with Trivial Homotopy Group](https://arxiv.org/pdf/hep-lat/9407005)
+- [On the continuum limit of gauge-fixed compact U(1) lattice gauge theory](https://arxiv.org/html/hep-lat/0308006v2)
+- [New computational methods in lattice gauge theory — quantum computation and tensor networks](https://arxiv.org/html/2508.03126)
+- [Review on novel methods for lattice gauge theories](https://arxiv.org/pdf/1910.00257)
+- [Quantum-Classical Computation of Schwinger Model Dynamics using Quantum Computers](https://arxiv.org/pdf/1803.03326)
+- [Fermion Doubling in Lattice Field Theory](https://www.emergentmind.com/topics/fermion-doubling)
+- [Chiral Anomalies and the Nielsen–Ninomiya No-Go Theorem](https://mcgreevy.physics.ucsd.edu/s13/final-papers/2013S-215C-Kadakia-Nirag.pdf)
+- [Schwinger pair production and string breaking from real-time lattice improved Hamiltonians](https://arxiv.org/pdf/1812.05835)
+
+## 🧑 User - 2026-09-27 00:58:14
+
+yeah check the dirac and weyl kernels for doublers
+
+## 🤖 Assistant - 2026-09-27 00:58:20
+
+*Model: claude-opus-5*
+
+`Gradient10` is the key. Let me look at the stencil:
+
+Antisymmetric stencil — that's the signature. Let me get the exact offsets and weights:
+
+Now I have the exact stencil. Let me verify the symbol numerically rather than trust my algebra:
+
+28 zeros, not the textbook 8. Let me check Dirac, which is second-order and might differ:
+
+Dirac's free propagation uses `Laplacian19`, not the gradient — that's a crucial difference. Verifying:
+
+Definitive answer: **yes for Weyl and the electroweak leptons, no for Dirac.** And the Weyl case is worse than the textbook.
+
+## The gradient stencil factorizes
+
+`Gradient10` is 5 antipodal pairs, weights face:edge:corner = 2:1:0, normalized. Working out the Fourier symbol, it factorizes exactly:
+
+```
+g_x(k) = (i/3) · sin(k_x) · [1 + cos(k_y) + cos(k_z)]
+```
+
+On axis that's exactly `i·sin(k)`, reproducing your measured `ĝ = sin(k)` to 6 digits — so the stencil is the naive antisymmetric difference dressed with a transverse weight. The `sin(k_x)` factor is unavoidable for *any* antipodal ±1 stencil, and it's the doubler: it vanishes at `k=π` as well as `k=0`.
+
+## Weyl: 28 zeros, not 1
+
+I scanned the Brillouin zone numerically and Newton-polished every hit:
+
+| k/π (sorted) | count | cone speeds | chirality |
+|---|---|---|---|
+| (0, 0, 0) | 1 | 1.000, 1.000, 1.000 | + |
+| (0, 0, 1) | 3 | 1.000, 0.333, 0.333 | − |
+| (0, 1, 1) | 3 | 0.333, 0.333, 0.333 | − |
+| (½, ½, 1) | 12 | 0.333, 0.333, 0.333 | + |
+| (⅔, ⅔, ⅔) | 8 | 0.500, 0.250, 0.250 | − |
+| (1, 1, 1) | 1 | 0.333, 0.333, 0.333 | + |
+| **total** | **28** | | |
+
+The naive first-order fermion gives 2³ = 8. You have 28, because the transverse factor `[1 + cos k_y + cos k_z]` vanishes on its own surfaces, and those intersect — that's where the (½,½,1) and (⅔,⅔,⅔) families come from. Those are extra species your stencil's isotropy tuning bought you.
+
+Every one is a genuine linear Weyl cone (nonzero Jacobian determinant). Several are strongly anisotropic — the (0,0,π) doubler runs at full c along one axis and c/3 along the other two.
+
+**The chirality sum is exactly zero**: 14 positive, 14 negative. That's Nielsen–Ninomiya being satisfied to the letter, and it's a strong check that the enumeration is complete.
+
+So your "Weyl neutrino" is, as an operator, 14 left-handed and 14 right-handed species with net chirality zero.
+
+## Dirac is clean
+
+`DiracKernel` propagates with `Laplacian19`, not the gradient. Its symbol is
+
+```
+(6/13)·[(cx+cy+cz) + (cxcy+cycz+cxcz) − 6]
+```
+
+which hits zero only when all three cosines equal 1. I confirmed numerically: **exactly one zero in the whole zone, at k=0**; the smallest value anywhere else is 0.17. No doublers.
+
+This is the textbook distinction, and your code lands on the right side of it by accident of formulation: doubling is a disease of *first-order* equations with central differences. Second-order equations using `k̂ = 2sin(k/2)` don't have it, because `sin(k/2)` has no zero at `k=π`.
+
+`Gradient10` still appears in Dirac for the current and the `A·∇` coupling. That doesn't add species — the free spectrum is what sets those — but the EM coupling is blind to high-k content. Much milder.
+
+**`EWFermionKernel` uses `Gradient10` for σ·∇ on all three lepton fields** (ν, e_L, e_R), so it inherits the full 28.
+
+## Does it affect your measurements?
+
+Almost certainly not, for what you've run. Your packets are wavelength 8, width 12, so `k₀ ≈ 0.25π` and the nearest doubler is at `0.67π` — about 16σ away in k-space. The overlap is ~10⁻⁵⁴. Your dispersion statistics, `TestWeylNeutrino`, and the group velocities are all reading the k≈0 cone, which is a correct single Weyl fermion with the right chirality and speed.
+
+Where it could bite: sharp initial conditions, the `EdgesFixed` discontinuity, damping-region boundaries, and nonlinear transfer of power up in k over long electroweak runs. Any of those inject broadband content, and a doubler that gets populated propagates as a real particle with the wrong chirality.
+
+Worth knowing too: **the mass term does not lift them.** At a doubler `sin ω = √(C²|g|² + ω₀²)` gives `ω = arcsin(ω₀)` — the same rest frequency as the physical mode. The doublers are degenerate with your actual particle. Lifting them is exactly what Wilson's `(1−cos k)` term is for.
+
+## The part that matters for your project
+
+You can't just add a Wilson term. It breaks chiral symmetry, and your electroweak model is built on only L coupling to W. **Chiral gauge theories on a lattice are a genuinely open problem** — domain-wall and overlap fermions solve the vector-like case, but putting the Standard Model's chiral structure on a lattice remains unsolved. Your `EWFermionKernel` is sitting directly on that, which is worth a line in its doc comment rather than a fix.
+
+The practical consequence I'd actually flag: with net chirality zero, this lattice **cannot reproduce the chiral anomaly**. If anything downstream depends on anomaly physics, it will come out zero for a structural reason rather than a bug.
+
+---
+
+Analysis script is at `doubler.py` and `lap.py` in the scratchpad. Two things I could do if useful: add a test pinning the 28 zeros and the zero chirality sum (it would catch any future stencil change silently altering the species content), or measure the actual spectral power near the zone corners in a running electroweak sim to see whether the nonlinear terms populate them. I'd suggest the second one first — it's the empirical question, and it's the one I've only bounded analytically.
+
+## 🧑 User - 2026-09-27 01:11:08
+
+wouldn't you want to run that test in the simpler Weyl sim? also, can you provide a clear explanation for what a doubler is, exactly? maybe it would be useful to create one in Weyl as a init config, and I can see it? also I am reading output in the Claude desktop app so go ahead and do the latex math.
+
+## 🤖 Assistant - 2026-09-27 01:11:54
+
+*Model: claude-opus-5*
+
+Agreed — Weyl is the right place; it isolates the effect with no gauge fields in the way. Let me look at the init configs.
+
+Let me check the call sites before changing signatures:
+
+Now I'll build it. First the carrier shift in `ChiralSlab`:
+
+Now the doubler init config in `weyl.goal`:
+
+One apostrophe in my comment would trip goal's line parser — fixing before build:
+
+22 validations, 0 errors. But there are two quote warnings — let me check whether they're mine:
+
+The warnings are pre-existing (same count on a clean tree). My stash check left the `.go` files stale — rebuilding:
+
+Now the two tests — the doubler's reversed velocity, and the spectral power question:
+
+The spectrum test works. But `TestWeylDoubler` returned NaN and passed vacuously — `WeylMag` isn't written until the kernel runs once. Fixing:
+
+Exactly equal and opposite. Now the regression check on everything touching `ChiralSlab`:
+
+Done — all three. Let me start with the explanation, since the rest follows from it.
+
+## What a doubler is
+
+The cleanest way in: ask what the central difference does to the most violently oscillating field the lattice can hold, $f(x) = (-1)^x$.
+
+$$f(x+1) - f(x-1) = 0$$
+
+Two cells apart, the alternating mode has returned to the same value. **The stencil reports that the jaggiest possible field is perfectly flat.** That blind spot is the doubler.
+
+Formally: the continuum derivative $\partial_x$ has Fourier symbol $ik$, with a single zero at $k=0$. The central difference has symbol
+
+$$\frac{e^{ika} - e^{-ika}}{2a} = \frac{i\sin(ka)}{a}$$
+
+and $\sin(ka)$ vanishes at $ka = 0$ **and** at $ka = \pi$. Two zeros where the continuum had one.
+
+The second zero isn't a mere numerical inaccuracy, and that's the whole problem. Expand around it with $k = \pi/a + q$:
+
+$$\sin(ka) = \sin(\pi + qa) = -\sin(qa) \approx -qa$$
+
+The symbol is $\approx -iq$ — **linear in $q$, exactly like the physical mode at the origin.** A gapless linear dispersion *is* a massless relativistic particle. So the lattice contains a second massless fermion nobody asked for, and no measurement inside the theory can call it spurious: it propagates, carries energy and momentum, and is degenerate with the real one. Each axis doubles independently, giving $2^d$ species.
+
+**Why the sign flip matters.** For the Weyl equation $\partial_t\psi = c\,(\boldsymbol\sigma\cdot\nabla)\psi$, writing $\nabla_j \to i G_j(\mathbf k)$ gives
+
+$$\omega = -c\,s\,|\mathbf G|, \qquad s = \pm 1$$
+
+where $s$ is the eigenvalue of $\boldsymbol\sigma\cdot\hat{\mathbf G}$. Helicity is spin locked to the direction of $\mathbf G$ — not of $\mathbf k$. At the doubler $\mathbf G$ points *opposite* to $\mathbf k$, so the spin–momentum relation reverses: **the doubler carries the opposite handedness.** That's why they come in pairs summing to zero net chirality, and why Nielsen–Ninomiya is a theorem rather than bad luck — the total chirality is a topological invariant of a map from the Brillouin zone (a torus, compact, no boundary) and it must cancel.
+
+**And why Dirac escapes.** The second difference gives
+
+$$\frac{f(x{+}1) - 2f(x) + f(x{-}1)}{a^2} \;\to\; \frac{2\cos(ka)-2}{a^2} = -\frac{4\sin^2(ka/2)}{a^2}$$
+
+so $\hat k = 2\sin(ka/2)$, and $\sin(ka/2)$ vanishes only at $ka=0$ — at $ka=\pi$ it equals $1$, its maximum. One zero, no doubling. That single factor-of-two in the argument is the entire difference between your two kernels.
+
+## The init config
+
+Added **"Neutrino Doubler"** to the Weyl equation list, in [weyl.goal](../wavesim/weyl.goal). It's `NeutrinoPacket` with the carrier moved from $k$ to $k+\pi$ — identical helicity, identical envelope, identical everything else:
+
+```go
+func WeylDoublerPacket(ss *Sim) {
+	ss.Params.Mass = 0
+	ss.Params.Update()
+	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
+	ss.ChiralSlab(WeylL1a, math32.X, -1, ss.Config.Amplitude, -om, -vg, 0, Pi)
+}
+```
+
+`ChiralSlab` picked up a `kshift` parameter (radians per cell, $0$ for everything else). Both $\omega$ and $v_g$ negate because both flip with $\mathbf G$.
+
+**What to watch:** the raw spinor components will look like a fine checkerboard — the carrier is 1.6 cells. Watch `WeylMag` instead: $|\psi|^2$ squares the alternating sign away, so you get a clean Gaussian blob, and it **moves backward**. Run it side by side with Neutrino Packet.
+
+## Results
+
+`TestWeylDoubler`:
+
+```
+neutrino Vg = +0.1903 (+0.761 c);  doubler Vg = -0.1903 (-0.761 c)
+```
+
+Equal and opposite to four digits.
+
+`TestWeylDoublerSpectrum` — the question you actually wanted answered, and yes, Weyl was the right place for it:
+
+```
+carrier k=0.785: 3.2316e+02   doubler k+pi: 9.2684e-08 (2.87e-10 of carrier)
+zone corner pi:  1.9841e-08 (6.14e-11)
+doubler config -- carrier: 1.3568e-07   k+pi: 3.2316e+02   ratio 4.199e-10
+```
+
+A smooth packet puts $2.9\times10^{-10}$ of its power on the doubler. So the modes are in the operator but are simply never populated — your existing measurements are reading a clean single Weyl cone at $k\approx 0$, and the dispersion statistics you've collected are sound. The second run confirms the config is a genuine mirror: all power at $k+\pi$, none at $k$.
+
+I used direct projection onto $e^{-ikx}$ rather than an FFT, since only a few $k$ matter and they aren't on the FFT grid.
+
+## Build state
+
+`goal build` + `go generate` clean — 22 validations, 0 errors. The two `unterminated quotes` warnings are pre-existing; I confirmed the same count on a stashed clean tree. Regenerated the yaegi bindings since `WeylDoublerPacket` is a new exported symbol. Ran the Weyl, EW fermion/lepton, and packet-envelope tests — all pass.
+
+One test-quality note worth flagging: my first version of `TestWeylDoubler` read the centroid before any kernel step, when `WeylMag` is still all zeros, so it computed $0/0$ and **passed vacuously** — every NaN comparison is false. Fixed by stepping once first, plus an explicit `IsNaN` guard so it can't happen silently again.
+
+The thing I'd still flag for the electroweak work: `EWFermionKernel` uses `Gradient10` for σ·∇ on all three lepton fields, so it carries the same 28 species. Harmless for smooth packets, but it means that model has net chirality zero at the lattice level — which is in tension with the whole point of only L coupling to W. I put that in the `WeylDoublerPacket` doc comment rather than trying to fix it, since the fix is an open research problem.
+
+Done — all three. Let me start with the explanation, since the rest follows from it.
+
+## What a doubler is
+
+The cleanest way in: ask what the central difference does to the most violently oscillating field the lattice can hold, $f(x) = (-1)^x$.
+
+$$f(x+1) - f(x-1) = 0$$
+
+Two cells apart, the alternating mode has returned to the same value. **The stencil reports that the jaggiest possible field is perfectly flat.** That blind spot is the doubler.
+
+Formally: the continuum derivative $\partial_x$ has Fourier symbol $ik$, with a single zero at $k=0$. The central difference has symbol
+
+$$\frac{e^{ika} - e^{-ika}}{2a} = \frac{i\sin(ka)}{a}$$
+
+and $\sin(ka)$ vanishes at $ka = 0$ **and** at $ka = \pi$. Two zeros where the continuum had one.
+
+The second zero isn't a mere numerical inaccuracy, and that's the whole problem. Expand around it with $k = \pi/a + q$:
+
+$$\sin(ka) = \sin(\pi + qa) = -\sin(qa) \approx -qa$$
+
+The symbol is $\approx -iq$ — **linear in $q$, exactly like the physical mode at the origin.** A gapless linear dispersion *is* a massless relativistic particle. So the lattice contains a second massless fermion nobody asked for, and no measurement inside the theory can call it spurious: it propagates, carries energy and momentum, and is degenerate with the real one. Each axis doubles independently, giving $2^d$ species.
+
+**Why the sign flip matters.** For the Weyl equation $\partial_t\psi = c\,(\boldsymbol\sigma\cdot\nabla)\psi$, writing $\nabla_j \to i G_j(\mathbf k)$ gives
+
+$$\omega = -c\,s\,|\mathbf G|, \qquad s = \pm 1$$
+
+where $s$ is the eigenvalue of $\boldsymbol\sigma\cdot\hat{\mathbf G}$. Helicity is spin locked to the direction of $\mathbf G$ — not of $\mathbf k$. At the doubler $\mathbf G$ points *opposite* to $\mathbf k$, so the spin–momentum relation reverses: **the doubler carries the opposite handedness.** That's why they come in pairs summing to zero net chirality, and why Nielsen–Ninomiya is a theorem rather than bad luck — the total chirality is a topological invariant of a map from the Brillouin zone (a torus, compact, no boundary) and it must cancel.
+
+**And why Dirac escapes.** The second difference gives
+
+$$\frac{f(x{+}1) - 2f(x) + f(x{-}1)}{a^2} \;\to\; \frac{2\cos(ka)-2}{a^2} = -\frac{4\sin^2(ka/2)}{a^2}$$
+
+so $\hat k = 2\sin(ka/2)$, and $\sin(ka/2)$ vanishes only at $ka=0$ — at $ka=\pi$ it equals $1$, its maximum. One zero, no doubling. That single factor-of-two in the argument is the entire difference between your two kernels.
+
+## The init config
+
+Added **"Neutrino Doubler"** to the Weyl equation list, in [weyl.goal](../wavesim/weyl.goal). It's `NeutrinoPacket` with the carrier moved from $k$ to $k+\pi$ — identical helicity, identical envelope, identical everything else:
+
+```go
+func WeylDoublerPacket(ss *Sim) {
+	ss.Params.Mass = 0
+	ss.Params.Update()
+	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
+	ss.ChiralSlab(WeylL1a, math32.X, -1, ss.Config.Amplitude, -om, -vg, 0, Pi)
+}
+```
+
+`ChiralSlab` picked up a `kshift` parameter (radians per cell, $0$ for everything else). Both $\omega$ and $v_g$ negate because both flip with $\mathbf G$.
+
+**What to watch:** the raw spinor components will look like a fine checkerboard — the carrier is 1.6 cells. Watch `WeylMag` instead: $|\psi|^2$ squares the alternating sign away, so you get a clean Gaussian blob, and it **moves backward**. Run it side by side with Neutrino Packet.
+
+## Results
+
+`TestWeylDoubler`:
+
+```
+neutrino Vg = +0.1903 (+0.761 c);  doubler Vg = -0.1903 (-0.761 c)
+```
+
+Equal and opposite to four digits.
+
+`TestWeylDoublerSpectrum` — the question you actually wanted answered, and yes, Weyl was the right place for it:
+
+```
+carrier k=0.785: 3.2316e+02   doubler k+pi: 9.2684e-08 (2.87e-10 of carrier)
+zone corner pi:  1.9841e-08 (6.14e-11)
+doubler config -- carrier: 1.3568e-07   k+pi: 3.2316e+02   ratio 4.199e-10
+```
+
+A smooth packet puts $2.9\times10^{-10}$ of its power on the doubler. So the modes are in the operator but are simply never populated — your existing measurements are reading a clean single Weyl cone at $k\approx 0$, and the dispersion statistics you've collected are sound. The second run confirms the config is a genuine mirror: all power at $k+\pi$, none at $k$.
+
+I used direct projection onto $e^{-ikx}$ rather than an FFT, since only a few $k$ matter and they aren't on the FFT grid.
+
+## Build state
+
+`goal build` + `go generate` clean — 22 validations, 0 errors. The two `unterminated quotes` warnings are pre-existing; I confirmed the same count on a stashed clean tree. Regenerated the yaegi bindings since `WeylDoublerPacket` is a new exported symbol. Ran the Weyl, EW fermion/lepton, and packet-envelope tests — all pass.
+
+One test-quality note worth flagging: my first version of `TestWeylDoubler` read the centroid before any kernel step, when `WeylMag` is still all zeros, so it computed $0/0$ and **passed vacuously** — every NaN comparison is false. Fixed by stepping once first, plus an explicit `IsNaN` guard so it can't happen silently again.
+
+The thing I'd still flag for the electroweak work: `EWFermionKernel` uses `Gradient10` for σ·∇ on all three lepton fields, so it carries the same 28 species. Harmless for smooth packets, but it means that model has net chirality zero at the lattice level — which is in tension with the whole point of only L coupling to W. I put that in the `WeylDoublerPacket` doc comment rather than trying to fix it, since the fix is an open research problem.
 

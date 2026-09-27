@@ -420,6 +420,7 @@ func (ss *Sim) WeylDispersion(wavelength float32) (float32, float32) {
 
 var WeylConfigs = []InitFunc{
 	InitFunc{Name: "Neutrino Packet", Doc: "A massless left-handed wave travelling at exactly c, with the right-handed half staying exactly empty", Func: NeutrinoPacket, Current: true},
+	InitFunc{Name: "Neutrino Doubler", Doc: "The same neutrino on a lattice doubler at k + pi: alternating sign cell to cell, and it travels BACKWARD at the same speed", Func: WeylDoublerPacket},
 	InitFunc{Name: "Electron Packet", Doc: "The same wave with a mass: both halves, moving together, and visibly slower than the neutrino", Func: ElectronPacket},
 	InitFunc{Name: "Electron At Rest", Doc: "Both halves in equal measure, which is what a massive particle at rest is: half left and half right", Func: ElectronAtRest},
 	InitFunc{Name: "Electron Chiral Flip", Doc: "The whole electron started left-handed: the mass turns it entirely into the right-handed one and back", Func: ElectronChiralFlip},
@@ -481,7 +482,7 @@ func (ss *Sim) WeylPacket(side WeylStates, dim math32.Dims, helicity, amp float3
 	if ss.Params.EM.IsTrue() {
 		eoh = ss.Params.WeylQ * ss.Params.E / ss.Params.Hbar
 	}
-	ss.ChiralSlab(side, dim, helicity, amp, om, vg, eoh)
+	ss.ChiralSlab(side, dim, helicity, amp, om, vg, eoh, 0)
 }
 
 // NeutrinoPacket is a massless left-handed wave and nothing else. With Mass at
@@ -493,6 +494,43 @@ func NeutrinoPacket(ss *Sim) {
 	ss.Params.Mass = 0
 	ss.Params.Update()
 	ss.WeylPacket(WeylL1a, math32.X, -1, ss.Config.Amplitude)
+}
+
+// WeylDoublerPacket is the same neutrino with its carrier moved from k to
+// k + pi, which is one lattice DOUBLER: a second massless mode the stencil has
+// that the continuum equation does not.
+//
+// Gradient10 is antisymmetric, so its symbol along the propagation axis is
+//
+//	G(k) = sin(k) (1 + cos(ky) + cos(kz)) / 3
+//
+// and sin vanishes at k = pi just as surely as at k = 0. Around BOTH points
+// the massless mode is linear in k, so both are real particles as far as the
+// lattice is concerned: same speed, same dispersion, same everything a
+// measurement here can see. There are 28 such zeros in the zone, 14 of each
+// handedness, which is exactly the count Nielsen-Ninomiya forces.
+//
+// What separates them is the SIGN. dG/dk = cos(k) flips between k and k + pi,
+// with the spinor held fixed the group velocity reverses: this packet is
+// built identically to NeutrinoPacket, with the same helicity and the same
+// envelope, and it travels the other way. Equivalently, for a fixed direction
+// of travel it carries the opposite handedness -- which is why a lattice
+// cannot hold a single Weyl fermion, and why the chiral structure of
+// [ElectroweakKernel] is on unsound footing at the lattice level.
+//
+// A carrier at k + pi is just the packet times (-1)^x: alternating sign from
+// cell to cell, the shortest wave the lattice can hold. That is the tell.
+// Nothing smooth excites these, which is why the ordinary configs never see
+// one -- TestWeylDoublerSpectrum measures how little.
+//
+// om and vg are both negated because both flip with G: the phase turns the
+// other way and the envelope moves the other way, and a past written with
+// either sign wrong is the past of some other wave.
+func WeylDoublerPacket(ss *Sim) {
+	ss.Params.Mass = 0
+	ss.Params.Update()
+	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
+	ss.ChiralSlab(WeylL1a, math32.X, -1, ss.Config.Amplitude, -om, -vg, 0, Pi)
 }
 
 // ElectronPacket is the same wave given a mass, and the comparison to make

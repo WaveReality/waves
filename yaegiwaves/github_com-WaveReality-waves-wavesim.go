@@ -550,6 +550,7 @@ func init() {
 		"WaveViewAll":                  reflect.ValueOf(wavesim.WaveViewAll),
 		"Weyl":                         reflect.ValueOf(wavesim.Weyl),
 		"WeylConfigs":                  reflect.ValueOf(&wavesim.WeylConfigs).Elem(),
+		"WeylDoublerPacket":            reflect.ValueOf(wavesim.WeylDoublerPacket),
 		"WeylFieldE":                   reflect.ValueOf(wavesim.WeylFieldE),
 		"WeylHydrogen":                 reflect.ValueOf(wavesim.WeylHydrogen),
 		"WeylKernel":                   reflect.ValueOf(wavesim.WeylKernel),

@@ -393,3 +393,108 @@ func TestWeylBound(t *testing.T) {
 	}
 	t.Logf("hydrogen rms %.3f -> %.3f (%+.1f%%), L/R %.4f, total held", rms0, wyRMS(sz), 100*grow, hr/hl)
 }
+
+// wySpectralPower returns |sum_x psi(x) e^{-i k x}|^2 along X, summed over the
+// four components of the left-handed spinor and over the transverse plane at
+// the box center. Direct projection rather than an FFT: only a handful of k
+// are of interest and they are not all on the FFT grid.
+func wySpectralPower(sz int32, k float64) float64 {
+	cur := int(GetCtx(0).CurState)
+	var tot float64
+	for _, vr := range []WeylStates{WeylL1a, WeylL1b, WeylL2a, WeylL2b} {
+		var re, im float64
+		for x := int32(1); x <= sz; x++ {
+			v := float64(State.Value(int(sz/2), int(sz/2), int(x), int(vr), cur))
+			re += v * math.Cos(k*float64(x))
+			im -= v * math.Sin(k*float64(x))
+		}
+		tot += re*re + im*im
+	}
+	return tot
+}
+
+// TestWeylDoubler pins the defining property of a lattice doubler: the packet
+// at k + pi is built exactly like NeutrinoPacket, with the same helicity and
+// the same envelope, and it travels the same speed in the OPPOSITE direction.
+//
+// That is what makes it a distinct particle rather than a numerical artifact
+// of the initialization. Both are massless modes of the same kernel with the
+// same |dispersion|; only the sign of dG/dk differs, and it is that sign that
+// a measurement of the centroid sees.
+func TestWeylDoubler(t *testing.T) {
+	sz := int32(64)
+	nst := 24
+
+	// one step first: WeylMag is written by the kernel, so it is all zeros
+	// until then and the centroid would be 0/0.
+	vel := func(init func(*Sim)) float64 {
+		ss := wySim(sz, init)
+		wyStep(ss)
+		c0 := wyCtr(sz, WeylMag, math32.X)
+		for range nst {
+			wyStep(ss)
+		}
+		return (wyCtr(sz, WeylMag, math32.X) - c0) / float64(nst)
+	}
+	nuV := vel(NeutrinoPacket)
+	dbV := vel(WeylDoublerPacket)
+
+	c := float64(GetParams(0).C)
+	t.Logf("neutrino Vg = %+.4f (%+.3f c);  doubler Vg = %+.4f (%+.3f c)", nuV, nuV/c, dbV, dbV/c)
+
+	if math.IsNaN(nuV) || math.IsNaN(dbV) {
+		t.Fatalf("NaN centroid velocity: neutrino %g, doubler %g", nuV, dbV)
+	}
+	if nuV <= 0 {
+		t.Errorf("neutrino should move in +X, got %g", nuV)
+	}
+	if dbV >= 0 {
+		t.Errorf("doubler should move in -X, got %g", dbV)
+	}
+	if rel := math.Abs(math.Abs(dbV)-math.Abs(nuV)) / math.Abs(nuV); rel > 0.05 {
+		t.Errorf("doubler speed should match the neutrino: |%g| vs |%g|, rel %.3f", dbV, nuV, rel)
+	}
+}
+
+// TestWeylDoublerSpectrum is the reason the ordinary configs never see a
+// doubler: a smooth packet has essentially no power at k = pi, so the mode
+// exists in the operator but is never populated.
+//
+// This is what makes the 28 zeros harmless HERE and not in general. Anything
+// with lattice-scale structure -- a hard edge, a discontinuous boundary, noise
+// accumulating at the zone corner -- puts power there, and what it excites is
+// a real particle with the wrong handedness.
+func TestWeylDoublerSpectrum(t *testing.T) {
+	sz := int32(64)
+	ss := wySim(sz, NeutrinoPacket)
+	k0 := 2 * math.Pi / float64(ss.Config.Wavelength)
+
+	for range 48 {
+		wyStep(ss)
+	}
+
+	phys := wySpectralPower(sz, k0)
+	dbl := wySpectralPower(sz, k0+math.Pi)
+	corner := wySpectralPower(sz, math.Pi)
+	t.Logf("carrier k=%.3f: %.4e   doubler k+pi=%.3f: %.4e (%.2e of carrier)   zone corner pi: %.4e (%.2e)",
+		k0, phys, k0+math.Pi, dbl, dbl/phys, corner, corner/phys)
+
+	if phys <= 0 {
+		t.Fatalf("no power at the carrier: %g", phys)
+	}
+	if dbl/phys > 1e-6 {
+		t.Errorf("smooth packet should not excite the doubler: %.3e of carrier power", dbl/phys)
+	}
+
+	// and the doubler config is the mirror image: power at k+pi, not at k
+	ss = wySim(sz, WeylDoublerPacket)
+	for range 48 {
+		wyStep(ss)
+	}
+	dphys := wySpectralPower(sz, k0)
+	ddbl := wySpectralPower(sz, k0+math.Pi)
+	t.Logf("doubler config -- carrier: %.4e   k+pi: %.4e   ratio %.3e", dphys, ddbl, dphys/ddbl)
+	if dphys/ddbl > 1e-6 {
+		t.Errorf("doubler config should have its power at k+pi, not k: ratio %.3e", dphys/ddbl)
+	}
+}

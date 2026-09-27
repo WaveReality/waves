@@ -525,7 +525,11 @@ func (ss *Sim) ChiralDispersion(wavelength, om0 float32) (float32, float32) {
 // where the packet sits in a potential: a wave at rest in one turns at a rate
 // shifted by q A0 / hbar, and a past written without it is the past of a
 // different wave. Pass 0 where there is no such field.
-func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, vg, eoh float32) {
+//
+// kshift adds to the carrier k, in radians PER CELL, and is 0 for any ordinary
+// packet. Pi puts the carrier on a lattice doubler instead of the physical
+// mode: see [WeylDoublerPacket], which is the only thing that passes it.
+func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, vg, eoh, kshift float32) {
 	c1 := int(base.Int64())
 	// the spinor with sigma.khat = helicity, for khat along +dim
 	s1, s2 := float32(1)/math32.Sqrt2, helicity/math32.Sqrt2 // +X: sigma_x
@@ -535,7 +539,7 @@ func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, v
 			s1, s2 = 1, 0
 		}
 	}
-	k := TwoPi / ss.Config.Wavelength
+	k := TwoPi/ss.Config.Wavelength + kshift
 	wd := ss.Config.PacketWidth
 	ctx := GetCtx(0)
 	cur := ctx.CurState

@@ -1461,7 +1461,7 @@ func LeptonPackets(ss *Sim) {
 
 	// the neutrino: massless, so nothing joins the chiralities
 	omn, vgn := ss.ChiralDispersion(wl, 0)
-	ss.ChiralSlab(EWNu1a, math32.X, -1, a, omn, vgn, 0)
+	ss.ChiralSlab(EWNu1a, math32.X, -1, a, omn, vgn, 0, 0)
 
 	// the electron: both halves at one helicity, in the ratio a positive
 	// energy state has, exactly as ElectronPacket does for the free equation
@@ -1472,8 +1472,8 @@ func LeptonPackets(ss *Sim) {
 	if om0 > 0 {
 		rr = (ome - ck) / om0
 	}
-	ss.ChiralSlab(EWEL1a, math32.X, -1, a, ome, vge, 0)
-	ss.ChiralSlab(EWER1a, math32.X, -1, a*rr, ome, vge, 0)
+	ss.ChiralSlab(EWEL1a, math32.X, -1, a, ome, vge, 0, 0)
+	ss.ChiralSlab(EWER1a, math32.X, -1, a*rr, ome, vge, 0, 0)
 }
 
 // HiggsSymmetric starts every Higgs component at zero plus a whisper of noise,
