@@ -123,7 +123,7 @@ func (ss *Sim) WaveConfig() {
 	ParamsShouldDisplay = WaveShouldDisplay
 	ss.StateVars = WaveStatesN
 	ss.initFuncs = WaveConfigs
-	ss.InitFunc = WavePacket
+	ss.SetCurrentInitFunc(0)
 	ss.WaveStats()
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveViewAll

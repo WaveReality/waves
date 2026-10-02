@@ -219,11 +219,7 @@ func (gui *GUI) MakeToolbar(p *tree.Plan) {
 			for ici, ic := range gui.sim.initFuncs {
 				mb := core.NewButton(m)
 				mb.SetText(ic.Name).SetTooltip(ic.Doc).OnClick(func(e events.Event) {
-					for i := range gui.sim.initFuncs {
-						gui.sim.initFuncs[i].Current = false
-					}
-					gui.sim.initFuncs[ici].Current = true
-					gui.sim.InitFunc = ic.Func
+					gui.sim.SetCurrentInitFunc(ici)
 					gui.sim.Init()
 					gui.SimForm.Update()
 					go gui.sim.UpdateView()

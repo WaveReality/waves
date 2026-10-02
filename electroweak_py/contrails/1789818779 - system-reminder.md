@@ -1,6 +1,6 @@
 - **Session ID:** `f686e1ea-bdd7-4bb7-941a-3f50e95f69df`
 - **Created:** 2026-09-19 11:52:59
-- **Last Message:** 2026-09-27 01:21:09
+- **Last Message:** 2026-09-27 19:52:17
 - **User:** User
 - **Agent:** Claude Code
 - **Model:** claude-opus-5
@@ -15609,84 +15609,167 @@ One test-quality note worth flagging: my first version of `TestWeylDoubler` read
 
 The thing I'd still flag for the electroweak work: `EWFermionKernel` uses `Gradient10` for σ·∇ on all three lepton fields, so it carries the same 28 species. Harmless for smooth packets, but it means that model has net chirality zero at the lattice level — which is in tension with the whole point of only L coupling to W. I put that in the `WeylDoublerPacket` doc comment rather than trying to fix it, since the fix is an open research problem.
 
-Done — all three. Let me start with the explanation, since the rest follows from it.
+## 🧑 User - 2026-09-27 19:49:37
 
-## What a doubler is
+Ok, aside from detailed technical issues related to the lattice scaling (these doubler issues), and the compute cost of sampling appropriately from the space of initial conditions, I would like to know what other _qualitative_ effects are missing _in principle_ from the lattice-based model, that are represented in QED: in other words, what *physics* are we missing, specifically for the case of a single electron interacting with an EM field. I know there are going to be lots of issues once you need to introduce multiple electrons. So the question is really, again, about the role of the virtual particles in QED: do we really need to take into account the possibility of creating all these other virtual particles, just for brief moments, or is that somehow accounting for something else that we would already have in our lattice model?
 
-The cleanest way in: ask what the central difference does to the most violently oscillating field the lattice can hold, $f(x) = (-1)^x$.
+## 🤖 Assistant - 2026-09-27 19:50:56
 
-$$f(x+1) - f(x-1) = 0$$
+*Model: claude-opus-5*
 
-Two cells apart, the alternating mode has returned to the same value. **The stencil reports that the jaggiest possible field is perfectly flat.** That blind spot is the doubler.
+This is the right question to ask, and the answer turns on a distinction that's easy to miss. Let me check one thing first, since it touches literature you already cite.
 
-Formally: the continuum derivative $\partial_x$ has Fourier symbol $ik$, with a single zero at $k=0$. The central difference has symbol
+Nothing in that changes my answer, but it sharpens one part and flags a fairness issue with your own citations. Here's the picture.
 
-$$\frac{e^{ika} - e^{-ika}}{2a} = \frac{i\sin(ka)}{a}$$
+## The distinction that does the work
 
-and $\sin(ka)$ vanishes at $ka = 0$ **and** at $ka = \pi$. Two zeros where the continuum had one.
+There are two separate things, and "virtual particles are an artifact" is often taken to imply both:
 
-The second zero isn't a mere numerical inaccuracy, and that's the whole problem. Expand around it with $k = \pi/a + q$:
+1. **Perturbation theory / virtual particles** — a calculational scheme.
+2. **Field quantization** — the EM field being a quantum object rather than a definite configuration.
 
-$$\sin(ka) = \sin(\pi + qa) = -\sin(qa) \approx -qa$$
+Lattice QED drops (1) and keeps (2). Your model drops both. That's the whole gap, and it's why the correct observation that virtual particles are bookkeeping doesn't license the conclusion that a classical field is enough.
 
-The symbol is $\approx -iq$ — **linear in $q$, exactly like the physical mode at the origin.** A gapless linear dispersion *is* a massless relativistic particle. So the lattice contains a second massless fermion nobody asked for, and no measurement inside the theory can call it spurious: it propagates, carries energy and momentum, and is degenerate with the real one. Each axis doubles independently, giving $2^d$ species.
+Worth killing the "brief moments" picture explicitly: an internal line in a Feynman diagram is an integration variable, integrated over *all* momenta including off-shell. There is no instant at which the pair exists. The energy-time-uncertainty story is a heuristic laid over the math afterwards. What's actually true is not a sequence of fleeting creation events but something permanent and static — the field has a spread in every mode, always.
 
-**Why the sign flip matters.** For the Weyl equation $\partial_t\psi = c\,(\boldsymbol\sigma\cdot\nabla)\psi$, writing $\nabla_j \to i G_j(\mathbf k)$ gives
+## What you already have
 
-$$\omega = -c\,s\,|\mathbf G|, \qquad s = \pm 1$$
+This is the part that surprised me when I worked through it. A great deal of what gets narrated with virtual particles is classical field physics you've already implemented:
 
-where $s$ is the eigenvalue of $\boldsymbol\sigma\cdot\hat{\mathbf G}$. Helicity is spin locked to the direction of $\mathbf G$ — not of $\mathbf k$. At the doubler $\mathbf G$ points *opposite* to $\mathbf k$, so the spin–momentum relation reverses: **the doubler carries the opposite handedness.** That's why they come in pairs summing to zero net chirality, and why Nielsen–Ninomiya is a theorem rather than bad luck — the total chirality is a topological invariant of a map from the Brillouin zone (a torus, compact, no boundary) and it must cancel.
+- **The Coulomb force.** Textbooks call it virtual photon exchange. You get it from classical $A_0$. The exchange picture is just the perturbative expansion of that.
+- **Self-energy / back-reaction** — the thing you built with `SelfField`. Perturbatively a virtual photon loop; classically the field a charge makes acting back on it.
+- **The seagull mass, London equation, plasma frequency** — tree-level, already there.
+- **The entire Higgs mechanism, W and Z masses** — tree-level. No loops anywhere.
+- **Zitterbewegung, the Klein paradox** — interference of positive- and negative-energy components, classical Dirac field.
+- **Hydrogen through fine structure** — the Dirac equation with a classical Coulomb field gives the spectrum correctly including spin-orbit.
 
-**And why Dirac escapes.** The second difference gives
+So the gap is narrower and more specific than the pop-science framing suggests.
 
-$$\frac{f(x{+}1) - 2f(x) + f(x{-}1)}{a^2} \;\to\; \frac{2\cos(ka)-2}{a^2} = -\frac{4\sin^2(ka/2)}{a^2}$$
+## What's structurally missing
 
-so $\hat k = 2\sin(ka/2)$, and $\sin(ka/2)$ vanishes only at $ka=0$ — at $ka=\pi$ it equals $1$, its maximum. One zero, no doubling. That single factor-of-two in the argument is the entire difference between your two kernels.
+One sentence: **you represent the EM field by a configuration $A(x)$; QED represents it by an amplitude over all configurations, $\Psi[A]$.**
 
-## The init config
+Your vacuum is $\delta[A = 0]$ — one state, nothing happening. The QED vacuum is
 
-Added **"Neutrino Doubler"** to the Weyl equation list, in [weyl.goal](../wavesim/weyl.goal). It's `NeutrinoPacket` with the carrier moved from $k$ to $k+\pi$ — identical helicity, identical envelope, identical everything else:
+$$\Psi_0[A] \;\propto\; \exp\!\left(-\tfrac{1}{2}\int d^3k\, |k|\,|A_{\mathbf k}|^2\right)$$
 
-```go
-func WeylDoublerPacket(ss *Sim) {
-	ss.Params.Mass = 0
-	ss.Params.Update()
-	om, vg := ss.WeylDispersion(ss.Config.Wavelength)
-	ss.ChiralSlab(WeylL1a, math32.X, -1, ss.Config.Amplitude, -om, -vg, 0, Pi)
-}
-```
+a Gaussian of irreducible width, because each mode is a harmonic oscillator and an oscillator cannot sit still. That width is what "virtual particles" names, stated without any particles in it. Your model is the limit where $\Psi[A]$ is a sharply peaked coherent state, and the peak is all you keep.
 
-`ChiralSlab` picked up a `kshift` parameter (radians per cell, $0$ for everything else). Both $\omega$ and $v_g$ negate because both flip with $\mathbf G$.
+From that one omission follow: spontaneous emission from a stationary excited state (your $|\psi|^2$ is static, so it doesn't radiate), the Lamb shift, the running of $\alpha$, the Casimir effect, photon counting statistics, and electron–field entanglement — in QED the two become entangled, in yours the state stays a product.
 
-**What to watch:** the raw spinor components will look like a fine checkerboard — the carrier is 1.6 cells. Watch `WeylMag` instead: $|\psi|^2$ squares the alternating sign away, so you get a clean Gaussian blob, and it **moves backward**. Run it side by side with Neutrino Packet.
+## The sharpest in-principle test
 
-## Results
+For your exact scenario — one electron, one EM field — the cleanest discriminator is not $g-2$ but **photon antibunching**.
 
-`TestWeylDoubler`:
+For *any* classical field with a fluctuating intensity $I(t)$, however you distribute it:
 
-```
-neutrino Vg = +0.1903 (+0.761 c);  doubler Vg = -0.1903 (-0.761 c)
-```
+$$g^{(2)}(0) = \frac{\langle I^2\rangle}{\langle I\rangle^2} \;\geq\; 1$$
 
-Equal and opposite to four digits.
+That's Cauchy–Schwarz — it follows from $\mathrm{Var}(I) \geq 0$. It is a theorem, not a limitation of any particular model. Yet a single atom in resonance fluorescence measures $g^{(2)}(0) \to 0$: having just emitted, it must be re-excited before it can emit again, so two photons never arrive together.
 
-`TestWeylDoublerSpectrum` — the question you actually wanted answered, and yes, Weyl was the right place for it:
+No classical field can produce that, no matter how you initialize it, and it needs only one electron. Antibunching is "nonclassical and incompatible with the demarcation between continuous light waves and discrete photoelectric counts." That's your answer to "what physics is missing in principle."
 
-```
-carrier k=0.785: 3.2316e+02   doubler k+pi: 9.2684e-08 (2.87e-10 of carrier)
-zone corner pi:  1.9841e-08 (6.14e-11)
-doubler config -- carrier: 1.3568e-07   k+pi: 3.2316e+02   ratio 4.199e-10
-```
+## A fairness note on your own citations
 
-A smooth packet puts $2.9\times10^{-10}$ of its power on the doubler. So the modes are in the operator but are simply never populated — your existing measurements are reading a clean single Weyl cone at $k\approx 0$, and the dispersion statistics you've collected are sound. The second run confirms the config is a genuine mirror: all power at $k+\pi$, none at $k$.
+You cite Barut. His self-field electrodynamics is exactly your model's theoretical ancestor, and it's more ambitious than I implied earlier: self-field QED "views the vacuum as empty, and derives all effects from matter interacting with itself, with no need for vacuum fluctuations, zero-point energy, or any independent electromagnetic field," and Barut and Dowling published derivations of the Lamb shift, spontaneous emission rates, **and $g-2$** without second quantization.
 
-I used direct projection onto $e^{-ikx}$ rather than an FFT, since only a few $k$ matter and they aren't on the FFT grid.
+So I should not have implied $g-2$ is flatly unreachable for your approach — there's a published claim otherwise, by an author you cite. It is contested: there's a [Comment in Phys. Rev. A 34, 3500](https://link.aps.org/doi/10.1103/PhysRevA.34.3500) disputing the Lamb shift claim, and more recent criticism that the framework lacks a consistent Born-rule interpretation. Live and disputed, not settled either way. Antibunching is the better test precisely because it's a theorem rather than a calculation anyone can dispute.
 
-## Build state
+## Why sampling initial conditions won't close it
 
-`goal build` + `go generate` clean — 22 validations, 0 errors. The two `unterminated quotes` warnings are pre-existing; I confirmed the same count on a stashed clean tree. Regenerated the yaegi bindings since `WeylDoublerPacket` is a new exported symbol. Ran the Weyl, EW fermion/lepton, and packet-envelope tests — all pass.
+You raised this as a cost problem. It's worse than that — it's a validity problem, and the bound is in the paper I checked earlier.
 
-One test-quality note worth flagging: my first version of `TestWeylDoubler` read the centroid before any kernel step, when `WeylMag` is still all zeros, so it computed $0/0$ and **passed vacuously** — every NaN comparison is false. Fixed by stepping once first, plus an explicit `IsNaN` guard so it can't happen silently again.
+Kasper–Hebenstreit–Berges require $1 \ll n_q \lesssim O(1/g^2)$: the classical-statistical approximation works at **high occupation numbers**. The vacuum has $n = 0$. Every effect on the missing list is a vacuum effect, so the method is provably inapplicable to exactly the physics you'd be trying to buy. Sampling initial conditions is the right move for strong-field and high-occupancy problems — Schwinger pair production, early-universe and heavy-ion dynamics — and it's genuinely quantum-accurate there. It does not reach down to the vacuum.
 
-The thing I'd still flag for the electroweak work: `EWFermionKernel` uses `Gradient10` for σ·∇ on all three lepton fields, so it carries the same 28 species. Harmless for smooth packets, but it means that model has net chirality zero at the lattice level — which is in tension with the whole point of only L coupling to W. I put that in the `WeylDoublerPacket` doc comment rather than trying to fix it, since the fix is an open research problem.
+The more ambitious version, **stochastic electrodynamics**, adds a classical random zero-point field and does recover some results (blackbody spectrum, the oscillator ground state). It does not get antibunching, and it cannot, by the theorem above.
+
+---
+
+The honest summary: your instinct is right that virtual particles are an artifact, and right that far more of QED is classically available than the standard narrative suggests. But the residue is real, it's specific, and it reduces to one thing — a quantum field has a spread that a classical field doesn't. For a single electron, antibunching is where that becomes a measurement rather than a matter of interpretation.
+
+Sources:
+- [Barut, self-field QED collected papers](https://worrydream.com/refs/Barut_1991_-_Self-field_papers.html)
+- [Barut & Dowling, QED Based on Self-Fields: A Relativistic Calculation of g−2](https://worrydream.com/refs/Barut_1989_-_QED_Based_on_Self-Fields,_A_Relativistic_Calculation_of_g-2.pdf)
+- [Comment on "QED based on self-energy: Lamb shift and spontaneous emission without field quantization" — Phys. Rev. A 34, 3500](https://link.aps.org/doi/10.1103/PhysRevA.34.3500)
+- [Quantum mechanics without quanta (critique of Barut's program)](https://arxiv.org/pdf/1507.02113)
+- [Photon Bunching and Antibunching — Progress in Optics 26](https://ui.adsabs.harvard.edu/abs/1988PrOpt..26....1T/abstract)
+- [Quantum Fluctuations of Light: A Modern Perspective on Wave/Particle Duality](https://arxiv.org/pdf/quant-ph/0104073)
+- [Fermion production from real-time lattice gauge theory in the classical-statistical regime](https://arxiv.org/html/1403.4849)
+
+Nothing in that changes my answer, but it sharpens one part and flags a fairness issue with your own citations. Here's the picture.
+
+## The distinction that does the work
+
+There are two separate things, and "virtual particles are an artifact" is often taken to imply both:
+
+1. **Perturbation theory / virtual particles** — a calculational scheme.
+2. **Field quantization** — the EM field being a quantum object rather than a definite configuration.
+
+Lattice QED drops (1) and keeps (2). Your model drops both. That's the whole gap, and it's why the correct observation that virtual particles are bookkeeping doesn't license the conclusion that a classical field is enough.
+
+Worth killing the "brief moments" picture explicitly: an internal line in a Feynman diagram is an integration variable, integrated over *all* momenta including off-shell. There is no instant at which the pair exists. The energy-time-uncertainty story is a heuristic laid over the math afterwards. What's actually true is not a sequence of fleeting creation events but something permanent and static — the field has a spread in every mode, always.
+
+## What you already have
+
+This is the part that surprised me when I worked through it. A great deal of what gets narrated with virtual particles is classical field physics you've already implemented:
+
+- **The Coulomb force.** Textbooks call it virtual photon exchange. You get it from classical $A_0$. The exchange picture is just the perturbative expansion of that.
+- **Self-energy / back-reaction** — the thing you built with `SelfField`. Perturbatively a virtual photon loop; classically the field a charge makes acting back on it.
+- **The seagull mass, London equation, plasma frequency** — tree-level, already there.
+- **The entire Higgs mechanism, W and Z masses** — tree-level. No loops anywhere.
+- **Zitterbewegung, the Klein paradox** — interference of positive- and negative-energy components, classical Dirac field.
+- **Hydrogen through fine structure** — the Dirac equation with a classical Coulomb field gives the spectrum correctly including spin-orbit.
+
+So the gap is narrower and more specific than the pop-science framing suggests.
+
+## What's structurally missing
+
+One sentence: **you represent the EM field by a configuration $A(x)$; QED represents it by an amplitude over all configurations, $\Psi[A]$.**
+
+Your vacuum is $\delta[A = 0]$ — one state, nothing happening. The QED vacuum is
+
+$$\Psi_0[A] \;\propto\; \exp\!\left(-\tfrac{1}{2}\int d^3k\, |k|\,|A_{\mathbf k}|^2\right)$$
+
+a Gaussian of irreducible width, because each mode is a harmonic oscillator and an oscillator cannot sit still. That width is what "virtual particles" names, stated without any particles in it. Your model is the limit where $\Psi[A]$ is a sharply peaked coherent state, and the peak is all you keep.
+
+From that one omission follow: spontaneous emission from a stationary excited state (your $|\psi|^2$ is static, so it doesn't radiate), the Lamb shift, the running of $\alpha$, the Casimir effect, photon counting statistics, and electron–field entanglement — in QED the two become entangled, in yours the state stays a product.
+
+## The sharpest in-principle test
+
+For your exact scenario — one electron, one EM field — the cleanest discriminator is not $g-2$ but **photon antibunching**.
+
+For *any* classical field with a fluctuating intensity $I(t)$, however you distribute it:
+
+$$g^{(2)}(0) = \frac{\langle I^2\rangle}{\langle I\rangle^2} \;\geq\; 1$$
+
+That's Cauchy–Schwarz — it follows from $\mathrm{Var}(I) \geq 0$. It is a theorem, not a limitation of any particular model. Yet a single atom in resonance fluorescence measures $g^{(2)}(0) \to 0$: having just emitted, it must be re-excited before it can emit again, so two photons never arrive together.
+
+No classical field can produce that, no matter how you initialize it, and it needs only one electron. Antibunching is "nonclassical and incompatible with the demarcation between continuous light waves and discrete photoelectric counts." That's your answer to "what physics is missing in principle."
+
+## A fairness note on your own citations
+
+You cite Barut. His self-field electrodynamics is exactly your model's theoretical ancestor, and it's more ambitious than I implied earlier: self-field QED "views the vacuum as empty, and derives all effects from matter interacting with itself, with no need for vacuum fluctuations, zero-point energy, or any independent electromagnetic field," and Barut and Dowling published derivations of the Lamb shift, spontaneous emission rates, **and $g-2$** without second quantization.
+
+So I should not have implied $g-2$ is flatly unreachable for your approach — there's a published claim otherwise, by an author you cite. It is contested: there's a [Comment in Phys. Rev. A 34, 3500](https://link.aps.org/doi/10.1103/PhysRevA.34.3500) disputing the Lamb shift claim, and more recent criticism that the framework lacks a consistent Born-rule interpretation. Live and disputed, not settled either way. Antibunching is the better test precisely because it's a theorem rather than a calculation anyone can dispute.
+
+## Why sampling initial conditions won't close it
+
+You raised this as a cost problem. It's worse than that — it's a validity problem, and the bound is in the paper I checked earlier.
+
+Kasper–Hebenstreit–Berges require $1 \ll n_q \lesssim O(1/g^2)$: the classical-statistical approximation works at **high occupation numbers**. The vacuum has $n = 0$. Every effect on the missing list is a vacuum effect, so the method is provably inapplicable to exactly the physics you'd be trying to buy. Sampling initial conditions is the right move for strong-field and high-occupancy problems — Schwinger pair production, early-universe and heavy-ion dynamics — and it's genuinely quantum-accurate there. It does not reach down to the vacuum.
+
+The more ambitious version, **stochastic electrodynamics**, adds a classical random zero-point field and does recover some results (blackbody spectrum, the oscillator ground state). It does not get antibunching, and it cannot, by the theorem above.
+
+---
+
+The honest summary: your instinct is right that virtual particles are an artifact, and right that far more of QED is classically available than the standard narrative suggests. But the residue is real, it's specific, and it reduces to one thing — a quantum field has a spread that a classical field doesn't. For a single electron, antibunching is where that becomes a measurement rather than a matter of interpretation.
+
+Sources:
+- [Barut, self-field QED collected papers](https://worrydream.com/refs/Barut_1991_-_Self-field_papers.html)
+- [Barut & Dowling, QED Based on Self-Fields: A Relativistic Calculation of g−2](https://worrydream.com/refs/Barut_1989_-_QED_Based_on_Self-Fields,_A_Relativistic_Calculation_of_g-2.pdf)
+- [Comment on "QED based on self-energy: Lamb shift and spontaneous emission without field quantization" — Phys. Rev. A 34, 3500](https://link.aps.org/doi/10.1103/PhysRevA.34.3500)
+- [Quantum mechanics without quanta (critique of Barut's program)](https://arxiv.org/pdf/1507.02113)
+- [Photon Bunching and Antibunching — Progress in Optics 26](https://ui.adsabs.harvard.edu/abs/1988PrOpt..26....1T/abstract)
+- [Quantum Fluctuations of Light: A Modern Perspective on Wave/Particle Duality](https://arxiv.org/pdf/quant-ph/0104073)
+- [Fermion production from real-time lattice gauge theory in the classical-statistical regime](https://arxiv.org/html/1403.4849)
 

@@ -25,6 +25,21 @@ type InitFunc struct {
 	Current bool
 }
 
+// SetCurrentInitFunc sets the initFunc to given index in initFuncs list.
+func (ss *Sim) SetCurrentInitFunc(funcNo int) {
+	var fun func(sim *Sim)
+	for i := range ss.initFuncs {
+		if i == funcNo {
+			ss.initFuncs[i].Current = true
+			fun = ss.initFuncs[i].Func
+		} else {
+			ss.initFuncs[i].Current = false
+		}
+	}
+	ss.InitFunc = fun
+}
+
+
 // CopyCurToPrev copies the current values to previous values
 // for all variables.
 func (ss *Sim) CopyCurToPrev() {
