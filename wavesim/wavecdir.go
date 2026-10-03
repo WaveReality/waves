@@ -91,7 +91,8 @@ func WaveCDirKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) WaveCDirConfig() {
-	ParamsShouldDisplay = WaveCDirShouldDisplay
+	ParamsShouldDisplay = WaveCDirParamFields
+	ConfigShouldDisplay = WaveCDirConfigFields
 	ss.StateVars = WaveCStatesN
 	ss.initFuncs = WaveCDirConfigs
 	ss.InitFunc = WaveCDirPacket
@@ -100,8 +101,13 @@ func (ss *Sim) WaveCDirConfig() {
 	ss.eqViewInitFunc = WaveCViewAll
 }
 
-// WaveCDirShouldDisplay determines which Parameters fields to display.
-var WaveCDirShouldDisplay = []string{"ThreeD", "Edges", "C", "WaveDir", "Wavelength", "PacketWidth", "Amplitude"}
+var (
+	// WaveCDirParamFields determines which Parameters fields to display.
+	WaveCDirParamFields = []string{"Edges", "C", "WaveDir"}
+
+	// WaveCDirConfigFields determines which Parameters fields to display.
+	WaveCDirConfigFields = []string{"PacketSlab"}
+)
 
 func (ss *Sim) WaveCDirStats() {
 	ss.AddStat(ss.StatStep())

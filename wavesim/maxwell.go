@@ -216,7 +216,8 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) MaxwellConfig() {
-	ParamsShouldDisplay = MaxwellShouldDisplay
+	ParamsShouldDisplay = MaxwellParamFields
+	ConfigShouldDisplay = MaxwellConfigFields
 	ss.StateVars = EMStatesN
 	ss.initFuncs = MaxwellConfigs
 	ss.InitFunc = ElectricPotential
@@ -239,8 +240,13 @@ func MaxwellViewAll(view *View) {
 	view.Panels[3].Mode = Vectors
 }
 
-// MaxwellShouldDisplay determines which Parameters fields to display.
-var MaxwellShouldDisplay = []string{"Edges", "C", "Mu0", "Eps0", "A0NoWave"}
+var (
+	// MaxwellParamFields determines which Parameters fields to display.
+	MaxwellParamFields = []string{"Edges", "C", "Mu0", "Eps0", "A0NoWave"}
+
+	// MaxwellConfigFields determines which Config fields to display.
+	MaxwellConfigFields = []string{"PacketSlab", "Polarization", "Velocity", "Source"}
+)
 
 // EMNRadii is how many Config.Wavelength steps out the radial stats sample.
 const EMNRadii = 4

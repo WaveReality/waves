@@ -91,7 +91,8 @@ func KleinGordonDampKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) KleinGordonConfig() {
-	ParamsShouldDisplay = KGShouldDisplay
+	ParamsShouldDisplay = KGParamFields
+	ConfigShouldDisplay = KGConfigFields
 	ss.StateVars = WaveStatesN
 	// the SAME configs Wave uses, on the same state: switch equation and the
 	// only thing that changes is the mass term
@@ -102,5 +103,10 @@ func (ss *Sim) KleinGordonConfig() {
 	ss.eqViewInitFunc = WaveViewAll
 }
 
-// KGShouldDisplay determines which Parameters fields to display.
-var KGShouldDisplay = []string{"Edges", "Energy", "C", "Mass", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+var (
+	// KGParamFields determines which Parameters fields to display.
+	KGParamFields = []string{"Edges", "Energy", "C", "Mass", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+
+	// KGConfigFields determines which Config fields to display.
+	KGConfigFields = []string{"PacketSlab"}
+)

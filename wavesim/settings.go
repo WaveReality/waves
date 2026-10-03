@@ -136,23 +136,20 @@ type VarSettings struct {
 	// the variable
 	Var enums.Enum
 
-	// keep Min - Max centered around 0, and use negative heights for units
-	// else use full min-max range for height (no negative heights)
+	// keep Min - Max centered around 0, and use negative heights for cells
+	// else use full min-max range for height (no negative heights).
 	ZeroCtr bool
 
 	// range to display
-	Range minmax.Range32 `display:"inline"`
-
-	// if not using fixed range, this is the actual range of data
-	MinMax minmax.F32 `display:"inline"`
+	Range minmax.F32 `display:"inline"`
 }
 
 // Defaults sets default values if otherwise not set
 func (vs *VarSettings) Defaults() {
 	if vs.Range.Max == 0 && vs.Range.Min == 0 {
 		vs.ZeroCtr = true
-		vs.Range.SetMin(-1)
-		vs.Range.SetMax(1)
+		vs.Range.Min = -1
+		vs.Range.Max = 1
 	}
 }
 

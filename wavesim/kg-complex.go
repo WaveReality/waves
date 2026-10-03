@@ -203,7 +203,8 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) KleinGordonCConfig() {
-	ParamsShouldDisplay = KGCShouldDisplay
+	ParamsShouldDisplay = KGCParamFields
+	ConfigShouldDisplay = KGCConfigFields
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.StateVars = CabStatesN
 	ss.initFuncs = KGCConfigs
@@ -222,9 +223,13 @@ func CabViewAll(view *View) {
 	view.Panels[3].Var = CabBs
 }
 
-// KGCShouldDisplay determines which Parameters fields to display for the
-// complex, optionally EM-coupled version.
-var KGCShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
+var (
+	// KGCParamFields determines which Parameters fields to display
+	KGCParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave"}
+
+	// KGCConfigFields determines which Config fields to display
+	KGCConfigFields = []string{"PacketSlab", "HydrogenRadius", "OscillatorPeriod"}
+)
 
 // KGCConfigs stats plotted over time in the GUI.
 func (ss *Sim) KleinGordonCStats() {

@@ -7,6 +7,7 @@ package wavesim
 import (
 	"fmt"
 	"image"
+	"math"
 
 	"cogentcore.org/core/colors/colormap"
 	"cogentcore.org/core/core"
@@ -17,6 +18,7 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/styles/abilities"
 	"cogentcore.org/core/tree"
+	"cogentcore.org/lab/plot/ticks"
 )
 
 func (vw *View) MakeToolbar(p *tree.Plan) {
@@ -33,6 +35,15 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 						vw.GoUpdateView()
 					})
 				d.RunWindowDialog(vw)
+			})
+	})
+	tree.Add(p, func(w *core.Button) {
+		w.SetText("Rescale").SetIcon(icons.Expand).
+			SetTooltip("rescale the min / max value range for all variables, based on current max state values").
+			OnClick(func(e events.Event) {
+				vw.RescaleToRangeAll()
+				vw.Update()
+				vw.UpdateView()
 			})
 	})
 	tree.Add(p, func(w *core.Button) {
@@ -91,9 +102,57 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 
 	var minSpin, maxSpin *core.Spinner
 
+	stepFunc := func(vp *VarSettings, isMin bool, sp *core.Spinner, steps float32) float32 {
+		v := float64(sp.Value)
+		mn := 0.0
+		if !vp.ZeroCtr {
+			mn = float64(vp.Range.Min)
+		} else {
+			v = math.Abs(v)
+		}
+		values, step, _, mag := ticks.ForRange(mn, float64(vp.Range.Max), 10)
+		nvals := len(values)
+		cidx := 0
+		if !isMin {
+			cidx = nvals - 1
+		}
+		var nv float64
+		if vp.ZeroCtr {
+			switch {
+			case isMin:
+				nv = v - float64(steps)*values[1]
+			case steps > 0:
+				nv = v + float64(steps)*values[1]
+			case steps < -1: // page
+				nv = v + float64(steps)*values[1]
+			default:
+				nidx := int(math32.Clamp(float32(nvals-1)+steps, 0, float32(nvals-1)))
+				nv = values[nidx]
+			}
+			if isMin {
+				return -float32(nv)
+			}
+			return float32(nv)
+		}
+		switch {
+		case isMin && v < 0:
+			nv = v + float64(steps)*step*math.Pow10(mag)
+		case !isMin && steps > 0:
+			nv = v + float64(steps)*step*math.Pow10(mag)
+		default:
+			nidx := int(math32.Clamp(float32(cidx)+steps, 0, float32(nvals-1)))
+			nv = values[nidx]
+		}
+		return float32(nv)
+	}
+
 	tree.Add(p, func(w *core.Separator) {})
 	tree.AddAt(p, "minSpin", func(w *core.Spinner) {
 		minSpin = w
+		w.StepFunc = func(sp *core.Spinner, steps float32) float32 {
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
+			return stepFunc(vp, true, sp, steps)
+		}
 		w.Styler(func(s *styles.Style) {
 			s.Min.X.Ch(15)
 			s.Max.X.Ch(15)
@@ -104,10 +163,10 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 				if vp == nil {
 					return
 				}
-				vp.Range.SetMin(w.Value)
-				vp.Range.FixMin = true
-				if vp.ZeroCtr && vp.Range.Min < 0 && vp.Range.FixMax {
-					vp.Range.SetMax(-vp.Range.Min)
+				vp.Range.Min = w.Value
+				if vp.ZeroCtr {
+					vp.Range.Min = math32.Min(-math32.Abs(w.Value), -1.0/math32.MaxFloat32)
+					vp.Range.Max = -vp.Range.Min
 				}
 				if vp.ZeroCtr {
 					maxSpin.UpdateWidget().NeedsRender()
@@ -141,6 +200,10 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 
 	tree.AddAt(p, "maxSpin", func(w *core.Spinner) {
 		maxSpin = w
+		w.StepFunc = func(sp *core.Spinner, steps float32) float32 {
+			vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
+			return stepFunc(vp, false, sp, steps)
+		}
 		w.Styler(func(s *styles.Style) {
 			s.Min.X.Ch(15)
 			s.Max.X.Ch(15)
@@ -150,10 +213,10 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			if vp == nil {
 				return
 			}
-			vp.Range.SetMax(w.Value)
-			vp.Range.FixMax = true
-			if vp.ZeroCtr && vp.Range.Max > 0 && vp.Range.FixMin {
-				vp.Range.SetMin(-vp.Range.Max)
+			vp.Range.Max = w.Value
+			if vp.ZeroCtr {
+				vp.Range.Max = math32.Max(math32.Abs(w.Value), 1.0/math32.MaxFloat32)
+				vp.Range.Min = -vp.Range.Max
 			}
 			if vp.ZeroCtr {
 				minSpin.UpdateWidget().NeedsRender()

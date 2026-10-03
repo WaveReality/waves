@@ -275,12 +275,11 @@ func (ss *Sim) Init() {
 	ss.RunStats(true)
 }
 
-// Run runs until stopped or Step > MaxSteps. Must be called by goroutine.
+// Run runs until stopped. Must be called by goroutine.
 func (ss *Sim) Run() {
-	ctx := GetCtx(0)
 	ToGPU(ParamsVar, CtxVar)
 	for {
-		if ss.GUI.StopNow() || int(ctx.Step) > ss.Config.MaxSteps {
+		if ss.GUI.StopNow() {
 			break
 		}
 		ss.StepRun()

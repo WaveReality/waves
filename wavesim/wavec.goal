@@ -140,7 +140,8 @@ func (ss *Sim) RunWaveC(n int) {
 }
 
 func (ss *Sim) WaveCConfig() {
-	ParamsShouldDisplay = WaveCShouldDisplay
+	ParamsShouldDisplay = WaveCParamFields
+	ConfigShouldDisplay = WaveCConfigFields
 	ss.StateVars = WaveCStatesN
 	ss.initFuncs = WaveCConfigs
 	ss.InitFunc = WaveCPacket
@@ -160,8 +161,13 @@ func WaveCViewAll(view *View) {
 	view.SetCurPrev(Previous, 3)
 }
 
-// WaveCShouldDisplay determines which Parameters fields to display.
-var WaveCShouldDisplay = []string{"ThreeD", "Edges", "C", "WaveDir", "Wavelength", "PacketWidth", "Amplitude"}
+var (
+	// WaveCParamFields determines which Parameters fields to display.
+	WaveCParamFields = []string{"Edges", "C"}
+
+	// WaveCConfigFields determines which Parameters fields to display.
+	WaveCConfigFields = []string{"PacketSlab"}
+)
 
 func (ss *Sim) WaveCStats() {
 	ss.AddStat(ss.StatStep())

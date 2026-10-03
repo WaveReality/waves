@@ -130,7 +130,8 @@ func (ss *Sim) RunSchrodinger(n int) {
 }
 
 func (ss *Sim) SchrodingerConfig() {
-	ParamsShouldDisplay = SchrodingerShouldDisplay
+	ParamsShouldDisplay = SchrodingerParamFields
+	ConfigShouldDisplay = SchrodingerConfigFields
 	ss.StateVars = CabStatesN
 	ss.initFuncs = SchrodingerConfigs
 	ss.InitFunc = HarmonicOscillator
@@ -139,8 +140,13 @@ func (ss *Sim) SchrodingerConfig() {
 	ss.eqViewInitFunc = CabViewAll
 }
 
-// SchrodingerShouldDisplay determines which Parameters fields to display.
-var SchrodingerShouldDisplay = []string{"Edges", "Hbar", "Mass", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
+var (
+	// SchrodingerParamFields determines which Parameters fields to display.
+	SchrodingerParamFields = []string{"Edges", "Hbar", "Mass"}
+
+	// SchrodingerConfigFields determines which Config fields to display.
+	SchrodingerConfigFields = []string{"PacketSlab", "HydrogenRadius", "OscillatorPeriod"}
+)
 
 func (ss *Sim) SchrodingerStats() {
 	ss.AddStat(ss.StatStep())

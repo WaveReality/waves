@@ -1146,8 +1146,9 @@ func EWFermionKernel(i uint32) { //gosl:kernel
 	// factor. Leaving it out makes the coupling 1/c too strong.
 	//
 	// The left doublet sees all of it. The right electron is an SU(2) singlet,
-
-	// words.
+	// so its G is g' Y B alone -- no W at all, which is what
+	// "the weak force only touches left-handed fields"
+	// means in the equation rather than in words.
 	if Params[0].EM.IsTrue() {
 		w10 := State.Value(int(z), int(y), int(x), int(EWW10s), int(prv))
 		w1x := State.Value(int(z), int(y), int(x), int(EWW1Xs), int(prv))
@@ -1329,7 +1330,8 @@ func ElectroweakDampKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) ElectroweakConfig() {
-	ParamsShouldDisplay = ElectroweakDisplay
+	ParamsShouldDisplay = ElectroweakParamFields
+	ConfigShouldDisplay = ElectroweakConfigFields
 	ss.StateVars = EWStatesN
 	ss.initFuncs = ElectroweakConfigs
 	ss.InitFunc = HiggsBroken
@@ -1347,8 +1349,21 @@ func ElectroweakViewAll(view *View) {
 	view.Panels[3].Var = EWW3Ys
 }
 
-// ElectroweakDisplay determines which Parameters fields to display.
-var ElectroweakDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ"}
+// ElectroweakWViewAll configures the View to display Electroweak W collision values
+func ElectroweakWViewAll(view *View) {
+	view.Panels[0].Var = EWHs0a
+	view.Panels[1].Var = EWZX
+	view.Panels[2].Var = EWW3Xs
+	view.Panels[3].Var = EWW1Ys
+}
+
+var (
+	// ElectroweakParamFields determines which Parameters fields to display.
+	ElectroweakParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "SelfField", "EM", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ", "YukawaE", "MassE"}
+
+	// ElectroweakConfigFields determines which additional Config fields to display.
+	ElectroweakConfigFields = []string{"PacketSlab"}
+)
 
 //////// stats
 
@@ -1565,4 +1580,8 @@ func WCollision(ss *Sim) {
 	xl := float32(ss.Config.Size.X)
 	ss.CarrierPacket(EWW1Ys, EWW1Yv, math32.X, xl*0.3, wl, 0.75*wl, amp, 1, om, 0)
 	ss.CarrierPacket(EWW2Ys, EWW2Yv, math32.X, xl*0.7, wl, 0.75*wl, amp, -1, om, 0)
+	if ss.GUI.View != nil {
+		ss.eqViewInitFunc = ElectroweakWViewAll
+		ss.callViewInit(ss.GUI.View)
+	}
 }

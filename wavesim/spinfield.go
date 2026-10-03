@@ -258,7 +258,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) SpinfieldConfig() {
-	ParamsShouldDisplay = ParticleDisplay
+	ParamsShouldDisplay = SpinfieldParamFields
+	ConfigShouldDisplay = SpinfieldConfigFields
 	ss.StateVars = SpinfieldStatesN
 	// todo: configs!
 	// ss.initFuncs = ElectroweakConfigs
@@ -289,5 +290,10 @@ func (ss *Sim) SpinfieldStats() {
 	ss.AddStat(ss.StatParticle(0))
 }
 
-// ParticleDisplay determines which Parameters fields to display.
-var ParticleDisplay = []string{"Edges", "Energy", "C", "Diff", "Decay", "Hbar", "Mass", "Wavelength", "PacketWidth", "Velocity", "Move"}
+var (
+	// SpinFieldParamFields determines which Parameters fields to display.
+	SpinfieldParamFields = []string{"Edges", "Energy", "C", "Diff", "Decay", "Hbar", "Mass"}
+
+	// SpinfieldConfigFields determines which Config fields to display.
+	SpinfieldConfigFields = []string{"Velocity", "Move"}
+)

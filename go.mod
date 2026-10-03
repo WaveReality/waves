@@ -3,8 +3,8 @@ module github.com/WaveReality/waves
 go 1.25.6
 
 require (
-	cogentcore.org/core v0.3.43
-	cogentcore.org/lab v0.1.19
+	cogentcore.org/core v0.3.44
+	cogentcore.org/lab v0.1.20
 	github.com/cogentcore/yaegi v0.0.0-20260116172027-700fbf8949f3
 	golang.org/x/text v0.40.0
 )

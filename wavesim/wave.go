@@ -122,7 +122,8 @@ func (ws WaveStates) SetVarSettings(vs *VarSettings) {
 }
 
 func (ss *Sim) WaveConfig() {
-	ParamsShouldDisplay = WaveShouldDisplay
+	ParamsShouldDisplay = WaveParamFields
+	ConfigShouldDisplay = WaveConfigFields
 	ss.StateVars = WaveStatesN
 	ss.initFuncs = WaveConfigs
 	ss.SetCurrentInitFunc(0)
@@ -141,8 +142,13 @@ func WaveViewAll(view *View) {
 	view.SetCurPrev(Previous, 3)
 }
 
-// WaveShouldDisplay determines which Parameters fields to display.
-var WaveShouldDisplay = []string{"ThreeD", "Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+var (
+	// WaveParamFields determines which Parameters fields to display.
+	WaveParamFields = []string{"Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
+
+	// WaveConfigFields determines which additional Config fields to display.
+	WaveConfigFields = []string{"Wavelength", "PacketWidth", "Amplitude"}
+)
 
 func (ss *Sim) WaveStats() {
 	ss.AddStat(ss.StatStep())

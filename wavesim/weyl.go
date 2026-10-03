@@ -292,7 +292,8 @@ const (
 )
 
 func (ss *Sim) WeylConfig() {
-	ParamsShouldDisplay = WeylShouldDisplay
+	ParamsShouldDisplay = WeylParamFields
+	ConfigShouldDisplay = WeylConfigFields
 	ss.StateVars = WeylStatesN
 	ss.initFuncs = WeylConfigs
 	ss.InitFunc = NeutrinoPacket
@@ -312,7 +313,13 @@ func WeylViewAll(view *View) {
 	view.Panels[3].Var = WeylR1b
 }
 
-var WeylShouldDisplay = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E", "Wavelength", "PacketWidth", "Amplitude"}
+var (
+	// WeylParamFields determines which Parameters fields to display.
+	WeylParamFields = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E"}
+
+	// WeylConfigFields determines which Parameters fields to display.
+	WeylConfigFields = []string{"PacketSlab"}
+)
 
 //////// stats
 

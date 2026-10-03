@@ -20,11 +20,11 @@ import (
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/math32"
-	"cogentcore.org/core/math32/minmax"
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/system"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/core/xyz"
+	"cogentcore.org/lab/plot/ticks"
 )
 
 // Canned ViewInitFunc functions that the user can select.
@@ -269,8 +269,8 @@ func (vw *View) SetVarMinMax(vr enums.Enum, mn, mx float32) {
 	if errors.Log(err) != nil {
 		return
 	}
-	vp.Range.SetMin(mn)
-	vp.Range.SetMax(mx)
+	vp.Range.Min = mn
+	vp.Range.Max = mx
 	vw.UpdateView()
 }
 
@@ -338,54 +338,49 @@ func (vw *View) UpdateImpl() {
 			vw.Panels[i].Var = vw.Var
 		}
 	}
-	vp, err := vw.GetVarSettings(vw.Panels[vw.curPanel].Var)
-	if errors.Log(err) != nil {
-		vw.Unlock()
-		return
-	}
-
-	if false && (!vp.Range.FixMin || !vp.Range.FixMax) { // todo: not yet
-		needUpdate := false
-		// need to autoscale
-		// min, max, ok := vw.Data.VarRange(vw.Var)
-		min, max, ok := float32(-1), float32(1), true
-		if ok {
-			vp.MinMax.Set(min, max)
-			if !vp.Range.FixMin {
-				nmin := float32(minmax.NiceRoundNumber(float64(min), true)) // true = below
-				if vp.Range.Min != nmin {
-					vp.Range.Min = nmin
-					needUpdate = true
-				}
-			}
-			if !vp.Range.FixMax {
-				nmax := float32(minmax.NiceRoundNumber(float64(max), false)) // false = above
-				if vp.Range.Max != nmax {
-					vp.Range.Max = nmax
-					needUpdate = true
-				}
-			}
-			if vp.ZeroCtr && !vp.Range.FixMin && !vp.Range.FixMax {
-				bmax := math32.Max(math32.Abs(vp.Range.Max), math32.Abs(vp.Range.Min))
-				if !needUpdate {
-					if vp.Range.Max != bmax || vp.Range.Min != -bmax {
-						needUpdate = true
-					}
-				}
-				vp.Range.Max = bmax
-				vp.Range.Min = -bmax
-			}
-			if needUpdate {
-				tb := vw.toolbar
-				tb.UpdateTree()
-				tb.NeedsRender()
-			}
-		}
-	}
-
 	vw.SetCounters(vw.Counters)
 	vw.Unlock()
 	vw.UpdatePlanes()
+}
+
+// RescaleToRangeAll rescales the displayed ranges of all viewed variables
+// to the current max range of actual data values.
+// returns true if updated.
+func (vw *View) RescaleToRangeAll() bool {
+	np := vw.Settings.NPanels.N()
+	needsUpdate := false
+	for vi := range np {
+		nu := vw.RescaleToRange(vi)
+		needsUpdate = nu || needsUpdate
+	}
+	return needsUpdate
+}
+
+// RescaleToRange rescales the displayed ranges of viewed variable
+// for given panel to the current max range of actual data values.
+// returns true if updated.
+func (vw *View) RescaleToRange(panel int) bool {
+	vr := vw.Panels[panel].Var
+	ctx := GetCtx(0)
+	sz := ctx.Size.V()
+	cur := ctx.CurState
+	vp, _ := vw.GetVarSettings(vr)
+	needUpdate := false
+	mx := StateMaxAbs(sz, vr, cur)
+	mn := -mx
+	if !vp.ZeroCtr {
+		mn = StateMin(sz, vr, cur)
+	}
+	values, _, _, _ := ticks.ForRange(mn, mx, 10)
+	if vp.Range.Min != float32(values[0]) {
+		needUpdate = true
+		vp.Range.Min = float32(values[0])
+	}
+	if vp.Range.Max != float32(values[len(values)-1]) {
+		needUpdate = true
+		vp.Range.Max = float32(values[len(values)-1])
+	}
+	return needUpdate
 }
 
 func (vw *View) SceneXYZ() *xyz.Scene {
@@ -511,8 +506,12 @@ func (vw *View) makeVars(frame *core.Frame) {
 func (vw *View) ViewDefaults(se *xyz.Scene) {
 	se.Camera.Near = 0.1
 
-	se.Camera.Pose.Pos.Set(0, 1.9, 2.7)
-	se.Camera.LookAt(math32.Vec3(0, 0.2, -.8), math32.Vec3(0, 1, 0))
+	se.Camera.Pose.Pos.Set(0, 1.3, 2.0)
+	se.Camera.LookAt(math32.Vec3(0, 0, -0.7), math32.Vec3(0, 1, 0))
+	se.SaveCamera("3")
+
+	se.Camera.Pose.Pos.Set(0, 1.4, 1.95)
+	se.Camera.LookAt(math32.Vec3(0, .1, -0.75), math32.Vec3(0, 1, 0))
 	se.SaveCamera("2")
 
 	se.Camera.Pose.Pos.Set(0, 2.7, 1.2)

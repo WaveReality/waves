@@ -4,7 +4,20 @@
 
 package wavesim
 
-import "cogentcore.org/core/math32"
+import (
+	"slices"
+
+	"cogentcore.org/core/math32"
+)
+
+var (
+	// ConfigShouldDisplay should be set to an equation-specific list of
+	// Config field names to display, for the config options that are relevant.
+	ConfigShouldDisplay []string
+
+	// ConfigAlwaysDisplay are Config fields to always display by default.
+	ConfigAlwaysDisplay = []string{"Equation", "GPU", "Size", "ViewInterval", "Wavelength", "PacketWidth", "Amplitude"}
+)
 
 // Config contains overall simulation configuration options.
 type Config struct {
@@ -93,9 +106,6 @@ type Config struct {
 
 	// Velocity provides the default particle velocity.
 	Velocity math32.Vector3
-
-	// MaxSteps is the maximum number of steps to run.
-	MaxSteps int
 }
 
 // Update reconfigures for a new Equation if one has been selected, which is
@@ -111,7 +121,6 @@ func (cfg *Config) Update() {
 
 func (cfg *Config) Defaults() {
 	cfg.Size.Set(100, 100, 1)
-	cfg.MaxSteps = 100000
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
 	cfg.PacketWidth = 12
@@ -121,6 +130,13 @@ func (cfg *Config) Defaults() {
 	cfg.OscillatorPeriod = 320
 	cfg.Source.Set(-1, -1, -1) // center
 	cfg.Polarization = math32.Y
+}
+
+func (cfg *Config) ShouldDisplay(field string) bool {
+	if ConfigShouldDisplay != nil {
+		return slices.Contains(ConfigShouldDisplay, field) || slices.Contains(ConfigAlwaysDisplay, field)
+	}
+	return slices.Contains(ConfigAlwaysDisplay, field)
 }
 
 func (cfg *Config) SizeFull() math32.Vector3i {

@@ -301,7 +301,8 @@ func DiracDampKernel(i uint32) { //gosl:kernel
 //gosl:end
 
 func (ss *Sim) DiracConfig() {
-	ParamsShouldDisplay = DiracShouldDisplay
+	ParamsShouldDisplay = DiracParamFields
+	ConfigShouldDisplay = DiracConfigFields
 	ss.StateVars = DiracStatesN
 	ss.initFuncs = DiracConfigs
 	ss.InitFunc = SpinAtRest
@@ -324,8 +325,13 @@ func DiracViewAll(view *View) {
 	view.Panels[3].Var = Dirac2As
 }
 
-// DiracShouldDisplay determines which Parameters fields to display.
-var DiracShouldDisplay = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave", "Wavelength", "PacketWidth", "Amplitude", "HydrogenRadius", "OscillatorPeriod"}
+var (
+	// DiracParamFields determines which Parameters fields to display.
+	DiracParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave"}
+
+	// DiracConfigFields determines which Config fields to display.
+	DiracConfigFields = []string{"PacketSlab", "HydrogenRadius", "OscillatorPeriod"}
+)
 
 //////// stats
 

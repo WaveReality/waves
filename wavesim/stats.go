@@ -42,8 +42,6 @@ func (ss *Sim) RunStats(init bool) {
 	}
 }
 
-// StateSum computes the sum of given variable at given cur vs. prev state
-// with given non-edge size.
 // StateMax returns the largest value of the vr variable over the interior.
 func StateMax(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
@@ -63,6 +61,46 @@ func StateMax(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	return float64(mx)
 }
 
+// StateMin returns the smallest value of the vr variable over the interior.
+func StateMin(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	vri := int(vr.Int64())
+	mn := float32(math32.MaxFloat32)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
+				if v < mn {
+					mn = v
+				}
+			}
+		}
+	}
+	return float64(mn)
+}
+
+// StateMaxAbs returns the largest abs(value) of the vr variable over the interior.
+func StateMaxAbs(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	vri := int(vr.Int64())
+	mx := float32(-math32.MaxFloat32)
+	var c math32.Vector3i
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v := math32.Abs(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)))
+				if v > mx {
+					mx = v
+				}
+			}
+		}
+	}
+	return float64(mx)
+}
+
+// StateSum computes the sum of given variable at given cur vs. prev state
+// with given non-edge size.
 func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
 	sum := 0.0
