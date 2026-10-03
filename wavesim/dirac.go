@@ -555,8 +555,9 @@ func DiracOscillator(ss *Sim) {
 	p.Edges = EdgesDamp
 	p.Update()
 	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
-	w := math32.Sqrt(p.Hbar / (p.Mass * om))
-	d := 2 * w
+	sig := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state sigma
+	w := Sqrt2 * sig                           // Gauss writes exp(-(r/w)^2)
+	d := 2 * sig
 	ph := ss.HarmonicWell(DiracV, om, d, ss.KleinGordonVMax())
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + d

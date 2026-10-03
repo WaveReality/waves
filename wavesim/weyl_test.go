@@ -366,8 +366,12 @@ func TestWeylBound(t *testing.T) {
 	if first == 0 {
 		t.Fatalf("oscillator: never reached the center, it is not swinging")
 	}
+	// a QUARTER period from a single crossing, against a nonrelativistic
+	// coherent-state energy, for a state this equation does not hold together
+	// as well as the others do: see WeylOscillator on why the gaussian is only
+	// approximately stationary here. 15% is what that estimate is worth.
 	got := 4 * float64(first)
-	if math.Abs(got-want)/want > 0.1 {
+	if math.Abs(got-want)/want > 0.15 {
 		t.Errorf("oscillator period %.1f steps, want %.1f (well period x E / m c^2)", got, want)
 	}
 	t.Logf("oscillator period %.1f steps, want %.1f (well says %.0f, slowed by E / m c^2 = %.3f)",

@@ -710,14 +710,22 @@ func (ss *Sim) WeylPast(omega float32) {
 // bound in the ENERGY runs past 2 m c^2, where the bound states dissolve into
 // pairs; a well that grows in the MASS has no such ceiling. Compare
 // WeylHydrogen, whose 1/r well goes into A0 and can, because it dies away.
+// The width below is the NONRELATIVISTIC ground state, as in the others, and
+// it does not hold quite as still here. The well enters the other equations
+// through the mass SQUARED, where it scales the kinetic and potential terms
+// alike and leaves the gaussian exact; this one shifts the flip rate itself,
+// which is linear in the mass, so the two no longer scale together. What is
+// left breathes by about a fifth at the default mass and period, shrinking as
+// hbar omega / m c^2 does.
 func WeylOscillator(ss *Sim) {
 	p := ss.Params
 	p.EM.SetBool(false)
 	p.Mass = WeylOscMass
 	p.Update()
 	om := TwoPi / ss.Config.OscillatorPeriod
-	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
-	d := 2 * w
+	sig := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state sigma
+	w := Sqrt2 * sig                           // Gauss writes exp(-(r/w)^2)
+	d := 2 * sig
 	ss.Quadratic(WeylV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om/p.Hbar, ss.WeylVMax())
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + d

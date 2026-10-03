@@ -424,6 +424,11 @@ func (ss *Sim) KleinGordonVMax() float32 {
 // Those levels are also not evenly spaced, so unlike the Schrodinger coherent
 // state this one slowly dephases and smears. The state that moves exactly like
 // a classical particle forever is a nonrelativistic idea.
+//
+// [Sim.Gauss] writes exp(-(r/w)^2), not exp(-r^2 / 2 sigma^2), so the width
+// handed to it carries a factor of sqrt(2) over the textbook sigma. Get it
+// wrong and the state breathes instead of holding its shape. The DISPLACEMENT
+// is still two sigma, which is why the two are kept apart below.
 func ScalarOscillator(ss *Sim) {
 	p := ss.Params
 	p.EM.SetBool(false)
@@ -431,8 +436,9 @@ func ScalarOscillator(ss *Sim) {
 	p.Edges = EdgesDamp
 	p.Update()
 	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
-	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
-	d := 2 * w
+	sig := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state sigma
+	w := Sqrt2 * sig                           // Gauss writes exp(-(r/w)^2)
+	d := 2 * sig
 	ph := ss.HarmonicWell(CabV, om, d, ss.KleinGordonVMax())
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + d

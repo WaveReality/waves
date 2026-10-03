@@ -408,15 +408,26 @@ func TestScalarOscillator(t *testing.T) {
 		e := 1.5*float64(p.Hbar)*om + 0.5*float64(p.Mass)*om*om*4*w*w
 		want := float64(ss.Config.OscillatorPeriod) * (mc2 + e) / mc2
 		var first, last, n int
+		// Count a crossing only after the centroid has swung out past half the
+		// displacement since the last one. The centroid carries a wobble at
+		// twice the carrier frequency, and once the state has smeared the
+		// swing passes the center slowly enough for that wobble to cross it
+		// two or three times in a row: without the hysteresis those land in
+		// the average and report a period a third too short.
+		armed, h := false, 0.5*2*w
 		prev := atomCtrX(sz, tc.mag) - mid
 		for s := range 800 {
 			tc.step(ss)
 			d := atomCtrX(sz, tc.mag) - mid
-			if prev > 0 && d <= 0 { // downward zero crossing: one per swing
+			if d > h {
+				armed = true
+			}
+			if armed && prev > 0 && d <= 0 { // downward zero crossing: one per swing
 				if n == 0 {
 					first = s
 				}
 				last, n = s, n+1
+				armed = false
 			}
 			prev = d
 		}

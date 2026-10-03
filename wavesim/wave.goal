@@ -172,7 +172,7 @@ var WaveConfigs = []InitFunc{
 	InitFunc{Name: "Wave Packet", Doc: "A travelling packet of one wavelength: run it under Wave and under KleinGordon to see what the mass term costs. In 3D explore the effects of PacketSlab", Func: WavePacket, Current: true},
 	InitFunc{Name: "Wave Pulse", Doc: "A bare bump with no velocity: it splits in half, one going each way, because the second-order operator contains both directions", Func: WavePulse},
 	InitFunc{Name: "Symmetric Packet ", Doc: "A symmetric packet of one wavelength, without any velocity terms, so the wave goes in both directions, which is good for seeing the superposition effects.", Func: SymmetricPacket},
-	InitFunc{Name: "Oscillator", Doc: "A wave sloshing around in a harmonic well, held by an external  potential", Func: WaveOscillator},
+	InitFunc{Name: "Oscillator", Doc: "A wave sloshing around in a harmonic well of mass-like potential: with no rest mass the levels go as sqrt(n), so it smears instead of swinging like a particle", Func: WaveOscillator},
 }
 
 // WavePacket is a travelling wave packet along X.
@@ -208,19 +208,46 @@ func (ss *Sim) WaveVMax() float32 {
 	return 4/p.CSq - Laplacian19Radius
 }
 
-// WaveOscillator is HarmonicOscillator for the basic wave equation: a
-// wave state swinging in a harmonic well.
+// WaveOscillator is HarmonicOscillator for the basic wave equation: a wave
+// state swinging in a harmonic well, and the one config here that shows what
+// a mass-like potential alone can and cannot do.
+//
+// The well is the SAME scalar one [Sim.HarmonicWell] writes for the other
+// equations, so confinement is again the wave getting heavier with distance.
+// The difference is that this equation has no rest mass to get heavier THAN:
+// Params.Mass never appears in [WaveKernel], and setting it here only sets
+// the depth of the well through HarmonicWell.
+//
+// That one missing term changes the spectrum completely. With the well as the
+// whole mass term the stationary states solve
+//
+//	(-grad^2 + lam^2 r^2) psi = (Om/c)^2 psi,  lam = m om / hbar
+//
+// so Om_n = c sqrt(lam (2n+3)): the levels go as the SQUARE ROOT of n, not
+// linearly in it. Their spacing shrinks as you go up, a displaced gaussian is
+// a spread over many of them, and it dephases within the first swing. There
+// is no coherent state here.
+//
+// That is the point worth seeing. Schrodinger gives exactly even spacing and
+// a coherent state that swings forever without spreading; ScalarOscillator is
+// nearly even, because the rest mass dominates, and dephases slowly; this one
+// has no rest mass and smears immediately. The classical-looking particle is
+// something a rest mass buys you, not something the well provides.
+//
+// Undisplaced it is a genuine stationary state and holds its width, which is
+// what fixes the width below: [Sim.Gauss] writes exp(-(r/w)^2) while the
+// ground state of the well is exp(-lam r^2 / 2), so w is sqrt(2 / lam).
 func WaveOscillator(ss *Sim) {
 	p := ss.Params
 	p.Mass = BoundStateMass
 	p.Edges = EdgesDamp
 	p.Update()
 	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
-	w := math32.Sqrt(1.0 / om) // ground state width
-	d := 2 * w
-	ph := ss.HarmonicWell(WaveV, om, d, ss.WaveVMax())
+	sig := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state sigma
+	w := Sqrt2 * sig                           // Gauss writes exp(-(r/w)^2)
+	d := 2 * sig
+	ss.HarmonicWell(WaveV, om, d, ss.WaveVMax())
 	ctr := math32.Vec3(-1, -1, -1)
 	ctr.X = float32(ss.Config.Size.X)*0.5 + d
 	ss.Gauss(WavePos, Both, ctr, w, ss.Config.Amplitude, 0)
-	ss.ChargedBound(1, ph)
 }

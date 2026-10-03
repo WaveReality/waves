@@ -196,6 +196,11 @@ func schrodOmega(ss *Sim) float32 {
 //
 // The ground state width is sqrt(hbar / m omega), which is set from the period
 // rather than chosen, so the two are not free to disagree.
+//
+// [Sim.Gauss] writes exp(-(r/w)^2), not exp(-r^2 / 2 sigma^2), so the width
+// handed to it carries a factor of sqrt(2) over the textbook sigma. Get it
+// wrong and the state breathes instead of holding its shape. The DISPLACEMENT
+// is still two sigma, which is why the two are kept apart below.
 func HarmonicOscillator(ss *Sim) {
 	// a bound state wants a WALL, not a wrapped neighbour: the potential at the
 	// far edge is up against SchrodingerVMax, and the shared wrap carries the
@@ -205,9 +210,10 @@ func HarmonicOscillator(ss *Sim) {
 	p := ss.Params
 	om := schrodOmega(ss)
 	ss.Quadratic(CabV, math32.Vec3(-1, -1, -1), 0.5*p.Mass*om*om, ss.SchrodingerVMax())
-	w := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state width
+	sig := math32.Sqrt(p.Hbar / (p.Mass * om)) // ground state sigma
+	w := Sqrt2 * sig                           // Gauss writes exp(-(r/w)^2)
 	ctr := math32.Vec3(-1, -1, -1)
-	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*w
+	ctr.X = float32(ss.Config.Size.X)*0.5 + 2*sig // displaced by two sigma
 	ss.Gauss(CabAs, Both, ctr, w, ss.Config.Amplitude, 0)
 }
 
