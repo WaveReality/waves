@@ -125,7 +125,7 @@ func TestConfigPulseSpeeds(t *testing.T) {
 		probe enums.Enum
 		mass  func(p *Parameters) float64
 	}{
-		{"photon", PhotonPulse, AYs, func(p *Parameters) float64 { return 0 }},
+		{"photon", EMPulse, AYs, func(p *Parameters) float64 { return 0 }},
 		{"Z", ZPulse, EWZY, func(p *Parameters) float64 { return float64(p.MZ) }},
 	} {
 		// carrier from Config, so the prediction tracks it, not a literal.
@@ -177,7 +177,7 @@ func TestPulseCondensateBackReaction(t *testing.T) {
 		minDrop float64 // how far below vacuum the condensate must go at amp 1
 		maxDrop float64
 	}{
-		{"photon", PhotonPulse, AYs, 0.99, 1.01},
+		{"photon", EMPulse, AYs, 0.99, 1.01},
 		{"Z", ZPulse, EWZY, 0.0, 0.70},
 	} {
 		vLin, hLin := cfgSpeed(sz, tc.init, tc.probe, 0.02, 100)

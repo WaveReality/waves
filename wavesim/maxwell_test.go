@@ -160,7 +160,7 @@ func emLine(sz int32, vr EMStates, y, z int32) []float64 {
 	return v
 }
 
-// TestPolarizedPhoton: only the vector potential is set, and everything else
+// TestLinearPolarization: only the vector potential is set, and everything else
 // follows. E must come out along the polarization, B along the other
 // transverse direction, and nothing along the direction of travel.
 //
@@ -168,7 +168,7 @@ func emLine(sz int32, vr EMStates, y, z int32) []float64 {
 // lattice symbol is 2 sin(k/2) and B from a space derivative with a different
 // one, so the ratio is c times a factor that goes to 1 as the wavelength grows.
 // The test is that it converges, at the second-order rate.
-func TestPolarizedPhoton(t *testing.T) {
+func TestLinearPolarization(t *testing.T) {
 	const sz = 32
 	for _, tc := range []struct {
 		name           string
@@ -185,7 +185,7 @@ func TestPolarizedPhoton(t *testing.T) {
 				s.Config.Polarization = tc.pol
 				s.Config.Wavelength = wl
 				s.Config.PacketWidth = 2 * wl
-				PolarizedPhoton(s)
+				LinearPolarization(s)
 			})
 			for range 20 {
 				emStep(ss)
@@ -238,7 +238,7 @@ func TestCircularPolarization(t *testing.T) {
 		}
 		return (hi - lo) / (hi + lo), ss
 	}
-	lin, _ := ripple(PolarizedPhoton)
+	lin, _ := ripple(LinearPolarization)
 	cir, _ := ripple(CircularPolarization)
 	t.Logf("|E_transverse|^2 ripple over one wavelength: linear %.3f, circular %.3f", lin, cir)
 	if lin < 0.9 {
@@ -282,7 +282,7 @@ func TestStandingWave(t *testing.T) {
 		cov := seb/n - (se/n)*(sb/n)
 		return cov / math.Sqrt((see/n-(se/n)*(se/n))*(sbb/n-(sb/n)*(sb/n)))
 	}
-	trav := corr(PolarizedPhoton, 5)
+	trav := corr(LinearPolarization, 5)
 	stand := corr(StandingWave, 5)
 	t.Logf("correlation of |E| with |B| along X: travelling %+.3f, standing %+.3f", trav, stand)
 	if trav < 0.9 {

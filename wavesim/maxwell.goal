@@ -265,7 +265,7 @@ func (ss *Sim) MaxwellStats() {
 var MaxwellConfigs = []InitFunc{
 	InitFunc{Name: "Electric Potential", Doc: "A point charge at Config.Source: A0 relaxes to 1/r and E to 1/r^2; watch the A0 radial stats", Func: ElectricPotential, Current: true},
 	InitFunc{Name: "Charge Dipole", Doc: "Two opposite charges: the far field falls as 1/r^3 because the potentials cancel to leading order", Func: ChargeDipole},
-	InitFunc{Name: "Polarized Photon", Doc: "A linearly polarized packet along X, in the Config.Polarization transverse direction; E along it, B along the other", Func: PolarizedPhoton},
+	InitFunc{Name: "Linear Polarization", Doc: "A linearly polarized packet along X, in the Config.Polarization transverse direction; E along it, B along the other", Func: LinearPolarization},
 	InitFunc{Name: "Circular Polarization", Doc: "Both transverse components a quarter cycle apart, so E turns as it travels; Config.Polarization picks the handedness", Func: CircularPolarization},
 	InitFunc{Name: "Standing Wave", Doc: "Two packets sent at each other: E and B stand still with nodes a quarter wavelength apart", Func: StandingWave},
 	InitFunc{Name: "Moving Charge", Doc: "A charged line moving along itself at Config.Velocity.X: E radial, B circling, with |B|/|E| = v/c^2", Func: MovingCharge},
@@ -335,7 +335,7 @@ func ChargeDipole(ss *Sim) {
 	ss.Point(Charge, Both, math32.Vec3i(c.X+d, c.Y, c.Z), -ss.Config.Amplitude)
 }
 
-// PolarizedPhoton sends a linearly polarized electromagnetic packet along X.
+// LinearPolarization sends a linearly polarized electromagnetic packet along X.
 //
 // Only the vector potential is set, in the single transverse component
 // [Config.Polarization]. Everything else follows from the kernel: E = -dA/dt
@@ -348,7 +348,7 @@ func ChargeDipole(ss *Sim) {
 //
 // A longitudinal wave is not available to pick, and that is not an omission:
 // setting AX instead would be pure gauge, giving E = B = 0.
-func PolarizedPhoton(ss *Sim) {
+func LinearPolarization(ss *Sim) {
 	ss.Params.Edges = EdgesWrap
 	ss.Params.Update()
 	pos, vel, _, _ := emTransverse(ss)

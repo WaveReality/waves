@@ -147,7 +147,7 @@ var (
 	WaveParamFields = []string{"Edges", "Energy", "C", "Diffusion", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
 
 	// WaveConfigFields determines which additional Config fields to display.
-	WaveConfigFields = []string{"Wavelength", "PacketWidth", "Amplitude"}
+	WaveConfigFields = []string{"Wavelength", "PacketWidth", "Amplitude", "OscillatorPeriod"}
 )
 
 func (ss *Sim) WaveStats() {

@@ -99,6 +99,28 @@ func StateMaxAbs(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	return float64(mx)
 }
 
+// StateMaxVectorLen returns the largest vector length of the vr variable + 2
+// additional components, over the interior.
+func StateMaxVectorLen(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
+	vri := int(vr.Int64())
+	mx := float32(-math32.MaxFloat32)
+	var c math32.Vector3i
+	var v math32.Vector3
+	for c.Z = range sz.Z {
+		for c.Y = range sz.Y {
+			for c.X = range sz.X {
+				f := c.AddScalar(1)
+				v.Set(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)), State.Value(int(f.Z), int(f.Y), int(f.X), int(vri+1), int(curPrv)), State.Value(int(f.Z), int(f.Y), int(f.X), int(vri+2), int(curPrv)))
+				l := v.Length()
+				if l > mx {
+					mx = l
+				}
+			}
+		}
+	}
+	return float64(mx)
+}
+
 // StateSum computes the sum of given variable at given cur vs. prev state
 // with given non-edge size.
 func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {

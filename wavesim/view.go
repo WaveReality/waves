@@ -367,10 +367,16 @@ func (vw *View) RescaleToRange(panel int) bool {
 	cur := ctx.CurState
 	vp, _ := vw.GetVarSettings(vr)
 	needUpdate := false
-	mx := StateMaxAbs(sz, vr, cur)
-	mn := -mx
-	if !vp.ZeroCtr {
-		mn = StateMin(sz, vr, cur)
+	var mx, mn float64
+	if vw.Panels[panel].Mode == Vectors {
+		mx = StateMaxVectorLen(sz, vr, cur)
+		mn = -mx
+	} else {
+		mx = StateMaxAbs(sz, vr, cur)
+		mn = -mx
+		if !vp.ZeroCtr {
+			mn = StateMin(sz, vr, cur)
+		}
 	}
 	values, _, _, _ := ticks.ForRange(mn, mx, 10, ticks.ContainData)
 	if vp.Range.Min != float32(values[0]) {

@@ -241,7 +241,7 @@ func TestDispersion(t *testing.T) {
 	for _, tc := range []dispCase{
 		{name: "Wave", eq: Wave, probe: WavePos},
 		{name: "KleinGordon", eq: KleinGordon, probe: WavePos},
-		{name: "Maxwell photon", eq: Maxwell, probe: AYs, init: PolarizedPhoton},
+		{name: "Maxwell photon", eq: Maxwell, probe: AYs, init: LinearPolarization},
 		{name: "WaveC", eq: WaveC, probe: WaveCMag},
 		{name: "WaveCDir", eq: WaveCDir, probe: WaveCMag, maxVd: 0.005},
 		{name: "Schrodinger", eq: Schrodinger, probe: CabMag, init: FreePacket},

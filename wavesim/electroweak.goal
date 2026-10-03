@@ -1401,7 +1401,7 @@ const (
 var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
-	InitFunc{Name: "Photon Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: PhotonPulse},
+	InitFunc{Name: "EM Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: EMPulse},
 	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
 	InitFunc{Name: "Lepton Packets", Doc: "A neutrino and an electron as the same wave in the two halves of one doublet: the Higgs gives one of them a mass and cannot touch the other", Func: LeptonPackets},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
@@ -1505,13 +1505,13 @@ func HiggsSymmetric(ss *Sim) {
 	ss.SmoothNoise(EWHs0b, amp, 6)
 }
 
-// PhotonPulse sends a transverse electromagnetic pulse along X at exactly the
+// EMPulse sends a transverse electromagnetic pulse along X at exactly the
 // speed of light.
 //
 // The packet is written in the PHYSICAL basis: the photon is the combination
 // sin(theta_W) W^3 + cos(theta_W) B, the direction that Q = T^3 + Y annihilates,
 // so the condensate gives it no mass and it moves at c. Watch AYs.
-func PhotonPulse(ss *Sim) {
+func EMPulse(ss *Sim) {
 	HiggsBroken(ss)
 	p := ss.Params
 	wl := ss.Config.Wavelength

@@ -111,38 +111,20 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			v = math.Abs(v)
 		}
 		values, step, _, mag := ticks.ForRange(mn, float64(vp.Range.Max), 10, ticks.ContainData)
-		nvals := len(values)
-		cidx := 0
-		if !isMin {
-			cidx = nvals - 1
-		}
 		var nv float64
 		if vp.ZeroCtr {
 			switch {
 			case isMin:
 				nv = v - float64(steps)*values[1]
-			case steps > 0:
-				nv = v + float64(steps)*values[1]
-			case steps < -1: // page
-				nv = v + float64(steps)*values[1]
 			default:
-				nidx := int(math32.Clamp(float32(nvals-1)+steps, 0, float32(nvals-1)))
-				nv = values[nidx]
+				nv = v + float64(steps)*values[1]
 			}
 			if isMin {
 				return -float32(nv)
 			}
 			return float32(nv)
 		}
-		switch {
-		case isMin && v < 0:
-			nv = v + float64(steps)*step*math.Pow10(mag)
-		case !isMin && steps > 0:
-			nv = v + float64(steps)*step*math.Pow10(mag)
-		default:
-			nidx := int(math32.Clamp(float32(cidx)+steps, 0, float32(nvals-1)))
-			nv = values[nidx]
-		}
+		nv = v + float64(steps)*step*math.Pow10(mag)
 		return float32(nv)
 	}
 
@@ -238,6 +220,11 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 				vp, _ := vw.GetVarSettingsPanel(vw.curPanel)
 				if vp != nil {
 					vp.ZeroCtr = w.IsChecked()
+					if vp.ZeroCtr {
+						vp.Range.Min = -vp.Range.Max
+					}
+					minSpin.UpdateWidget().NeedsRender()
+					maxSpin.UpdateWidget().NeedsRender()
 					vw.UpdateView()
 				}
 			})

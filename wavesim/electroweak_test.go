@@ -780,7 +780,7 @@ func ewDampSim(sz int32, edges Edges, init func(*Sim)) *Sim {
 //
 // The mean has to come out, because a uniform offset is a k = 0 mode and a
 // k = 0 mode has zero group velocity. It cannot propagate to the boundary, so
-// no boundary condition of any kind can absorb it -- and PhotonPulse leaves a
+// no boundary condition of any kind can absorb it -- and EMPulse leaves a
 // small one behind, since a gaussian times a cosine does not integrate to
 // zero. Counting it makes a working boundary look 15% broken.
 //
@@ -840,7 +840,7 @@ func TestElectroweakDamp(t *testing.T) {
 	// as in TestEdgesDamp, the step count is several box traversals at the
 	// shared C: a boundary that reflects only shows it on the way back
 	const psz, pst = 32, 900
-	ss := ewDampSim(psz, EdgesDamp, PhotonPulse)
+	ss := ewDampSim(psz, EdgesDamp, EMPulse)
 	ss.StepRun()
 	g0 := ewGaugeWave()
 	for range pst {

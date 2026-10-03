@@ -120,6 +120,7 @@ func (cfg *Config) Update() {
 }
 
 func (cfg *Config) Defaults() {
+	cfg.GPU = true
 	cfg.Size.Set(100, 100, 1)
 	cfg.ViewInterval = 1
 	cfg.Wavelength = 8
