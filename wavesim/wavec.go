@@ -168,7 +168,7 @@ var (
 	WaveCParamFields = []string{"Edges", "C"}
 
 	// WaveCConfigFields determines which Parameters fields to display.
-	WaveCConfigFields = []string{"PacketSlab"}
+	WaveCConfigFields = []string{}
 )
 
 func (ss *Sim) WaveCStats() {

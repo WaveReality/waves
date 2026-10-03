@@ -318,7 +318,7 @@ var (
 	WeylParamFields = []string{"Edges", "C", "Hbar", "Mass", "EM", "WeylQ", "E"}
 
 	// WeylConfigFields determines which Parameters fields to display.
-	WeylConfigFields = []string{"PacketSlab"}
+	WeylConfigFields = []string{}
 )
 
 //////// stats

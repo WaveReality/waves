@@ -108,5 +108,5 @@ var (
 	KGParamFields = []string{"Edges", "Energy", "C", "Mass", "VPotential", "Wavelength", "PacketWidth", "Amplitude"}
 
 	// KGConfigFields determines which Config fields to display.
-	KGConfigFields = []string{"PacketSlab"}
+	KGConfigFields = []string{}
 )

@@ -106,7 +106,7 @@ var (
 	WaveCDirParamFields = []string{"Edges", "C", "WaveDir"}
 
 	// WaveCDirConfigFields determines which Parameters fields to display.
-	WaveCDirConfigFields = []string{"PacketSlab"}
+	WaveCDirConfigFields = []string{}
 )
 
 func (ss *Sim) WaveCDirStats() {

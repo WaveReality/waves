@@ -1357,7 +1357,7 @@ var (
 	ElectroweakParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "A0NoWave", "E", "Mu0", "SelfField", "EM", "HiggsMu", "HiggsLambda", "Temp", "ThermalC", "GW", "GpW", "YangMills", "Boris", "TempCrit", "HiggsV", "MW", "MZ", "YukawaE", "MassE"}
 
 	// ElectroweakConfigFields determines which additional Config fields to display.
-	ElectroweakConfigFields = []string{"PacketSlab"}
+	ElectroweakConfigFields = []string{}
 )
 
 //////// stats

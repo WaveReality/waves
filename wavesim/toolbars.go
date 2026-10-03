@@ -110,7 +110,7 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 		} else {
 			v = math.Abs(v)
 		}
-		values, step, _, mag := ticks.ForRange(mn, float64(vp.Range.Max), 10)
+		values, step, _, mag := ticks.ForRange(mn, float64(vp.Range.Max), 10, ticks.ContainData)
 		nvals := len(values)
 		cidx := 0
 		if !isMin {
@@ -257,16 +257,6 @@ func (vw *View) MakeViewbar(p *tree.Plan) {
 				vw.SceneXYZ().SetCamera("default")
 				vw.RebuildView()
 			})
-	})
-
-	tree.Add(p, func(w *core.Chooser) {
-		w.SetEnums(math32.Y, math32.Z).SetTooltip("state dimension drawn going back into the screen, which is what selects the display plane: Z shows the X-Z plane sliced at a Y level, and Y shows the X-Y plane sliced at a Z level, which is what a 2D sim needs because it has only one Z")
-		w.OnChange(func(e events.Event) {
-			vw.SetDepth(w.CurrentItem.Value.(math32.Dims))
-		})
-		w.Updater(func() {
-			w.SetCurrentValue(vw.Depth)
-		})
 	})
 
 	tree.Add(p, func(w *core.Button) {

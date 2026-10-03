@@ -169,8 +169,10 @@ func (ss *Sim) WaveStats() {
 // [Sim.PacketFreq], which already knows whether the equation has a mass, so
 // the same call gives a genuine travelling packet either way.
 var WaveConfigs = []InitFunc{
-	InitFunc{Name: "Wave Packet", Doc: "A travelling packet of one wavelength: run it under Wave and under KleinGordon to see what the mass term costs", Func: WavePacket, Current: true},
+	InitFunc{Name: "Wave Packet", Doc: "A travelling packet of one wavelength: run it under Wave and under KleinGordon to see what the mass term costs. In 3D explore the effects of PacketSlab", Func: WavePacket, Current: true},
 	InitFunc{Name: "Wave Pulse", Doc: "A bare bump with no velocity: it splits in half, one going each way, because the second-order operator contains both directions", Func: WavePulse},
+	InitFunc{Name: "Symmetric Packet ", Doc: "A symmetric packet of one wavelength, without any velocity terms, so the wave goes in both directions, which is good for seeing the superposition effects.", Func: SymmetricPacket},
+	InitFunc{Name: "Oscillator", Doc: "A wave sloshing around in a harmonic well, held by an external  potential", Func: WaveOscillator},
 }
 
 // WavePacket is a travelling wave packet along X.
@@ -190,4 +192,35 @@ func WavePacket(ss *Sim) {
 // to both time levels, which is what "no velocity" means in a leapfrog.
 func WavePulse(ss *Sim) {
 	ss.PacketEnv(WavePos, Both, math32.X, math32.Vec3(-1, -1, -1), ss.Config.PacketWidth, ss.Config.Amplitude)
+}
+
+// SymmetricPacket is a wave packet along X with no velocity, so it splits and
+// moves in both directions symmetrically. Good for visualizing superposition.
+func SymmetricPacket(ss *Sim) {
+	ss.PosWavePacketConfig(WavePos, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
+}
+
+// WaveVMax is the largest |WaveV| the leapfrog can carry. The kernel
+// applies c^2 (Laplacian + V) as an acceleration, and a leapfrog holds
+// while that coefficient stays under 4 -- of which Laplacian19Radius is spent.
+func (ss *Sim) WaveVMax() float32 {
+	p := ss.Params
+	return 4/p.CSq - Laplacian19Radius
+}
+
+// WaveOscillator is HarmonicOscillator for the basic wave equation: a
+// wave state swinging in a harmonic well.
+func WaveOscillator(ss *Sim) {
+	p := ss.Params
+	p.Mass = BoundStateMass
+	p.Edges = EdgesDamp
+	p.Update()
+	om := 2 * math32.Pi / ss.Config.OscillatorPeriod
+	w := math32.Sqrt(1.0 / om) // ground state width
+	d := 2 * w
+	ph := ss.HarmonicWell(WaveV, om, d, ss.WaveVMax())
+	ctr := math32.Vec3(-1, -1, -1)
+	ctr.X = float32(ss.Config.Size.X)*0.5 + d
+	ss.Gauss(WavePos, Both, ctr, w, ss.Config.Amplitude, 0)
+	ss.ChargedBound(1, ph)
 }

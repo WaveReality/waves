@@ -328,7 +328,7 @@ var (
 	DiracParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave"}
 
 	// DiracConfigFields determines which Config fields to display.
-	DiracConfigFields = []string{"PacketSlab", "HydrogenRadius", "OscillatorPeriod"}
+	DiracConfigFields = []string{"HydrogenRadius", "OscillatorPeriod"}
 )
 	
 //////// stats

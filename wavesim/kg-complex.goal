@@ -226,7 +226,7 @@ var (
 	KGCParamFields = []string{"Edges", "Energy", "C", "Hbar", "Mass", "E", "Mu0", "EM", "SelfField", "Boris", "A0NoWave"}
 
 	// KGCConfigFields determines which Config fields to display
-	KGCConfigFields = []string{"PacketSlab", "HydrogenRadius", "OscillatorPeriod"}
+	KGCConfigFields = []string{"HydrogenRadius", "OscillatorPeriod"}
 )
 
 // KGCConfigs stats plotted over time in the GUI.
@@ -248,7 +248,7 @@ var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
 	InitFunc{Name: "Scalar Hydrogen", Doc: "A spin-0 particle bound in a Coulomb well in its exp(-r/a) ground state: a pionic atom, turning at one frequency everywhere", Func: ScalarHydrogen},
 	InitFunc{Name: "Scalar Hydrogen P", Doc: "The 2p orbital of the same: two lobes of opposite phase with a node between them", Func: ScalarHydrogenP},
-	InitFunc{Name: "Scalar Oscillator", Doc: "A coherent state swinging in a harmonic well, held by a scalar (mass) potential rather than an electric one", Func: ScalarOscillator},
+	InitFunc{Name: "Scalar Oscillator", Doc: "A coherent state swinging in a harmonic well, held by an external (mass-like) potential rather than an electric one", Func: ScalarOscillator},
 }
 
 // ChargeAtRest is a gaussian lump of charge sitting still: a particle, as far

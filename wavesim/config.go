@@ -16,7 +16,7 @@ var (
 	ConfigShouldDisplay []string
 
 	// ConfigAlwaysDisplay are Config fields to always display by default.
-	ConfigAlwaysDisplay = []string{"Equation", "GPU", "Size", "ViewInterval", "Wavelength", "PacketWidth", "Amplitude"}
+	ConfigAlwaysDisplay = []string{"Equation", "GPU", "Size", "ViewInterval", "Wavelength", "PacketWidth", "PacketSlab", "Amplitude"}
 )
 
 // Config contains overall simulation configuration options.

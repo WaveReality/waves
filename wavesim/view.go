@@ -33,6 +33,7 @@ import (
 func ViewInitBars1D(view *View) {
 	if view.Sim.Params.ThreeD.IsFalse() {
 		view.SetMode(Bars, -1)
+		view.Settings.Camera = 3
 	}
 }
 
@@ -371,7 +372,7 @@ func (vw *View) RescaleToRange(panel int) bool {
 	if !vp.ZeroCtr {
 		mn = StateMin(sz, vr, cur)
 	}
-	values, _, _, _ := ticks.ForRange(mn, mx, 10)
+	values, _, _, _ := ticks.ForRange(mn, mx, 10, ticks.ContainData)
 	if vp.Range.Min != float32(values[0]) {
 		needUpdate = true
 		vp.Range.Min = float32(values[0])
