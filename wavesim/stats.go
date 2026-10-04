@@ -414,12 +414,10 @@ func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum)
 				dt.SetNumRows(0)
 				// only the RATES are on by default: they share a scale, where
 				// a width in cubes would flatten them against the axis
-				plot.SetFirstStyler(wt, func(s *plot.Style) {
-					s.On = false
-				})
-				plot.SetFirstStyler(dt, func(s *plot.Style) {
-					s.On = true
-				})
+				//
+				//	plot.SetFirstStyler(dt, func(s *plot.Style) {
+				//		s.On = true
+				//	})
 				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
 				metadata.SetDoc(dt, "Spreading rate of "+vr.String()+" along "+dim.String()+", in units of C, on the same scale as the group velocity: dispersion along the direction of travel, diffraction across it")
 				if !vel {
@@ -429,12 +427,9 @@ func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum)
 				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
 				ct.SetNumRows(0)
 				vt.SetNumRows(0)
-				plot.SetFirstStyler(ct, func(s *plot.Style) {
-					s.On = false
-				})
-				plot.SetFirstStyler(vt, func(s *plot.Style) {
-					s.On = true
-				})
+				//	plot.SetFirstStyler(vt, func(s *plot.Style) {
+				//		s.On = true
+				//	})
 				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
 				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
 			}
@@ -547,9 +542,6 @@ func (ss *Sim) StatWeightedMean(name string, vr, wtVr enums.Enum) func(init bool
 		tsr := ss.Stats.Float64(name)
 		if init {
 			tsr.SetNumRows(0)
-			plot.SetFirstStyler(tsr, func(s *plot.Style) {
-				s.On = false
-			})
 			metadata.SetDoc(tsr, "Mean of "+vr.String()+" weighted by the intensity of "+wtVr.String())
 			return
 		}

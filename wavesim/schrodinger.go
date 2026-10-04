@@ -134,7 +134,7 @@ func (ss *Sim) SchrodingerConfig() {
 	ConfigShouldDisplay = SchrodingerConfigFields
 	ss.StateVars = CabStatesN
 	ss.initFuncs = SchrodingerConfigs
-	ss.InitFunc = HarmonicOscillator
+	ss.InitFunc = FreePacket
 	ss.SchrodingerStats()
 	ss.Params.Update()
 	ss.eqViewInitFunc = CabViewAll
@@ -162,8 +162,8 @@ func (ss *Sim) SchrodingerStats() {
 
 // SchrodingerConfigs are the initialization options offered in the GUI.
 var SchrodingerConfigs = []InitFunc{
-	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket},
-	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator, Current: true},
+	InitFunc{Name: "Free Packet", Doc: "A gaussian packet moving along X with nothing to push it: travels and spreads", Func: FreePacket, Current: true},
+	InitFunc{Name: "Harmonic Oscillator", Doc: "A coherent state in a parabolic well: swings at omega and does not spread, the one quantum state that acts classical", Func: HarmonicOscillator},
 	InitFunc{Name: "Box Standing Wave", Doc: "The lowest standing wave between hard walls: an energy eigenstate, so |chi|^2 does not move at all", Func: BoxStandingWave},
 	InitFunc{Name: "Box Two States", Doc: "The lowest two standing waves together: they beat at the difference frequency and the probability sloshes side to side", Func: BoxTwoStates},
 	InitFunc{Name: "Hydrogen Ground", Doc: "An electron in a 1/r well in its exp(-r/a) ground state, with the well depth set from the Bohr radius", Func: HydrogenGround},
@@ -185,6 +185,14 @@ func (ss *Sim) SchrodingerVMax() float32 {
 // on screen is twice 2 pi / omega.
 func schrodOmega(ss *Sim) float32 {
 	return 2 * math32.Pi / ss.Config.OscillatorPeriod
+}
+
+// FreePacket is a gaussian wave packet moving along X with nothing to push it:
+// it travels at the group velocity and spreads, which is the one thing a free
+// quantum particle reliably does.
+func FreePacket(ss *Sim) {
+	ss.Params.Update()
+	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
 }
 
 // HarmonicOscillator is the classic: a particle in a parabolic well
@@ -296,12 +304,4 @@ func HydrogenP(ss *Sim) {
 	ctr := math32.Vec3(-1, -1, -1)
 	ss.InvR(CabV, ctr, -k)
 	ss.ExpoP(CabAs, Both, ctr, math32.Z, 2*a, ss.Config.Amplitude)
-}
-
-// FreePacket is a gaussian wave packet moving along X with nothing to push it:
-// it travels at the group velocity and spreads, which is the one thing a free
-// quantum particle reliably does.
-func FreePacket(ss *Sim) {
-	ss.Params.Update()
-	ss.ComplexPacketConfig(CabAs, CabBs, math32.X, math32.Vec3(-1, -1, -1), 1, 0, 1)
 }

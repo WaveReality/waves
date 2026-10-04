@@ -243,8 +243,8 @@ func (ss *Sim) KleinGordonCStats() {
 //////// configurations
 
 var KGCConfigs = []InitFunc{
-	InitFunc{Name: "Charge At Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
-	InitFunc{Name: "Charge At Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
+	InitFunc{Name: "Charge at Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
+	InitFunc{Name: "Charge at Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
 	InitFunc{Name: "Charge Uniform", Doc: "Charge at rest filling all of space: flat, but rho is then exactly constant and equal to -e |chi|^2", Func: ChargeUniform},
 	InitFunc{Name: "Charge Self Field", Doc: "The charge makes its own potential and is pushed back by it: Mu0 is scaled so the self-field is a twentieth of the rest energy, which is the only regime where this is stable", Func: ChargeSelfField},
 	InitFunc{Name: "Charged Packet", Doc: "A moving charge: a complex wave packet travelling along X, carrying charge and current", Func: ChargedPacket},
