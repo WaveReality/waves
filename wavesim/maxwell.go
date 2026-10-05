@@ -220,7 +220,6 @@ func (ss *Sim) MaxwellConfig() {
 	ConfigShouldDisplay = MaxwellConfigFields
 	ss.StateVars = EMStatesN
 	ss.initFuncs = MaxwellConfigs
-	ss.InitFunc = ElectricPotential
 	ss.MaxwellStats()
 	ss.Params.ThreeD.SetBool(true)
 	ss.Config.Wavelength = 16

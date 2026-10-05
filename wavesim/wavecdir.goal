@@ -93,7 +93,6 @@ func (ss *Sim) WaveCDirConfig() {
 	ConfigShouldDisplay = WaveCDirConfigFields
 	ss.StateVars = WaveCStatesN
 	ss.initFuncs = WaveCDirConfigs
-	ss.InitFunc = WaveCDirPacket
 	ss.WaveCDirStats()
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveCViewAll

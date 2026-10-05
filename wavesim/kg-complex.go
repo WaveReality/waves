@@ -208,7 +208,6 @@ func (ss *Sim) KleinGordonCConfig() {
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.StateVars = CabStatesN
 	ss.initFuncs = KGCConfigs
-	ss.InitFunc = ChargeAtRest
 	ss.KleinGordonCStats()
 	ss.eqViewInitFunc = CabViewAll
 }
@@ -242,6 +241,7 @@ func (ss *Sim) KleinGordonCStats() {
 
 //////// configurations
 
+// KGCConfigs are the initialization options offered in the GUI.
 var KGCConfigs = []InitFunc{
 	InitFunc{Name: "Charge at Rest", Doc: "A gaussian lump of charge at rest: rho = -e |chi|^2 exactly, conserved as the lump disperses", Func: ChargeAtRest, Current: true},
 	InitFunc{Name: "Charge at Rest Anti", Doc: "The same lump turning the other way, which is the same thing with the opposite charge", Func: ChargeAtRestAnti},
@@ -287,11 +287,11 @@ func ChargeUniform(ss *Sim) {
 	ss.ChargedUniform(ss.Config.Amplitude, 1)
 }
 
-// kgSelfScale sets Mu0 so the potential a charge blob makes for itself is the
+// Mu0SelfScale sets Mu0 so the potential a charge blob makes for itself is the
 // given fraction of its own rest energy.
 //
 // A gaussian charge density of peak rho0 = e amp^2 and width w sits at the
-// centre of its own potential
+// center of its own potential
 //
 //	A0(0) = Mu0 rho0 w^2 / 2
 //
@@ -306,7 +306,7 @@ func ChargeUniform(ss *Sim) {
 // while the display range does not -- Mu0 is the knob, not the amplitude.
 // Reducing it is not a fudge: the real coupling is weak too, which is what the
 // fine structure constant being 1/137 says.
-func kgSelfScale(ss *Sim, frac float32) {
+func Mu0SelfScale(ss *Sim, frac float32) {
 	p := ss.Params
 	a := ss.Config.Amplitude
 	w := ss.Config.PacketWidth
@@ -317,7 +317,7 @@ func kgSelfScale(ss *Sim, frac float32) {
 // ChargeSelfField is [ChargeAtRest] with the back-reaction on: the charge
 // makes its own electromagnetic potential, and is pushed by it.
 //
-// Mu0 is set from [kgSelfScale] so the self-potential is a twentieth of the
+// Mu0 is set from [Mu0SelfScale] so the self-potential is a twentieth of the
 // rest energy, which is the regime where this is a charge with a field rather
 // than a numerical accident. Raise the fraction and it goes sooner.
 //
@@ -335,7 +335,7 @@ func ChargeSelfField(ss *Sim) {
 	ss.Params.EM.SetBool(true)
 	ss.Params.SelfField.SetBool(true)
 	ss.Params.Edges = EdgesDamp
-	kgSelfScale(ss, 0.05)
+	Mu0SelfScale(ss, 0.05)
 	ChargeAtRest(ss)
 }
 
@@ -345,7 +345,6 @@ func ChargedPacket(ss *Sim) {
 	ss.ChargedPacketConfig(math32.X, ss.Config.Amplitude, 1)
 }
 
-// KGCConfigs are the initialization options offered in the GUI.
 // scalarAtom is the shared setup for the two bound-state configs: an external
 // Coulomb well, no self-field, damped edges so whatever is not held can leave.
 func scalarAtom(ss *Sim, a, n float32) float32 {

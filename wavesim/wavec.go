@@ -146,7 +146,6 @@ func (ss *Sim) WaveCConfig() {
 	ConfigShouldDisplay = WaveCConfigFields
 	ss.StateVars = WaveCStatesN
 	ss.initFuncs = WaveCConfigs
-	ss.InitFunc = WaveCPacket
 	ss.WaveCStats()
 	ss.Params.Update()
 	ss.eqViewInitFunc = WaveCViewAll

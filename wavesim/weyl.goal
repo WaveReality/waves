@@ -292,7 +292,6 @@ func (ss *Sim) WeylConfig() {
 	ConfigShouldDisplay = WeylConfigFields
 	ss.StateVars = WeylStatesN
 	ss.initFuncs = WeylConfigs
-	ss.InitFunc = NeutrinoPacket
 	ss.WeylStats()
 	// C comes from Parameters.Defaults, which is set by THIS equation's bound:
 	// it is the tightest of them. Mass is set per config, not here.

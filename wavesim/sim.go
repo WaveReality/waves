@@ -188,6 +188,7 @@ func (ss *Sim) ConfigEquation() { //types:add
 	case Spinfield:
 		ss.SpinfieldConfig()
 	}
+	ss.SetCurrentInitFunc(0)
 	ss.ConfigState()
 	ss.Init()
 	ss.Config.curEquation = ss.Config.Equation
@@ -325,17 +326,17 @@ func (ss *Sim) StepRun() {
 	case Maxwell:
 		RunMaxwellKernel(ns)
 	case KleinGordonC:
-		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+		if ss.Params.SelfField.IsTrue() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunKleinGordonCKernel(ns)
 	case Dirac:
-		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+		if ss.Params.SelfField.IsTrue() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunDiracKernel(ns)
 	case Weyl:
-		if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+		if ss.Params.SelfField.IsTrue() {
 			RunMaxwellKernel(ns) // reads the Charge / Current the wave wrote
 		}
 		RunWeylKernel(ns)
@@ -368,17 +369,17 @@ func (ss *Sim) StepRun() {
 			case Maxwell:
 				RunMaxwellDampKernel(ne)
 			case KleinGordonC:
-				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+				if ss.Params.SelfField.IsTrue() {
 					RunMaxwellDampKernel(ne)
 				}
 				RunKleinGordonCDampKernel(ne)
 			case Dirac:
-				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+				if ss.Params.SelfField.IsTrue() {
 					RunMaxwellDampKernel(ne)
 				}
 				RunDiracDampKernel(ne)
 			case Weyl:
-				if ss.Params.EM.IsTrue() && ss.Params.SelfField.IsTrue() {
+				if ss.Params.SelfField.IsTrue() {
 					RunMaxwellDampKernel(ne)
 				}
 				RunEdgesOpenKernel(ne) // first order: see EdgesOpenKernel

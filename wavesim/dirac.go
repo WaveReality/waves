@@ -305,11 +305,6 @@ func (ss *Sim) DiracConfig() {
 	ConfigShouldDisplay = DiracConfigFields
 	ss.StateVars = DiracStatesN
 	ss.initFuncs = DiracConfigs
-	ss.InitFunc = SpinAtRest
-	// wrapped: these configs are free waves, and a torus loses no charge, so
-	// the conservation the equation promises is the one you actually see. A
-	// config that couples to its own field wants damped edges instead, for the
-	// reason in ChargeSelfField, and should set that itself.
 	ss.Params.ThreeD.SetBool(true) // the kernel has no 1D path: EM needs 3D
 	ss.DiracStats()
 	ss.eqViewInitFunc = DiracViewAll

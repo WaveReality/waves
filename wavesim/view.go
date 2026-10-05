@@ -379,13 +379,17 @@ func (vw *View) RescaleToRange(panel int) bool {
 		}
 	}
 	values, _, _, _ := ticks.ForRange(mn, mx, 10, ticks.ContainData)
+	nv := len(values)
+	if values[0] == 0 && values[nv-1] == 0 {
+		return false
+	}
 	if vp.Range.Min != float32(values[0]) {
 		needUpdate = true
 		vp.Range.Min = float32(values[0])
 	}
-	if vp.Range.Max != float32(values[len(values)-1]) {
+	if vp.Range.Max != float32(values[nv-1]) {
 		needUpdate = true
-		vp.Range.Max = float32(values[len(values)-1])
+		vp.Range.Max = float32(values[nv-1])
 	}
 	return needUpdate
 }

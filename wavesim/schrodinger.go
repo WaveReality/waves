@@ -134,7 +134,6 @@ func (ss *Sim) SchrodingerConfig() {
 	ConfigShouldDisplay = SchrodingerConfigFields
 	ss.StateVars = CabStatesN
 	ss.initFuncs = SchrodingerConfigs
-	ss.InitFunc = FreePacket
 	ss.SchrodingerStats()
 	ss.Params.Update()
 	ss.eqViewInitFunc = CabViewAll
