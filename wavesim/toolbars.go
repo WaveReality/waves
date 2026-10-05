@@ -38,15 +38,6 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 			})
 	})
 	tree.Add(p, func(w *core.Button) {
-		w.SetText("Rescale").SetIcon(icons.Expand).
-			SetTooltip("rescale the min / max value range for all variables, based on current max state values").
-			OnClick(func(e events.Event) {
-				vw.RescaleToRangeAll()
-				vw.Update()
-				vw.UpdateView()
-			})
-	})
-	tree.Add(p, func(w *core.Button) {
 		w.SetText("State").SetType(core.ButtonAction).SetMenu(func(m *core.Scene, pos image.Point) {
 			fb := core.NewFuncButton(m).SetFunc(vw.Sim.SaveState)
 			fb.SetIcon(icons.Save)
@@ -129,6 +120,15 @@ func (vw *View) MakeToolbar(p *tree.Plan) {
 	}
 
 	tree.Add(p, func(w *core.Separator) {})
+	tree.Add(p, func(w *core.Button) {
+		w.SetText("Rescale").SetIcon(icons.Expand).
+			SetTooltip("rescale the min / max value range for all variables, based on current max state values").
+			OnClick(func(e events.Event) {
+				vw.RescaleToRangeAll()
+				vw.Update()
+				vw.UpdateView()
+			})
+	})
 	tree.AddAt(p, "minSpin", func(w *core.Spinner) {
 		minSpin = w
 		w.StepFunc = func(sp *core.Spinner, steps float32) float32 {

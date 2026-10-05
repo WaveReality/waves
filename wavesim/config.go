@@ -42,6 +42,9 @@ type Config struct {
 	// edges at all sizes (add 2 to each dim).
 	Size math32.Vector3i
 
+	// curSize is a copy of the Size of currently-built -- to trigger updating.
+	curSize math32.Vector3i
+
 	// ViewInterval is how often to update the view
 	ViewInterval int `min:"1"`
 
@@ -112,11 +115,18 @@ type Config struct {
 // what makes switching equations in the GUI work. curEquation is set BEFORE
 // reconfiguring, since that path calls back through here.
 func (cfg *Config) Update() {
-	if cfg.sim == nil || cfg.Equation == cfg.curEquation {
+	if cfg.sim == nil {
 		return
 	}
-	cfg.curEquation = cfg.Equation
-	cfg.sim.ConfigEquation()
+	if cfg.Equation != cfg.curEquation {
+		cfg.curEquation = cfg.Equation
+		cfg.curSize = cfg.Size
+		cfg.sim.ConfigEquation()
+	}
+	if cfg.Size != cfg.curSize {
+		cfg.curSize = cfg.Size
+		cfg.sim.RebuildState()
+	}
 }
 
 func (cfg *Config) Defaults() {

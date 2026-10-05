@@ -239,6 +239,12 @@ func (ss *Sim) ConfigState() {
 	Particles.SetShapeSizes(int(NParticles), int(ParticleVarsN))
 }
 
+func (ss *Sim) RebuildState() {
+	ss.ConfigState()
+	ss.Init()
+	ss.ViewRebuild()
+}
+
 func (ss *Sim) InitRandSeed(run int) {
 	ss.RandSeeds.Set(run, ss.Rand)
 }
