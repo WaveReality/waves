@@ -305,6 +305,7 @@ func init() {
 		"MovingCharge":                 reflect.ValueOf(wavesim.MovingCharge),
 		"Mp":                           reflect.ValueOf(constant.MakeFromLiteral("2.176440000000000000079608115732591967685788381103861865994986147e-08", token.FLOAT, 0)),
 		"Mu0":                          reflect.ValueOf(constant.MakeFromLiteral("1.25663706143591729538505735331180115367886775975004232838997783600000106671829429763630728957022790665909780876034854774020246776363384946956115543565804489881865500517955904525873754553397724874054487351204834055806713877245784e-06", token.FLOAT, 0)),
+		"Mu0SelfScale":                 reflect.ValueOf(wavesim.Mu0SelfScale),
 		"NGradPair":                    reflect.ValueOf(constant.MakeFromLiteral("5", token.INT, 0)),
 		"NLapNeigh":                    reflect.ValueOf(constant.MakeFromLiteral("18", token.INT, 0)),
 		"NNeigh":                       reflect.ValueOf(constant.MakeFromLiteral("26", token.INT, 0)),

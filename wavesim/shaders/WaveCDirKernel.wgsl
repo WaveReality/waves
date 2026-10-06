@@ -21,18 +21,6 @@ var<storage, read_write> State1: array<f32>;
 var<storage, read_write> State2: array<f32>;
 @group(1) @binding(5)
 var<storage, read_write> State3: array<f32>;
-@group(1) @binding(6)
-var<storage, read_write> State4: array<f32>;
-@group(1) @binding(7)
-var<storage, read_write> State5: array<f32>;
-@group(1) @binding(8)
-var<storage, read_write> State6: array<f32>;
-@group(1) @binding(9)
-var<storage, read_write> State7: array<f32>;
-@group(1) @binding(10)
-var<storage, read_write> State8: array<f32>;
-@group(1) @binding(11)
-var<storage, read_write> State9: array<f32>;
 
 alias GPUVars = i32;
 
@@ -62,26 +50,8 @@ fn StateGet(ix: u32) -> f32 {
 	case u32(2): {
 		return State2[ix - 1073741808];
 	}
-	case u32(3): {
-		return State3[ix - 1610612712];
-	}
-	case u32(4): {
-		return State4[ix - 2147483616];
-	}
-	case u32(5): {
-		return State5[ix - 2684354520];
-	}
-	case u32(6): {
-		return State6[ix - 3221225424];
-	}
-	case u32(7): {
-		return State7[ix - 3758096328];
-	}
-	case u32(8): {
-		return State8[ix - 4294967232];
-	}
 	default: {
-		return State9[ix - 536870840];
+		return State3[ix - 1610612712];
 	}
 	}
 }
@@ -98,26 +68,8 @@ fn StateSet(vl: f32, ix: u32) {
 	case u32(2): {
 		State2[ix - 1073741808] = vl;
 	}
-	case u32(3): {
-		State3[ix - 1610612712] = vl;
-	}
-	case u32(4): {
-		State4[ix - 2147483616] = vl;
-	}
-	case u32(5): {
-		State5[ix - 2684354520] = vl;
-	}
-	case u32(6): {
-		State6[ix - 3221225424] = vl;
-	}
-	case u32(7): {
-		State7[ix - 3758096328] = vl;
-	}
-	case u32(8): {
-		State8[ix - 4294967232] = vl;
-	}
 	default: {
-		State9[ix - 536870840] = vl;
+		State3[ix - 1610612712] = vl;
 	}
 	}
 }
@@ -134,26 +86,8 @@ fn StateSetAdd(vl: f32, ix: u32) {
 	case u32(2): {
 		State2[ix - 1073741808] += vl;
 	}
-	case u32(3): {
-		State3[ix - 1610612712] += vl;
-	}
-	case u32(4): {
-		State4[ix - 2147483616] += vl;
-	}
-	case u32(5): {
-		State5[ix - 2684354520] += vl;
-	}
-	case u32(6): {
-		State6[ix - 3221225424] += vl;
-	}
-	case u32(7): {
-		State7[ix - 3758096328] += vl;
-	}
-	case u32(8): {
-		State8[ix - 4294967232] += vl;
-	}
 	default: {
-		State9[ix - 536870840] += vl;
+		State3[ix - 1610612712] += vl;
 	}
 	}
 }
@@ -170,26 +104,8 @@ fn StateSetSub(vl: f32, ix: u32) {
 	case u32(2): {
 		State2[ix - 1073741808] -= vl;
 	}
-	case u32(3): {
-		State3[ix - 1610612712] -= vl;
-	}
-	case u32(4): {
-		State4[ix - 2147483616] -= vl;
-	}
-	case u32(5): {
-		State5[ix - 2684354520] -= vl;
-	}
-	case u32(6): {
-		State6[ix - 3221225424] -= vl;
-	}
-	case u32(7): {
-		State7[ix - 3758096328] -= vl;
-	}
-	case u32(8): {
-		State8[ix - 4294967232] -= vl;
-	}
 	default: {
-		State9[ix - 536870840] -= vl;
+		State3[ix - 1610612712] -= vl;
 	}
 	}
 }
@@ -206,26 +122,8 @@ fn StateSetMul(vl: f32, ix: u32) {
 	case u32(2): {
 		State2[ix - 1073741808] *= vl;
 	}
-	case u32(3): {
-		State3[ix - 1610612712] *= vl;
-	}
-	case u32(4): {
-		State4[ix - 2147483616] *= vl;
-	}
-	case u32(5): {
-		State5[ix - 2684354520] *= vl;
-	}
-	case u32(6): {
-		State6[ix - 3221225424] *= vl;
-	}
-	case u32(7): {
-		State7[ix - 3758096328] *= vl;
-	}
-	case u32(8): {
-		State8[ix - 4294967232] *= vl;
-	}
 	default: {
-		State9[ix - 536870840] *= vl;
+		State3[ix - 1610612712] *= vl;
 	}
 	}
 }
@@ -242,26 +140,8 @@ fn StateSetDiv(vl: f32, ix: u32) {
 	case u32(2): {
 		State2[ix - 1073741808] /= vl;
 	}
-	case u32(3): {
-		State3[ix - 1610612712] /= vl;
-	}
-	case u32(4): {
-		State4[ix - 2147483616] /= vl;
-	}
-	case u32(5): {
-		State5[ix - 2684354520] /= vl;
-	}
-	case u32(6): {
-		State6[ix - 3221225424] /= vl;
-	}
-	case u32(7): {
-		State7[ix - 3758096328] /= vl;
-	}
-	case u32(8): {
-		State8[ix - 4294967232] /= vl;
-	}
 	default: {
-		State9[ix - 536870840] /= vl;
+		State3[ix - 1610612712] /= vl;
 	}
 	}
 }
@@ -576,8 +456,8 @@ struct Parameters {
 	Hbar: f32,
 	Mass: f32,
 	VPotential: f32,
-	SelfField: i32,
 	EM: i32,
+	SelfField: i32,
 	A0NoWave: i32,
 	E: f32,
 	Mu0: f32,

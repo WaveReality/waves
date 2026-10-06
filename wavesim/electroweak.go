@@ -1406,8 +1406,8 @@ const (
 var ElectroweakConfigs = []InitFunc{
 	InitFunc{Name: "Higgs Broken", Doc: "Broken symmetry with Higgs field (Hs0a) at vacuum expectation value", Func: HiggsBroken, Current: true},
 	InitFunc{Name: "Higgs Symmetric", Doc: "Higgs starts at zero plus noise and falls off the top of the Mexican hat; watch Hmag climb to v^2 and ring", Func: HiggsSymmetric},
-	InitFunc{Name: "EM Pulse", Doc: "Transverse EM pulse travelling along X at exactly c; watch AYs", Func: EMPulse},
-	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 c, slower than light because the condensate gives it mass; watch ZY", Func: ZPulse},
+	InitFunc{Name: "EM Pulse", Doc: "Transverse EM pulse travelling along X at exactly C; Note that BYs and W3Ys are _aligned_ and thus cancel out the mass factor; watch AYs", Func: EMPulse},
+	InitFunc{Name: "Z Pulse", Doc: "Z boson pulse along X at about 0.75 C, slower than light because the BYs and W3Ys are at 180 degree opposite phases, so they do not cancel out, and thus experience a mass factor; watch ZY", Func: ZPulse},
 	InitFunc{Name: "Lepton Packets", Doc: "A neutrino and an electron as the same wave in the two halves of one doublet: the Higgs gives one of them a mass and cannot touch the other", Func: LeptonPackets},
 	InitFunc{Name: "W Collision", Doc: "Two W packets cross and generate longitudinal W^3 where they overlap: the non-abelian eps^abc coupling in action; watch W3Xs and ZX", Func: WCollision},
 }

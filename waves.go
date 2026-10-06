@@ -24,7 +24,7 @@ func main() {
 	// threed := false
 	threed := true
 	// these support 1D or 3D:
-	eqs := wavesim.Wave
+	// eqs := wavesim.Wave
 	// eqs := wavesim.WaveC
 	// eqs := wavesim.WaveCDir
 	// eqs := wavesim.KleinGordon
@@ -35,7 +35,7 @@ func main() {
 	// eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Dirac
 	// eqs := wavesim.Weyl
-	// eqs := wavesim.Electroweak
+	eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	t1sz := 512

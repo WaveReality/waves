@@ -48,8 +48,12 @@ var (
 	// and previous states. [Z][Y][X][VarsN][2]
 	// The display shows X-Y planes stacked in the Z dimension.
 	//gosl:dims 5
-	//gosl:nbuffs 10
+	//gosl:nbuffs 4
 	State *tensor.Float32
+
+	// todo: want 10 or more nbuffs when running locally. 4 is max for current 10 limits on mac
+	// on chrome. see https://github.com/cogentcore/lab/issues/71 for issues with being diff on
+	// diff platforms.
 )
 
 //gosl:end
