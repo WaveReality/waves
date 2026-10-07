@@ -4,7 +4,7 @@
     </a>
 </h1>
 
-Waves is a wave simulator for quantum physics wave equations, with an interactive 3D GUI interface that shows you the waves rippling across your screen. It is integrated into the [Wave Reality](https://wavereality.org) wiki-like interactive documentation of quantum physics, from the perspective where the quantum waves are physically real (i.e., the pilot-wave approach of de Broglie & Bohm). See that link for full documentation of all the physics that goes into this simulator.
+**Waves** is a wave simulator for quantum physics wave equations, with an interactive 3D GUI interface that shows you the waves rippling across your screen. It is integrated into the [Wave Reality](https://wavereality.org) wiki-like interactive documentation of quantum physics, from the perspective where the quantum waves are physically real (i.e., the pilot-wave approach of de Broglie & Bohm). See that link for full documentation of all the physics that goes into this simulator.
 
 Waves supports every relevant type of quantum wave, from the basic second-order "physical" wave, to Maxwell's equations for electromagnetic fields (based on the A four-potential), to Schrodinger, Klein-Gordon, Dirac, Weyl, and finally, the full electroweak (EW) system of coupled wave equations that simulates the Higgs boson interacting with four copies of a Maxwell-like four-potential, to generate the massless EM field along with the massive W and Z boson fields of the weak force. This EW system couples with Weyl fermions (electrons and neutrinos), and demonstrates the full symmetry breaking phenomena, to show where mass comes from in the Standard Model.
 
