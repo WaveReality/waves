@@ -1,4 +1,8 @@
-# waves
+<h1 align="center">
+    <a href="https://wavereality.org">
+        <img alt="WaveReality Logo" src="icon.svg"><br>
+    </a>
+</h1>
 
 Waves is a wave simulator for quantum physics wave equations, with an interactive 3D GUI interface that shows you the waves rippling across your screen. It is integrated into the [Wave Reality](https://wavereality.org) wiki-like interactive documentation of quantum physics, from the perspective where the quantum waves are physically real (i.e., the pilot-wave approach of de Broglie & Bohm). See that link for full documentation of all the physics that goes into this simulator.
 
@@ -11,4 +15,8 @@ In technical terms, the waves are simulated using lattice-based explicit forward
 ## Use of AI
 
 Claude (Opus 5.5) was used after the initial app was written entirely by the main human author (Randall O'Reilly) (starting on 20 Sept, 2026), and everything was carefully reviewed and guided by me. The summary transcript of all the prompts and output from Claude is available in: xxx. Given my lack of knowledge about many technical details, Claude was invaluable for writing all the appropriate tests, and for implementing the electroweak sector especially. I had previously hand-written all the basic wave equations up to the Dirac, in an earlier version of this simulator written in C++.
+
+## News
+
+* Oct, 2026: Version 1.0 released.
 
