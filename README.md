@@ -1,6 +1,6 @@
 <h1 align="center">
     <a href="https://wavereality.org">
-        <img alt="WaveReality Logo" src="icon.svg" height="30"<br>
+        <img alt="WaveReality Logo" src="icon.svg" height="128"<br>
     </a>
 </h1>
 
