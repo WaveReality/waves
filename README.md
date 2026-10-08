@@ -14,7 +14,7 @@ In technical terms, the waves are simulated using lattice-based explicit forward
 
 ## Use of AI
 
-Claude (Opus 5.5) was used after the initial app was written entirely by the main human author (Randall O'Reilly) (starting on 20 Sept, 2026), and everything was carefully reviewed and guided by me. The summary transcript of all the prompts and output from Claude is available in: xxx. Given my lack of knowledge about many technical details, Claude was invaluable for writing all the appropriate tests, and for implementing the electroweak sector especially. I had previously hand-written all the basic wave equations up to the Dirac, in an earlier version of this simulator written in C++.
+Claude (Opus 5.5) was used after the initial app was written entirely by the main human author (Randall O'Reilly) (starting on 20 Sept, 2026), and everything was carefully reviewed and guided by me. The summary transcript of all the prompts and output from Claude is available in [notes](notes). Given my lack of knowledge about many technical details, Claude was invaluable for writing all the appropriate tests, and for implementing the electroweak sector especially. I had previously hand-written all the basic wave equations up to the Dirac, in an earlier version of this simulator written in C++.
 
 ## News
 

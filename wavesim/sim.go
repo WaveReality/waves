@@ -218,6 +218,7 @@ func (ss *Sim) Reset() { //types:add
 func (ss *Sim) ConfigState() {
 	ctx := GetCtx(0)
 	ctx.Size.SetV(ss.Config.Size)
+	ss.Config.curSize = ss.Config.Size
 	nvar := int(ss.StateVars.Int64())
 	ctx.NVars = int32(nvar)
 	if State == nil {

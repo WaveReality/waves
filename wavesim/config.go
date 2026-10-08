@@ -120,11 +120,9 @@ func (cfg *Config) Update() {
 	}
 	if cfg.Equation != cfg.curEquation {
 		cfg.curEquation = cfg.Equation
-		cfg.curSize = cfg.Size
 		cfg.sim.ConfigEquation()
 	}
 	if cfg.Size != cfg.curSize {
-		cfg.curSize = cfg.Size
 		cfg.sim.RebuildState()
 	}
 }
