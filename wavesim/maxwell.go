@@ -222,6 +222,7 @@ func (ss *Sim) MaxwellConfig() {
 	ss.initFuncs = MaxwellConfigs
 	ss.MaxwellStats()
 	ss.Params.ThreeD.SetBool(true)
+	ss.Params.Mu0 = 1.0
 	ss.Config.Wavelength = 16
 	ss.Config.PacketWidth = 2 * ss.Config.Wavelength
 	ss.Config.Velocity.X = 0.5 * ss.Params.C
