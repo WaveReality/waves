@@ -42,39 +42,41 @@ func (ss *Sim) RunStats(init bool) {
 	}
 }
 
-// StateMax returns the largest value of the vr variable over the interior.
+// StateMax returns the largest value of the vr variable over entire state.
 func StateMax(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
+	vrn := len(vr.Values())
+	cpi := int(curPrv)
 	mx := float32(-math32.MaxFloat32)
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				v := State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
-				if v > mx {
-					mx = v
-				}
-			}
+	for i, v := range State.Values {
+		if i%2 != cpi {
+			continue
+		}
+		if (i/2)%vrn != vri {
+			continue
+		}
+		if v > mx {
+			mx = v
 		}
 	}
 	return float64(mx)
 }
 
-// StateMin returns the smallest value of the vr variable over the interior.
+// StateMin returns the smallest value of the vr variable over the entire state.
 func StateMin(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
+	vrn := len(vr.Values())
+	cpi := int(curPrv)
 	mn := float32(math32.MaxFloat32)
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				v := State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
-				if v < mn {
-					mn = v
-				}
-			}
+	for i, v := range State.Values {
+		if i%2 != cpi {
+			continue
+		}
+		if (i/2)%vrn != vri {
+			continue
+		}
+		if v < mn {
+			mn = v
 		}
 	}
 	return float64(mn)
@@ -83,43 +85,50 @@ func StateMin(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 // StateMaxAbs returns the largest abs(value) of the vr variable over the interior.
 func StateMaxAbs(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
+	vrn := len(vr.Values())
+	cpi := int(curPrv)
 	mx := float32(-math32.MaxFloat32)
-	var c math32.Vector3i
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				v := math32.Abs(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)))
-				if v > mx {
-					mx = v
-				}
-			}
+	for i, v := range State.Values {
+		if i%2 != cpi {
+			continue
+		}
+		if (i/2)%vrn != vri {
+			continue
+		}
+		v = math32.Abs(v)
+		if v > mx {
+			mx = v
 		}
 	}
 	return float64(mx)
 }
 
 // StateMaxVectorLen returns the largest vector length of the vr variable + 2
-// additional components, over the interior.
+// additional components, over the entire state.
 func StateMaxVectorLen(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 	vri := int(vr.Int64())
+	vrn := len(vr.Values())
+	cpi := int(curPrv)
 	mx := float32(-math32.MaxFloat32)
-	var c math32.Vector3i
-	var v math32.Vector3
-	for c.Z = range sz.Z {
-		for c.Y = range sz.Y {
-			for c.X = range sz.X {
-				f := c.AddScalar(1)
-				v.Set(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)), State.Value(int(f.Z), int(f.Y), int(f.X), int(vri+1), int(curPrv)), State.Value(int(f.Z), int(f.Y), int(f.X), int(vri+2), int(curPrv)))
-				l := v.Length()
-				if l > mx {
-					mx = l
-				}
-			}
+	var vec math32.Vector3
+	for i, v := range State.Values {
+		if i%2 != cpi {
+			continue
+		}
+		if (i/2)%vrn != vri {
+			continue
+		}
+		vec.Set(v, State.Values[i+1], State.Values[i+2])
+		l := vec.Length()
+		if l > mx {
+			mx = l
 		}
 	}
 	return float64(mx)
 }
+
+// todo: this needs to exclude edges, but the state indexing call is expensive on CPU..
+// see if the shortcut skipping is faster..
 
 // StateSum computes the sum of given variable at given cur vs. prev state
 // with given non-edge size.

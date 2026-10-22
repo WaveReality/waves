@@ -12,8 +12,10 @@ import (
 	"cogentcore.org/core/base/fsx"
 	"cogentcore.org/core/base/iox/gzipx"
 	"cogentcore.org/core/cli"
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/enums"
 	"cogentcore.org/core/math32"
+	"cogentcore.org/core/system"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/lab/base/randx"
 	"cogentcore.org/lab/tensor"
@@ -98,6 +100,17 @@ type Sim struct {
 func Run(configFunc, initFunc func(sim *Sim)) *Sim {
 	cfg := &Config{}
 	cfg.Defaults()
+	// A browser has no config.toml to turn on the GUI, and the
+	// app only stays running while it shows its window there.
+	if core.TheApp.Platform() == system.Web {
+		cfg.GUI = true
+	}
+	// core build runs the app with -generatehtml for the HTML preview
+	// of its window, which is not a flag of Config.
+	if system.GenerateHTMLArg() {
+		cfg.GUI = true
+		return RunSim(cfg, configFunc, initFunc)
+	}
 	opts := cli.DefaultOptions("Waves", "Waves")
 	opts.DefaultFiles = append(opts.DefaultFiles, "config.toml")
 	opts.SearchUp = true // so that the sim can be run from the command subdirectory

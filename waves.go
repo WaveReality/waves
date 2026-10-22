@@ -32,10 +32,10 @@ func main() {
 
 	// 3D only:
 	// eqs := wavesim.Maxwell
-	// eqs := wavesim.KleinGordonC
+	eqs := wavesim.KleinGordonC
 	// eqs := wavesim.Dirac
 	// eqs := wavesim.Weyl
-	eqs := wavesim.Electroweak
+	// eqs := wavesim.Electroweak
 	// eqs := wavesim.Spinfield
 
 	t1sz := 512

@@ -104,7 +104,9 @@ func (gui *GUI) SetStopNow() {
 // Stopped is called when a run method stops running,
 // from a separate goroutine (do not call from main event loop).
 // Turns off the isRunning flag, calls OnStop,
-// and calls GoUpdateWindow to update window state.
+// and calls GoUpdateToolbar to update the enabled states of the run buttons.
+// A run does not change the values shown in SimForm, so updating it here
+// would only cost a layout of the whole scene.
 func (gui *GUI) Stopped() {
 	gui.runMu.Lock()
 	gui.isRunning = false
@@ -113,7 +115,18 @@ func (gui *GUI) Stopped() {
 	// if gui.OnStop != nil {
 	// 	gui.OnStop(mode, level)
 	// }
-	gui.GoUpdateWindow()
+	gui.GoUpdateToolbar()
+}
+
+// GoUpdateToolbar restyles the toolbar, for the enabled states of its buttons,
+// from a separate goroutine. It does not need a new layout.
+func (gui *GUI) GoUpdateToolbar() {
+	if gui.Toolbar == nil {
+		return
+	}
+	gui.Toolbar.AsyncLock()
+	defer gui.Toolbar.AsyncUnlock()
+	gui.Toolbar.Restyle()
 }
 
 // NewGUIBody returns a new GUI, with an initialized Body by calling [gui.MakeBody].
