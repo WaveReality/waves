@@ -27,7 +27,7 @@ var done = false
 func FitPacketMain() {
 	wavesim.Run(
 		func(sim *wavesim.Sim) {
-			sim.Config.Equation = wavesim.Wave1D
+			sim.Config.Equation = wavesim.Wave
 			sim.Config.Size.Set(1000, 1, 1)
 			// sim.Config.Size.Set(80, 1, 1)
 		},
@@ -95,7 +95,7 @@ func FitPacketPos(st *tensor.Float32, maxX, vidx, curprv int, minPos, maxPos, st
 				continue
 			}
 			d := float32(x-1) - pos
-			t := math32.Abs(wavesim.WavePacket(d, d, wavelength, width, phase, amp))
+			t := math32.Abs(wavesim.GaussWave(d, d, wavelength, width, phase, amp))
 			erd := math32.Abs(v - t)
 			er += erd
 			//	if math32.Abs(pos - 26.2) < 0.001 {
@@ -123,7 +123,7 @@ func FitPacketWidth(st *tensor.Float32, maxX, vidx, curprv int, minWd, maxWd, st
 				continue
 			}
 			d := float32(x-1) - pos
-			t := math32.Abs(wavesim.WavePacket(d, d, wavelength, wd, phase, amp))
+			t := math32.Abs(wavesim.GaussWave(d, d, wavelength, wd, phase, amp))
 			erd := math32.Abs(v - t)
 			er += erd
 			//	if math32.Abs(per - 12) < 0.001 {
@@ -151,7 +151,7 @@ func FitPacketWavelength(st *tensor.Float32, maxX, vidx, curprv int, minPer, max
 				continue
 			}
 			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, per, width, phase, amp)
+			t := wavesim.GaussWave(d, d, per, width, phase, amp)
 			erd := float32(0)
 			if math32.Sign(v) != math32.Sign(t) {
 				erd = 1
@@ -176,7 +176,7 @@ func FitPacketPhase(st *tensor.Float32, maxX, vidx, curprv int, minPhs, maxPhs, 
 		for x := range maxX {
 			v := st.Value(int(1), int(1), int(x), int(vidx), int(curprv))
 			d := float32(x-1) - pos
-			t := wavesim.WavePacket(d, d, wavelength, width, phs, amp)
+			t := wavesim.GaussWave(d, d, wavelength, width, phs, amp)
 			erd := float32(0)
 			if math32.Sign(v) != math32.Sign(t) {
 				erd = 1
@@ -198,7 +198,7 @@ func FitPacketErr(print bool, st *tensor.Float32, maxX, vidx, curprv int, pos, w
 	for x := range maxX {
 		v := st.Value(int(1), int(1), int(x), int(vidx), int(curprv))
 		d := float32(x-1) - pos
-		t := wavesim.WavePacket(d, d, wavelength, width, phase, amp)
+		t := wavesim.GaussWave(d, d, wavelength, width, phase, amp)
 		erd := math32.Abs(v - t)
 		er += erd
 		if print {
