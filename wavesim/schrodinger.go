@@ -50,12 +50,12 @@ func SchrodingerAKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	pposA := State.Value5D(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value5D(int(z), int(y), int(x), int(CabBs), int(prv))
 
 	hbar := Params[0].Hbar
 	hm := Params[0].HSqOver2M / hbar // hbar / 2m
-	voh := State.Value(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
+	voh := State.Value5D(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
 
 	var lap float32
 	if Params[0].ThreeD.IsTrue() {
@@ -64,8 +64,8 @@ func SchrodingerAKernel(i uint32) { //gosl:kernel
 		lap = Laplacian1D(x, y, z, int32(CabBs), prv, pposB)
 	}
 	velA := -hm*lap + voh*pposB // first order: the velocity IS the derivative
-	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
-	State.Set(pposA+velA, int(z), int(y), int(x), int(CabAs), int(cur))
+	State.Set5D(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set5D(pposA+velA, int(z), int(y), int(x), int(CabAs), int(cur))
 }
 
 // SchrodingerBKernel advances b from the a that SchrodingerAKernel just wrote,
@@ -79,12 +79,12 @@ func SchrodingerBKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
-	posA := State.Value(int(z), int(y), int(x), int(CabAs), int(cur)) // the new a: this is the whole point
+	pposB := State.Value5D(int(z), int(y), int(x), int(CabBs), int(prv))
+	posA := State.Value5D(int(z), int(y), int(x), int(CabAs), int(cur)) // the new a: this is the whole point
 
 	hbar := Params[0].Hbar
 	hm := Params[0].HSqOver2M / hbar
-	voh := State.Value(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
+	voh := State.Value5D(int(z), int(y), int(x), int(CabV), int(prv)) / hbar
 
 	var lap float32
 	if Params[0].ThreeD.IsTrue() {
@@ -105,17 +105,17 @@ func SchrodingerBKernel(i uint32) { //gosl:kernel
 		posA *= df
 		posB *= df
 		velB *= df
-		State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
-		State.Set(df*State.Value(int(z), int(y), int(x), int(CabAv), int(cur)), int(z), int(y), int(x), int(CabAv), int(cur))
+		State.Set5D(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+		State.Set5D(df*State.Value5D(int(z), int(y), int(x), int(CabAv), int(cur)), int(z), int(y), int(x), int(CabAv), int(cur))
 	}
-	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
+	State.Set5D(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set5D(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 
 	// the norm a^2 + b^2 is NOT what a staggered scheme conserves: a and b sit
 	// half a step apart, so squaring b compares it with itself at the wrong
 	// time and the total ripples at the level rate. What is exactly conserved
 	// is a^2 + b(t-1/2) b(t+1/2), and this kernel holds all three.
-	State.Set(posA*posA+pposB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
+	State.Set5D(posA*posA+pposB*posB, int(z), int(y), int(x), int(CabMag), int(cur))
 }
 
 //gosl:end

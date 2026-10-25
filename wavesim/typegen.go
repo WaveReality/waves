@@ -537,13 +537,13 @@ var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.Sp
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.SpinfieldViewAll", Doc: "SpinfieldViewAll configures the View to display Spinfield values", Args: []string{"view"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMax", Doc: "StateMax returns the largest value of the vr variable over the interior.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMax", Doc: "StateMax returns the largest value of the vr variable over entire state.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMin", Doc: "StateMin returns the smallest value of the vr variable over the interior.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMin", Doc: "StateMin returns the smallest value of the vr variable over the entire state.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMaxAbs", Doc: "StateMaxAbs returns the largest abs(value) of the vr variable over the interior.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
-var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMaxVectorLen", Doc: "StateMaxVectorLen returns the largest vector length of the vr variable + 2\nadditional components, over the interior.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
+var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateMaxVectorLen", Doc: "StateMaxVectorLen returns the largest vector length of the vr variable + 2\nadditional components, over the entire state.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 
 var _ = types.AddFunc(&types.Func{Name: "github.com/WaveReality/waves/wavesim.StateSum", Doc: "StateSum computes the sum of given variable at given cur vs. prev state\nwith given non-edge size.", Args: []string{"sz", "vr", "curPrv"}, Returns: []string{"float64"}})
 

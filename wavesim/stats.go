@@ -140,7 +140,7 @@ func StateSum(sz math32.Vector3i, vr enums.Enum, curPrv int32) float64 {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				sum += float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)))
+				sum += float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv)))
 			}
 		}
 	}
@@ -203,7 +203,7 @@ func (ss *Sim) StatParticle(idx int) func(init bool) {
 				continue
 			}
 			vri := int(pv.Int64())
-			stat := float64(Particles.Value(int(idx), int(vri)))
+			stat := float64(Particles.Value2D(int(idx), int(vri)))
 			tsr.AppendRowFloat(stat)
 		}
 	}
@@ -288,7 +288,7 @@ func StateMoments(sz math32.Vector3i, dim math32.Dims, curPrv int32, square bool
 				di := int(c.Dim(dim))
 				d := float64(di)
 				for i := range nv {
-					w := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(vris[i]), int(curPrv)))
+					w := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vris[i]), int(curPrv)))
 					if square {
 						w *= w
 					}
@@ -423,10 +423,9 @@ func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum)
 				dt.SetNumRows(0)
 				// only the RATES are on by default: they share a scale, where
 				// a width in cubes would flatten them against the axis
-				//
-				//	plot.SetFirstStyler(dt, func(s *plot.Style) {
-				//		s.On = true
-				//	})
+				// plot.SetFirstStyler(dt, func(s *plot.Style) {
+				// 	s.On = true
+				// })
 				metadata.SetDoc(wt, "Packet width of "+vr.String()+" along "+dim.String()+", in cubes: the rms spread of its intensity")
 				metadata.SetDoc(dt, "Spreading rate of "+vr.String()+" along "+dim.String()+", in units of C, on the same scale as the group velocity: dispersion along the direction of travel, diffraction across it")
 				if !vel {
@@ -436,9 +435,9 @@ func (ss *Sim) statGroupVel(vel, square bool, dim math32.Dims, vrs []enums.Enum)
 				vt := ss.Stats.Float64(StatGroupVelName(vr, dim))
 				ct.SetNumRows(0)
 				vt.SetNumRows(0)
-				//	plot.SetFirstStyler(vt, func(s *plot.Style) {
-				//		s.On = true
-				//	})
+				// plot.SetFirstStyler(vt, func(s *plot.Style) {
+				// 	s.On = true
+				// })
 				metadata.SetDoc(ct, "Intensity centroid of "+vr.String()+" along "+dim.String()+", in cubes")
 				metadata.SetDoc(vt, "Group velocity of "+vr.String()+" along "+dim.String()+", in units of C")
 			}
@@ -534,7 +533,7 @@ func (ss *Sim) StatSumSq(name string, vrs ...enums.Enum) func(init bool) {
 				for c.X = range sz.X {
 					f := c.AddScalar(1)
 					for i := range vris {
-						v := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(vris[i]), int(cur)))
+						v := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vris[i]), int(cur)))
 						sum += v * v
 					}
 				}
@@ -565,9 +564,9 @@ func (ss *Sim) StatWeightedMean(name string, vr, wtVr enums.Enum) func(init bool
 			for c.Y = range sz.Y {
 				for c.X = range sz.X {
 					f := c.AddScalar(1)
-					w := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(wti), int(cur)))
+					w := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(wti), int(cur)))
 					w *= w
-					num += w * float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(cur)))
+					num += w * float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vri), int(cur)))
 					den += w
 				}
 			}
@@ -603,7 +602,7 @@ func StateAt(sz math32.Vector3i, vri int, pos math32.Vector3, curPrv int32) floa
 	c.Y = min(max(c.Y, 0), sz.Y-1)
 	c.Z = min(max(c.Z, 0), sz.Z-1)
 	f := c.AddScalar(1)
-	return State.Value(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
+	return State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vri), int(curPrv))
 }
 
 // invSqrt3 is 1/sqrt(3), normalizing the (1,1,1) diagonal.
@@ -640,7 +639,7 @@ func StateAtInterp(sz math32.Vector3i, vri int, pos math32.Vector3, curPrv int32
 				c.Y = min(max(c.Y, 0), sz.Y-1)
 				c.Z = min(max(c.Z, 0), sz.Z-1)
 				g := c.AddScalar(1)
-				tot += wx * wy * wz * State.Value(int(g.Z), int(g.Y), int(g.X), int(vri), int(curPrv))
+				tot += wx * wy * wz * State.Value5D(int(g.Z), int(g.Y), int(g.X), int(vri), int(curPrv))
 			}
 		}
 	}

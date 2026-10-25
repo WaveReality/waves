@@ -569,29 +569,37 @@ const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
 fn WaveCBKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-; if (!ok) {
-	return;
-}; var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var pb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(prv)));
-; var na = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], // the new a: this is the whole point
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
-; var la: f32;; if (Params[0].ThreeD == 1) {
-	la = Laplacian19(x, y, z, i32(WaveCa), cur, na);
-} else {
-	la = Laplacian1D(x, y, z, i32(WaveCa), cur, na);
-}; var nb = pb + Params[0].C*la;
-; if (Params[0].Edges == EdgesDamp) { // the absorbing layer: see EdgeDampFactor
-	var df = EdgeDampFactor(x, y, z, vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z));
-	na *= df;
-	nb *= df;
-	StateSet(na, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
-}; StateSet(nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(cur)));; StateSet(na*na + pb*nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCMag), u32(cur))); }
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+	if (!ok) {
+		return;
+	}
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var pb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(prv)));
+	var na = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], // the new a: this is the whole point
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
+	var la: f32;
+	if (Params[0].ThreeD == 1) {
+		la = Laplacian19(x, y, z, i32(WaveCa), cur, na);
+	} else {
+		la = Laplacian1D(x, y, z, i32(WaveCa), cur, na);
+	}
+	var nb = pb + Params[0].C*la;
+	if (Params[0].Edges == EdgesDamp) { // the absorbing layer: see EdgeDampFactor
+		var df = EdgeDampFactor(x, y, z, vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z));
+		na *= df;
+		nb *= df;
+		StateSet(na, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
+	}
+	StateSet(nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(cur)));
+	StateSet(na*na + pb*nb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCMag), u32(cur)));
+}
 
 //////// import: "wavecdir.go"
 

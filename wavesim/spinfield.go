@@ -94,10 +94,10 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	sz := ctx.Size.V()
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
+	pposA := State.Value5D(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value5D(int(z), int(y), int(x), int(CabBs), int(prv))
+	pvelA := State.Value5D(int(z), int(y), int(x), int(CabAv), int(prv))
+	pvelB := State.Value5D(int(z), int(y), int(x), int(CabBv), int(prv))
 
 	csq := Params[0].CSq
 	omega0 := Params[0].Omega0
@@ -107,12 +107,12 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	// hcsq := csq * hbar * hbar
 	// mhsq := Params[0].MOverHSq
 
-	particle := State.Value(int(z), int(y), int(x), int(SpinfieldParticle), int(prv))
+	particle := State.Value5D(int(z), int(y), int(x), int(SpinfieldParticle), int(prv))
 
 	maxNeigh := NeighMax26(x, y, z, int32(SpinfieldDist), prv)
 
-	s0a := State.Value(int(z), int(y), int(x), int(Spinfield0a), int(prv))
-	s0b := State.Value(int(z), int(y), int(x), int(Spinfield0b), int(prv))
+	s0a := State.Value5D(int(z), int(y), int(x), int(Spinfield0a), int(prv))
+	s0b := State.Value5D(int(z), int(y), int(x), int(Spinfield0b), int(prv))
 	var dist, drive, d0a, d0b float32
 	if particle != 0 {
 		dist = 1
@@ -120,7 +120,7 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 		d0a = s0a
 		d0b = s0b
 	} else {
-		dist = State.Value(int(z), int(y), int(x), int(SpinfieldDist), int(prv))
+		dist = State.Value5D(int(z), int(y), int(x), int(SpinfieldDist), int(prv))
 		distF := Laplacian19(x, y, z, int32(SpinfieldDist), prv, dist)
 		dist += diff * distF // no velocity
 
@@ -132,8 +132,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 			drive = math32.Pow(decay, 1.0/dist)
 		}
 	}
-	State.Set(dist, int(z), int(y), int(x), int(SpinfieldDist), int(cur))
-	State.Set(drive, int(z), int(y), int(x), int(SpinfieldDrive), int(cur))
+	State.Set5D(dist, int(z), int(y), int(x), int(SpinfieldDist), int(cur))
+	State.Set5D(drive, int(z), int(y), int(x), int(SpinfieldDrive), int(cur))
 
 	s0a += drive * (d0a - s0a)
 	s0b += drive * (d0b - s0b)
@@ -141,8 +141,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	s0a -= omega0 * s0b // everybody update to present tense
 	s0b += omega0 * s0a
 
-	State.Set(s0a, int(z), int(y), int(x), int(Spinfield0a), int(cur))
-	State.Set(s0b, int(z), int(y), int(x), int(Spinfield0b), int(cur))
+	State.Set5D(s0a, int(z), int(y), int(x), int(Spinfield0a), int(cur))
+	State.Set5D(s0b, int(z), int(y), int(x), int(Spinfield0b), int(cur))
 
 	forceA := Laplacian19(x, y, z, int32(CabAs), prv, pposA)
 	forceB := Laplacian19(x, y, z, int32(CabBs), prv, pposB)
@@ -166,11 +166,11 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	// curY := pposA*grBY - pposB*grAY
 	// curZ := pposA*grBZ - pposB*grAZ
 
-	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+	State.Set5D(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set5D(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
+	State.Set5D(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set5D(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 
 	// State[z, y, x, CabCharge, cur] = chg
 	// State[z, y, x, CabCurrentX, cur] = curX
@@ -190,10 +190,10 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	lorentz := 1.0 / math32.Sqrt(1.0-(pvSq/csq))
 	esq := Params[0].C6M2 / (csq - pvSq)
 
-	State.Set(pvX, int(z), int(y), int(x), int(SpinfieldPvelX), int(cur))
-	State.Set(pvY, int(z), int(y), int(x), int(SpinfieldPvelY), int(cur))
-	State.Set(pvZ, int(z), int(y), int(x), int(SpinfieldPvelZ), int(cur))
-	State.Set(esq, int(z), int(y), int(x), int(SpinfieldPESq), int(cur))
+	State.Set5D(pvX, int(z), int(y), int(x), int(SpinfieldPvelX), int(cur))
+	State.Set5D(pvY, int(z), int(y), int(x), int(SpinfieldPvelY), int(cur))
+	State.Set5D(pvZ, int(z), int(y), int(x), int(SpinfieldPvelZ), int(cur))
+	State.Set5D(esq, int(z), int(y), int(x), int(SpinfieldPESq), int(cur))
 
 	if particle == 0 {
 		return
@@ -240,7 +240,7 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	}
 
 	if mvX == 0 && mvY == 0 && mvZ == 0 { // not moving..
-		State.Set(particle, int(z), int(y), int(x), int(SpinfieldParticle), int(cur))
+		State.Set5D(particle, int(z), int(y), int(x), int(SpinfieldParticle), int(cur))
 		SetParticleAt(0, lorentz, esq, math32.Vec3i(x, y, z), math32.Vec3(pvX, pvY, pvZ))
 		return
 	}
@@ -249,8 +249,8 @@ func SpinfieldKernel(i uint32) { //gosl:kernel
 	my := y + mvY
 	mz := z + mvZ
 
-	State.Set(0.0, int(z), int(y), int(x), int(SpinfieldParticle), int(cur))
-	State.Set(particle, int(mz), int(my), int(mx), int(SpinfieldParticle), int(cur))
+	State.Set5D(0.0, int(z), int(y), int(x), int(SpinfieldParticle), int(cur))
+	State.Set5D(particle, int(mz), int(my), int(mx), int(SpinfieldParticle), int(cur))
 
 	SetParticleAt(0, lorentz, esq, math32.Vec3i(mx, my, mz), math32.Vec3(pvX, pvY, pvZ))
 }

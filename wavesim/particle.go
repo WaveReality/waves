@@ -42,20 +42,20 @@ const (
 
 // SetParticleAt sets particle dynamic data at given index.
 func SetParticleAt(idx int32, lorentz, esq float32, pos math32.Vector3i, vel math32.Vector3) {
-	Particles.Set(lorentz, int(idx), int(ParticleLorentz))
-	Particles.Set(esq, int(idx), int(ParticleESq))
-	Particles.Set(float32(pos.X), int(idx), int(ParticlePosX))
-	Particles.Set(float32(pos.Y), int(idx), int(ParticlePosY))
-	Particles.Set(float32(pos.Z), int(idx), int(ParticlePosZ))
+	Particles.Set2D(lorentz, int(idx), int(ParticleLorentz))
+	Particles.Set2D(esq, int(idx), int(ParticleESq))
+	Particles.Set2D(float32(pos.X), int(idx), int(ParticlePosX))
+	Particles.Set2D(float32(pos.Y), int(idx), int(ParticlePosY))
+	Particles.Set2D(float32(pos.Z), int(idx), int(ParticlePosZ))
 }
 
 // GetParticleAt gets particle dynamic data at given index.
 func GetParticleAt(idx int32) (lorentz, esq float32, pos math32.Vector3i, vel math32.Vector3) {
-	lorentz = Particles.Value(int(idx), int(ParticleLorentz))
-	esq = Particles.Value(int(idx), int(ParticleESq))
-	pos.X = int32(Particles.Value(int(idx), int(ParticlePosX)))
-	pos.Y = int32(Particles.Value(int(idx), int(ParticlePosY)))
-	pos.Z = int32(Particles.Value(int(idx), int(ParticlePosZ)))
+	lorentz = Particles.Value2D(int(idx), int(ParticleLorentz))
+	esq = Particles.Value2D(int(idx), int(ParticleESq))
+	pos.X = int32(Particles.Value2D(int(idx), int(ParticlePosX)))
+	pos.Y = int32(Particles.Value2D(int(idx), int(ParticlePosY)))
+	pos.Z = int32(Particles.Value2D(int(idx), int(ParticlePosZ)))
 	return
 }
 

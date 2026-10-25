@@ -536,107 +536,131 @@ const  SpinfieldYb: SpinfieldStates = 40;
 const  SpinfieldZa: SpinfieldStates = 41;
 const  SpinfieldZb: SpinfieldStates = 42;
 fn SpinfieldKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-; if (!ok) {
-	return;
-}; var sz = vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z);
-; var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var pposA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(prv)));
-; var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(prv)));
-; var pvelA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(prv)));
-; var pvelB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(prv)));
-; var csq = Params[0].CSq;
-; var omega0 = Params[0].Omega0;
-; var diff = Params[0].Diff;
-; var decay = Params[0].Decay;
-;
-var particle = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(prv)));
-; var maxNeigh = NeighMax26(x, y, z, i32(SpinfieldDist), prv);
-; var s0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(prv)));
-; var s0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(prv)));
-; var dist: f32;
-var drive: f32;
-var d0a: f32;
-var d0b: f32;; if (particle != 0) {
-	dist = f32(1);
-	drive = f32(1);
-	d0a = s0a;
-	d0b = s0b;
-} else {
-	dist = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDist), u32(prv)));
-	var distF = Laplacian19(x, y, z, i32(SpinfieldDist), prv, dist);
-	dist += diff * distF; // no velocity
-	d0a = NeighValue(maxNeigh, x, y, z, i32(Spinfield0a), prv);
-	d0b = NeighValue(maxNeigh, x, y, z, i32(Spinfield0b), prv);
-	if (dist < 0.001) {
-		drive = f32(0);
-	} else {
-		drive = pow(decay, 1.0/dist);
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+	if (!ok) {
+		return;
 	}
-}; StateSet(dist, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDist), u32(cur)));; StateSet(drive, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDrive), u32(cur)));; s0a += drive * (d0a - s0a);
-; s0b += drive * (d0b - s0b);
-; s0a -= omega0 * s0b;
-; // everybody update to present tense
-s0b += omega0 * s0a;
-; StateSet(s0a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(cur)));; StateSet(s0b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(cur)));; var forceA = Laplacian19(x, y, z, i32(CabAs), prv, pposA);
-; var forceB = Laplacian19(x, y, z, i32(CabBs), prv, pposB);
-; forceA += drive * (s0a - pposA);
-; forceB += drive * (s0b - pposB);
-; var velA = pvelA + csq*forceA;
-; var posA = pposA + velA;
-; var velB = pvelB + csq*forceB;
-; var posB = pposB + velB;
-;
-StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(cur)));; StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(cur)));; StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(cur)));; StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));;
-var pvX: f32;
-var pvY: f32;
-var pvZ: f32;; var pvSq = pvX*pvX + pvY*pvY + pvZ*pvZ;
-; var lorentz = 1.0 / sqrt(1.0-(pvSq/csq));
-; var esq = Params[0].C6M2 / (csq - pvSq);
-; StateSet(pvX, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelX), u32(cur)));; StateSet(pvY, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelY), u32(cur)));; StateSet(pvZ, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelZ), u32(cur)));; StateSet(esq, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-u32(z), u32(y), u32(x), u32(SpinfieldPESq), u32(cur)));; if (particle == 0) {
-	return;
-}; var e = 0.5 * (1.0 + pvSq);
-; var pXp = 0.5 * (e + pvX);
-; var pXn = 0.5 * (e - pvX);
-; var pYp = 0.5 * (e + pvY);
-; var pYn = 0.5 * (e - pvY);
-; var pZp = 0.5 * (e + pvZ);
-; var pZn = 0.5 * (e - pvZ);
-; var rndX = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(0)));
-; var rndY = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(1)));
-; var rndZ = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(2)));
-; var mvX = i32(0);
-; if (rndX < pXp && x < sz.x) {
-	mvX = i32(1);
-} else if (rndX < pXp+pXn && x > 1) {
-	mvX = i32(-1);
-}; var mvY = i32(0);
-; if (rndY < pYp && y < sz.y) {
-	mvY = i32(1);
-} else if (rndY < pYp+pYn && y > 1) {
-	mvY = i32(-1);
-}; var mvZ = i32(0);
-; if (rndZ < pZp && z < sz.z) {
-	mvZ = i32(1);
-} else if (rndZ < pZp+pZn && z > 1) {
-	mvZ = i32(-1);
-}; if (Params[0].ThreeD == 0 || Params[0].Move == 0) {
-	mvY = i32(0);
-	mvZ = i32(0);
-}; if (Params[0].Move == 0) {
-	mvX = i32(0);
-}; if (mvX == 0 && mvY == 0 && mvZ == 0) { // not moving..
-	StateSet(particle, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(cur)));
-	SetParticleAt(i32(i32(0)), lorentz, esq, vec3<i32>(x, y, z), vec3<f32>(pvX, pvY, pvZ));return;
-}; var mx = x + mvX;
-; var my = y + mvY;
-; var mz = z + mvZ;
-; StateSet(0.0, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(cur)));; StateSet(particle, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(mz), u32(my), u32(mx), u32(SpinfieldParticle), u32(cur)));; SetParticleAt(i32(i32(0)), lorentz, esq, vec3<i32>(mx, my, mz), vec3<f32>(pvX, pvY, pvZ)); }
+	var sz = vec3<i32>(ctx.Size.x,ctx.Size.y,ctx.Size.z);
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var pposA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(prv)));
+	var pposB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(prv)));
+	var pvelA = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(prv)));
+	var pvelB = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(prv)));
+	var csq = Params[0].CSq;
+	var omega0 = Params[0].Omega0;
+	var diff = Params[0].Diff;
+	var decay = Params[0].Decay;
+	var particle = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(prv)));
+	var maxNeigh = NeighMax26(x, y, z, i32(SpinfieldDist), prv);
+	var s0a = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(prv)));
+	var s0b = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(prv)));
+	var dist: f32;
+	var drive: f32;
+	var d0a: f32;
+	var d0b: f32;
+	if (particle != 0) {
+		dist = f32(1);
+		drive = f32(1);
+		d0a = s0a;
+		d0b = s0b;
+	} else {
+		dist = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDist), u32(prv)));
+		var distF = Laplacian19(x, y, z, i32(SpinfieldDist), prv, dist);
+		dist += diff * distF; // no velocity
+		d0a = NeighValue(maxNeigh, x, y, z, i32(Spinfield0a), prv);
+		d0b = NeighValue(maxNeigh, x, y, z, i32(Spinfield0b), prv);
+		if (dist < 0.001) {
+			drive = f32(0);
+		} else {
+			drive = pow(decay, 1.0/dist);
+		}
+	}
+	StateSet(dist, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDist), u32(cur)));
+	StateSet(drive, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldDrive), u32(cur)));
+	s0a += drive * (d0a - s0a);
+	s0b += drive * (d0b - s0b);
+	s0a -= omega0 * s0b; // everybody update to present tense
+	s0b += omega0 * s0a;
+	StateSet(s0a, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0a), u32(cur)));
+	StateSet(s0b, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(Spinfield0b), u32(cur)));
+	var forceA = Laplacian19(x, y, z, i32(CabAs), prv, pposA);
+	var forceB = Laplacian19(x, y, z, i32(CabBs), prv, pposB);
+	forceA += drive * (s0a - pposA);
+	forceB += drive * (s0b - pposB);
+	var velA = pvelA + csq*forceA;
+	var posA = pposA + velA;
+	var velB = pvelB + csq*forceB;
+	var posB = pposB + velB;
+	StateSet(velA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAv), u32(cur)));
+	StateSet(posA, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabAs), u32(cur)));
+	StateSet(velB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBv), u32(cur)));
+	StateSet(posB, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(CabBs), u32(cur)));
+	var pvX: f32;
+	var pvY: f32;
+	var pvZ: f32;
+	var pvSq = pvX*pvX + pvY*pvY + pvZ*pvZ;
+	var lorentz = 1.0 / sqrt(1.0-(pvSq/csq));
+	var esq = Params[0].C6M2 / (csq - pvSq);
+	StateSet(pvX, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelX), u32(cur)));
+	StateSet(pvY, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelY), u32(cur)));
+	StateSet(pvZ, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldPvelZ), u32(cur)));
+	StateSet(esq, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
+	u32(z), u32(y), u32(x), u32(SpinfieldPESq), u32(cur)));
+	if (particle == 0) {
+		return;
+	}
+	var e = 0.5 * (1.0 + pvSq);
+	var pXp = 0.5 * (e + pvX);
+	var pXn = 0.5 * (e - pvX);
+	var pYp = 0.5 * (e + pvY);
+	var pYn = 0.5 * (e - pvY);
+	var pZp = 0.5 * (e + pvZ);
+	var pZn = 0.5 * (e - pvZ);
+	var rndX = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(0)));
+	var rndY = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(1)));
+	var rndZ = GetRandomNumber(i, ctx.RandCounter.Counter, u32(u32(2)));
+	var mvX = i32(0);
+	if (rndX < pXp && x < sz.x) {
+		mvX = i32(1);
+	} else if (rndX < pXp+pXn && x > 1) {
+		mvX = i32(-1);
+	}
+	var mvY = i32(0);
+	if (rndY < pYp && y < sz.y) {
+		mvY = i32(1);
+	} else if (rndY < pYp+pYn && y > 1) {
+		mvY = i32(-1);
+	}
+	var mvZ = i32(0);
+	if (rndZ < pZp && z < sz.z) {
+		mvZ = i32(1);
+	} else if (rndZ < pZp+pZn && z > 1) {
+		mvZ = i32(-1);
+	}
+	if (Params[0].ThreeD == 0 || Params[0].Move == 0) {
+		mvY = i32(0);
+		mvZ = i32(0);
+	}
+	if (Params[0].Move == 0) {
+		mvX = i32(0);
+	}
+	if (mvX == 0 && mvY == 0 && mvZ == 0) { // not moving..
+		StateSet(particle, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(cur)));
+		SetParticleAt(i32(i32(0)), lorentz, esq, vec3<i32>(x, y, z), vec3<f32>(pvX, pvY, pvZ));return;
+	}
+	var mx = x + mvX;
+	var my = y + mvY;
+	var mz = z + mvZ;
+	StateSet(0.0, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(SpinfieldParticle), u32(cur)));
+	StateSet(particle, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(mz), u32(my), u32(mx), u32(SpinfieldParticle), u32(cur)));
+	SetParticleAt(i32(i32(0)), lorentz, esq, vec3<i32>(mx, my, mz), vec3<f32>(pvX, pvY, pvZ));
+}
 
 //////// import: "wave.go"
 alias WaveStates = i32; //enums:enum -trim-prefix=Wave

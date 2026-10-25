@@ -183,26 +183,28 @@ const  DiracL2As: DiracStates = 30;
 const  DiracL2Bs: DiracStates = 31;
 const  DiracLMag: DiracStates = 32;
 fn DiracDampKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var face = Context_EdgeCoords(ctx, i, &x, &y, &z);
-; if (face < 0) {
-	return;
-}; var sz = Context_SizePlus1(ctx);
-; // exclude updating on edges
-var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var csq = Params[0].CSq;
-; var vo = i32(Dirac1Av) - i32(Dirac1As);
-;                         // position to its velocity
-for (var c=0; c<4; c++) { // the four real components, all alike
-	var vr = i32(Dirac1As) + i32(c);
-	var pp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(prv)));
-	var f = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, vr, prv, pp);
-	var v = csq * f; // key damp: no +=
-	StateSet(v, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr + vo), u32(cur)));
-	StateSet(pp + v, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(cur)));
-} }
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var face = Context_EdgeCoords(ctx, i, &x, &y, &z);
+	if (face < 0) {
+		return;
+	}
+	var sz = Context_SizePlus1(ctx); // exclude updating on edges
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var csq = Params[0].CSq;
+	var vo = i32(Dirac1Av) - i32(Dirac1As); // position to its velocity
+	for (var c=0; c<4; c++) {                   // the four real components, all alike
+		var vr = i32(Dirac1As) + i32(c);
+		var pp = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(prv)));
+		var f = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, vr, prv, pp);
+		var v = csq * f; // key damp: no +=
+		StateSet(v, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr + vo), u32(cur)));
+		StateSet(pp + v, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(cur)));
+	}
+}
 
 //////// import: "edges.go"
 alias Edges = i32; //enums:enum -trim-prefix=Edges

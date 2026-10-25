@@ -536,41 +536,51 @@ const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
 fn WaveKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-; if (!ok) {
-	return;
-}; var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
-; var pvel = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
-; var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveV), u32(prv)));
-; var force: f32;; if (Params[0].ThreeD == 1) {
-	force = Laplacian19(x, y, z, i32(WavePos), prv, ppos);
-} else {
-	force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
-}; force += vpot * ppos;
-;
-var vel: f32;; if (Params[0].Diffusion == 1) {
-	vel = Params[0].CSq * force;
-} else {
-	vel = pvel + Params[0].CSq*force;
-}; var pos = ppos + vel;
-; if (Params[0].Energy == 1) {
-	var midVel = 0.5 * (pvel + vel);
-	var kinetic = Params[0].Inv2CSq * midVel * midVel;
-	var potential: f32;
-	if (Params[0].ThreeD == 1) {
-		potential = PotentialEnergy19(x, y, z, i32(WavePos), prv, ppos);
-	} else {
-		potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+	if (!ok) {
+		return;
 	}
-	StateSet(kinetic, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
-	StateSet(potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
-	StateSet(kinetic + potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
-}; StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
+	var pvel = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(prv)));
+	var vpot = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveV), u32(prv)));
+	var force: f32;
+	if (Params[0].ThreeD == 1) {
+		force = Laplacian19(x, y, z, i32(WavePos), prv, ppos);
+	} else {
+		force = Laplacian1D(x, y, z, i32(WavePos), prv, ppos);
+	}
+	force += vpot * ppos;
+	var vel: f32;
+	if (Params[0].Diffusion == 1) {
+		vel = Params[0].CSq * force;
+	} else {
+		vel = pvel + Params[0].CSq*force;
+	}
+	var pos = ppos + vel;
+	if (Params[0].Energy == 1) {
+		var midVel = 0.5 * (pvel + vel);
+		var kinetic = Params[0].Inv2CSq * midVel * midVel;
+		var potential: f32;
+		if (Params[0].ThreeD == 1) {
+			potential = PotentialEnergy19(x, y, z, i32(WavePos), prv, ppos);
+		} else {
+			potential = PotentialEnergy1D(x, y, z, i32(WavePos), prv, ppos);
+		}
+		StateSet(kinetic, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveKinetic), u32(cur)));
+		StateSet(potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePotential), u32(cur)));
+		StateSet(kinetic + potential, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveEnergy), u32(cur)));
+	}
+	StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));
+	StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));
+	StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur)));
+}
 
 //////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave

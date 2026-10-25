@@ -393,8 +393,8 @@ fn ElectroweakDampKernel(i: u32) { //gosl:kernel
 	for (var k=0; k<9; k++) { // the four components, their four velocities, and Hmag
 		var vr = i32(EWHsCa) + i32(k);
 		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(iz), u32(iy), u32(ix), u32(vr), u32(cur))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(cur)));
-		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-		u32(iz), u32(iy), u32(ix), u32(vr), u32(prv))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(prv)));
+		StateSet(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(iz), u32(iy), u32(ix), u32(vr), u32(prv))), Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+		TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(vr), u32(prv)));
 	}
 	for (var k=0; k<16; k++) { // three spinors, then the four magnitudes
 		var vr = i32(EWNu1a) + i32(k);

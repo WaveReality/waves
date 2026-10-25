@@ -116,24 +116,24 @@ func WeylKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 
 	// the three-level leapfrog: cur still holds u(t-1) until we write it
-	ol1a := State.Value(int(z), int(y), int(x), int(WeylL1a), int(cur))
-	ol1b := State.Value(int(z), int(y), int(x), int(WeylL1b), int(cur))
-	ol2a := State.Value(int(z), int(y), int(x), int(WeylL2a), int(cur))
-	ol2b := State.Value(int(z), int(y), int(x), int(WeylL2b), int(cur))
-	or1a := State.Value(int(z), int(y), int(x), int(WeylR1a), int(cur))
-	or1b := State.Value(int(z), int(y), int(x), int(WeylR1b), int(cur))
-	or2a := State.Value(int(z), int(y), int(x), int(WeylR2a), int(cur))
-	or2b := State.Value(int(z), int(y), int(x), int(WeylR2b), int(cur))
+	ol1a := State.Value5D(int(z), int(y), int(x), int(WeylL1a), int(cur))
+	ol1b := State.Value5D(int(z), int(y), int(x), int(WeylL1b), int(cur))
+	ol2a := State.Value5D(int(z), int(y), int(x), int(WeylL2a), int(cur))
+	ol2b := State.Value5D(int(z), int(y), int(x), int(WeylL2b), int(cur))
+	or1a := State.Value5D(int(z), int(y), int(x), int(WeylR1a), int(cur))
+	or1b := State.Value5D(int(z), int(y), int(x), int(WeylR1b), int(cur))
+	or2a := State.Value5D(int(z), int(y), int(x), int(WeylR2a), int(cur))
+	or2b := State.Value5D(int(z), int(y), int(x), int(WeylR2b), int(cur))
 
 	// u(t), which the right-hand side is evaluated at
-	nl1a := State.Value(int(z), int(y), int(x), int(WeylL1a), int(prv))
-	nl1b := State.Value(int(z), int(y), int(x), int(WeylL1b), int(prv))
-	nl2a := State.Value(int(z), int(y), int(x), int(WeylL2a), int(prv))
-	nl2b := State.Value(int(z), int(y), int(x), int(WeylL2b), int(prv))
-	nr1a := State.Value(int(z), int(y), int(x), int(WeylR1a), int(prv))
-	nr1b := State.Value(int(z), int(y), int(x), int(WeylR1b), int(prv))
-	nr2a := State.Value(int(z), int(y), int(x), int(WeylR2a), int(prv))
-	nr2b := State.Value(int(z), int(y), int(x), int(WeylR2b), int(prv))
+	nl1a := State.Value5D(int(z), int(y), int(x), int(WeylL1a), int(prv))
+	nl1b := State.Value5D(int(z), int(y), int(x), int(WeylL1b), int(prv))
+	nl2a := State.Value5D(int(z), int(y), int(x), int(WeylL2a), int(prv))
+	nl2b := State.Value5D(int(z), int(y), int(x), int(WeylL2b), int(prv))
+	nr1a := State.Value5D(int(z), int(y), int(x), int(WeylR1a), int(prv))
+	nr1b := State.Value5D(int(z), int(y), int(x), int(WeylR1b), int(prv))
+	nr2a := State.Value5D(int(z), int(y), int(x), int(WeylR2a), int(prv))
+	nr2b := State.Value5D(int(z), int(y), int(x), int(WeylR2b), int(prv))
 
 	gl1a := Gradient10(x, y, z, int32(WeylL1a), prv)
 	gl1b := Gradient10(x, y, z, int32(WeylL1b), prv)
@@ -145,10 +145,8 @@ func WeylKernel(i uint32) { //gosl:kernel
 	gr2b := Gradient10(x, y, z, int32(WeylR2b), prv)
 
 	// sigma.grad on a 2-spinor, written out in real components:
-	//
 	//	(sigma.grad psi)_1 = d_z psi_1 + (d_x - i d_y) psi_2
 	//	(sigma.grad psi)_2 = (d_x + i d_y) psi_1 - d_z psi_2
-	//
 	// The d_y terms are where sigma_y puts real and imaginary into each
 	// other, and are why this cannot be staggered the way Schrodinger is.
 	sl1a := gl1a.Z + gl2a.X + gl2b.Y
@@ -163,7 +161,7 @@ func WeylKernel(i uint32) { //gosl:kernel
 	cc := Params[0].C
 	// m c^2 / hbar, the rate L and R turn into each other, plus whatever the
 	// scalar potential adds to it locally
-	om := Params[0].Omega0 + State.Value(int(z), int(y), int(x), int(WeylV), int(prv))
+	om := Params[0].Omega0 + State.Value5D(int(z), int(y), int(x), int(WeylV), int(prv))
 
 	// -i M psi takes (a, b) to (M b, -M a), which is the whole mass term
 	dl1a := cc*sl1a + om*nr1b
@@ -201,10 +199,10 @@ func WeylKernel(i uint32) { //gosl:kernel
 	// arcsin saturates and the wave stops making sense.
 	if Params[0].EM.IsTrue() && Params[0].WeylQ != 0 {
 		eoh := Params[0].WeylQ * Params[0].E / Params[0].Hbar
-		a0 := State.Value(int(z), int(y), int(x), int(A0s), int(prv))
-		ax := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-		ay := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-		az := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		a0 := State.Value5D(int(z), int(y), int(x), int(A0s), int(prv))
+		ax := State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+		ay := State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+		az := State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 		// sigma.A on each spinor, same component pattern as sigma.grad
 		ql1a := a0*nl1a + (az*nl1a + ax*nl2a + ay*nl2b)
 		ql1b := a0*nl1b + (az*nl1b + ax*nl2b - ay*nl2a)
@@ -245,23 +243,23 @@ func WeylKernel(i uint32) { //gosl:kernel
 		r2a *= df
 		r2b *= df
 	}
-	State.Set(l1a, int(z), int(y), int(x), int(WeylL1a), int(cur))
-	State.Set(l1b, int(z), int(y), int(x), int(WeylL1b), int(cur))
-	State.Set(l2a, int(z), int(y), int(x), int(WeylL2a), int(cur))
-	State.Set(l2b, int(z), int(y), int(x), int(WeylL2b), int(cur))
-	State.Set(r1a, int(z), int(y), int(x), int(WeylR1a), int(cur))
-	State.Set(r1b, int(z), int(y), int(x), int(WeylR1b), int(cur))
-	State.Set(r2a, int(z), int(y), int(x), int(WeylR2a), int(cur))
-	State.Set(r2b, int(z), int(y), int(x), int(WeylR2b), int(cur))
+	State.Set5D(l1a, int(z), int(y), int(x), int(WeylL1a), int(cur))
+	State.Set5D(l1b, int(z), int(y), int(x), int(WeylL1b), int(cur))
+	State.Set5D(l2a, int(z), int(y), int(x), int(WeylL2a), int(cur))
+	State.Set5D(l2b, int(z), int(y), int(x), int(WeylL2b), int(cur))
+	State.Set5D(r1a, int(z), int(y), int(x), int(WeylR1a), int(cur))
+	State.Set5D(r1b, int(z), int(y), int(x), int(WeylR1b), int(cur))
+	State.Set5D(r2a, int(z), int(y), int(x), int(WeylR2a), int(cur))
+	State.Set5D(r2b, int(z), int(y), int(x), int(WeylR2b), int(cur))
 
 	// the STAGGERED magnitude u(t).u(t+1), not |u(t+1)|^2: a three-level
 	// leapfrog conserves the product of adjacent levels exactly, the same way
 	// Visscher's scheme does, and squaring one level alone ripples instead.
 	lm := nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
 	rm := nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
-	State.Set(lm+rm, int(z), int(y), int(x), int(WeylMag), int(cur))
-	State.Set(lm, int(z), int(y), int(x), int(WeylLMag), int(cur))
-	State.Set(rm, int(z), int(y), int(x), int(WeylRMag), int(cur))
+	State.Set5D(lm+rm, int(z), int(y), int(x), int(WeylMag), int(cur))
+	State.Set5D(lm, int(z), int(y), int(x), int(WeylLMag), int(cur))
+	State.Set5D(rm, int(z), int(y), int(x), int(WeylRMag), int(cur))
 }
 
 // Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
@@ -380,10 +378,10 @@ func (ss *Sim) StatWeylHelicity(dim math32.Dims) func(init bool) {
 					f := c.AddScalar(1)
 					for h, base := range []WeylStates{WeylL1a, WeylR1a} {
 						b := int(base.Int64())
-						a1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(b), int(cur)))
-						b1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur)))
-						a2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(b+2), int(cur)))
-						b2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(b+3), int(cur)))
+						a1 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b), int(cur)))
+						b1 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur)))
+						a2 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b+2), int(cur)))
+						b2 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b+3), int(cur)))
 						sp := 0.0
 						switch dim {
 						case math32.X:
@@ -453,8 +451,8 @@ func (ss *Sim) WeylSlab(side WeylStates, dim math32.Dims, amp float32) {
 				f := c.AddScalar(1)
 				g := ss.PacketDist(CoordToFloat(c).Sub(ctr), dim) / wd
 				v := amp * math32.FastExp(-g*g)
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(c1), int(prv))
 			}
 		}
 	}
@@ -690,10 +688,10 @@ func (ss *Sim) WeylPast(omega float32) {
 				f := c.AddScalar(1)
 				for _, base := range []WeylStates{WeylL1a, WeylL2a, WeylR1a, WeylR2a} {
 					b := int(base.Int64())
-					a := State.Value(int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
-					v := State.Value(int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
-					State.Set(cs*a-sn*v, int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
-					State.Set(sn*a+cs*v, int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
+					a := State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
+					v := State.Value5D(int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
+					State.Set5D(cs*a-sn*v, int(f.Z), int(f.Y), int(f.X), int(b), int(cur))
+					State.Set5D(sn*a+cs*v, int(f.Z), int(f.Y), int(f.X), int(b+1), int(cur))
 				}
 			}
 		}

@@ -75,15 +75,15 @@ func WaveCAKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pa := State.Value(int(z), int(y), int(x), int(WaveCa), int(prv))
-	pb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
+	pa := State.Value5D(int(z), int(y), int(x), int(WaveCa), int(prv))
+	pb := State.Value5D(int(z), int(y), int(x), int(WaveCb), int(prv))
 	var lb float32
 	if Params[0].ThreeD.IsTrue() {
 		lb = Laplacian19(x, y, z, int32(WaveCb), prv, pb)
 	} else {
 		lb = Laplacian1D(x, y, z, int32(WaveCb), prv, pb)
 	}
-	State.Set(pa-Params[0].C*lb, int(z), int(y), int(x), int(WaveCa), int(cur))
+	State.Set5D(pa-Params[0].C*lb, int(z), int(y), int(x), int(WaveCa), int(cur))
 }
 
 // WaveCBKernel advances b from the a that WaveCAKernel just wrote, reading it
@@ -97,8 +97,8 @@ func WaveCBKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
-	na := State.Value(int(z), int(y), int(x), int(WaveCa), int(cur)) // the new a: this is the whole point
+	pb := State.Value5D(int(z), int(y), int(x), int(WaveCb), int(prv))
+	na := State.Value5D(int(z), int(y), int(x), int(WaveCa), int(cur)) // the new a: this is the whole point
 	var la float32
 	if Params[0].ThreeD.IsTrue() {
 		la = Laplacian19(x, y, z, int32(WaveCa), cur, na)
@@ -110,12 +110,12 @@ func WaveCBKernel(i uint32) { //gosl:kernel
 		df := EdgeDampFactor(x, y, z, ctx.Size.V())
 		na *= df
 		nb *= df
-		State.Set(na, int(z), int(y), int(x), int(WaveCa), int(cur))
+		State.Set5D(na, int(z), int(y), int(x), int(WaveCa), int(cur))
 	}
-	State.Set(nb, int(z), int(y), int(x), int(WaveCb), int(cur))
+	State.Set5D(nb, int(z), int(y), int(x), int(WaveCb), int(cur))
 	// a and b sit half a step apart, so what is conserved is the staggered
 	// a^2 + b(t-1/2) b(t+1/2), not a^2 + b^2
-	State.Set(na*na+pb*nb, int(z), int(y), int(x), int(WaveCMag), int(cur))
+	State.Set5D(na*na+pb*nb, int(z), int(y), int(x), int(WaveCMag), int(cur))
 }
 
 // Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
@@ -230,10 +230,10 @@ func (ss *Sim) WaveCPacketAt(wavelength float32) {
 				}
 				// both levels alike: Visscher staggers a and b in time, so
 				// there is no past to write, unlike the three-level scheme
-				State.SetAdd(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
-				State.SetAdd(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
-				State.SetAdd(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
-				State.SetAdd(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
+				State.SetAdd5D(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
+				State.SetAdd5D(va, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
+				State.SetAdd5D(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
+				State.SetAdd5D(vb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
 			}
 		}
 	}

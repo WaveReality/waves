@@ -34,14 +34,10 @@ func (ss *Sim) ConfigVars() {
 	//
 	// Laplacian weights, face : edge : corner = 2 : 1 : 0 -- the 19-point
 	// stencil. Two conditions pin these down. Normalization
-	//
 	//	sum_j w_j dx_j^2 = 2
-	//
 	// makes the stencil exact on quadratics. Isotropy of the leading
 	// (4th-order) error additionally needs
-	//
 	//	sum_j w_j dx^4 == 3 sum_j w_j dx^2 dy^2
-	//
 	// The intuitive 1/d^2 weighting over all 26 neighbors normalizes correctly
 	// but leaves that ratio at 1.615, giving ~36x more directional spread in
 	// the wave dispersion (1.97% vs 0.055% at |k| = 0.8). The 18 face+edge
@@ -63,17 +59,17 @@ func (ss *Sim) ConfigVars() {
 					if d2 != shell {
 						continue
 					}
-					NeighOffs.Set(int32(x), int(idx), int(math32.X))
-					NeighOffs.Set(int32(y), int(idx), int(math32.Y))
-					NeighOffs.Set(int32(z), int(idx), int(math32.Z))
-					NeighWts.Set(lapWt[shell], int(LaplacianWts), int(idx))
-					NeighWts.Set(1.0/math32.Sqrt(float32(d2)), int(AverageWts), int(idx))
+					NeighOffs.Set2D(int32(x), int(idx), int(math32.X))
+					NeighOffs.Set2D(int32(y), int(idx), int(math32.Y))
+					NeighOffs.Set2D(int32(z), int(idx), int(math32.Z))
+					NeighWts.Set2D(lapWt[shell], int(LaplacianWts), int(idx))
+					NeighWts.Set2D(1.0/math32.Sqrt(float32(d2)), int(AverageWts), int(idx))
 					idx++
 				}
 			}
 		}
 	}
-	NeighWts.Set(1.0, int(AverageWts), int(idx))
+	NeighWts.Set2D(1.0, int(AverageWts), int(idx))
 	// sum += 1.0
 	// fmt.Println("sum:", sum, "oneo:", 1.0 / sum)
 
@@ -86,9 +82,7 @@ func (ss *Sim) ConfigVars() {
 	// pair sits at x = +-1, so sum_j w_j is pinned by the normalization below
 	// and the MAGNITUDE error is identical for any ratios; only the isotropy
 	// can be tuned. Isotropy of the leading 3rd-order error needs
-	//
 	//	T111 == 3*T122,  i.e.  face = 2*edge + 8*corner
-	//
 	// The intuitive 1/d weighting satisfies the normalization but overshoots
 	// that by 82%, giving ~26x more directional spread (5.04% vs 0.16% at
 	// |k| = 0.8). Dropping the corner pairs is both cheaper AND slightly more
@@ -111,18 +105,18 @@ func (ss *Sim) ConfigVars() {
 		}
 	}
 	setPair := func(dim math32.Dims, j int32, mx, my, mz int32) {
-		FaceOffs.Set(mx, int(dim), int(Minus1), int(j), int(math32.X))
-		FaceOffs.Set(my, int(dim), int(Minus1), int(j), int(math32.Y))
-		FaceOffs.Set(mz, int(dim), int(Minus1), int(j), int(math32.Z))
-		FaceOffs.Set(-mx, int(dim), int(Plus1), int(j), int(math32.X))
-		FaceOffs.Set(-my, int(dim), int(Plus1), int(j), int(math32.Y))
-		FaceOffs.Set(-mz, int(dim), int(Plus1), int(j), int(math32.Z))
+		FaceOffs.Set4D(mx, int(dim), int(Minus1), int(j), int(math32.X))
+		FaceOffs.Set4D(my, int(dim), int(Minus1), int(j), int(math32.Y))
+		FaceOffs.Set4D(mz, int(dim), int(Minus1), int(j), int(math32.Z))
+		FaceOffs.Set4D(-mx, int(dim), int(Plus1), int(j), int(math32.X))
+		FaceOffs.Set4D(-my, int(dim), int(Plus1), int(j), int(math32.Y))
+		FaceOffs.Set4D(-mz, int(dim), int(Plus1), int(j), int(math32.Z))
 	}
 	sum := float32(0)
 	for j := range 9 {
 		a, b := tra[j][0], tra[j][1]
 		w := grdWt[a*a+b*b]
-		NeighWts.Set(w, int(Grad10Wts), int(j))
+		NeighWts.Set2D(w, int(Grad10Wts), int(j))
 		sum += w
 		setPair(math32.X, int32(j), -1, a, b)
 		setPair(math32.Y, int32(j), a, -1, b)
@@ -130,7 +124,7 @@ func (ss *Sim) ConfigVars() {
 	}
 	sum *= 2
 	for j := range 9 {
-		NeighWts.SetDiv(sum, int(Grad10Wts), int(j))
+		NeighWts.SetDiv2D(sum, int(Grad10Wts), int(j))
 	}
 }
 
@@ -188,8 +182,8 @@ const (
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
 func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
-	m1 := State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx))
-	p1 := State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx))
+	m1 := State.Value5D(int(z), int(y), int(x-1), int(vidx), int(tidx))
+	p1 := State.Value5D(int(z), int(y), int(x+1), int(vidx), int(tidx))
 	return (m1 + p1) - 2*ctr
 }
 
@@ -200,11 +194,11 @@ func Laplacian1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 func Laplacian19(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
-		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-		avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
+		xo := NeighOffs.Value2D(int(j), int(math32.X))
+		yo := NeighOffs.Value2D(int(j), int(math32.Y))
+		zo := NeighOffs.Value2D(int(j), int(math32.Z))
+		nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+		avg += NeighWts.Value2D(int(LaplacianWts), int(j)) * (nv - ctr)
 	}
 	return avg
 }
@@ -215,13 +209,13 @@ func Laplacian19(x, y, z, vidx, tidx int32, ctr float32) float32 {
 func NeighAverage27(x, y, z, vidx, tidx int32) float32 {
 	avg := float32(0)
 	for j := range NNeigh {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
-		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-		avg += NeighWts.Value(int(AverageWts), int(j)) * nv
+		xo := NeighOffs.Value2D(int(j), int(math32.X))
+		yo := NeighOffs.Value2D(int(j), int(math32.Y))
+		zo := NeighOffs.Value2D(int(j), int(math32.Z))
+		nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+		avg += NeighWts.Value2D(int(AverageWts), int(j)) * nv
 	}
-	avg += NeighWts.Value(int(AverageWts), int(26)) * State.Value(int(z), int(y), int(x), int(vidx), int(tidx))
+	avg += NeighWts.Value2D(int(AverageWts), int(26)) * State.Value5D(int(z), int(y), int(x), int(vidx), int(tidx))
 	return avg
 }
 
@@ -233,10 +227,10 @@ func NeighMax26(x, y, z, vidx, tidx int32) int32 {
 	mx := float32(0)
 	mxi := int32(0)
 	for j := range NNeigh {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
-		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+		xo := NeighOffs.Value2D(int(j), int(math32.X))
+		yo := NeighOffs.Value2D(int(j), int(math32.Y))
+		zo := NeighOffs.Value2D(int(j), int(math32.Z))
+		nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 		if nv > mx {
 			mx = nv
 			mxi = int32(j)
@@ -249,10 +243,10 @@ func NeighMax26(x, y, z, vidx, tidx int32) int32 {
 // (into NeighOffs offsets), for given x,y,z center coordinates,
 // variable index vidx, and cur / prev time index tidx.
 func NeighValue(nidx, x, y, z, vidx, tidx int32) float32 {
-	xo := NeighOffs.Value(int(nidx), int(math32.X))
-	yo := NeighOffs.Value(int(nidx), int(math32.Y))
-	zo := NeighOffs.Value(int(nidx), int(math32.Z))
-	nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+	xo := NeighOffs.Value2D(int(nidx), int(math32.X))
+	yo := NeighOffs.Value2D(int(nidx), int(math32.Y))
+	zo := NeighOffs.Value2D(int(nidx), int(math32.Z))
+	nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 	return nv
 }
 
@@ -263,7 +257,7 @@ func NeighValue(nidx, x, y, z, vidx, tidx int32) float32 {
 // the 1D counterpart of [Gradient10], for non-ThreeD runs.
 func Gradient1D(x, y, z, vidx, tidx int32) math32.Vector3 {
 	var g math32.Vector3
-	g.X = 0.5 * (State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx)) - State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx)))
+	g.X = 0.5 * (State.Value5D(int(z), int(y), int(x+1), int(vidx), int(tidx)) - State.Value5D(int(z), int(y), int(x-1), int(vidx), int(tidx)))
 	return g
 }
 
@@ -272,13 +266,13 @@ func Gradient10(x, y, z, vidx, tidx int32) math32.Vector3 {
 	for xyz := range 3 {
 		sum := float32(0)
 		for j := range NGradPair {
-			xp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.X))
-			xm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.X))
-			yp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Y))
-			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
-			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
-			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
-			grad := NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
+			xp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.X))
+			xm := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.X))
+			yp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.Y))
+			ym := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.Y))
+			zp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.Z))
+			zm := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.Z))
+			grad := NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zp), int(y+yp), int(x+xp), int(vidx), int(tidx)) - State.Value5D(int(z+zm), int(y+ym), int(x+xm), int(vidx), int(tidx)))
 			sum += grad
 		}
 		switch xyz {
@@ -307,13 +301,13 @@ func Divergence10(x, y, z, vidx, tidx int32, dx, dy, dz *float32) float32 {
 		// a divergence rather than a sum of derivatives of one scalar.
 		vi := vidx + int32(xyz)
 		for j := range NGradPair {
-			xp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.X))
-			xm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.X))
-			yp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Y))
-			ym := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Y))
-			zp := FaceOffs.Value(int(xyz), int(Plus1), int(j), int(math32.Z))
-			zm := FaceOffs.Value(int(xyz), int(Minus1), int(j), int(math32.Z))
-			d += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zp), int(y+yp), int(x+xp), int(vi), int(tidx)) - State.Value(int(z+zm), int(y+ym), int(x+xm), int(vi), int(tidx)))
+			xp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.X))
+			xm := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.X))
+			yp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.Y))
+			ym := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.Y))
+			zp := FaceOffs.Value4D(int(xyz), int(Plus1), int(j), int(math32.Z))
+			zm := FaceOffs.Value4D(int(xyz), int(Minus1), int(j), int(math32.Z))
+			d += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zp), int(y+yp), int(x+xp), int(vi), int(tidx)) - State.Value5D(int(z+zm), int(y+ym), int(x+xm), int(vi), int(tidx)))
 		}
 		switch xyz {
 		case 0:
@@ -338,35 +332,35 @@ func Curl10(x, y, z, vidx, tidx int32) math32.Vector3 {
 	dimY := vidx + int32(math32.Y)
 	dimZ := vidx + int32(math32.Z)
 	for j := range NGradPair {
-		xpX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.X))
-		xmX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.X))
-		ypX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.Y))
-		ymX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.Y))
-		zpX := FaceOffs.Value(int(math32.X), int(Plus1), int(j), int(math32.Z))
-		zmX := FaceOffs.Value(int(math32.X), int(Minus1), int(j), int(math32.Z))
+		xpX := FaceOffs.Value4D(int(math32.X), int(Plus1), int(j), int(math32.X))
+		xmX := FaceOffs.Value4D(int(math32.X), int(Minus1), int(j), int(math32.X))
+		ypX := FaceOffs.Value4D(int(math32.X), int(Plus1), int(j), int(math32.Y))
+		ymX := FaceOffs.Value4D(int(math32.X), int(Minus1), int(j), int(math32.Y))
+		zpX := FaceOffs.Value4D(int(math32.X), int(Plus1), int(j), int(math32.Z))
+		zmX := FaceOffs.Value4D(int(math32.X), int(Minus1), int(j), int(math32.Z))
 
-		xpY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.X))
-		xmY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.X))
-		ypY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.Y))
-		ymY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.Y))
-		zpY := FaceOffs.Value(int(math32.Y), int(Plus1), int(j), int(math32.Z))
-		zmY := FaceOffs.Value(int(math32.Y), int(Minus1), int(j), int(math32.Z))
+		xpY := FaceOffs.Value4D(int(math32.Y), int(Plus1), int(j), int(math32.X))
+		xmY := FaceOffs.Value4D(int(math32.Y), int(Minus1), int(j), int(math32.X))
+		ypY := FaceOffs.Value4D(int(math32.Y), int(Plus1), int(j), int(math32.Y))
+		ymY := FaceOffs.Value4D(int(math32.Y), int(Minus1), int(j), int(math32.Y))
+		zpY := FaceOffs.Value4D(int(math32.Y), int(Plus1), int(j), int(math32.Z))
+		zmY := FaceOffs.Value4D(int(math32.Y), int(Minus1), int(j), int(math32.Z))
 
-		xpZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.X))
-		xmZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.X))
-		ypZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.Y))
-		ymZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.Y))
-		zpZ := FaceOffs.Value(int(math32.Z), int(Plus1), int(j), int(math32.Z))
-		zmZ := FaceOffs.Value(int(math32.Z), int(Minus1), int(j), int(math32.Z))
+		xpZ := FaceOffs.Value4D(int(math32.Z), int(Plus1), int(j), int(math32.X))
+		xmZ := FaceOffs.Value4D(int(math32.Z), int(Minus1), int(j), int(math32.X))
+		ypZ := FaceOffs.Value4D(int(math32.Z), int(Plus1), int(j), int(math32.Y))
+		ymZ := FaceOffs.Value4D(int(math32.Z), int(Minus1), int(j), int(math32.Y))
+		zpZ := FaceOffs.Value4D(int(math32.Z), int(Plus1), int(j), int(math32.Z))
+		zmZ := FaceOffs.Value4D(int(math32.Z), int(Minus1), int(j), int(math32.Z))
 
-		dzdy += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimZ), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimZ), int(tidx)))
-		dydz += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimY), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimY), int(tidx)))
+		dzdy += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpY), int(y+ypY), int(x+xpY), int(dimZ), int(tidx)) - State.Value5D(int(z+zmY), int(y+ymY), int(x+xmY), int(dimZ), int(tidx)))
+		dydz += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimY), int(tidx)) - State.Value5D(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimY), int(tidx)))
 
-		dxdz += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimX), int(tidx)) - State.Value(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimX), int(tidx)))
-		dzdx += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimZ), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimZ), int(tidx)))
+		dxdz += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpZ), int(y+ypZ), int(x+xpZ), int(dimX), int(tidx)) - State.Value5D(int(z+zmZ), int(y+ymZ), int(x+xmZ), int(dimX), int(tidx)))
+		dzdx += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpX), int(y+ypX), int(x+xpX), int(dimZ), int(tidx)) - State.Value5D(int(z+zmX), int(y+ymX), int(x+xmX), int(dimZ), int(tidx)))
 
-		dydx += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpX), int(y+ypX), int(x+xpX), int(dimY), int(tidx)) - State.Value(int(z+zmX), int(y+ymX), int(x+xmX), int(dimY), int(tidx)))
-		dxdy += NeighWts.Value(int(Grad10Wts), int(j)) * (State.Value(int(z+zpY), int(y+ypY), int(x+xpY), int(dimX), int(tidx)) - State.Value(int(z+zmY), int(y+ymY), int(x+xmY), int(dimX), int(tidx)))
+		dydx += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpX), int(y+ypX), int(x+xpX), int(dimY), int(tidx)) - State.Value5D(int(z+zmX), int(y+ymX), int(x+xmX), int(dimY), int(tidx)))
+		dxdy += NeighWts.Value2D(int(Grad10Wts), int(j)) * (State.Value5D(int(z+zpY), int(y+ypY), int(x+xpY), int(dimX), int(tidx)) - State.Value5D(int(z+zmY), int(y+ymY), int(x+xmY), int(dimX), int(tidx)))
 	}
 	var c math32.Vector3
 	c.X = dzdy - dydz
@@ -468,10 +462,10 @@ func EdgeInBounds0(x, y, z, sx, sy, sz int32) bool {
 func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
 	sum := float32(0)
 	if EdgeInBounds1(x-1, y, z, sx, sy, sz) {
-		sum += State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx)) - ctr
+		sum += State.Value5D(int(z), int(y), int(x-1), int(vidx), int(tidx)) - ctr
 	}
 	if EdgeInBounds1(x+1, y, z, sx, sy, sz) {
-		sum += State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx)) - ctr
+		sum += State.Value5D(int(z), int(y), int(x+1), int(vidx), int(tidx)) - ctr
 	}
 	return sum
 }
@@ -483,12 +477,12 @@ func LaplacianEdge1D(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 func LaplacianEdge19(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
+		xo := NeighOffs.Value2D(int(j), int(math32.X))
+		yo := NeighOffs.Value2D(int(j), int(math32.Y))
+		zo := NeighOffs.Value2D(int(j), int(math32.Z))
 		if EdgeInBounds1(x+xo, y+yo, z+zo, sx, sy, sz) {
-			nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
-			avg += NeighWts.Value(int(LaplacianWts), int(j)) * (nv - ctr)
+			nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+			avg += NeighWts.Value2D(int(LaplacianWts), int(j)) * (nv - ctr)
 		}
 	}
 	return avg
@@ -498,8 +492,8 @@ func LaplacianEdge19(x, y, z, sx, sy, sz, vidx, tidx int32, ctr float32) float32
 // for given x,y,z center coordinates, variable index vidx,
 // and cur / prev time index tidx. ctr is the center value.
 func PotentialEnergy1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
-	m1 := State.Value(int(z), int(y), int(x-1), int(vidx), int(tidx))
-	p1 := State.Value(int(z), int(y), int(x+1), int(vidx), int(tidx))
+	m1 := State.Value5D(int(z), int(y), int(x-1), int(vidx), int(tidx))
+	p1 := State.Value5D(int(z), int(y), int(x+1), int(vidx), int(tidx))
 	pm1d := m1 - ctr
 	pp1d := p1 - ctr
 	return 0.5 * (pm1d*pm1d + pp1d*pp1d)
@@ -511,12 +505,12 @@ func PotentialEnergy1D(x, y, z, vidx, tidx int32, ctr float32) float32 {
 func PotentialEnergy19(x, y, z, vidx, tidx int32, ctr float32) float32 {
 	avg := float32(0)
 	for j := range NLapNeigh {
-		xo := NeighOffs.Value(int(j), int(math32.X))
-		yo := NeighOffs.Value(int(j), int(math32.Y))
-		zo := NeighOffs.Value(int(j), int(math32.Z))
-		nv := State.Value(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
+		xo := NeighOffs.Value2D(int(j), int(math32.X))
+		yo := NeighOffs.Value2D(int(j), int(math32.Y))
+		zo := NeighOffs.Value2D(int(j), int(math32.Z))
+		nv := State.Value5D(int(z+zo), int(y+yo), int(x+xo), int(vidx), int(tidx))
 		dv := (nv - ctr)
-		avg += NeighWts.Value(int(LaplacianWts), int(j)) * dv * dv
+		avg += NeighWts.Value2D(int(LaplacianWts), int(j)) * dv * dv
 	}
 	return avg
 }

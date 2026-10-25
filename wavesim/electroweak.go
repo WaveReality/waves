@@ -360,12 +360,12 @@ func EWSpinBilinear(mu int32, p1, p2, c1, c2 math32.Vector2) math32.Vector2 {
 // at all from the neutrino. The charge the leptons SOURCE is the same charge
 // they FEEL, and neither was written down.
 func EWLeptonCurrent(x, y, z, prv, mu int32) math32.Vector4 {
-	n1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWNu1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWNu1b), int(prv)))
-	n2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWNu2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWNu2b), int(prv)))
-	l1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWEL1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWEL1b), int(prv)))
-	l2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWEL2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWEL2b), int(prv)))
-	r1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWER1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWER1b), int(prv)))
-	r2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWER2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWER2b), int(prv)))
+	n1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWNu1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWNu1b), int(prv)))
+	n2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWNu2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWNu2b), int(prv)))
+	l1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWEL1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWEL1b), int(prv)))
+	l2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWEL2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWEL2b), int(prv)))
+	r1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWER1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWER1b), int(prv)))
+	r2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWER2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWER2b), int(prv)))
 
 	nn := EWSpinBilinear(mu, n1, n2, n1, n2)
 	ee := EWSpinBilinear(mu, l1, l2, l1, l2)
@@ -570,28 +570,28 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	lambda := Params[0].HiggsLambda
 
 	// ---- Higgs doublet and its velocity ----------------------------------
-	psi := math32.Vec4(State.Value(int(z), int(y), int(x), int(EWHsCa), int(prv)), State.Value(int(z), int(y), int(x), int(EWHsCb), int(prv)),
-		State.Value(int(z), int(y), int(x), int(EWHs0a), int(prv)), State.Value(int(z), int(y), int(x), int(EWHs0b), int(prv)))
-	psv := math32.Vec4(State.Value(int(z), int(y), int(x), int(EWHvCa), int(prv)), State.Value(int(z), int(y), int(x), int(EWHvCb), int(prv)),
-		State.Value(int(z), int(y), int(x), int(EWHv0a), int(prv)), State.Value(int(z), int(y), int(x), int(EWHv0b), int(prv)))
+	psi := math32.Vec4(State.Value5D(int(z), int(y), int(x), int(EWHsCa), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWHsCb), int(prv)),
+		State.Value5D(int(z), int(y), int(x), int(EWHs0a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWHs0b), int(prv)))
+	psv := math32.Vec4(State.Value5D(int(z), int(y), int(x), int(EWHvCa), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWHvCb), int(prv)),
+		State.Value5D(int(z), int(y), int(x), int(EWHv0a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWHv0b), int(prv)))
 
 	// ---- gauge potentials, per spacetime index ---------------------------
-	w10 := State.Value(int(z), int(y), int(x), int(EWW10s), int(prv))
-	w1x := State.Value(int(z), int(y), int(x), int(EWW1Xs), int(prv))
-	w1y := State.Value(int(z), int(y), int(x), int(EWW1Ys), int(prv))
-	w1z := State.Value(int(z), int(y), int(x), int(EWW1Zs), int(prv))
-	w20 := State.Value(int(z), int(y), int(x), int(EWW20s), int(prv))
-	w2x := State.Value(int(z), int(y), int(x), int(EWW2Xs), int(prv))
-	w2y := State.Value(int(z), int(y), int(x), int(EWW2Ys), int(prv))
-	w2z := State.Value(int(z), int(y), int(x), int(EWW2Zs), int(prv))
-	w30 := State.Value(int(z), int(y), int(x), int(EWW30s), int(prv))
-	w3x := State.Value(int(z), int(y), int(x), int(EWW3Xs), int(prv))
-	w3y := State.Value(int(z), int(y), int(x), int(EWW3Ys), int(prv))
-	w3z := State.Value(int(z), int(y), int(x), int(EWW3Zs), int(prv))
-	b0 := State.Value(int(z), int(y), int(x), int(EWB0s), int(prv))
-	bx := State.Value(int(z), int(y), int(x), int(EWBXs), int(prv))
-	by := State.Value(int(z), int(y), int(x), int(EWBYs), int(prv))
-	bz := State.Value(int(z), int(y), int(x), int(EWBZs), int(prv))
+	w10 := State.Value5D(int(z), int(y), int(x), int(EWW10s), int(prv))
+	w1x := State.Value5D(int(z), int(y), int(x), int(EWW1Xs), int(prv))
+	w1y := State.Value5D(int(z), int(y), int(x), int(EWW1Ys), int(prv))
+	w1z := State.Value5D(int(z), int(y), int(x), int(EWW1Zs), int(prv))
+	w20 := State.Value5D(int(z), int(y), int(x), int(EWW20s), int(prv))
+	w2x := State.Value5D(int(z), int(y), int(x), int(EWW2Xs), int(prv))
+	w2y := State.Value5D(int(z), int(y), int(x), int(EWW2Ys), int(prv))
+	w2z := State.Value5D(int(z), int(y), int(x), int(EWW2Zs), int(prv))
+	w30 := State.Value5D(int(z), int(y), int(x), int(EWW30s), int(prv))
+	w3x := State.Value5D(int(z), int(y), int(x), int(EWW3Xs), int(prv))
+	w3y := State.Value5D(int(z), int(y), int(x), int(EWW3Ys), int(prv))
+	w3z := State.Value5D(int(z), int(y), int(x), int(EWW3Zs), int(prv))
+	b0 := State.Value5D(int(z), int(y), int(x), int(EWB0s), int(prv))
+	bx := State.Value5D(int(z), int(y), int(x), int(EWBXs), int(prv))
+	by := State.Value5D(int(z), int(y), int(x), int(EWBYs), int(prv))
+	bz := State.Value5D(int(z), int(y), int(x), int(EWBZs), int(prv))
 
 	// ---- ordinary gradients of the four Higgs components -----------------
 	gCa := Gradient10(x, y, z, int32(EWHsCa), prv)
@@ -619,9 +619,7 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 
 	// ---- covariant Laplacian ---------------------------------------------
 	// D_j D_j Psi = d_j(D_j Psi) - i G_j (D_j Psi)
-	//
-	//	= lap(Psi) - i(d_j G_j)Psi - i G_j d_j Psi - i G_j D_j Psi
-	//
+	//             = lap(Psi) - i(d_j G_j)Psi - i G_j d_j Psi - i G_j D_j Psi
 	// Each -i G ... piece is just EWGaugeAct applied to a different argument,
 	// so the whole covariant Laplacian composes out of the one operation.
 	// Spatial gradients of all twelve W components. These serve double duty:
@@ -666,19 +664,19 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	// sources W_0 and B_0 through j_0 but never feels them back, which breaks
 	// gauge invariance: a constant A_0 is pure gauge and must produce a phase
 	// rotation at constant |Phi|, not a change in the magnitude.
-	w1xv := State.Value(int(z), int(y), int(x), int(EWW1Xv), int(prv))
-	w1yv := State.Value(int(z), int(y), int(x), int(EWW1Yv), int(prv))
-	w1zv := State.Value(int(z), int(y), int(x), int(EWW1Zv), int(prv))
-	w2xv := State.Value(int(z), int(y), int(x), int(EWW2Xv), int(prv))
-	w2yv := State.Value(int(z), int(y), int(x), int(EWW2Yv), int(prv))
-	w2zv := State.Value(int(z), int(y), int(x), int(EWW2Zv), int(prv))
-	w3xv := State.Value(int(z), int(y), int(x), int(EWW3Xv), int(prv))
-	w3yv := State.Value(int(z), int(y), int(x), int(EWW3Yv), int(prv))
-	w3zv := State.Value(int(z), int(y), int(x), int(EWW3Zv), int(prv))
-	w10v := State.Value(int(z), int(y), int(x), int(EWW10v), int(prv))
-	w20v := State.Value(int(z), int(y), int(x), int(EWW20v), int(prv))
-	w30v := State.Value(int(z), int(y), int(x), int(EWW30v), int(prv))
-	b0v := State.Value(int(z), int(y), int(x), int(EWB0v), int(prv))
+	w1xv := State.Value5D(int(z), int(y), int(x), int(EWW1Xv), int(prv))
+	w1yv := State.Value5D(int(z), int(y), int(x), int(EWW1Yv), int(prv))
+	w1zv := State.Value5D(int(z), int(y), int(x), int(EWW1Zv), int(prv))
+	w2xv := State.Value5D(int(z), int(y), int(x), int(EWW2Xv), int(prv))
+	w2yv := State.Value5D(int(z), int(y), int(x), int(EWW2Yv), int(prv))
+	w2zv := State.Value5D(int(z), int(y), int(x), int(EWW2Zv), int(prv))
+	w3xv := State.Value5D(int(z), int(y), int(x), int(EWW3Xv), int(prv))
+	w3yv := State.Value5D(int(z), int(y), int(x), int(EWW3Yv), int(prv))
+	w3zv := State.Value5D(int(z), int(y), int(x), int(EWW3Zv), int(prv))
+	w10v := State.Value5D(int(z), int(y), int(x), int(EWW10v), int(prv))
+	w20v := State.Value5D(int(z), int(y), int(x), int(EWW20v), int(prv))
+	w30v := State.Value5D(int(z), int(y), int(x), int(EWW30v), int(prv))
+	b0v := State.Value5D(int(z), int(y), int(x), int(EWB0v), int(prv))
 
 	// Of the three, only the two built on dtp depend on the Higgs VELOCITY.
 	// Together they are -2 G_0 (dPsi/dt)/c, i.e. exactly the connection acting
@@ -725,12 +723,12 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	// down where it sits, which lowers its own mass there -- the field and the
 	// particle finally arguing with each other.
 	if Params[0].SelfField.IsTrue() {
-		nu1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWNu1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWNu1b), int(prv)))
-		nu2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWNu2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWNu2b), int(prv)))
-		el1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWEL1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWEL1b), int(prv)))
-		el2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWEL2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWEL2b), int(prv)))
-		er1 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWER1a), int(prv)), State.Value(int(z), int(y), int(x), int(EWER1b), int(prv)))
-		er2 := math32.Vec2(State.Value(int(z), int(y), int(x), int(EWER2a), int(prv)), State.Value(int(z), int(y), int(x), int(EWER2b), int(prv)))
+		nu1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWNu1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWNu1b), int(prv)))
+		nu2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWNu2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWNu2b), int(prv)))
+		el1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWEL1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWEL1b), int(prv)))
+		el2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWEL2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWEL2b), int(prv)))
+		er1 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWER1a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWER1b), int(prv)))
+		er2 := math32.Vec2(State.Value5D(int(z), int(y), int(x), int(EWER2a), int(prv)), State.Value5D(int(z), int(y), int(x), int(EWER2b), int(prv)))
 		re := EWSpinBilinear(0, er1, er2, el1, el2) // e_R^dag e_L
 		rn := EWSpinBilinear(0, er1, er2, nu1, nu2) // e_R^dag nu_L
 		yh := -csq * Sqrt2 * Params[0].YukawaE
@@ -802,9 +800,7 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 
 		// [transport] -2g sum_mu (W^mu x d_mu W^nu)  (upper-lower, no signs)
 		// [transpose] +g sum_mu (W_mu x d^nu W^mu)   (metric signs, and
-		//
-		//	d^nu = +d_0 for nu=0 but -d_j for nu=j)
-		//
+		//             d^nu = +d_0 for nu=0 but -d_j for nu=j)
 		// [quartic]   -g^2 sum_mu (W_mu x (W^mu x W^nu))
 		// [divergence] -g (dv x W^nu)
 		ym0 = EWCrossUp(wb, wx, wy, wz, t0, x0, y0, z0).MulScalar(2 * gw)
@@ -860,15 +856,15 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	hv0aN := hvN.Z
 	hv0bN := hvN.W
 
-	State.Set(psi.X+hvCaN, int(z), int(y), int(x), int(EWHsCa), int(cur))
-	State.Set(psi.Y+hvCbN, int(z), int(y), int(x), int(EWHsCb), int(cur))
-	State.Set(psi.Z+hv0aN, int(z), int(y), int(x), int(EWHs0a), int(cur))
-	State.Set(psi.W+hv0bN, int(z), int(y), int(x), int(EWHs0b), int(cur))
+	State.Set5D(psi.X+hvCaN, int(z), int(y), int(x), int(EWHsCa), int(cur))
+	State.Set5D(psi.Y+hvCbN, int(z), int(y), int(x), int(EWHsCb), int(cur))
+	State.Set5D(psi.Z+hv0aN, int(z), int(y), int(x), int(EWHs0a), int(cur))
+	State.Set5D(psi.W+hv0bN, int(z), int(y), int(x), int(EWHs0b), int(cur))
 
-	State.Set(hvCaN, int(z), int(y), int(x), int(EWHvCa), int(cur))
-	State.Set(hvCbN, int(z), int(y), int(x), int(EWHvCb), int(cur))
-	State.Set(hv0aN, int(z), int(y), int(x), int(EWHv0a), int(cur))
-	State.Set(hv0bN, int(z), int(y), int(x), int(EWHv0b), int(cur))
+	State.Set5D(hvCaN, int(z), int(y), int(x), int(EWHvCa), int(cur))
+	State.Set5D(hvCbN, int(z), int(y), int(x), int(EWHvCb), int(cur))
+	State.Set5D(hv0aN, int(z), int(y), int(x), int(EWHv0a), int(cur))
+	State.Set5D(hv0bN, int(z), int(y), int(x), int(EWHv0b), int(cur))
 
 	// ---- mass-eigenstate views ---------------------------------------------
 	// Rotate the freshly-updated (W^3, B) pair through the weak mixing angle.
@@ -880,30 +876,30 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 	cw := Params[0].CosThetaW
 	for k := range 4 {
 		ki := int32(k)
-		w3s := State.Value(int(z), int(y), int(x), int(int32(EWW30s)+ki), int(cur))
-		w3v := State.Value(int(z), int(y), int(x), int(int32(EWW30v)+ki), int(cur))
-		bs := State.Value(int(z), int(y), int(x), int(int32(EWB0s)+ki), int(cur))
-		bv := State.Value(int(z), int(y), int(x), int(int32(EWB0v)+ki), int(cur))
-		State.Set(sw*w3s+cw*bs, int(z), int(y), int(x), int(int32(A0s)+ki), int(cur))
-		State.Set(sw*w3v+cw*bv, int(z), int(y), int(x), int(int32(A0v)+ki), int(cur))
-		State.Set(cw*w3s-sw*bs, int(z), int(y), int(x), int(int32(EWZ0)+ki), int(cur))
+		w3s := State.Value5D(int(z), int(y), int(x), int(int32(EWW30s)+ki), int(cur))
+		w3v := State.Value5D(int(z), int(y), int(x), int(int32(EWW30v)+ki), int(cur))
+		bs := State.Value5D(int(z), int(y), int(x), int(int32(EWB0s)+ki), int(cur))
+		bv := State.Value5D(int(z), int(y), int(x), int(int32(EWB0v)+ki), int(cur))
+		State.Set5D(sw*w3s+cw*bs, int(z), int(y), int(x), int(int32(A0s)+ki), int(cur))
+		State.Set5D(sw*w3v+cw*bv, int(z), int(y), int(x), int(int32(A0v)+ki), int(cur))
+		State.Set5D(cw*w3s-sw*bs, int(z), int(y), int(x), int(int32(EWZ0)+ki), int(cur))
 
-		w1s := State.Value(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
-		w2s := State.Value(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
-		State.Set(w1s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPr0)+ki), int(cur))
-		State.Set(-w2s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPi0)+ki), int(cur))
+		w1s := State.Value5D(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
+		w2s := State.Value5D(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
+		State.Set5D(w1s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPr0)+ki), int(cur))
+		State.Set5D(-w2s*InvSqrt2, int(z), int(y), int(x), int(int32(EWWPi0)+ki), int(cur))
 	}
 	wm := float32(0)
 	for k := range 4 {
 		ki := int32(k)
-		w1s := State.Value(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
-		w2s := State.Value(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
+		w1s := State.Value5D(int(z), int(y), int(x), int(int32(EWW10s)+ki), int(cur))
+		w2s := State.Value5D(int(z), int(y), int(x), int(int32(EWW20s)+ki), int(cur))
 		wm += 0.5 * (w1s*w1s + w2s*w2s)
 	}
-	State.Set(wm, int(z), int(y), int(x), int(EWWMag), int(cur))
+	State.Set5D(wm, int(z), int(y), int(x), int(EWWMag), int(cur))
 
-	State.Set(mag, int(z), int(y), int(x), int(EWHmag), int(cur))
-	State.Set(-0.5*musq*mag+0.25*lambda*mag*mag, int(z), int(y), int(x), int(EWHV), int(cur))
+	State.Set5D(mag, int(z), int(y), int(x), int(EWHmag), int(cur))
+	State.Set5D(-0.5*musq*mag+0.25*lambda*mag*mag, int(z), int(y), int(x), int(EWHV), int(cur))
 }
 
 // EWWStep advances the twelve SU(2) potentials. src carries the
@@ -916,16 +912,16 @@ func ElectroweakKernel(i uint32) { //gosl:kernel
 func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, boris, noWave bool) {
 	vs := int32(EWW10s) + nu
 	vv := int32(EWW10v) + nu
-	p1 := State.Value(int(z), int(y), int(x), int(vs), int(prv))
-	p2 := State.Value(int(z), int(y), int(x), int(vs+8), int(prv))
-	p3 := State.Value(int(z), int(y), int(x), int(vs+16), int(prv))
+	p1 := State.Value5D(int(z), int(y), int(x), int(vs), int(prv))
+	p2 := State.Value5D(int(z), int(y), int(x), int(vs+8), int(prv))
+	p3 := State.Value5D(int(z), int(y), int(x), int(vs+16), int(prv))
 	l1 := Laplacian19(x, y, z, vs, prv, p1)
 	l2 := Laplacian19(x, y, z, vs+8, prv, p2)
 	l3 := Laplacian19(x, y, z, vs+16, prv, p3)
 	f := math32.Vec3(csq*(l1+src.X), csq*(l2+src.Y), csq*(l3+src.Z))
-	q1 := State.Value(int(z), int(y), int(x), int(vv), int(prv))
-	q2 := State.Value(int(z), int(y), int(x), int(vv+8), int(prv))
-	q3 := State.Value(int(z), int(y), int(x), int(vv+16), int(prv))
+	q1 := State.Value5D(int(z), int(y), int(x), int(vv), int(prv))
+	q2 := State.Value5D(int(z), int(y), int(x), int(vv+8), int(prv))
+	q3 := State.Value5D(int(z), int(y), int(x), int(vv+16), int(prv))
 	v := math32.Vec3(q1, q2, q3)
 	var vn math32.Vector3
 	if noWave && nu == 0 {
@@ -942,12 +938,12 @@ func EWWStep(x, y, z, cur, prv, nu int32, csq float32, om, src math32.Vector3, b
 	} else {
 		vn = v.Add(f)
 	}
-	State.Set(vn.X, int(z), int(y), int(x), int(vv), int(cur))
-	State.Set(vn.Y, int(z), int(y), int(x), int(vv+8), int(cur))
-	State.Set(vn.Z, int(z), int(y), int(x), int(vv+16), int(cur))
-	State.Set(p1+vn.X, int(z), int(y), int(x), int(vs), int(cur))
-	State.Set(p2+vn.Y, int(z), int(y), int(x), int(vs+8), int(cur))
-	State.Set(p3+vn.Z, int(z), int(y), int(x), int(vs+16), int(cur))
+	State.Set5D(vn.X, int(z), int(y), int(x), int(vv), int(cur))
+	State.Set5D(vn.Y, int(z), int(y), int(x), int(vv+8), int(cur))
+	State.Set5D(vn.Z, int(z), int(y), int(x), int(vv+16), int(cur))
+	State.Set5D(p1+vn.X, int(z), int(y), int(x), int(vs), int(cur))
+	State.Set5D(p2+vn.Y, int(z), int(y), int(x), int(vs+8), int(cur))
+	State.Set5D(p3+vn.Z, int(z), int(y), int(x), int(vs+16), int(cur))
 }
 
 // EWGaugeStep advances one four-potential (the 0,X,Y,Z state variables
@@ -974,15 +970,15 @@ func EWGaugeStep(x, y, z, cur, prv, v0 int32, csq, j0, jx, jy, jz float32, noWav
 		default:
 			jc = jz
 		}
-		ps := State.Value(int(z), int(y), int(x), int(vs), int(prv))
-		vp := State.Value(int(z), int(y), int(x), int(vv), int(prv))
+		ps := State.Value5D(int(z), int(y), int(x), int(vs), int(prv))
+		vp := State.Value5D(int(z), int(y), int(x), int(vv), int(prv))
 		f := csq * (Laplacian19(x, y, z, vs, prv, ps) + jc)
 		vc := vp + f
 		if noWave && ki == 0 {
 			vc = f // see EWWStep: the scalar potential is the gauge direction
 		}
-		State.Set(vc, int(z), int(y), int(x), int(vv), int(cur))
-		State.Set(ps+vc, int(z), int(y), int(x), int(vs), int(cur))
+		State.Set5D(vc, int(z), int(y), int(x), int(vv), int(cur))
+		State.Set5D(ps+vc, int(z), int(y), int(x), int(vs), int(cur))
 	}
 }
 
@@ -1028,32 +1024,32 @@ func EWFermionKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 
 	// the three-level leapfrog: cur still holds u(t-1) until we write it
-	on1a := State.Value(int(z), int(y), int(x), int(EWNu1a), int(cur))
-	on1b := State.Value(int(z), int(y), int(x), int(EWNu1b), int(cur))
-	on2a := State.Value(int(z), int(y), int(x), int(EWNu2a), int(cur))
-	on2b := State.Value(int(z), int(y), int(x), int(EWNu2b), int(cur))
-	ol1a := State.Value(int(z), int(y), int(x), int(EWEL1a), int(cur))
-	ol1b := State.Value(int(z), int(y), int(x), int(EWEL1b), int(cur))
-	ol2a := State.Value(int(z), int(y), int(x), int(EWEL2a), int(cur))
-	ol2b := State.Value(int(z), int(y), int(x), int(EWEL2b), int(cur))
-	or1a := State.Value(int(z), int(y), int(x), int(EWER1a), int(cur))
-	or1b := State.Value(int(z), int(y), int(x), int(EWER1b), int(cur))
-	or2a := State.Value(int(z), int(y), int(x), int(EWER2a), int(cur))
-	or2b := State.Value(int(z), int(y), int(x), int(EWER2b), int(cur))
+	on1a := State.Value5D(int(z), int(y), int(x), int(EWNu1a), int(cur))
+	on1b := State.Value5D(int(z), int(y), int(x), int(EWNu1b), int(cur))
+	on2a := State.Value5D(int(z), int(y), int(x), int(EWNu2a), int(cur))
+	on2b := State.Value5D(int(z), int(y), int(x), int(EWNu2b), int(cur))
+	ol1a := State.Value5D(int(z), int(y), int(x), int(EWEL1a), int(cur))
+	ol1b := State.Value5D(int(z), int(y), int(x), int(EWEL1b), int(cur))
+	ol2a := State.Value5D(int(z), int(y), int(x), int(EWEL2a), int(cur))
+	ol2b := State.Value5D(int(z), int(y), int(x), int(EWEL2b), int(cur))
+	or1a := State.Value5D(int(z), int(y), int(x), int(EWER1a), int(cur))
+	or1b := State.Value5D(int(z), int(y), int(x), int(EWER1b), int(cur))
+	or2a := State.Value5D(int(z), int(y), int(x), int(EWER2a), int(cur))
+	or2b := State.Value5D(int(z), int(y), int(x), int(EWER2b), int(cur))
 
 	// u(t), where the right-hand side is evaluated
-	nn1a := State.Value(int(z), int(y), int(x), int(EWNu1a), int(prv))
-	nn1b := State.Value(int(z), int(y), int(x), int(EWNu1b), int(prv))
-	nn2a := State.Value(int(z), int(y), int(x), int(EWNu2a), int(prv))
-	nn2b := State.Value(int(z), int(y), int(x), int(EWNu2b), int(prv))
-	nl1a := State.Value(int(z), int(y), int(x), int(EWEL1a), int(prv))
-	nl1b := State.Value(int(z), int(y), int(x), int(EWEL1b), int(prv))
-	nl2a := State.Value(int(z), int(y), int(x), int(EWEL2a), int(prv))
-	nl2b := State.Value(int(z), int(y), int(x), int(EWEL2b), int(prv))
-	nr1a := State.Value(int(z), int(y), int(x), int(EWER1a), int(prv))
-	nr1b := State.Value(int(z), int(y), int(x), int(EWER1b), int(prv))
-	nr2a := State.Value(int(z), int(y), int(x), int(EWER2a), int(prv))
-	nr2b := State.Value(int(z), int(y), int(x), int(EWER2b), int(prv))
+	nn1a := State.Value5D(int(z), int(y), int(x), int(EWNu1a), int(prv))
+	nn1b := State.Value5D(int(z), int(y), int(x), int(EWNu1b), int(prv))
+	nn2a := State.Value5D(int(z), int(y), int(x), int(EWNu2a), int(prv))
+	nn2b := State.Value5D(int(z), int(y), int(x), int(EWNu2b), int(prv))
+	nl1a := State.Value5D(int(z), int(y), int(x), int(EWEL1a), int(prv))
+	nl1b := State.Value5D(int(z), int(y), int(x), int(EWEL1b), int(prv))
+	nl2a := State.Value5D(int(z), int(y), int(x), int(EWEL2a), int(prv))
+	nl2b := State.Value5D(int(z), int(y), int(x), int(EWEL2b), int(prv))
+	nr1a := State.Value5D(int(z), int(y), int(x), int(EWER1a), int(prv))
+	nr1b := State.Value5D(int(z), int(y), int(x), int(EWER1b), int(prv))
+	nr2a := State.Value5D(int(z), int(y), int(x), int(EWER2a), int(prv))
+	nr2b := State.Value5D(int(z), int(y), int(x), int(EWER2b), int(prv))
 
 	gn1a := Gradient10(x, y, z, int32(EWNu1a), prv)
 	gn1b := Gradient10(x, y, z, int32(EWNu1b), prv)
@@ -1111,10 +1107,10 @@ func EWFermionKernel(i uint32) { //gosl:kernel
 	// quantity, so y phi is an inverse Compton length and c y phi is the rate
 	// per step that L and R actually trade at. Params.MassE is the former.
 	ye := Params[0].YukawaE * InvSqrt2 * cc
-	hca := ye * State.Value(int(z), int(y), int(x), int(EWHsCa), int(prv))
-	hcb := ye * State.Value(int(z), int(y), int(x), int(EWHsCb), int(prv))
-	h0a := ye * State.Value(int(z), int(y), int(x), int(EWHs0a), int(prv))
-	h0b := ye * State.Value(int(z), int(y), int(x), int(EWHs0b), int(prv))
+	hca := ye * State.Value5D(int(z), int(y), int(x), int(EWHsCa), int(prv))
+	hcb := ye * State.Value5D(int(z), int(y), int(x), int(EWHsCb), int(prv))
+	h0a := ye * State.Value5D(int(z), int(y), int(x), int(EWHs0a), int(prv))
+	h0b := ye * State.Value5D(int(z), int(y), int(x), int(EWHs0b), int(prv))
 
 	dn1a += hca*nr1b + hcb*nr1a
 	dn1b += hcb*nr1b - hca*nr1a
@@ -1150,22 +1146,22 @@ func EWFermionKernel(i uint32) { //gosl:kernel
 	// "the weak force only touches left-handed fields"
 	// means in the equation rather than in words.
 	if Params[0].EM.IsTrue() {
-		w10 := State.Value(int(z), int(y), int(x), int(EWW10s), int(prv))
-		w1x := State.Value(int(z), int(y), int(x), int(EWW1Xs), int(prv))
-		w1y := State.Value(int(z), int(y), int(x), int(EWW1Ys), int(prv))
-		w1z := State.Value(int(z), int(y), int(x), int(EWW1Zs), int(prv))
-		w20 := State.Value(int(z), int(y), int(x), int(EWW20s), int(prv))
-		w2x := State.Value(int(z), int(y), int(x), int(EWW2Xs), int(prv))
-		w2y := State.Value(int(z), int(y), int(x), int(EWW2Ys), int(prv))
-		w2z := State.Value(int(z), int(y), int(x), int(EWW2Zs), int(prv))
-		w30 := State.Value(int(z), int(y), int(x), int(EWW30s), int(prv))
-		w3x := State.Value(int(z), int(y), int(x), int(EWW3Xs), int(prv))
-		w3y := State.Value(int(z), int(y), int(x), int(EWW3Ys), int(prv))
-		w3z := State.Value(int(z), int(y), int(x), int(EWW3Zs), int(prv))
-		b0 := State.Value(int(z), int(y), int(x), int(EWB0s), int(prv))
-		bx := State.Value(int(z), int(y), int(x), int(EWBXs), int(prv))
-		by := State.Value(int(z), int(y), int(x), int(EWBYs), int(prv))
-		bz := State.Value(int(z), int(y), int(x), int(EWBZs), int(prv))
+		w10 := State.Value5D(int(z), int(y), int(x), int(EWW10s), int(prv))
+		w1x := State.Value5D(int(z), int(y), int(x), int(EWW1Xs), int(prv))
+		w1y := State.Value5D(int(z), int(y), int(x), int(EWW1Ys), int(prv))
+		w1z := State.Value5D(int(z), int(y), int(x), int(EWW1Zs), int(prv))
+		w20 := State.Value5D(int(z), int(y), int(x), int(EWW20s), int(prv))
+		w2x := State.Value5D(int(z), int(y), int(x), int(EWW2Xs), int(prv))
+		w2y := State.Value5D(int(z), int(y), int(x), int(EWW2Ys), int(prv))
+		w2z := State.Value5D(int(z), int(y), int(x), int(EWW2Zs), int(prv))
+		w30 := State.Value5D(int(z), int(y), int(x), int(EWW30s), int(prv))
+		w3x := State.Value5D(int(z), int(y), int(x), int(EWW3Xs), int(prv))
+		w3y := State.Value5D(int(z), int(y), int(x), int(EWW3Ys), int(prv))
+		w3z := State.Value5D(int(z), int(y), int(x), int(EWW3Zs), int(prv))
+		b0 := State.Value5D(int(z), int(y), int(x), int(EWB0s), int(prv))
+		bx := State.Value5D(int(z), int(y), int(x), int(EWBXs), int(prv))
+		by := State.Value5D(int(z), int(y), int(x), int(EWBYs), int(prv))
+		bz := State.Value5D(int(z), int(y), int(x), int(EWBZs), int(prv))
 
 		// the doublet at each spin component: (nu real, nu imag, e real, e imag)
 		p1 := math32.Vec4(nn1a, nn1b, nl1a, nl1b)
@@ -1244,28 +1240,28 @@ func EWFermionKernel(i uint32) { //gosl:kernel
 		r2b *= df
 	}
 
-	State.Set(n1a, int(z), int(y), int(x), int(EWNu1a), int(cur))
-	State.Set(n1b, int(z), int(y), int(x), int(EWNu1b), int(cur))
-	State.Set(n2a, int(z), int(y), int(x), int(EWNu2a), int(cur))
-	State.Set(n2b, int(z), int(y), int(x), int(EWNu2b), int(cur))
-	State.Set(l1a, int(z), int(y), int(x), int(EWEL1a), int(cur))
-	State.Set(l1b, int(z), int(y), int(x), int(EWEL1b), int(cur))
-	State.Set(l2a, int(z), int(y), int(x), int(EWEL2a), int(cur))
-	State.Set(l2b, int(z), int(y), int(x), int(EWEL2b), int(cur))
-	State.Set(r1a, int(z), int(y), int(x), int(EWER1a), int(cur))
-	State.Set(r1b, int(z), int(y), int(x), int(EWER1b), int(cur))
-	State.Set(r2a, int(z), int(y), int(x), int(EWER2a), int(cur))
-	State.Set(r2b, int(z), int(y), int(x), int(EWER2b), int(cur))
+	State.Set5D(n1a, int(z), int(y), int(x), int(EWNu1a), int(cur))
+	State.Set5D(n1b, int(z), int(y), int(x), int(EWNu1b), int(cur))
+	State.Set5D(n2a, int(z), int(y), int(x), int(EWNu2a), int(cur))
+	State.Set5D(n2b, int(z), int(y), int(x), int(EWNu2b), int(cur))
+	State.Set5D(l1a, int(z), int(y), int(x), int(EWEL1a), int(cur))
+	State.Set5D(l1b, int(z), int(y), int(x), int(EWEL1b), int(cur))
+	State.Set5D(l2a, int(z), int(y), int(x), int(EWEL2a), int(cur))
+	State.Set5D(l2b, int(z), int(y), int(x), int(EWEL2b), int(cur))
+	State.Set5D(r1a, int(z), int(y), int(x), int(EWER1a), int(cur))
+	State.Set5D(r1b, int(z), int(y), int(x), int(EWER1b), int(cur))
+	State.Set5D(r2a, int(z), int(y), int(x), int(EWER2a), int(cur))
+	State.Set5D(r2b, int(z), int(y), int(x), int(EWER2b), int(cur))
 
 	// the STAGGERED magnitudes, as WeylKernel uses: a three-level leapfrog
 	// conserves the product of adjacent levels, not the square of one
 	nm := nn1a*n1a + nn1b*n1b + nn2a*n2a + nn2b*n2b
 	lm := nl1a*l1a + nl1b*l1b + nl2a*l2a + nl2b*l2b
 	rm := nr1a*r1a + nr1b*r1b + nr2a*r2a + nr2b*r2b
-	State.Set(nm, int(z), int(y), int(x), int(EWNuMag), int(cur))
-	State.Set(lm, int(z), int(y), int(x), int(EWELMag), int(cur))
-	State.Set(rm, int(z), int(y), int(x), int(EWERMag), int(cur))
-	State.Set(lm+rm, int(z), int(y), int(x), int(EWEMag), int(cur))
+	State.Set5D(nm, int(z), int(y), int(x), int(EWNuMag), int(cur))
+	State.Set5D(lm, int(z), int(y), int(x), int(EWELMag), int(cur))
+	State.Set5D(rm, int(z), int(y), int(x), int(EWERMag), int(cur))
+	State.Set5D(lm+rm, int(z), int(y), int(x), int(EWEMag), int(cur))
 }
 
 func ElectroweakDampKernel(i uint32) { //gosl:kernel
@@ -1286,11 +1282,11 @@ func ElectroweakDampKernel(i uint32) { //gosl:kernel
 		base := int32(EWB0s) + int32(g)*8
 		for k := range 4 {
 			vr := base + int32(k)
-			pp := State.Value(int(z), int(y), int(x), int(vr), int(prv))
+			pp := State.Value5D(int(z), int(y), int(x), int(vr), int(prv))
 			f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
 			v := csq * f // key damp: no +=
-			State.Set(v, int(z), int(y), int(x), int(vr+4), int(cur))
-			State.Set(pp+v, int(z), int(y), int(x), int(vr), int(cur))
+			State.Set5D(v, int(z), int(y), int(x), int(vr+4), int(cur))
+			State.Set5D(pp+v, int(z), int(y), int(x), int(vr), int(cur))
 		}
 	}
 
@@ -1312,8 +1308,8 @@ func ElectroweakDampKernel(i uint32) { //gosl:kernel
 	ctx.EdgeInward(x, y, z, &ix, &iy, &iz)
 	for k := range 9 { // the four components, their four velocities, and Hmag
 		vr := int32(EWHsCa) + int32(k)
-		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(cur)), int(z), int(y), int(x), int(vr), int(cur))
-		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(prv)), int(z), int(y), int(x), int(vr), int(prv))
+		State.Set5D(State.Value5D(int(iz), int(iy), int(ix), int(vr), int(cur)), int(z), int(y), int(x), int(vr), int(cur))
+		State.Set5D(State.Value5D(int(iz), int(iy), int(ix), int(vr), int(prv)), int(z), int(y), int(x), int(vr), int(prv))
 	}
 	// The leptons are FIRST order, so Sommerfeld damping has nothing to leave
 	// out: they get the open halo of EdgesOpenKernel instead, which is the
@@ -1322,8 +1318,8 @@ func ElectroweakDampKernel(i uint32) { //gosl:kernel
 	// because it would fight this one over the gauge edge cells.
 	for k := range 16 { // three spinors, then the four magnitudes
 		vr := int32(EWNu1a) + int32(k)
-		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(cur)), int(z), int(y), int(x), int(vr), int(cur))
-		State.Set(State.Value(int(iz), int(iy), int(ix), int(vr), int(prv)), int(z), int(y), int(x), int(vr), int(prv))
+		State.Set5D(State.Value5D(int(iz), int(iy), int(ix), int(vr), int(cur)), int(z), int(y), int(x), int(vr), int(cur))
+		State.Set5D(State.Value5D(int(iz), int(iy), int(ix), int(vr), int(prv)), int(z), int(y), int(x), int(vr), int(prv))
 	}
 }
 

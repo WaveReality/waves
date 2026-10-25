@@ -47,9 +47,9 @@ func WaveKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
-	pvel := State.Value(int(z), int(y), int(x), int(WaveVel), int(prv))
-	vpot := State.Value(int(z), int(y), int(x), int(WaveV), int(prv))
+	ppos := State.Value5D(int(z), int(y), int(x), int(WavePos), int(prv))
+	pvel := State.Value5D(int(z), int(y), int(x), int(WaveVel), int(prv))
+	vpot := State.Value5D(int(z), int(y), int(x), int(WaveV), int(prv))
 
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
@@ -79,13 +79,13 @@ func WaveKernel(i uint32) { //gosl:kernel
 			potential = PotentialEnergy1D(x, y, z, int32(WavePos), prv, ppos)
 		}
 
-		State.Set(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
-		State.Set(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
-		State.Set(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
+		State.Set5D(kinetic, int(z), int(y), int(x), int(WaveKinetic), int(cur))
+		State.Set5D(potential, int(z), int(y), int(x), int(WavePotential), int(cur))
+		State.Set5D(kinetic+potential, int(z), int(y), int(x), int(WaveEnergy), int(cur))
 	}
-	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
-	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
-	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+	State.Set5D(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set5D(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set5D(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
 // WaveDampKernel is the kernel for computing the Wave equations
@@ -100,7 +100,7 @@ func WaveDampKernel(i uint32) { //gosl:kernel
 	sz := ctx.SizePlus1() // exclude updating on edges
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	ppos := State.Value(int(z), int(y), int(x), int(WavePos), int(prv))
+	ppos := State.Value5D(int(z), int(y), int(x), int(WavePos), int(prv))
 	var force float32
 	if Params[0].ThreeD.IsTrue() {
 		force = LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(WavePos), prv, ppos)
@@ -110,9 +110,9 @@ func WaveDampKernel(i uint32) { //gosl:kernel
 	vel := Params[0].CSq * force // key damp: no +=
 	pos := ppos + vel
 
-	State.Set(force, int(z), int(y), int(x), int(WaveForce), int(cur))
-	State.Set(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
-	State.Set(pos, int(z), int(y), int(x), int(WavePos), int(cur))
+	State.Set5D(force, int(z), int(y), int(x), int(WaveForce), int(cur))
+	State.Set5D(vel, int(z), int(y), int(x), int(WaveVel), int(cur))
+	State.Set5D(pos, int(z), int(y), int(x), int(WavePos), int(cur))
 }
 
 //gosl:end

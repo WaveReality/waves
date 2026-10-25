@@ -514,9 +514,8 @@ fn ElectroweakKernel(i: u32) { //gosl:kernel
 		var el1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL1b), u32(prv))));
 		var el2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWEL2b), u32(prv))));
 		var er1 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER1b), u32(prv))));
-		var er2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44],
-		u32(z), u32(y), u32(x), u32(EWER2b), u32(prv))));
-		var re = EWSpinBilinear(i32(i32(0)), er1, er2, el1, el2);
+		var er2 = vec2<f32>(StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2a), u32(prv))), StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(EWER2b), u32(prv))));
+		var re = EWSpinBilinear(i32(i32(0)), er1, er2, el1, el2); // e_R^dag e_L
 		var rn = EWSpinBilinear(i32(i32(0)), er1, er2, nu1, nu2); // e_R^dag nu_L
 		var yh = -csq * Sqrt2 * Params[0].YukawaE;
 		hf.x += yh * rn.x;

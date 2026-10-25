@@ -55,7 +55,7 @@ func (ss *Sim) CopyCurToPrev() {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
 				for vi := range nvars {
-					State.Set(State.Value(int(f.Z), int(f.Y), int(f.X), int(vi), int(cur)), int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
+					State.Set5D(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(vi), int(cur)), int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
 				}
 			}
 		}
@@ -167,10 +167,10 @@ func (ss *Sim) PacketEnv(vr enums.Enum, curPrev CurPrevBoth, dim math32.Dims, ct
 				g := ss.PacketDist(CoordToFloat(c).Sub(ctrf), dim) / width
 				v := amp * math32.FastExp(-g*g)
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -185,10 +185,10 @@ func (ss *Sim) Point(vr enums.Enum, curPrev CurPrevBoth, c math32.Vector3i, val 
 	prv := ctx.PrevState()
 	f := CenterFull(c)
 	if curPrev == CurOnly || curPrev == Both {
-		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+		State.SetAdd5D(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 	}
 	if curPrev == PrevOnly || curPrev == Both {
-		State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+		State.SetAdd5D(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 	}
 }
 
@@ -205,10 +205,10 @@ func (ss *Sim) Fill(vr enums.Enum, curPrev CurPrevBoth, val float32) {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(val, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -230,8 +230,8 @@ func (ss *Sim) Sine(vr enums.Enum, dim math32.Dims, wavelength, phase, amp, off 
 				f := c.AddScalar(1)
 				dv := float32(c.Dim(dim))
 				v := off + amp*math32.Sin(TwoPi*((dv+phase)/wavelength))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}
@@ -254,10 +254,10 @@ func (ss *Sim) Gauss(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, wid
 				d := ff.Sub(ctr).Length() / width
 				v := off + amp*math32.FastExp(-d*d)
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -284,10 +284,10 @@ func (ss *Sim) Step(vr enums.Enum, curPrev CurPrevBoth, pos math32.Vector3, dim 
 					v += amp
 				}
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -314,12 +314,12 @@ func (ss *Sim) PosWavePacket(vr enums.Enum, dim math32.Dims, ctr math32.Vector3,
 				ff := CoordToFloat(c)
 				d := ff.Sub(ctrf)
 				cv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)
-				State.SetAdd(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(cv, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 
 				ff.SetAdd(diroff)
 				d = ff.Sub(ctrf)
 				pv := GaussWave(d.Dim(dim), ss.PacketDist(d, dim), wavelength, width, phase, amp)
-				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(pv, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}
@@ -376,10 +376,10 @@ func (ss *Sim) MovingWavePacket(posVar, velVar enums.Enum, dim math32.Dims, ctr 
 				dl := ss.PacketDist(d, dim)
 				pv := GaussWave(dd, dl, wavelength, width, phase, amp)
 				vv := dir * om * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
-				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
-				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(prv))
-				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(velI), int(cur))
-				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(velI), int(prv))
+				State.SetAdd5D(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(cur))
+				State.SetAdd5D(pv, int(f.Z), int(f.Y), int(f.X), int(posI), int(prv))
+				State.SetAdd5D(vv, int(f.Z), int(f.Y), int(f.X), int(velI), int(cur))
+				State.SetAdd5D(vv, int(f.Z), int(f.Y), int(f.X), int(velI), int(prv))
 			}
 		}
 	}
@@ -408,10 +408,10 @@ func (ss *Sim) ComplexPacket(posA, posB enums.Enum, dim math32.Dims, ctr math32.
 				dl := ss.PacketDist(d, dim)
 				av := GaussWave(dd, dl, wavelength, width, phase, amp)
 				bv := dir * GaussWave(dd, dl, wavelength, width, phase-0.25, amp)
-				State.SetAdd(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(cur))
-				State.SetAdd(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(prv))
-				State.SetAdd(bv, int(f.Z), int(f.Y), int(f.X), int(bi), int(cur))
-				State.SetAdd(bv, int(f.Z), int(f.Y), int(f.X), int(bi), int(prv))
+				State.SetAdd5D(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(cur))
+				State.SetAdd5D(av, int(f.Z), int(f.Y), int(f.X), int(ai), int(prv))
+				State.SetAdd5D(bv, int(f.Z), int(f.Y), int(f.X), int(bi), int(cur))
+				State.SetAdd5D(bv, int(f.Z), int(f.Y), int(f.X), int(bi), int(prv))
 			}
 		}
 	}
@@ -483,10 +483,10 @@ func (ss *Sim) CarrierPacket(pos, vel enums.Enum, dim math32.Dims, ctr, waveleng
 				pv := env * math32.Cos(ph)
 				vv := dir * om * env * math32.Sin(ph)
 				f := c.AddScalar(1)
-				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(cur))
-				State.SetAdd(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(prv))
-				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(cur))
-				State.SetAdd(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
+				State.SetAdd5D(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(cur))
+				State.SetAdd5D(pv, int(f.Z), int(f.Y), int(f.X), int(pi), int(prv))
+				State.SetAdd5D(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(cur))
+				State.SetAdd5D(vv, int(f.Z), int(f.Y), int(f.X), int(vi), int(prv))
 			}
 		}
 	}
@@ -577,16 +577,16 @@ func (ss *Sim) ChiralSlab(base enums.Enum, dim math32.Dims, helicity, amp, om, v
 				eo := amp * math32.FastExp(-e*e)
 				ph := k * d
 				na, nb := en*math32.Cos(ph), en*math32.Sin(ph)
-				po := om + eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(prv))
+				po := om + eoh*State.Value5D(int(f.Z), int(f.Y), int(f.X), int(A0s), int(prv))
 				oa, ob := eo*math32.Cos(ph+po), eo*math32.Sin(ph+po)
-				State.SetAdd(s1*na, int(f.Z), int(f.Y), int(f.X), int(c1), int(prv))
-				State.SetAdd(s1*nb, int(f.Z), int(f.Y), int(f.X), int(c1+1), int(prv))
-				State.SetAdd(s2*na, int(f.Z), int(f.Y), int(f.X), int(c1+2), int(prv))
-				State.SetAdd(s2*nb, int(f.Z), int(f.Y), int(f.X), int(c1+3), int(prv))
-				State.SetAdd(s1*oa, int(f.Z), int(f.Y), int(f.X), int(c1), int(cur))
-				State.SetAdd(s1*ob, int(f.Z), int(f.Y), int(f.X), int(c1+1), int(cur))
-				State.SetAdd(s2*oa, int(f.Z), int(f.Y), int(f.X), int(c1+2), int(cur))
-				State.SetAdd(s2*ob, int(f.Z), int(f.Y), int(f.X), int(c1+3), int(cur))
+				State.SetAdd5D(s1*na, int(f.Z), int(f.Y), int(f.X), int(c1), int(prv))
+				State.SetAdd5D(s1*nb, int(f.Z), int(f.Y), int(f.X), int(c1+1), int(prv))
+				State.SetAdd5D(s2*na, int(f.Z), int(f.Y), int(f.X), int(c1+2), int(prv))
+				State.SetAdd5D(s2*nb, int(f.Z), int(f.Y), int(f.X), int(c1+3), int(prv))
+				State.SetAdd5D(s1*oa, int(f.Z), int(f.Y), int(f.X), int(c1), int(cur))
+				State.SetAdd5D(s1*ob, int(f.Z), int(f.Y), int(f.X), int(c1+1), int(cur))
+				State.SetAdd5D(s2*oa, int(f.Z), int(f.Y), int(f.X), int(c1+2), int(cur))
+				State.SetAdd5D(s2*ob, int(f.Z), int(f.Y), int(f.X), int(c1+3), int(cur))
 			}
 		}
 	}
@@ -673,12 +673,12 @@ func (ss *Sim) EFromA0() {
 				} else {
 					g = Gradient1D(f.X, f.Y, f.Z, int32(A0s), cur)
 				}
-				State.SetAdd(-g.X, int(f.Z), int(f.Y), int(f.X), int(EX), int(cur))
-				State.SetAdd(-g.Y, int(f.Z), int(f.Y), int(f.X), int(EY), int(cur))
-				State.SetAdd(-g.Z, int(f.Z), int(f.Y), int(f.X), int(EZ), int(cur))
-				State.SetAdd(-g.X, int(f.Z), int(f.Y), int(f.X), int(EX), int(prv))
-				State.SetAdd(-g.Y, int(f.Z), int(f.Y), int(f.X), int(EY), int(prv))
-				State.SetAdd(-g.Z, int(f.Z), int(f.Y), int(f.X), int(EZ), int(prv))
+				State.SetAdd5D(-g.X, int(f.Z), int(f.Y), int(f.X), int(EX), int(cur))
+				State.SetAdd5D(-g.Y, int(f.Z), int(f.Y), int(f.X), int(EY), int(cur))
+				State.SetAdd5D(-g.Z, int(f.Z), int(f.Y), int(f.X), int(EZ), int(cur))
+				State.SetAdd5D(-g.X, int(f.Z), int(f.Y), int(f.X), int(EX), int(prv))
+				State.SetAdd5D(-g.Y, int(f.Z), int(f.Y), int(f.X), int(EY), int(prv))
+				State.SetAdd5D(-g.Z, int(f.Z), int(f.Y), int(f.X), int(EZ), int(prv))
 			}
 		}
 	}
@@ -728,9 +728,9 @@ func (ss *Sim) chargedPhase(sign, om float32, local bool) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				v := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * State.Value(int(f.Z), int(f.Y), int(f.X), int(CabAs), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(prv))
+				v := sign * (om - eoh*State.Value5D(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur))) * State.Value5D(int(f.Z), int(f.Y), int(f.X), int(CabAs), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(CabBv), int(prv))
 			}
 		}
 	}
@@ -800,20 +800,20 @@ func (ss *Sim) diracPhase(sign, om float32, local bool) {
 		for c.Y = range sz.Y {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
-				w := sign * (om - eoh*State.Value(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur)))
+				w := sign * (om - eoh*State.Value5D(int(f.Z), int(f.Y), int(f.X), int(A0s), int(cur)))
 				// d(chi) = i w chi for each component: (a, b) -> (-w b, w a)
-				v1a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur))
-				v1b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur))
-				v2a := -w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur))
-				v2b := w * State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur))
-				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(cur))
-				State.SetAdd(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(prv))
-				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(cur))
-				State.SetAdd(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(prv))
-				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(cur))
-				State.SetAdd(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(prv))
-				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(cur))
-				State.SetAdd(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(prv))
+				v1a := -w * State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur))
+				v1b := w * State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur))
+				v2a := -w * State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur))
+				v2b := w * State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur))
+				State.SetAdd5D(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(cur))
+				State.SetAdd5D(v1a, int(f.Z), int(f.Y), int(f.X), int(Dirac1Av), int(prv))
+				State.SetAdd5D(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(cur))
+				State.SetAdd5D(v1b, int(f.Z), int(f.Y), int(f.X), int(Dirac1Bv), int(prv))
+				State.SetAdd5D(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(cur))
+				State.SetAdd5D(v2a, int(f.Z), int(f.Y), int(f.X), int(Dirac2Av), int(prv))
+				State.SetAdd5D(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(cur))
+				State.SetAdd5D(v2b, int(f.Z), int(f.Y), int(f.X), int(Dirac2Bv), int(prv))
 			}
 		}
 	}
@@ -881,8 +881,8 @@ func (ss *Sim) SmoothNoise(vr EWStates, amp float32, nmodes int) {
 				for c.X = range sz.X {
 					f := c.AddScalar(1)
 					v := ma * math32.Sin(kx*float32(c.X)+ky*float32(c.Y)+kz*float32(c.Z)+ph)
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -911,8 +911,8 @@ func (ss *Sim) Quadratic(vr enums.Enum, ctr math32.Vector3, coef, vmax float32) 
 				if vmax > 0 && math32.Abs(v) > vmax {
 					v = math32.Copysign(vmax, v)
 				}
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}
@@ -935,10 +935,10 @@ func (ss *Sim) Expo(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, deca
 				d := CoordToFloat(c).Sub(ctr).Length()
 				v := amp * math32.FastExp(-d/decay)
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -963,10 +963,10 @@ func (ss *Sim) ExpoP(vr enums.Enum, curPrev CurPrevBoth, ctr math32.Vector3, dim
 				d := CoordToFloat(c).Sub(ctr)
 				v := amp * (d.Dim(dim) / decay) * math32.FastExp(-d.Length()/decay)
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -999,10 +999,10 @@ func (ss *Sim) SineBox(vr enums.Enum, curPrev CurPrevBoth, n int32, amp float32)
 					v *= math32.Sin(fn * math32.Pi * float32(c.Dim(d)+1) / float32(ln+1))
 				}
 				if curPrev == CurOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
 				}
 				if curPrev == PrevOnly || curPrev == Both {
-					State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+					State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 				}
 			}
 		}
@@ -1031,8 +1031,8 @@ func (ss *Sim) Ramp(vr enums.Enum, dim math32.Dims, slope float32) {
 			for c.X = range sz.X {
 				f := c.AddScalar(1)
 				v := slope * (CoordToFloat(c).Dim(dim) - ctr.Dim(dim))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}
@@ -1061,8 +1061,8 @@ func (ss *Sim) InvR(vr enums.Enum, ctr math32.Vector3, val float32) {
 				if c != ctri {
 					v = val / d
 				}
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}
@@ -1090,8 +1090,8 @@ func (ss *Sim) InvRDrive(vr enums.Enum, ctr math32.Vector3, decay float32) {
 				if c != ctri {
 					v = math32.Pow(decay, d)
 				}
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
-				State.SetAdd(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(cur))
+				State.SetAdd5D(v, int(f.Z), int(f.Y), int(f.X), int(vri), int(prv))
 			}
 		}
 	}

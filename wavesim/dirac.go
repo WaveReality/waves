@@ -104,18 +104,18 @@ func DiracKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	p1a := State.Value(int(z), int(y), int(x), int(Dirac1As), int(prv))
-	p1b := State.Value(int(z), int(y), int(x), int(Dirac1Bs), int(prv))
-	p2a := State.Value(int(z), int(y), int(x), int(Dirac2As), int(prv))
-	p2b := State.Value(int(z), int(y), int(x), int(Dirac2Bs), int(prv))
-	v1a := State.Value(int(z), int(y), int(x), int(Dirac1Av), int(prv))
-	v1b := State.Value(int(z), int(y), int(x), int(Dirac1Bv), int(prv))
-	v2a := State.Value(int(z), int(y), int(x), int(Dirac2Av), int(prv))
-	v2b := State.Value(int(z), int(y), int(x), int(Dirac2Bv), int(prv))
+	p1a := State.Value5D(int(z), int(y), int(x), int(Dirac1As), int(prv))
+	p1b := State.Value5D(int(z), int(y), int(x), int(Dirac1Bs), int(prv))
+	p2a := State.Value5D(int(z), int(y), int(x), int(Dirac2As), int(prv))
+	p2b := State.Value5D(int(z), int(y), int(x), int(Dirac2Bs), int(prv))
+	v1a := State.Value5D(int(z), int(y), int(x), int(Dirac1Av), int(prv))
+	v1b := State.Value5D(int(z), int(y), int(x), int(Dirac1Bv), int(prv))
+	v2a := State.Value5D(int(z), int(y), int(x), int(Dirac2Av), int(prv))
+	v2b := State.Value5D(int(z), int(y), int(x), int(Dirac2Bv), int(prv))
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
-	vpot := State.Value(int(z), int(y), int(x), int(DiracV), int(prv))
+	vpot := State.Value5D(int(z), int(y), int(x), int(DiracV), int(prv))
 	l1a := Laplacian19(x, y, z, int32(Dirac1As), prv, p1a)
 	l1b := Laplacian19(x, y, z, int32(Dirac1Bs), prv, p1b)
 	l2a := Laplacian19(x, y, z, int32(Dirac2As), prv, p2a)
@@ -135,10 +135,10 @@ func DiracKernel(i uint32) { //gosl:kernel
 	em := Params[0].EM.IsTrue()
 	var a0, omega float32
 	if em {
-		a0 = State.Value(int(z), int(y), int(x), int(A0s), int(prv))
-		ax := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-		ay := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-		az := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		a0 = State.Value5D(int(z), int(y), int(x), int(A0s), int(prv))
+		ax := State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+		ay := State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+		az := State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 		e2h := Params[0].E2OverH
 		cc := Params[0].C
 		asq := a0*a0 - (ax*ax + ay*ay + az*az)
@@ -152,12 +152,12 @@ func DiracKernel(i uint32) { //gosl:kernel
 		// the spin term: sigma . (cB + iE), mixing the two components.
 		// Params.SigmaF carries the sign and strength.
 		sf := Params[0].SigmaF
-		bx := cc * State.Value(int(z), int(y), int(x), int(BX), int(prv))
-		by := cc * State.Value(int(z), int(y), int(x), int(BY), int(prv))
-		bz := cc * State.Value(int(z), int(y), int(x), int(BZ), int(prv))
-		ex := State.Value(int(z), int(y), int(x), int(EX), int(prv))
-		ey := State.Value(int(z), int(y), int(x), int(EY), int(prv))
-		ez := State.Value(int(z), int(y), int(x), int(EZ), int(prv))
+		bx := cc * State.Value5D(int(z), int(y), int(x), int(BX), int(prv))
+		by := cc * State.Value5D(int(z), int(y), int(x), int(BY), int(prv))
+		bz := cc * State.Value5D(int(z), int(y), int(x), int(BZ), int(prv))
+		ex := State.Value5D(int(z), int(y), int(x), int(EX), int(prv))
+		ey := State.Value5D(int(z), int(y), int(x), int(EY), int(prv))
+		ez := State.Value5D(int(z), int(y), int(x), int(EZ), int(prv))
 		a1a += sf * (p1a*bz - p1b*ez + p2a*(bx+ey) - p2b*(ex-by))
 		a1b += sf * (p1b*bz + p1a*ez + p2b*(bx+ey) + p2a*(ex-by))
 		a2a += sf * (-p2a*bz + p2b*ez + p1a*(bx-ey) - p1b*(ex+by))
@@ -207,14 +207,14 @@ func DiracKernel(i uint32) { //gosl:kernel
 	if em {
 		rho -= Params[0].EsqOverMCSq * a0 * mag
 		ja := Params[0].EsqOverMCSq * Params[0].C * mag
-		jx -= ja * State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-		jy -= ja * State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-		jz -= ja * State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		jx -= ja * State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+		jy -= ja * State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+		jz -= ja * State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 	}
-	State.Set(rho, int(z), int(y), int(x), int(Charge), int(cur))
-	State.Set(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
-	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
-	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
+	State.Set5D(rho, int(z), int(y), int(x), int(Charge), int(cur))
+	State.Set5D(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
+	State.Set5D(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
+	State.Set5D(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
 
 	// the LEFT-chiral half, recovered rather than evolved. Writing the Dirac
 	// equation in the chiral basis splits it into two 2-spinors:
@@ -252,21 +252,21 @@ func DiracKernel(i uint32) { //gosl:kernel
 	w1b := kf * u1a
 	w2a := -kf * u2b
 	w2b := kf * u2a
-	State.Set(w1a, int(z), int(y), int(x), int(DiracL1As), int(cur))
-	State.Set(w1b, int(z), int(y), int(x), int(DiracL1Bs), int(cur))
-	State.Set(w2a, int(z), int(y), int(x), int(DiracL2As), int(cur))
-	State.Set(w2b, int(z), int(y), int(x), int(DiracL2Bs), int(cur))
-	State.Set(w1a*w1a+w1b*w1b+w2a*w2a+w2b*w2b, int(z), int(y), int(x), int(DiracLMag), int(cur))
+	State.Set5D(w1a, int(z), int(y), int(x), int(DiracL1As), int(cur))
+	State.Set5D(w1b, int(z), int(y), int(x), int(DiracL1Bs), int(cur))
+	State.Set5D(w2a, int(z), int(y), int(x), int(DiracL2As), int(cur))
+	State.Set5D(w2b, int(z), int(y), int(x), int(DiracL2Bs), int(cur))
+	State.Set5D(w1a*w1a+w1b*w1b+w2a*w2a+w2b*w2b, int(z), int(y), int(x), int(DiracLMag), int(cur))
 
-	State.Set(mag, int(z), int(y), int(x), int(DiracMag), int(cur))
-	State.Set(n1a, int(z), int(y), int(x), int(Dirac1Av), int(cur))
-	State.Set(n1b, int(z), int(y), int(x), int(Dirac1Bv), int(cur))
-	State.Set(n2a, int(z), int(y), int(x), int(Dirac2Av), int(cur))
-	State.Set(n2b, int(z), int(y), int(x), int(Dirac2Bv), int(cur))
-	State.Set(q1a, int(z), int(y), int(x), int(Dirac1As), int(cur))
-	State.Set(q1b, int(z), int(y), int(x), int(Dirac1Bs), int(cur))
-	State.Set(q2a, int(z), int(y), int(x), int(Dirac2As), int(cur))
-	State.Set(q2b, int(z), int(y), int(x), int(Dirac2Bs), int(cur))
+	State.Set5D(mag, int(z), int(y), int(x), int(DiracMag), int(cur))
+	State.Set5D(n1a, int(z), int(y), int(x), int(Dirac1Av), int(cur))
+	State.Set5D(n1b, int(z), int(y), int(x), int(Dirac1Bv), int(cur))
+	State.Set5D(n2a, int(z), int(y), int(x), int(Dirac2Av), int(cur))
+	State.Set5D(n2b, int(z), int(y), int(x), int(Dirac2Bv), int(cur))
+	State.Set5D(q1a, int(z), int(y), int(x), int(Dirac1As), int(cur))
+	State.Set5D(q1b, int(z), int(y), int(x), int(Dirac1Bs), int(cur))
+	State.Set5D(q2a, int(z), int(y), int(x), int(Dirac2As), int(cur))
+	State.Set5D(q2b, int(z), int(y), int(x), int(Dirac2Bs), int(cur))
 }
 
 // DiracDampKernel is Sommerfeld damping on the boundary shell, as
@@ -290,11 +290,11 @@ func DiracDampKernel(i uint32) { //gosl:kernel
 	vo := int32(Dirac1Av) - int32(Dirac1As) // position to its velocity
 	for c := range 4 {                      // the four real components, all alike
 		vr := int32(Dirac1As) + int32(c)
-		pp := State.Value(int(z), int(y), int(x), int(vr), int(prv))
+		pp := State.Value5D(int(z), int(y), int(x), int(vr), int(prv))
 		f := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, vr, prv, pp)
 		v := csq * f // key damp: no +=
-		State.Set(v, int(z), int(y), int(x), int(vr+vo), int(cur))
-		State.Set(pp+v, int(z), int(y), int(x), int(vr), int(cur))
+		State.Set5D(v, int(z), int(y), int(x), int(vr+vo), int(cur))
+		State.Set5D(pp+v, int(z), int(y), int(x), int(vr), int(cur))
 	}
 }
 
@@ -370,10 +370,10 @@ func (ss *Sim) StatDiracSpin() func(init bool) {
 			for c.Y = range sz.Y {
 				for c.X = range sz.X {
 					f := c.AddScalar(1)
-					a1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur)))
-					b1 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur)))
-					a2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur)))
-					b2 := float64(State.Value(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur)))
+					a1 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac1As), int(cur)))
+					b1 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac1Bs), int(cur)))
+					a2 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac2As), int(cur)))
+					b2 := float64(State.Value5D(int(f.Z), int(f.Y), int(f.X), int(Dirac2Bs), int(cur)))
 					sx += 2 * (a1*a2 + b1*b2)
 					sy += 2 * (a1*b2 - b1*a2)
 					sz2 += (a1*a1 + b1*b1) - (a2*a2 + b2*b2)

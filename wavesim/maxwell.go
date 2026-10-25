@@ -91,15 +91,15 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 
 	csq := Params[0].CSq
 
-	a0pp := State.Value(int(z), int(y), int(x), int(A0s), int(prv))
-	aXpp := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+	a0pp := State.Value5D(int(z), int(y), int(x), int(A0s), int(prv))
+	aXpp := State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+	aYpp := State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+	aZpp := State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 
-	a0vp := State.Value(int(z), int(y), int(x), int(A0v), int(prv))
-	aXvp := State.Value(int(z), int(y), int(x), int(AXv), int(prv))
-	aYvp := State.Value(int(z), int(y), int(x), int(AYv), int(prv))
-	aZvp := State.Value(int(z), int(y), int(x), int(AZv), int(prv))
+	a0vp := State.Value5D(int(z), int(y), int(x), int(A0v), int(prv))
+	aXvp := State.Value5D(int(z), int(y), int(x), int(AXv), int(prv))
+	aYvp := State.Value5D(int(z), int(y), int(x), int(AYv), int(prv))
+	aZvp := State.Value5D(int(z), int(y), int(x), int(AZv), int(prv))
 
 	f0 := Laplacian19(x, y, z, int32(A0s), prv, a0pp)
 	fX := Laplacian19(x, y, z, int32(AXs), prv, aXpp)
@@ -138,25 +138,25 @@ func MaxwellKernel(i uint32) { //gosl:kernel
 	b := Curl10(x, y, z, int32(AXs), prv)
 
 	// E = -grad A0 - dA/dt
-	State.Set(-g.X-aXvp, int(z), int(y), int(x), int(EX), int(cur))
-	State.Set(-g.Y-aYvp, int(z), int(y), int(x), int(EY), int(cur))
-	State.Set(-g.Z-aZvp, int(z), int(y), int(x), int(EZ), int(cur))
+	State.Set5D(-g.X-aXvp, int(z), int(y), int(x), int(EX), int(cur))
+	State.Set5D(-g.Y-aYvp, int(z), int(y), int(x), int(EY), int(cur))
+	State.Set5D(-g.Z-aZvp, int(z), int(y), int(x), int(EZ), int(cur))
 
-	State.Set(b.X, int(z), int(y), int(x), int(BX), int(cur))
-	State.Set(b.Y, int(z), int(y), int(x), int(BY), int(cur))
-	State.Set(b.Z, int(z), int(y), int(x), int(BZ), int(cur))
+	State.Set5D(b.X, int(z), int(y), int(x), int(BX), int(cur))
+	State.Set5D(b.Y, int(z), int(y), int(x), int(BY), int(cur))
+	State.Set5D(b.Z, int(z), int(y), int(x), int(BZ), int(cur))
 
-	State.Set(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
-	State.Set(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
+	State.Set5D(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
+	State.Set5D(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
 
-	State.Set(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
-	State.Set(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
+	State.Set5D(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
+	State.Set5D(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
 
-	State.Set(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
-	State.Set(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
+	State.Set5D(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
+	State.Set5D(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
 
-	State.Set(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
-	State.Set(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
+	State.Set5D(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
+	State.Set5D(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
 }
 
 // MaxwellDampKernel is the kernel for computing the Maxwell EM equations,
@@ -175,10 +175,10 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 
 	csq := Params[0].CSq
 
-	a0pp := State.Value(int(z), int(y), int(x), int(A0s), int(prv))
-	aXpp := State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-	aYpp := State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-	aZpp := State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+	a0pp := State.Value5D(int(z), int(y), int(x), int(A0s), int(prv))
+	aXpp := State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+	aYpp := State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+	aZpp := State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 	f0 := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(A0s), prv, a0pp)
 	fX := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AXs), prv, aXpp)
 	fY := LaplacianEdge19(x, y, z, sz.X, sz.Y, sz.Z, int32(AYs), prv, aYpp)
@@ -200,17 +200,17 @@ func MaxwellDampKernel(i uint32) { //gosl:kernel
 	aZvc := fZ
 	aZpc := aZpp + aZvc
 
-	State.Set(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
-	State.Set(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
+	State.Set5D(a0vc, int(z), int(y), int(x), int(A0v), int(cur))
+	State.Set5D(a0pc, int(z), int(y), int(x), int(A0s), int(cur))
 
-	State.Set(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
-	State.Set(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
+	State.Set5D(aXvc, int(z), int(y), int(x), int(AXv), int(cur))
+	State.Set5D(aXpc, int(z), int(y), int(x), int(AXs), int(cur))
 
-	State.Set(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
-	State.Set(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
+	State.Set5D(aYvc, int(z), int(y), int(x), int(AYv), int(cur))
+	State.Set5D(aYpc, int(z), int(y), int(x), int(AYs), int(cur))
 
-	State.Set(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
-	State.Set(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
+	State.Set5D(aZvc, int(z), int(y), int(x), int(AZv), int(cur))
+	State.Set5D(aZpc, int(z), int(y), int(x), int(AZs), int(cur))
 }
 
 //gosl:end
@@ -429,9 +429,9 @@ func MovingCharge(ss *Sim) {
 	prv := ctx.PrevState()
 	sz := ss.Config.Size
 	for x := int32(1); x <= sz.X; x++ {
-		State.SetAdd(q, int(c.Z), int(c.Y), int(x), int(Charge), int(cur))
-		State.SetAdd(q, int(c.Z), int(c.Y), int(x), int(Charge), int(prv))
-		State.SetAdd(q*v, int(c.Z), int(c.Y), int(x), int(CurrentX), int(cur))
-		State.SetAdd(q*v, int(c.Z), int(c.Y), int(x), int(CurrentX), int(prv))
+		State.SetAdd5D(q, int(c.Z), int(c.Y), int(x), int(Charge), int(cur))
+		State.SetAdd5D(q, int(c.Z), int(c.Y), int(x), int(Charge), int(prv))
+		State.SetAdd5D(q*v, int(c.Z), int(c.Y), int(x), int(CurrentX), int(cur))
+		State.SetAdd5D(q*v, int(c.Z), int(c.Y), int(x), int(CurrentX), int(prv))
 	}
 }

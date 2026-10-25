@@ -72,11 +72,11 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
-	pvelA := State.Value(int(z), int(y), int(x), int(CabAv), int(prv))
-	pvelB := State.Value(int(z), int(y), int(x), int(CabBv), int(prv))
-	vpot := State.Value(int(z), int(y), int(x), int(CabV), int(prv))
+	pposA := State.Value5D(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value5D(int(z), int(y), int(x), int(CabBs), int(prv))
+	pvelA := State.Value5D(int(z), int(y), int(x), int(CabAv), int(prv))
+	pvelB := State.Value5D(int(z), int(y), int(x), int(CabBv), int(prv))
+	vpot := State.Value5D(int(z), int(y), int(x), int(CabV), int(prv))
 
 	mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
@@ -94,10 +94,10 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 	em := Params[0].EM.IsTrue()
 	var a0, ax, ay, az, omega float32
 	if em {
-		a0 = State.Value(int(z), int(y), int(x), int(A0s), int(prv))
-		ax = State.Value(int(z), int(y), int(x), int(AXs), int(prv))
-		ay = State.Value(int(z), int(y), int(x), int(AYs), int(prv))
-		az = State.Value(int(z), int(y), int(x), int(AZs), int(prv))
+		a0 = State.Value5D(int(z), int(y), int(x), int(A0s), int(prv))
+		ax = State.Value5D(int(z), int(y), int(x), int(AXs), int(prv))
+		ay = State.Value5D(int(z), int(y), int(x), int(AYs), int(prv))
+		az = State.Value5D(int(z), int(y), int(x), int(AZs), int(prv))
 		e2h := Params[0].E2OverH
 		cc := Params[0].C
 		asq := a0*a0 - (ax*ax + ay*ay + az*az)
@@ -147,21 +147,21 @@ func KleinGordonCKernel(i uint32) { //gosl:kernel
 		jy -= ja * ay
 		jz -= ja * az
 	}
-	State.Set(rho, int(z), int(y), int(x), int(Charge), int(cur))
-	State.Set(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
-	State.Set(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
-	State.Set(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
+	State.Set5D(rho, int(z), int(y), int(x), int(Charge), int(cur))
+	State.Set5D(jx, int(z), int(y), int(x), int(CurrentX), int(cur))
+	State.Set5D(jy, int(z), int(y), int(x), int(CurrentY), int(cur))
+	State.Set5D(jz, int(z), int(y), int(x), int(CurrentZ), int(cur))
 
 	// ccm, not the new position: Charge, Current and Mag are all diagnostics
 	// of the same instant, the one the midpoint velocity belongs to. Reading
 	// Mag a step later than Charge breaks rho = -e |chi|^2 by the amount the
 	// Laplacian moves |chi|^2 in one step.
-	State.Set(ccm, int(z), int(y), int(x), int(CabMag), int(cur))
-	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+	State.Set5D(ccm, int(z), int(y), int(x), int(CabMag), int(cur))
+	State.Set5D(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set5D(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
+	State.Set5D(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set5D(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 }
 
 // KleinGordonCDampKernel is the kernel for computing the KleinGordonC equations,
@@ -177,8 +177,8 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	sz := ctx.SizePlus1() // exclude updating on edges
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	pposA := State.Value(int(z), int(y), int(x), int(CabAs), int(prv))
-	pposB := State.Value(int(z), int(y), int(x), int(CabBs), int(prv))
+	pposA := State.Value5D(int(z), int(y), int(x), int(CabAs), int(prv))
+	pposB := State.Value5D(int(z), int(y), int(x), int(CabBs), int(prv))
 
 	// mhsq := Params[0].MOverHSq
 	csq := Params[0].CSq
@@ -193,11 +193,11 @@ func KleinGordonCDampKernel(i uint32) { //gosl:kernel
 	velB := csq * forceB
 	posB := pposB + velB
 
-	State.Set(velA, int(z), int(y), int(x), int(CabAv), int(cur))
-	State.Set(posA, int(z), int(y), int(x), int(CabAs), int(cur))
+	State.Set5D(velA, int(z), int(y), int(x), int(CabAv), int(cur))
+	State.Set5D(posA, int(z), int(y), int(x), int(CabAs), int(cur))
 
-	State.Set(velB, int(z), int(y), int(x), int(CabBv), int(cur))
-	State.Set(posB, int(z), int(y), int(x), int(CabBs), int(cur))
+	State.Set5D(velB, int(z), int(y), int(x), int(CabBv), int(cur))
+	State.Set5D(posB, int(z), int(y), int(x), int(CabBs), int(cur))
 }
 
 //gosl:end

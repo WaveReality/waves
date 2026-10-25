@@ -588,24 +588,30 @@ const  WaveKinetic: WaveStates = 4;
 const  WavePotential: WaveStates = 5;
 const  WaveEnergy: WaveStates = 6;
 fn WaveDampKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var face = Context_EdgeCoords(ctx, i, &x, &y, &z);
-; if (face < 0) {
-	return;
-}; var sz = Context_SizePlus1(ctx);
-; // exclude updating on edges
-var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
-; var force: f32;; if (Params[0].ThreeD == 1) {
-	force = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
-} else {
-	force = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
-}; var vel = Params[0].CSq * force;
-; // key damp: no +=
-var pos = ppos + vel;
-; StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));; StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));; StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur))); }
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var face = Context_EdgeCoords(ctx, i, &x, &y, &z);
+	if (face < 0) {
+		return;
+	}
+	var sz = Context_SizePlus1(ctx); // exclude updating on edges
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var ppos = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(prv)));
+	var force: f32;
+	if (Params[0].ThreeD == 1) {
+		force = LaplacianEdge19(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
+	} else {
+		force = LaplacianEdge1D(x, y, z, sz.x, sz.y, sz.z, i32(WavePos), prv, ppos);
+	}
+	var vel = Params[0].CSq * force; // key damp: no +=
+	var pos = ppos + vel;
+	StateSet(force, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveForce), u32(cur)));
+	StateSet(vel, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveVel), u32(cur)));
+	StateSet(pos, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WavePos), u32(cur)));
+}
 
 //////// import: "wavec.go"
 alias WaveCStates = i32; //enums:enum -trim-prefix=Wave

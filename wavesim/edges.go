@@ -360,8 +360,8 @@ func EdgesOpenKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	nvars := ctx.NVars
 	for vi := range nvars {
-		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(cur)), int(z), int(y), int(x), int(vi), int(cur))
-		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(prv)), int(z), int(y), int(x), int(vi), int(prv))
+		State.Set5D(State.Value5D(int(sz), int(sy), int(sx), int(vi), int(cur)), int(z), int(y), int(x), int(vi), int(cur))
+		State.Set5D(State.Value5D(int(sz), int(sy), int(sx), int(vi), int(prv)), int(z), int(y), int(x), int(vi), int(prv))
 	}
 }
 
@@ -377,8 +377,8 @@ func EdgesWrapKernel(i uint32) { //gosl:kernel
 	prv := ctx.PrevState()
 	nvars := ctx.NVars
 	for vi := range nvars {
-		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(cur)), int(z), int(y), int(x), int(vi), int(cur))
-		State.Set(State.Value(int(sz), int(sy), int(sx), int(vi), int(prv)), int(z), int(y), int(x), int(vi), int(prv))
+		State.Set5D(State.Value5D(int(sz), int(sy), int(sx), int(vi), int(cur)), int(z), int(y), int(x), int(vi), int(cur))
+		State.Set5D(State.Value5D(int(sz), int(sy), int(sx), int(vi), int(prv)), int(z), int(y), int(x), int(vi), int(prv))
 	}
 }
 

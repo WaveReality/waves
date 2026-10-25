@@ -57,10 +57,10 @@ func WaveCDirKernel(i uint32) { //gosl:kernel
 	}
 	cur := ctx.CurState
 	prv := ctx.PrevState()
-	oa := State.Value(int(z), int(y), int(x), int(WaveCa), int(cur)) // psi(t-1), not yet overwritten
-	ob := State.Value(int(z), int(y), int(x), int(WaveCb), int(cur))
-	na := State.Value(int(z), int(y), int(x), int(WaveCa), int(prv)) // psi(t)
-	nb := State.Value(int(z), int(y), int(x), int(WaveCb), int(prv))
+	oa := State.Value5D(int(z), int(y), int(x), int(WaveCa), int(cur)) // psi(t-1), not yet overwritten
+	ob := State.Value5D(int(z), int(y), int(x), int(WaveCb), int(cur))
+	na := State.Value5D(int(z), int(y), int(x), int(WaveCa), int(prv)) // psi(t)
+	nb := State.Value5D(int(z), int(y), int(x), int(WaveCb), int(prv))
 
 	var ga, gb math32.Vector3
 	if Params[0].ThreeD.IsTrue() {
@@ -78,11 +78,11 @@ func WaveCDirKernel(i uint32) { //gosl:kernel
 		pa *= df
 		pb *= df
 	}
-	State.Set(pa, int(z), int(y), int(x), int(WaveCa), int(cur))
-	State.Set(pb, int(z), int(y), int(x), int(WaveCb), int(cur))
+	State.Set5D(pa, int(z), int(y), int(x), int(WaveCa), int(cur))
+	State.Set5D(pb, int(z), int(y), int(x), int(WaveCb), int(cur))
 	// staggered, as every three-level leapfrog wants: the product of adjacent
 	// levels is what is conserved, and squaring one alone ripples instead
-	State.Set(na*pa+nb*pb, int(z), int(y), int(x), int(WaveCMag), int(cur))
+	State.Set5D(na*pa+nb*pb, int(z), int(y), int(x), int(WaveCMag), int(cur))
 }
 
 // Damping for this one is [EdgesOpenKernel], not a Sommerfeld kernel: the
@@ -180,10 +180,10 @@ func (ss *Sim) WaveCDirPacketAt(wavelength, amp float32) {
 				} else {
 					na, oa = en, eo
 				}
-				State.SetAdd(na, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
-				State.SetAdd(nb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
-				State.SetAdd(oa, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
-				State.SetAdd(ob, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
+				State.SetAdd5D(na, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(prv))
+				State.SetAdd5D(nb, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(prv))
+				State.SetAdd5D(oa, int(f.Z), int(f.Y), int(f.X), int(WaveCa), int(cur))
+				State.SetAdd5D(ob, int(f.Z), int(f.Y), int(f.X), int(WaveCb), int(cur))
 			}
 		}
 	}

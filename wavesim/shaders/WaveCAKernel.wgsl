@@ -524,21 +524,27 @@ const  WaveCa: WaveCStates = 0;
 const  WaveCb: WaveCStates = 1;
 const  WaveCMag: WaveCStates = 2;
 fn WaveCAKernel(i: u32) { //gosl:kernel
-let ctx = Ctx[0];; var x: i32;
-var y: i32;
-var z: i32;; var ok = Context_StateCoords(ctx, i, &x, &y, &z);
-; if (!ok) {
-	return;
-}; var cur = ctx.CurState;
-; var prv = Context_PrevState(ctx);
-; var pa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(prv)));
-; var pb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(prv)));
-; var lb: f32;; if (Params[0].ThreeD == 1) {
-	lb = Laplacian19(x, y, z, i32(WaveCb), prv, pb);
-} else {
-	lb = Laplacian1D(x, y, z, i32(WaveCb), prv, pb);
-}; StateSet(pa - Params[0].C*lb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
-TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur))); }
+	let ctx = Ctx[0];
+	var x: i32;
+	var y: i32;
+	var z: i32;
+	var ok = Context_StateCoords(ctx, i, &x, &y, &z);
+	if (!ok) {
+		return;
+	}
+	var cur = ctx.CurState;
+	var prv = Context_PrevState(ctx);
+	var pa = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(prv)));
+	var pb = StateGet(Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42], TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCb), u32(prv)));
+	var lb: f32;
+	if (Params[0].ThreeD == 1) {
+		lb = Laplacian19(x, y, z, i32(WaveCb), prv, pb);
+	} else {
+		lb = Laplacian1D(x, y, z, i32(WaveCb), prv, pb);
+	}
+	StateSet(pa - Params[0].C*lb, Index5D(TensorStrides[40], TensorStrides[41], TensorStrides[42],
+	TensorStrides[43], TensorStrides[44], u32(z), u32(y), u32(x), u32(WaveCa), u32(cur)));
+}
 
 //////// import: "wavecdir.go"
 
