@@ -9,7 +9,7 @@ import (
 
 	"cogentcore.org/core/core"
 	"cogentcore.org/core/math32"
-	_ "cogentcore.org/lab/yaegilab"
+	_ "cogentcore.org/lab/mvmlab"
 	"github.com/WaveReality/waves/wavesim"
 )
 

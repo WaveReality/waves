@@ -1,0 +1,7 @@
+#!/bin/sh
+# make generates the symbols of the waves packages, one gen_*.go file per
+# package, with mvm extract -register.
+set -e
+cd "$(dirname "$0")"
+/bin/rm -f gen_*.go
+go run github.com/cogentcore/mvm/cmd/extract -register -pkg mvmwaves github.com/WaveReality/waves/wavesim
