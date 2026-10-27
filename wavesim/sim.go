@@ -140,17 +140,44 @@ func RunSim(cfg *Config, configFunc, initFunc func(sim *Sim)) *Sim {
 	return sim
 }
 
-func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim { //yaegi:add
-	cfg := &Config{}
-	cfg.Defaults()
-	cfg.GUI = true
+// Embed makes a new sim with its GUI in the given parent, as in a page of a
+// content app. The GUI is made in a frame that, when it is destroyed (as
+// when the page is left), stops the sim and then releases its GPU (see
+// [Sim.Destroy]). As the state and GPU of sims are global, the sim is made
+// once all of the sims that are being released are, in another goroutine
+// if any are.
+func Embed(parent tree.Node, configFunc, initFunc func(sim *Sim)) *Sim {
 	sim := &Sim{}
-	sim.Config = cfg
-	sim.ConfigFunc = configFunc
-	sim.InitFunc = initFunc
-	sim.ConfigSim()
-	sim.ConfigGUI(parent)
-	sim.Init()
+	sf := tree.New[simFrame](parent)
+	sf.sim = sim
+	sf.released = make(chan struct{})
+	newSim := func() {
+		cfg := &Config{}
+		cfg.Defaults()
+		cfg.GUI = true
+		sim.Config = cfg
+		sim.ConfigFunc = configFunc
+		sim.InitFunc = initFunc
+		sim.ConfigSim()
+		sim.ConfigGUI(sf)
+		sim.Init()
+	}
+
+	// The sim is made after the sims that are being released are.
+	pending := pendingReleases()
+	if len(pending) == 0 {
+		newSim()
+		return sim
+	}
+	go func() {
+		for _, c := range pending {
+			<-c
+		}
+		sf.AsyncLock()
+		newSim()
+		sf.Update()
+		sf.AsyncUnlock()
+	}()
 	return sim
 }
 
